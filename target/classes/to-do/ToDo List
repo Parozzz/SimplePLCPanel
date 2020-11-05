@@ -1,0 +1,13 @@
+1) Quick Setup Width/Height properties only update after have the control re-clicked.
+
+2) Add control wrapper duplication
+2.1) Allow CTRL+C , CTRL+V
+2.2) When duplicate add a little offset to the layoutX and layoutY of the cloned
+2.3) Allow to clone every selected ControlWrapper
+
+Control Wrapper Selection
+
+1)☑ Have a "main" selection that will be the main to gather information for the quick setup
+1.1)☑ The main selection is also the one's parameters visualized in the quick setup
+
+2) Allow changing parameters to multiple control wrappers at the same time

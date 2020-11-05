@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<BorderPane prefHeight="200.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="262.0" prefWidth="327.0" BorderPane.alignment="CENTER">
+         <children>
+            <ChoiceBox fx:id="plcTypeChoiceBox" layoutX="23.0" layoutY="44.0" prefHeight="37.0" prefWidth="272.0" AnchorPane.leftAnchor="23.0" AnchorPane.rightAnchor="23.0" />
+            <Button fx:id="setupPLCComunicationButton" alignment="CENTER" layoutX="23.0" layoutY="94.0" mnemonicParsing="false" text="Setup PLC Comunication" AnchorPane.leftAnchor="23.0" AnchorPane.rightAnchor="23.0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+            </Button>
+            <Button fx:id="createPageButton" alignment="CENTER" layoutX="23.0" layoutY="207.0" mnemonicParsing="false" text="Create Page" AnchorPane.leftAnchor="23.0" AnchorPane.rightAnchor="23.0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+            </Button>
+            <Label alignment="CENTER" layoutX="43.0" layoutY="163.0" prefHeight="27.0" prefWidth="99.0" text="Page Size">
+               <font>
+                  <Font size="17.0" />
+               </font>
+            </Label>
+            <TextField fx:id="pageWidthTextField" alignment="CENTER" layoutX="158.0" layoutY="161.0" prefHeight="31.0" prefWidth="53.0">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </TextField>
+            <TextField fx:id="pageHeightTextField" alignment="CENTER" layoutX="231.0" layoutY="161.0" prefHeight="25.0" prefWidth="53.0">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </TextField>
+            <Label layoutX="217.0" layoutY="168.0" text="X" />
+            <Label layoutX="143.0" layoutY="6.0" text="PLC" AnchorPane.leftAnchor="143.0" AnchorPane.rightAnchor="142.0">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+         </children>
+      </AnchorPane>
+   </center>
+   <top>
+      <MenuBar prefHeight="25.0" prefWidth="322.0" BorderPane.alignment="CENTER">
+         <menus>
+            <Menu mnemonicParsing="false" text="File">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="Close" />
+               </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Page">
+               <items>
+                  <CustomMenuItem hideOnClick="false" mnemonicParsing="false">
+                     <content>
+                        <CheckBox fx:id="setPageFullScreenCheckBox" graphicTextGap="0.0" style="-fx-text-fill: black;" text="FullScreen" />
+                     </content>
+                  </CustomMenuItem>
+                  <CustomMenuItem hideOnClick="false" mnemonicParsing="false" text="Unspecified Action">
+                     <content>
+                        <CheckBox fx:id="setPageAtStartupCheckBox" style="-fx-text-fill: black;" text="Startup" />
+                     </content>
+                  </CustomMenuItem>
+               </items>
+            </Menu>
+            <Menu mnemonicParsing="false">
+               <graphic>
+                  <RadioButton fx:id="plcConnectedRadioButton" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" text="PLC Connected" />
+               </graphic>
+            </Menu>
+         </menus>
+      </MenuBar>
+   </top>
+   <bottom>
+      <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="120.0" prefWidth="327.0" vbarPolicy="NEVER" BorderPane.alignment="CENTER">
+         <content>
+            <HBox fx:id="bottomScrollingHBox" alignment="BASELINE_LEFT" />
+         </content>
+      </ScrollPane>
+   </bottom>
+</BorderPane>

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <AnchorPane maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="225.0" prefWidth="400.0" style="-fx-border-color: darkgray; -fx-border-width: 1;">
+         <children>
+            <Label layoutX="174.0" layoutY="5.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Font">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label alignment="CENTER" layoutX="59.0" layoutY="124.0" text="Font Type">
+               <font>
+                  <Font size="20.0" />
+               </font>
+            </Label>
+            <StackPane layoutX="24.0" layoutY="49.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity">
+               <children>
+                  <ColorPicker fx:id="textColorPicker" prefHeight="35.0" prefWidth="157.0" />
+               </children>
+            </StackPane>
+            <StackPane layoutX="307.0" layoutY="32.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity">
+               <children>
+                  <ToggleButton fx:id="boldTextStyleButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="33.0" prefWidth="33.0" text="B">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                  </ToggleButton>
+               </children>
+            </StackPane>
+            <StackPane layoutX="351.0" layoutY="32.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity">
+               <children>
+                  <ToggleButton fx:id="italicTextStyleButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="33.0" prefWidth="33.0" text="B">
+                     <font>
+                        <Font name="System Italic" size="15.0" />
+                     </font>
+                  </ToggleButton>
+               </children>
+            </StackPane>
+            <StackPane layoutX="328.0" layoutY="72.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity">
+               <children>
+                  <ToggleButton fx:id="underlineButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="33.0" prefWidth="33.0" text="B" underline="true">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </ToggleButton>
+               </children>
+            </StackPane>
+            <StackPane layoutX="208.0" layoutY="50.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity">
+               <children>
+                  <ComboBox fx:id="textSizeComboBox" editable="true" prefHeight="33.0" prefWidth="75.0" promptText="Size" />
+               </children>
+            </StackPane>
+            <StackPane layoutX="174.0" layoutY="123.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity">
+               <children>
+                  <ComboBox fx:id="fontComboBox" prefHeight="33.0" prefWidth="184.0" style="-fx-font-size: 14;" visibleRowCount="20" />
+               </children>
+            </StackPane>
+            <StackPane layoutX="191.0" layoutY="179.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity">
+               <children>
+                  <ChoiceBox fx:id="textPositionChoiceBox" prefHeight="30.0" prefWidth="150.0" style="-fx-font-size: 14;" />
+               </children>
+            </StackPane>
+            <Label alignment="CENTER" layoutX="40.0" layoutY="179.0" prefHeight="30.0" prefWidth="126.0" text="Text Position">
+               <font>
+                  <Font size="20.0" />
+               </font>
+            </Label>
+         </children>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+      </AnchorPane>
+      <AnchorPane maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="90.0" prefWidth="400.0" style="-fx-border-color: darkgray; -fx-border-width: 1;">
+         <children>
+            <Label layoutX="21.0" layoutY="53.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Size" AnchorPane.bottomAnchor="30.0" AnchorPane.topAnchor="30.0">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label layoutX="229.0" layoutY="17.0" text="Width" AnchorPane.topAnchor="10.0">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <Label layoutX="226.0" layoutY="84.0" text="Height" AnchorPane.bottomAnchor="10.0">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <StackPane layoutX="103.0" layoutY="57.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" AnchorPane.bottomAnchor="30.0" AnchorPane.topAnchor="30.0">
+               <children>
+                  <CheckBox fx:id="adaptCheckbox" mnemonicParsing="false" prefHeight="27.0" prefWidth="87.0" text="Adapt">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </CheckBox>
+               </children>
+            </StackPane>
+            <StackPane layoutX="300.0" layoutY="17.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" AnchorPane.topAnchor="10.0">
+               <children>
+                  <TextField fx:id="widthTextField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="75.0" promptText="Width">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </TextField>
+               </children>
+            </StackPane>
+            <StackPane layoutX="300.0" layoutY="84.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" AnchorPane.bottomAnchor="10.0">
+               <children>
+                  <TextField fx:id="heightTextField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="75.0" promptText="Height">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </TextField>
+               </children>
+            </StackPane>
+         </children>
+         <VBox.margin>
+            <Insets top="-1.0" />
+         </VBox.margin>
+      </AnchorPane>
+   </children>
+</VBox>

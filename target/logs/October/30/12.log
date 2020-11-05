@@ -1,0 +1,78 @@
+[30-10-2020 12:00:59]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[30-10-2020 12:01:14]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[30-10-2020 12:01:29]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[30-10-2020 12:01:44]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[30-10-2020 12:02:14]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[30-10-2020 12:02:29]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[30-10-2020 12:02:44]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[30-10-2020 12:02:59]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[30-10-2020 12:03:14]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[30-10-2020 12:05:11]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[30-10-2020 12:05:26]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[30-10-2020 12:06:54]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[30-10-2020 12:07:09]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ContextMenu?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <bottom>
+      <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="100.0" prefWidth="800.0" BorderPane.alignment="CENTER">
+         <children>
+            <StackPane fx:id="previewStackPane" layoutX="10.0" layoutY="2.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="2.0" />
+         </children>
+      </AnchorPane>
+   </bottom>
+   <center>
+      <HBox prefHeight="100.0" prefWidth="200.0" spacing="1.0" BorderPane.alignment="CENTER">
+         <children>
+            <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" style="-fx-border-color: darkgray; -fx-border-width: 2;" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" style="-fx-background-color: #dddddd;" text="Global Attributes" VBox.vgrow="NEVER">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </Label>
+                  <TabPane fx:id="globalTabPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </TabPane>
+               </children>
+               <HBox.margin>
+                  <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+               </HBox.margin>
+            </VBox>
+            <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" style="-fx-border-color: darkgray; -fx-border-width: 2;" HBox.hgrow="ALWAYS">
+               <children>
+                  <HBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" style="-fx-background-color: #dddddd;">
+                     <children>
+                        <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" text="State Attributes" textAlignment="CENTER" HBox.hgrow="ALWAYS">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Label>
+                        <ToggleButton fx:id="selectMultipleToggleButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" style="-fx-border-color: darkgray; -fx-border-width: 2;">
+                           <graphic>
+                              <ImageView fx:id="selectMultipleImageView" fitHeight="19.0" fitWidth="25.0" pickOnBounds="true">
+                                 <image>
+                                    <Image url="@../images/select_multiple_icon.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                           <HBox.margin>
+                              <Insets right="3.0" />
+                           </HBox.margin>
+                           <padding>
+                              <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                           </padding>
+                        </ToggleButton>
+                        <Button fx:id="writeToAllStateButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" style="-fx-border-color: darkgray; -fx-border-width: 2;">
+                           <graphic>
+                              <ImageView fx:id="writeToAllStateImageView" fitHeight="19.0" fitWidth="25.0" pickOnBounds="true">
+                                 <image>
+                                    <Image url="@../images/write_to_all_icon.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                           <HBox.margin>
+                              <Insets right="3.0" />
+                           </HBox.margin>
+                           <padding>
+                              <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                           </padding>
+                        </Button>
+                     </children>
+                  </HBox>
+                  <TabPane fx:id="stateTabPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </TabPane>
+               </children>
+               <HBox.margin>
+                  <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+               </HBox.margin>
+            </VBox>
+         </children>
+      </HBox>
+   </center>
+   <top>
+      <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" BorderPane.alignment="CENTER">
+         <children>
+            <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="54.0" prefWidth="800.0">
+               <children>
+                  <Label alignment="CENTER" layoutX="267.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="28.0" prefWidth="63.0" text="State" AnchorPane.bottomAnchor="10.0" AnchorPane.topAnchor="10.0">
+                     <font>
+                        <Font name="System Bold" size="24.0" />
+                     </font>
+                  </Label>
+                  <ChoiceBox fx:id="stateSelectionChoiceBox" layoutX="345.0" layoutY="11.0" prefHeight="30.0" prefWidth="188.0" AnchorPane.bottomAnchor="9.0" AnchorPane.topAnchor="11.0">
+                     <contextMenu>
+                        <ContextMenu>
+                           <items>
+                              <MenuItem fx:id="createStateMenuItem" mnemonicParsing="false" text="Create" />
+                              <MenuItem fx:id="deleteStateMenuItem" mnemonicParsing="false" text="Delete" />
+                           </items>
+                        </ContextMenu>
+                     </contextMenu>
+                  </ChoiceBox>
+                  <AnchorPane fx:id="createStateAnchorPane" layoutX="78.0" layoutY="2.0" prefHeight="53.0" prefWidth="400.0" style="-fx-background-color: -fx-background;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <ChoiceBox fx:id="stateCreationSelectChoiceBox" layoutX="205.0" layoutY="13.0" prefHeight="36.0" prefWidth="98.0" AnchorPane.bottomAnchor="11.0" AnchorPane.topAnchor="13.0" />
+                        <Label fx:id="stateTypeLabel" alignment="CENTER" layoutX="372.0" layoutY="11.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="32.0" prefWidth="76.0" text="&lt;=X&lt;=" AnchorPane.bottomAnchor="11.0" AnchorPane.topAnchor="11.0">
+                           <font>
+                              <Font size="22.0" />
+                           </font>
+                        </Label>
+                        <TextField fx:id="lowerStateValueTextField" alignment="CENTER" layoutX="311.0" layoutY="13.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="62.0" promptText="L" AnchorPane.bottomAnchor="11.0" AnchorPane.topAnchor="13.0">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </TextField>
+                        <TextField fx:id="higherStateValueTextField" alignment="CENTER" layoutX="448.0" layoutY="13.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="62.0" promptText="H" AnchorPane.bottomAnchor="11.0" AnchorPane.topAnchor="13.0">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </TextField>
+                        <Button fx:id="addStateCreationButton" alignment="CENTER" contentDisplay="CENTER" layoutX="526.0" layoutY="13.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" opacity="0.84" prefHeight="30.0" prefWidth="30.0" style="-fx-background-color: green;" text="✓" textAlignment="CENTER" textFill="WHITE" AnchorPane.bottomAnchor="11.0" AnchorPane.topAnchor="13.0">
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </Button>
+                        <Button fx:id="closeStateCreationButton" alignment="CENTER" contentDisplay="CENTER" graphicTextGap="0.0" layoutX="566.0" layoutY="13.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" opacity="0.84" prefHeight="30.0" prefWidth="30.0" snapToPixel="false" style="-fx-background-color: red;" text="X" textAlignment="CENTER" textFill="WHITE" textOverrun="CENTER_ELLIPSIS" wrapText="true" AnchorPane.bottomAnchor="11.0" AnchorPane.topAnchor="13.0">
+                           <font>
+                              <Font name="System Bold" size="15.0" />
+                           </font>
+                        </Button>
+                     </children>
+                  </AnchorPane>
+               </children>
+            </AnchorPane>
+         </children>
+      </VBox>
+   </top>
+</BorderPane>

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.CustomMenuItem?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <top>
+      <MenuBar maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" BorderPane.alignment="TOP_CENTER">
+         <menus>
+            <Menu mnemonicParsing="false" text="File">
+               <items>
+                  <MenuItem fx:id="saveMenuItem" mnemonicParsing="false" text="Save" />
+                  <MenuItem fx:id="settingsMenuItem" mnemonicParsing="false" text="Settings" />
+                  <MenuItem fx:id="pictureBankMenuItem" mnemonicParsing="false" text="Picture Bank" />
+                  <MenuItem fx:id="messagesMenuItem" mnemonicParsing="false" text="Messages" />
+               </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Page">
+               <items>
+                  <MenuItem fx:id="createPageMenuItem" mnemonicParsing="false" text="Create New" />
+                  <CustomMenuItem hideOnClick="false" mnemonicParsing="false">
+                     <content>
+                        <Label contentDisplay="RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Scale (%)">
+                           <graphic>
+                              <TextField fx:id="zoomTextField" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="50.0" />
+                           </graphic>
+                        </Label>
+                     </content>
+                  </CustomMenuItem>
+                  <CustomMenuItem mnemonicParsing="false">
+                     <content>
+                        <Label alignment="CENTER" contentDisplay="RIGHT" graphicTextGap="7.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Width">
+                           <graphic>
+                              <TextField fx:id="pageWidthTextField" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" nodeOrientation="RIGHT_TO_LEFT" prefWidth="50.0">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </TextField>
+                           </graphic>
+                        </Label>
+                     </content>
+                  </CustomMenuItem>
+                  <CustomMenuItem mnemonicParsing="false">
+                     <content>
+                        <Label alignment="CENTER" contentDisplay="RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Height">
+                           <graphic>
+                              <TextField fx:id="pageHeightTextField" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" nodeOrientation="RIGHT_TO_LEFT" prefWidth="50.0">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </TextField>
+                           </graphic>
+                        </Label>
+                     </content>
+                  </CustomMenuItem>
+               </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Setup">
+               <items>
+                  <MenuItem fx:id="startReadOnlyMenuItem" mnemonicParsing="false" text="Start" />
+                  <CustomMenuItem hideOnClick="false" mnemonicParsing="false">
+                     <content>
+                        <CheckBox fx:id="setPageFullScreenCheckBox" graphicTextGap="0.0" nodeOrientation="RIGHT_TO_LEFT" style="-fx-text-fill: black;" text="FullScreen" />
+                     </content>
+                  </CustomMenuItem>
+                  <CustomMenuItem hideOnClick="false" mnemonicParsing="false" text="Unspecified Action">
+                     <content>
+                        <CheckBox fx:id="setPageAtStartupCheckBox" nodeOrientation="RIGHT_TO_LEFT" style="-fx-text-fill: black;" text="Startup" />
+                     </content>
+                  </CustomMenuItem>
+               </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Communication">
+               <items>
+                  <MenuItem fx:id="setupCommunicationMenuItem" mnemonicParsing="false" text="Setup" />
+                  <CustomMenuItem hideOnClick="false" mnemonicParsing="false">
+                     <content>
+                        <RadioButton fx:id="connectedRadioButton" alignment="TOP_RIGHT" graphicTextGap="0.0" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" style="-fx-text-fill: black;" text="Connected" />
+                     </content>
+                  </CustomMenuItem>
+               </items>
+            </Menu>
+         </menus>
+      </MenuBar>
+   </top>
+   <bottom>
+      <ScrollPane fitToHeight="true" fitToWidth="true" focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" vbarPolicy="NEVER" BorderPane.alignment="BOTTOM_CENTER">
+         <content>
+            <HBox fx:id="bottomScrollingHBox" alignment="CENTER" spacing="4.0" />
+         </content>
+         <BorderPane.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </BorderPane.margin>
+      </ScrollPane>
+   </bottom>
+   <left>
+      <StackPane fx:id="leftStackPane" maxHeight="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" style="-fx-border-color: lightgray; -fx-border-width: 2;" BorderPane.alignment="CENTER">
+         <BorderPane.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </BorderPane.margin>
+      </StackPane>
+   </left>
+   <center>
+      <VBox fx:id="centerMainVBox" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" style="-fx-border-color: lightgray; -fx-border-width: 2;" BorderPane.alignment="CENTER">
+         <children>
+            <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity">
+               <children>
+                  <Label fx:id="centerTopLabel" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" text="OPS!">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Label>
+               </children>
+            </StackPane>
+            <StackPane alignment="TOP_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" style="-fx-border-color: lightgray; -fx-border-width: 2 0 0 0;">
+               <children>
+                  <ScrollPane focusTraversable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0">
+                     <content>
+                        <Group>
+                           <children>
+                              <StackPane fx:id="centerScrollStackPane" alignment="TOP_LEFT" layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="50.0" minWidth="50.0" style="-fx-border-color: darkgray; -fx-border-width: 2;" />
+                           </children>
+                        </Group>
+                     </content>
+                     <StackPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </StackPane.margin>
+                  </ScrollPane>
+               </children>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </StackPane>
+         </children>
+         <BorderPane.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </BorderPane.margin>
+      </VBox>
+   </center>
+   <right>
+      <StackPane fx:id="rightStackPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-color: lightgray; -fx-border-width: 2;" BorderPane.alignment="CENTER">
+         <BorderPane.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </BorderPane.margin>
+      </StackPane>
+   </right>
+</BorderPane>
