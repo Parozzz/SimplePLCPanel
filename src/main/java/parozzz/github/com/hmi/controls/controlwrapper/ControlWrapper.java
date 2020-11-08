@@ -110,7 +110,7 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
         Stream.of(containerStackPane.widthProperty(), containerStackPane.heightProperty()).forEach(property ->
                 property.addListener((observableValue, oldValue, newValue) ->
                 {
-                    if(selected.get())
+                    if (selected.get())
                     {
                         ControlWrapperBorderCreator.applySelectedBorder(this);
                     }
@@ -121,7 +121,7 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
         {
             var selectionManager = controlContainerPane.getSelectionManager();
             //In this system, if i have control down and there is no selected the first will be added and deleted right away
-            if(!mouseEvent.isControlDown() && selectionManager.isEmpty())
+            if (!mouseEvent.isControlDown() && selectionManager.isEmpty())
             {
                 selectionManager.set(this);
             }
@@ -132,22 +132,24 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
 
         containerStackPane.addEventFilter(MouseEvent.MOUSE_RELEASED, mouseReleasedEventHandler = mouseEvent ->
         {
-            if(!isDragged)
+            if (isDragged)
             {
-                var selectionManager = controlContainerPane.getSelectionManager();
-                if(mouseEvent.isControlDown())
+                return;
+            }
+
+            var selectionManager = controlContainerPane.getSelectionManager();
+            if (mouseEvent.isControlDown())
+            {
+                if (selected.get())
                 {
-                    if(selected.get())
-                    {
-                        selectionManager.remove(this);
-                    }else
-                    {
-                        selectionManager.add(this);
-                    }
-                }else
+                    selectionManager.remove(this);
+                } else
                 {
-                    selectionManager.set(this);
+                    selectionManager.add(this);
                 }
+            } else
+            {
+                selectionManager.set(this);
             }
         });
 
@@ -163,7 +165,7 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
                     stateMap.forEach(wrapperState ->
                     {
                         var baseAttribute = AttributeFetcher.fetch(wrapperState, BaseAttribute.class);
-                        if(baseAttribute != null)
+                        if (baseAttribute != null)
                         {
                             baseAttribute.setValue(BaseAttribute.WIDTH, (int) Math.floor(width));
                         }
@@ -173,7 +175,7 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
                     stateMap.forEach(wrapperState ->
                     {
                         var baseAttribute = AttributeFetcher.fetch(wrapperState, BaseAttribute.class);
-                        if(baseAttribute != null)
+                        if (baseAttribute != null)
                         {
                             baseAttribute.setValue(BaseAttribute.HEIGHT, (int) Math.floor(height));
                         }
@@ -186,10 +188,10 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
     {
         super.loop();
 
-        if(!readOnly)
+        if (!readOnly)
         {
             var trigType = selected.checkTrig();
-            switch(trigType)
+            switch (trigType)
             {
                 case FALLING:
                     ControlWrapperBorderCreator.applyDashedBorder(this);
@@ -199,7 +201,7 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
                     break;
             }
 
-            if(mainSelection.checkTrig() == TrigBoolean.TrigType.RISING)
+            if (mainSelection.checkTrig() == TrigBoolean.TrigType.RISING)
             {
                 ControlWrapperBorderCreator.applySelectedBorder(this);
             }
@@ -253,7 +255,7 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
     public void setSelected(boolean selected)
     {
         this.selected.set(selected);
-        if(!selected)
+        if (!selected)
         {
             this.mainSelection.set(false);
         }
@@ -271,7 +273,7 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
 
     public void setExtraFeature(ControlWrapperExtraFeature extraFeature)
     {
-        if(this.extraFeature != null)
+        if (this.extraFeature != null)
         {
             this.extraFeature.unbind();
         }
@@ -389,16 +391,16 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
     public void applyAttributes(C control, Pane containerPane, AttributeMap attributeMap)
     {
         var backgroundAttribute = AttributeFetcher.fetch(attributeMap, BackgroundAttribute.class);
-        if(backgroundAttribute != null)
+        if (backgroundAttribute != null)
         {
             control.setBorder(backgroundAttribute.getBorder());
             control.setBackground(backgroundAttribute.getBackground());
         }
 
-        if(control == this.control) //This needs to be set only
+        if (control == this.control) //This needs to be set only
         {
             var extraFunctionAttribute = AttributeFetcher.fetch(globalAttributeMap, ExtraFunctionAttribute.class);
-            if(extraFunctionAttribute != null
+            if (extraFunctionAttribute != null
                     && extraFunctionAttribute.getValue(ExtraFunctionAttribute.TYPE) == ControlWrapperExtraFeature.Type.CHANGE_PAGE)
             {
                 var pageName = extraFunctionAttribute.getValue(ExtraFunctionAttribute.PAGE_NAME);
@@ -420,7 +422,7 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
             change.next();
             change.getAddedSubList().forEach(addedNode ->
             {
-                if(addedNode instanceof Text)
+                if (addedNode instanceof Text)
                 {
                     var text = (Text) addedNode;
                     text.setBoundsType(TextBoundsType.VISUAL);

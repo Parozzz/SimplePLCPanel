@@ -1,8 +1,10 @@
 package parozzz.github.com.hmi.util.specialfunction;
 
+import javafx.application.Platform;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import parozzz.github.com.hmi.util.DoubleClickable;
+import parozzz.github.com.hmi.util.FXUtil;
 
 final class DoubleClickFunction
 {
@@ -19,10 +21,10 @@ final class DoubleClickFunction
         this.runnable = runnable;
     }
 
-    void onMousePressed(MouseEvent mouseEvent)
+    void onMouseReleased(MouseEvent mouseEvent)
     {
         //If a click is done in a special way, do not count it as click and reset the timestamp
-        if(mouseEvent.getButton() != mouseButton
+        if (mouseEvent.getButton() != mouseButton
                 || mouseEvent.isControlDown() || mouseEvent.isAltDown()
                 || mouseEvent.isShiftDown() || !doubleClickable.canDoubleClick())
         {
@@ -31,7 +33,7 @@ final class DoubleClickFunction
         }
 
         //If first time or the time has passed, refresh the timestamp
-        if(System.currentTimeMillis() - lastClickTimestamp > 350)
+        if (System.currentTimeMillis() - lastClickTimestamp > 350)
         {
             lastClickTimestamp = System.currentTimeMillis();
             return;

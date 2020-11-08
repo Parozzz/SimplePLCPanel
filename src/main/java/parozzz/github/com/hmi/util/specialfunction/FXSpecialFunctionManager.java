@@ -54,11 +54,6 @@ public final class FXSpecialFunctionManager
 
         mousePressedEventHandler = mouseEvent ->
         {
-            if (doubleClickFunction != null)
-            {
-                doubleClickFunction.onMousePressed(mouseEvent);
-            }
-
             if (resizeFunction != null && resizeFunction.isOnEdge())
             {
                 resizeFunction.onMousePressed(mouseEvent);
@@ -77,6 +72,11 @@ public final class FXSpecialFunctionManager
 
         mouseReleasedEventHandler = mouseEvent ->
         {
+            if (doubleClickFunction != null)
+            {
+                doubleClickFunction.onMouseReleased(mouseEvent);
+            }
+
             if(resizeFunction != null)
             {
                 resizeFunction.onMouseReleased(mouseEvent);
