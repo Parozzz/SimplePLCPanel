@@ -66,14 +66,14 @@ public class ControlWrapperType<C extends Control, W extends ControlWrapper<C>>
         return controlSupplier.get();
     }
 
-    public W createWrapper(ControlContainerPane controlsPage, ControlWrapperSetupStage setupPage)
+    public W createWrapper(ControlContainerPane controlsPage)
     {
-        return creator.create(controlsPage, setupPage);
+        return creator.create(controlsPage);
     }
 
     @FunctionalInterface
     public interface ControlWrapperCreator<C extends Control, W extends ControlWrapper<C>>
     {
-        W create(ControlContainerPane mainPage, ControlWrapperSetupStage setupPage);
+        W create(ControlContainerPane mainPage);
     }
 }

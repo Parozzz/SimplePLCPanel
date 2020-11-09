@@ -34,7 +34,7 @@ public final class DraggableControlCreator<C extends Control> extends FXControll
 
         creatorButton.addEventFilter(MouseEvent.MOUSE_PRESSED, mouseEvent ->
         {
-            if(mainMenuPage.getShownControlContainer() == null)
+            if(mainMenuPage.getShownControlContainerPane() == null)
             {
                 return;
             }
@@ -52,7 +52,7 @@ public final class DraggableControlCreator<C extends Control> extends FXControll
             {
                 started = false;
 
-                var controlMainPage = mainMenuPage.getShownControlContainer();
+                var controlMainPage = mainMenuPage.getShownControlContainerPane();
                 if(controlMainPage != null)
                 {
                     var anchorPane = controlMainPage.getMainAnchorPane();

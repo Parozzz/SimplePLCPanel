@@ -14,6 +14,7 @@ import parozzz.github.com.hmi.controls.ControlContainerPane;
 import parozzz.github.com.hmi.controls.ReadOnlyControlContainerStage;
 import parozzz.github.com.hmi.database.ControlContainerDatabase;
 import parozzz.github.com.hmi.main.dragdrop.DragAndDropPane;
+import parozzz.github.com.hmi.main.others.ControlWrapperCopyPasteHandler;
 import parozzz.github.com.hmi.main.others.MessagesListStage;
 import parozzz.github.com.hmi.main.picturebank.PictureBankStage;
 import parozzz.github.com.hmi.main.quicksetup.QuickSetupVBox;
@@ -68,9 +69,10 @@ public final class MainEditStage extends BorderPaneHMIStage
     private final PictureBankStage pictureBankStage;
     private final CommunicationStage communicationStage;
     private final MessagesListStage messagesListStage;
+    private final ControlWrapperCopyPasteHandler copyPasteHandler;
     private final ReadOnlyControlContainerStage readOnlyControlMainPage;
 
-    private ControlContainerPane shownControlContainer;
+    private ControlContainerPane shownControlContainerPane;
 
     public MainEditStage(SiemensPLCThread plcThread, ModbusTCPThread modbusTCPThread) throws IOException
     {
@@ -85,6 +87,7 @@ public final class MainEditStage extends BorderPaneHMIStage
                 .addFXChild(pictureBankStage = new PictureBankStage())
                 .addFXChild(communicationStage = new CommunicationStage(plcThread, modbusTCPThread))
                 .addFXChild(messagesListStage = new MessagesListStage())
+                .addFXChild(copyPasteHandler = new ControlWrapperCopyPasteHandler(this))
                 .addFXChild(readOnlyControlMainPage = new ReadOnlyControlContainerStage(this));
     }
 
@@ -137,9 +140,9 @@ public final class MainEditStage extends BorderPaneHMIStage
             var newWidth = Util.parseInt(newValue, 640);
 
             controlContainerDatabase.getPageList().forEach(controlMainPage -> controlMainPage.getMainAnchorPane().setPrefWidth(newWidth));
-            if (shownControlContainer != null)
+            if (shownControlContainerPane != null)
             {
-                shownControlContainer.getMainAnchorPane().setPrefWidth(newWidth);
+                shownControlContainerPane.getMainAnchorPane().setPrefWidth(newWidth);
                 this.getStageSetter().get().sizeToScene();
             }
         });
@@ -150,9 +153,9 @@ public final class MainEditStage extends BorderPaneHMIStage
             var newHeight = Util.parseInt(newValue, 480);
 
             controlContainerDatabase.getPageList().forEach(controlMainPage -> controlMainPage.getMainAnchorPane().setPrefHeight(newHeight));
-            if (shownControlContainer != null)
+            if (shownControlContainerPane != null)
             {
-                shownControlContainer.getMainAnchorPane().setPrefHeight(newHeight);
+                shownControlContainerPane.getMainAnchorPane().setPrefHeight(newHeight);
                 this.getStageSetter().get().sizeToScene();
             }
         });
@@ -209,7 +212,7 @@ public final class MainEditStage extends BorderPaneHMIStage
         var pageList = controlContainerDatabase.getPageList();
         if (!pageList.isEmpty())
         {
-            this.setShownControlContainer(pageList.get(0));
+            this.setShownControlContainerPane(pageList.get(0));
         }
     }
 
@@ -238,9 +241,9 @@ public final class MainEditStage extends BorderPaneHMIStage
         return pictureBankStage;
     }
 
-    public ControlContainerPane getShownControlContainer()
+    public ControlContainerPane getShownControlContainerPane()
     {
-        return shownControlContainer;
+        return shownControlContainerPane;
     }
 
     public int getPageWidth()
@@ -268,7 +271,7 @@ public final class MainEditStage extends BorderPaneHMIStage
 
     public void showReadOnlyControlMainPage(boolean isDebug, boolean fullScreen)
     {
-        this.setShownControlContainer(null);
+        this.setShownControlContainerPane(null);
 
         var pageList = controlContainerDatabase.getPageList();
         if (!pageList.isEmpty())
@@ -286,25 +289,25 @@ public final class MainEditStage extends BorderPaneHMIStage
             //Close all the pages
             this.getStageSetter().close();
             settingsStage.getStageSetter().close();
-            pageList.stream().map(ControlContainerPane::getControlWrapperSetupPage)
+            pageList.stream().map(ControlContainerPane::getSetupStage)
                     .map(HMIStage::getStageSetter)
                     .forEach(HMIStageSetter::close);
         }
     }
 
-    public void setShownControlContainer(ControlContainerPane controlContainerPane)
+    public void setShownControlContainerPane(ControlContainerPane controlContainerPane)
     {
-        if (shownControlContainer != null)
+        if (shownControlContainerPane != null)
         {
             //If i don't clear selections some bad things could happen, especially while debugging read only page
-            shownControlContainer.getSelectionManager().clearSelections();
-            shownControlContainer.getMenuBottomImagePane().updateSnapshot();
+            shownControlContainerPane.getSelectionManager().clearSelections();
+            shownControlContainerPane.getMenuBottomImagePane().updateSnapshot();
         }
 
-        this.shownControlContainer = controlContainerPane;
+        this.shownControlContainerPane = controlContainerPane;
 
         AnchorPane anchorPane;
-        if (shownControlContainer == null)
+        if (shownControlContainerPane == null)
         {
             centerTopLabel.setText("Not Selected");
 
@@ -315,7 +318,7 @@ public final class MainEditStage extends BorderPaneHMIStage
         } else
         {
             centerTopLabel.setText(controlContainerPane.getName());
-            anchorPane = shownControlContainer.getMainAnchorPane();
+            anchorPane = shownControlContainerPane.getMainAnchorPane();
         }
 
         anchorPane.setPrefSize(this.getPageWidth(), this.getPageHeight());

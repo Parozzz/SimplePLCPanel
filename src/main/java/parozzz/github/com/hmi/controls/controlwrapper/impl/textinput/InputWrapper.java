@@ -37,9 +37,9 @@ public class InputWrapper extends ControlWrapper<TextField>
         STRING;
     }
 
-    public InputWrapper(ControlContainerPane controlContainerPane, ControlWrapperSetupStage setupPage)
+    public InputWrapper(ControlContainerPane controlContainerPane)
     {
-        super(controlContainerPane, setupPage, ControlWrapperType.NUMERIC_INPUT, InputWrapperValue::new);
+        super(controlContainerPane, ControlWrapperType.NUMERIC_INPUT, InputWrapperValue::new);
     }
 
     @Override

@@ -79,11 +79,20 @@ public final class WrapperStateMap extends FXObject
 
     public void addState(WrapperState wrapperState)
     {
+        this.addState(wrapperState, true);
+    }
+
+    public void addState(WrapperState wrapperState, boolean cloneFromDefault)
+    {
         this.requireDefaultInit();
 
         wrapperStateList.add(wrapperState);
-        //This other than clone, it populates the added state with the attribute
-        wrapperState.getAttributeMap().cloneOtherAttributeMap(defaultWrapperState.getAttributeMap());
+
+        if(cloneFromDefault) //If this is not used accurately, might lead to broken attribute maps
+        {
+            //This other than clone, it populates the added state with the attribute
+            wrapperState.getAttributeMap().cloneFromOther(defaultWrapperState.getAttributeMap());
+        }
     }
 
     public void removeState(WrapperState wrapperState)
@@ -114,10 +123,15 @@ public final class WrapperStateMap extends FXObject
         return defaultWrapperState;
     }
 
+    public void forEachNoDefault(Consumer<WrapperState> consumer)
+    {
+        wrapperStateList.forEach(consumer);
+    }
+
     public void forEach(Consumer<WrapperState> consumer)
     {
         consumer.accept(defaultWrapperState);
-        wrapperStateList.forEach(consumer);
+        this.forEachNoDefault(consumer);
     }
 
     public void addStateValueChangedConsumer(Consumer<WrapperState> consumer)

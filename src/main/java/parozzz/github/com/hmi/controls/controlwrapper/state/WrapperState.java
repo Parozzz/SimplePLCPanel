@@ -3,6 +3,8 @@ package parozzz.github.com.hmi.controls.controlwrapper.state;
 import parozzz.github.com.hmi.attribute.AttributeMap;
 import parozzz.github.com.util.functionalinterface.primitives.IntTriPredicate;
 
+import java.util.Objects;
+
 public class WrapperState implements Comparable<WrapperState>
 {
     private final static String FIRST_COMPARE_PLACEHOLDER = "{first}";
@@ -53,13 +55,13 @@ public class WrapperState implements Comparable<WrapperState>
         public WrapperState create(int lowerBound, int higherBound)
         {
             return lowerBound < higherBound
-                    ? new WrapperState(this, lowerBound, higherBound)
-                    : null;
+                     ? new WrapperState(this, lowerBound, higherBound)
+                     : null;
         }
 
         public WrapperState create(int compare)
         {
-            switch (this)
+            switch(this)
             {
                 case EQUAL:
                 case LOWER:
@@ -71,6 +73,23 @@ public class WrapperState implements Comparable<WrapperState>
                 default:
                     return null;
             }
+        }
+
+        public WrapperState cloneEmpty(WrapperState wrapperState)
+        {
+            var firstCompare = wrapperState.firstCompare;
+            var secondCompare = wrapperState.secondCompare;
+
+            if(firstCompare == secondCompare || secondCompare == 0)
+            {
+                return create(firstCompare);
+            }
+            else if(firstCompare == 0)
+            {
+                return create(secondCompare);
+            }
+
+            return this.create(firstCompare, secondCompare);
         }
     }
 
@@ -141,22 +160,36 @@ public class WrapperState implements Comparable<WrapperState>
         return type.compare(value, firstCompare, secondCompare);
     }
 
+    public WrapperState cloneEmpty()
+    {
+        return type.cloneEmpty(this);
+    }
+
+    @Override
+    public WrapperState clone()
+    {
+        var clonedWrapperState = this.cloneEmpty();
+        Objects.requireNonNull(clonedWrapperState, "Trying to clone an invalid state.");
+        clonedWrapperState.getAttributeMap().cloneFromOther(attributeMap);
+        return clonedWrapperState;
+    }
+
     @Override
     public int compareTo(WrapperState wrapperState)
     {
-        if (wrapperState == this)
+        if(wrapperState == this)
         {
             return 0;
-        } else if (wrapperState.isDefault())
+        }else if(wrapperState.isDefault())
         {
             return 1;
         }
 
         var otherFirstCompare = wrapperState.getFirstCompare();
-        if (firstCompare > otherFirstCompare)
+        if(firstCompare > otherFirstCompare)
         {
             return 1;
-        } else if (firstCompare < otherFirstCompare)
+        }else if(firstCompare < otherFirstCompare)
         {
             return -1;
         }

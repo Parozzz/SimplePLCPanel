@@ -62,6 +62,17 @@ public final class AttributeMap extends FXController
         return false;
     }
 
+    public void addOrReplaceAttribute(Attribute attribute)
+    {
+        var attributeClass = attribute.getClass();
+        if(classToAttributeMap.containsKey(attributeClass))
+        {
+            this.removeAttribute(attributeClass);
+        }
+
+        this.addAttribute(attribute);
+    }
+
     <T> T getAttribute(Class<T> attributeClass)
     {
         var attribute = classToAttributeMap.get(attributeClass);
@@ -109,11 +120,11 @@ public final class AttributeMap extends FXController
         attributeSet.forEach(consumer);
     }
 
-    public void cloneOtherAttributeMap(AttributeMap otherAttributeMap)
+    public void cloneFromOther(AttributeMap otherAttributeMap)
     {
         for (var otherAttribute : otherAttributeMap.attributeSet)
         {
-            this.addAttribute(otherAttribute.clone());
+            this.addOrReplaceAttribute(otherAttribute.clone());
         }
     }
 

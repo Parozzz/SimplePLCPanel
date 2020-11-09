@@ -124,7 +124,7 @@ public final class ControlContainerDatabase extends FXController
         if (controlsPageMap.remove(controlContainer.getName(), controlContainer))
         {
             mainEditStage.getBottomScrollingPane().removeImagePane(controlContainer.getMenuBottomImagePane());
-            mainEditStage.setShownControlContainer(null);
+            mainEditStage.setShownControlContainerPane(null);
         }
     }
 

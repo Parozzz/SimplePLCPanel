@@ -19,11 +19,10 @@ import java.util.function.BiFunction;
 public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C>
 {
     public LabeledWrapper(ControlContainerPane controlContainerPane,
-            ControlWrapperSetupStage setupPage,
             ControlWrapperType<C, ?> wrapperType,
             BiFunction<ControlWrapper<C>, C, ControlWrapperValue<C>> valueSupplierCreator)
     {
-        super(controlContainerPane, setupPage, wrapperType, valueSupplierCreator);
+        super(controlContainerPane, wrapperType, valueSupplierCreator);
     }
 
     @Override
@@ -90,7 +89,7 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
         var multiplyBy = valueAttribute.getValue(ValueAttribute.MULTIPLY_BY);
         var offset = valueAttribute.getValue(ValueAttribute.OFFSET);
 
-        var languageSettings = super.setupStage.getControlMainPage().getMainEditStage().getSettingsStage().getLanguage();
+        var languageSettings = super.getControlMainPage().getMainEditStage().getSettingsStage().getLanguage();
 
         //Use external value here ... WTF i was thinking?
         String stringPlaceholder;

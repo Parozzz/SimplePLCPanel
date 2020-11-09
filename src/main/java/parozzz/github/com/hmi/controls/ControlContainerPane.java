@@ -51,7 +51,7 @@ public class ControlContainerPane extends FXController
 
     private final AnchorPane mainAnchorPane;
 
-    private final ControlWrapperSetupStage controlWrapperSetupPage;
+    private final ControlWrapperSetupStage controlWrapperSetupStage;
     private final MainEditBottomScrollingPane.ImagePane mainEditBottomImagePane;
 
     private final Property<Color> backgroundColorProperty;
@@ -75,7 +75,7 @@ public class ControlContainerPane extends FXController
 
         this.mainAnchorPane = new AnchorPane();
 
-        super.addFXChild(controlWrapperSetupPage = new ControlWrapperSetupStage(this))
+        super.addFXChild(controlWrapperSetupStage = new ControlWrapperSetupStage(this))
                 .addFXChild(controlWrappersSelectionManager = new ControlWrappersSelectionManager(this, mainAnchorPane));
 
         this.mainEditBottomImagePane = new MainEditBottomScrollingPane.ImagePane(this);
@@ -185,7 +185,7 @@ public class ControlContainerPane extends FXController
         });
         FXSpecialFunctionManager.builder(menuBottomImageAnchorPane)
                 .enableDoubleClick(MouseButton.PRIMARY, mainEditBottomImagePane,
-                        () -> mainEditStage.setShownControlContainer(this))
+                        () -> mainEditStage.setShownControlContainerPane(this))
                 .bind();
 
         backgroundColorProperty.addListener((observableValue, oldColor, color) -> this.updateBackground());
@@ -233,9 +233,9 @@ public class ControlContainerPane extends FXController
         return mainEditStage;
     }
 
-    public ControlWrapperSetupStage getControlWrapperSetupPage()
+    public ControlWrapperSetupStage getSetupStage()
     {
-        return controlWrapperSetupPage;
+        return controlWrapperSetupStage;
     }
 
     public AnchorPane getMainAnchorPane()
@@ -275,7 +275,7 @@ public class ControlContainerPane extends FXController
 
     private ControlWrapper<?> createControlWrapper(ControlWrapperType<?, ?> wrapperType, boolean setDefault)
     {
-        var controlWrapper = wrapperType.createWrapper(this, controlWrapperSetupPage);
+        var controlWrapper = wrapperType.createWrapper(this);
         controlWrapper.setup();
         if(setDefault)
         {
@@ -355,6 +355,10 @@ public class ControlContainerPane extends FXController
         var controlJSONArray = jsonDataMap.getArray("Controls");
         if(controlJSONArray != null)
         {
+            //This is necessary otherwise you would be able to cancel stuff from serialization
+            var undoRedoManager = this.getMainEditStage().getUndoRedoManager();
+            undoRedoManager.setIgnoreNew(true);
+
             controlJSONArray.stream().filter(JSONObject.class::isInstance)
                     .map(JSONObject.class::cast)
                     .map(JSONDataMap::new)
@@ -369,6 +373,8 @@ public class ControlContainerPane extends FXController
                             controlWrapper.deserialize(controlJSONDataMap);
                         }
                     });
+
+            undoRedoManager.setIgnoreNew(false);
         }else
         {
             Logger.getLogger(ControlContainerPane.class.getSimpleName())

@@ -6,6 +6,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
+import parozzz.github.com.hmi.FXController;
 import parozzz.github.com.hmi.FXObject;
 import parozzz.github.com.hmi.controls.ControlContainerPane;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;

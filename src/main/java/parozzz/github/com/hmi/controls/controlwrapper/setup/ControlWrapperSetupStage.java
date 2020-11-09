@@ -362,12 +362,19 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage
 
         public SetupPaneList add(SetupPane<?> setupPane)
         {
+            //This is required otherwise when loading stuff could be undo event if it shouldn't
+            var undoRedoManager = getControlMainPage().getMainEditStage().getUndoRedoManager();
+            undoRedoManager.setIgnoreNew(true);
+
             setupPane.setup();
             setupPane.setDefault();
 
             ControlWrapperSetupStage.this.addFXChild(setupPane);
 
             setupPaneList.add(setupPane);
+
+            undoRedoManager.setIgnoreNew(false);
+
             return this;
         }
 

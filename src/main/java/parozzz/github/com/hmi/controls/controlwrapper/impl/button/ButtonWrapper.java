@@ -20,9 +20,9 @@ import java.util.List;
 public final class ButtonWrapper
         extends LabeledWrapper<Button>
 {
-    public ButtonWrapper(ControlContainerPane controlContainerPane, ControlWrapperSetupStage setupPage)
+    public ButtonWrapper(ControlContainerPane controlContainerPane)
     {
-        super(controlContainerPane, setupPage, ControlWrapperType.BUTTON, ButtonWrapperValue::new);
+        super(controlContainerPane, ControlWrapperType.BUTTON, ButtonWrapperValue::new);
     }
 
     @Override

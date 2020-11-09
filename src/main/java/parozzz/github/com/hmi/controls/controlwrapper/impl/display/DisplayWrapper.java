@@ -19,9 +19,9 @@ import java.util.List;
 
 public class DisplayWrapper extends LabeledWrapper<Label>
 {
-    public DisplayWrapper(ControlContainerPane controlContainerPane, ControlWrapperSetupStage setupPage)
+    public DisplayWrapper(ControlContainerPane controlContainerPane)
     {
-        super(controlContainerPane, setupPage, ControlWrapperType.DISPLAY, DisplayWrapperValue::new);
+        super(controlContainerPane, ControlWrapperType.DISPLAY, DisplayWrapperValue::new);
     }
 
     @Override

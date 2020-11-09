@@ -238,6 +238,7 @@ parozzz\github\com\hmi\controls\controlwrapper\impl\button\ButtonWrapperValue.cl
 parozzz\github\com\Main.class
 parozzz\github\com\hmi\main\quicksetup\QuickSetupPane.class
 parozzz\github\com\PLC\siemens\util\SiemensS7Util$ConnectionType.class
+parozzz\github\com\hmi\main\others\ControlWrapperCopyPasteHandler.class
 parozzz\github\com\PLC\siemens\packets\SiemensS7NegotiatePDULengthPacket.class
 parozzz\github\com\hmi\controls\controlwrapper\setup\impl\address\panes\siemens\SiemensAddressStringParser.class
 parozzz\github\com\hmi\attribute\impl\BackgroundAttribute.class
@@ -273,6 +274,7 @@ parozzz\github\com\PLC\siemens\packets\szl\SiemensS7SzlPacket.class
 parozzz\github\com\hmi\attribute\impl\address\data\AddressDataType.class
 parozzz\github\com\util\functionalinterface\TriConsumer.class
 parozzz\github\com\hmi\util\valueintermediate\BooleanIntermediate.class
+parozzz\github\com\hmi\main\others\ControlWrapperCopyPasteHandler$1.class
 parozzz\github\com\hmi\controls\controlwrapper\impl\textinput\InputWrapperValue.class
 parozzz\github\com\hmi\main\quicksetup\impl\GenericQuickSetupPane.class
 parozzz\github\com\hmi\attribute\AttributeFetcher.class

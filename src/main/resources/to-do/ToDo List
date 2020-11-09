@@ -13,6 +13,9 @@
 
 4) Allow a Control Wrappers context menu to appear only if selected (Should help with the [3])
 
+5) Do a lot of cleanup on data cloning. There is a lot of confusion of what does what (Especially on naming convention)
+   and avoid creating waste objects.
+
 Control Wrapper Selection
 
 1)☑ Have a "main" selection that will be the main to gather information for the quick setup

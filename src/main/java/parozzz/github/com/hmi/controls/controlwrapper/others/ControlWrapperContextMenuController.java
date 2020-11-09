@@ -6,7 +6,6 @@ import javafx.scene.control.*;
 import parozzz.github.com.hmi.FXObject;
 import parozzz.github.com.hmi.controls.ControlContainerPane;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
-import parozzz.github.com.hmi.controls.controlwrapper.setup.ControlWrapperSetupStage;
 import parozzz.github.com.hmi.util.FXTextFormatterUtil;
 import parozzz.github.com.hmi.util.FXUtil;
 
@@ -15,18 +14,16 @@ public final class ControlWrapperContextMenuController extends FXObject
     private final ControlWrapper<?> controlWrapper;
     private final Control control;
     private final ControlContainerPane controlContainerPane;
-    private final ControlWrapperSetupStage setupStage;
     private final ContextMenu contextMenu;
 
     public ControlWrapperContextMenuController(ControlWrapper<?> controlWrapper, Control control,
-            ControlContainerPane controlContainerPane, ControlWrapperSetupStage setupStage)
+            ControlContainerPane controlContainerPane)
     {
         super("ControlWrapperContextMenu");
 
         this.controlWrapper = controlWrapper;
         this.control = control;
         this.controlContainerPane = controlContainerPane;
-        this.setupStage = setupStage;
         this.contextMenu = new ContextMenu();
     }
 
@@ -42,7 +39,7 @@ public final class ControlWrapperContextMenuController extends FXObject
         var deleteMenuItem = FXUtil.createMenuItem("Delete",
                 () -> controlContainerPane.deleteControlWrapper(controlWrapper));
         var setupMenuItem = FXUtil.createMenuItem("Setup",
-                () -> setupStage.showStageFor(controlWrapper));
+                () -> controlContainerPane.getSetupStage().showStageFor(controlWrapper));
 
         var layoutXMenuItem = this.createLayoutContextMenuItem("X", containerStackPane.layoutXProperty());
         var layoutYMenuItem = this.createLayoutContextMenuItem("Y", containerStackPane.layoutYProperty());
