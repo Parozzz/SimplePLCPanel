@@ -156,6 +156,7 @@ parozzz\github\com\hmi\controls\controlwrapper\others\ControlWrapperBorderCreato
 parozzz\github\com\hmi\controls\controlwrapper\setup\impl\address\AddressSetupPane.class
 parozzz\github\com\hmi\controls\controlwrapper\impl\button\ButtonWrapper.class
 parozzz\github\com\hmi\controls\controlwrapper\ControlWrapper$1.class
+parozzz\github\com\hmi\ChartTest.class
 parozzz\github\com\hmi\controls\controlwrapper\impl\button\ButtonWrapperType.class
 parozzz\github\com\PLC\siemens\util\SiemensS7Error.class
 parozzz\github\com\hmi\comm\modbustcp\intermediate\doubleword\ModbusTCPWriteDWordIntermediate.class
@@ -197,6 +198,7 @@ parozzz\github\com\hmi\comm\siemens\SiemensPLCThread.class
 parozzz\github\com\hmi\controls\controlwrapper\state\WrapperDefaultState.class
 parozzz\github\com\hmi\controls\controlwrapper\setup\extra\SelectAndMultipleWrite$PropertyData.class
 parozzz\github\com\PLC\siemens\util\SiemensS7Error$SiemensS7Exception.class
+parozzz\github\com\hmi\ChartTest$MyLineChart.class
 parozzz\github\com\hmi\controls\controlwrapper\setup\StateCreationPane.class
 parozzz\github\com\PLC\siemens\util\SiemensS7AreaType.class
 parozzz\github\com\hmi\serialize\FXSerializableObject.class
@@ -267,6 +269,7 @@ parozzz\github\com\hmi\controls\controlwrapper\impl\button\ButtonWrapperValue$1.
 parozzz\github\com\util\Loopable.class
 parozzz\github\com\hmi\serialize\JSONSerializable.class
 parozzz\github\com\hmi\serialize\JSONSerializables.class
+parozzz\github\com\hmi\ChartTest$ChartRect.class
 parozzz\github\com\hmi\util\valueintermediate\ValueIntermediateType.class
 parozzz\github\com\PLC\siemens\util\SiemensS7Util.class
 parozzz\github\com\SiemensS7Thread.class

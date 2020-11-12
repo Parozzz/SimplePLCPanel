@@ -1,0 +1,356 @@
+[10-11-2020 12:00:06]32.4, 10.4
+[10-11-2020 12:00:06]X: 0.8367483296213809, Y: 7.044303797468355
+[10-11-2020 12:00:09]32.4, 10.4
+[10-11-2020 12:00:09]X: 3.7552338530066818, Y: 3.3227848101265822
+[10-11-2020 12:00:10]32.4, 10.4
+[10-11-2020 12:00:10]X: 0.7556792873051223, Y: 8.284810126582279
+[10-11-2020 12:00:12]32.4, 10.4
+[10-11-2020 12:00:12]X: 0.7209354120267261, Y: 9.778481012658228
+[10-11-2020 12:00:13]32.4, 10.4
+[10-11-2020 12:00:13]X: 1.0915367483296214, Y: 8.917721518987342
+[10-11-2020 12:00:16]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:00:18]32.4, 10.4
+[10-11-2020 12:00:18]X: 3.9868596881959912, Y: 3.1455696202531644
+[10-11-2020 12:00:19]32.4, 10.4
+[10-11-2020 12:00:19]X: 3.6741648106904226, Y: 5.221518987341772
+[10-11-2020 12:01:23]32.4, 10.4, 449.0, 316.0
+[10-11-2020 12:01:23]X: 1.42739420935412, Y: 6.462025316455695
+[10-11-2020 12:01:29]32.4, 10.4, 449.0, 316.0
+[10-11-2020 12:01:29]X: 1.3347438752783962, Y: 7.449367088607595
+[10-11-2020 12:01:32]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:04:44]32.0, 10.0, 449.0, 317.0
+[10-11-2020 12:04:44]X: 1.1089086859688195, Y: 7.747634069400631
+[10-11-2020 12:04:45]32.0, 10.0, 449.0, 317.0
+[10-11-2020 12:04:45]X: 1.8732739420935411, Y: 6.107255520504732
+[10-11-2020 12:04:47]32.0, 10.0, 449.0, 317.0
+[10-11-2020 12:04:47]X: 4.814922048997773, Y: 2.145110410094637
+[10-11-2020 12:05:43]32.0, 10.0, 449.0, 317.0
+[10-11-2020 12:05:43]X: 1.0857461024498887, Y: 5.526813880126182
+[10-11-2020 12:05:50]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:12:10]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:12:44]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:12:59]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:13:30]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:14:38]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:15:33]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:16:17]34.4, 10.4, 691.0, 502.0
+[10-11-2020 12:16:17]X: 1.9321273516642548, Y: 6.3320717131474105
+[10-11-2020 12:16:21]34.4, 10.4, 691.0, 502.0
+[10-11-2020 12:16:21]X: 1.6687409551374819, Y: 6.7711155378486065
+[10-11-2020 12:16:24]34.4, 10.4, 691.0, 502.0
+[10-11-2020 12:16:24]X: 0.9839363241678726, Y: 8.663545816733068
+[10-11-2020 12:16:26]34.4, 10.4, 691.0, 502.0
+[10-11-2020 12:16:26]X: 5.529232995658466, Y: 1.6085657370517927
+[10-11-2020 12:16:26]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:16:41]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:18:30]34.4, 10.4, 529.0, 464.0
+[10-11-2020 12:18:30]X: 1.875047258979206, Y: 6.260991379310345
+[10-11-2020 12:18:38]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:18:53]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:20:33]34.4, 10.4, 740.0, 480.0
+[10-11-2020 12:20:33]X: 1.9377027027027027, Y: 6.780625000000001
+[10-11-2020 12:20:42]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:22:30]34.4, 10.4, 448.0, 416.0
+[10-11-2020 12:22:30]X: 2.248883928571429, Y: 6.398798076923078
+[10-11-2020 12:22:42]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:22:57]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:23:12]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:23:27]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:23:30]34.4, 10.4, 658.0, 474.0
+[10-11-2020 12:23:30]X: 3.783434650455927, Y: 3.6757383966244723
+[10-11-2020 12:23:42]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:23:57]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:24:12]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:24:27]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:24:42]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:24:57]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:25:12]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:26:44]34.4, 10.4, 448.0, 416.0
+[10-11-2020 12:26:44]X: 1.5988839285714285, Y: 7.20264423076923
+[10-11-2020 12:26:55]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:27:10]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:27:25]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:27:40]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:27:55]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:28:10]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:29:02]34.4, 10.4, 448.0, 416.0
+[10-11-2020 12:29:02]X: 1.9819196428571428, Y: 6.727644230769231
+[10-11-2020 12:29:03]34.4, 10.4, 448.0, 416.0
+[10-11-2020 12:29:03]X: 2.6783482142857142, Y: 5.576682692307693
+[10-11-2020 12:29:05]34.4, 10.4, 448.0, 416.0
+[10-11-2020 12:29:05]X: 4.419419642857143, Y: 2.598798076923076
+[10-11-2020 12:29:12]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:29:18]32.4, 10.4, 305.0, 329.0
+[10-11-2020 12:29:18]X: 2.6639344262295084, Y: 2.656534954407295
+[10-11-2020 12:29:19]32.4, 10.4, 305.0, 329.0
+[10-11-2020 12:29:19]X: 2.7832786885245904, Y: 2.2917933130699093
+[10-11-2020 12:29:21]32.4, 10.4, 305.0, 329.0
+[10-11-2020 12:29:21]X: 3.4822950819672136, Y: 1.4893617021276597
+[10-11-2020 12:29:27]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:30:51]
+Level: SEVERE
+InvolvedClass: JavaFXMain
+Message: Error while stopping JavaFX Main Application
+parozzz.github.com.hmi.JavaFXMain.saveData(JavaFXMain.java:110)
+parozzz.github.com.hmi.JavaFXMain.stop(JavaFXMain.java:89)
+com.sun.javafx.application.LauncherImpl.lambda$launchApplication1$10(LauncherImpl.java:865)
+com.sun.javafx.application.PlatformImpl.lambda$runAndWait$12(PlatformImpl.java:455)
+com.sun.javafx.application.PlatformImpl.lambda$runLater$10(PlatformImpl.java:428)
+java.base/java.security.AccessController.doPrivileged(AccessController.java:391)
+com.sun.javafx.application.PlatformImpl.lambda$runLater$11(PlatformImpl.java:427)
+com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
+com.sun.glass.ui.win.WinApplication._runLoop(Native Method)
+com.sun.glass.ui.win.WinApplication.lambda$runLoop$3(WinApplication.java:174)
+java.base/java.lang.Thread.run(Thread.java:832)
+
+[10-11-2020 12:30:59]
+Level: SEVERE
+InvolvedClass: JavaFXMain
+Message: Error while stopping JavaFX Main Application
+parozzz.github.com.hmi.JavaFXMain.saveData(JavaFXMain.java:110)
+parozzz.github.com.hmi.JavaFXMain.stop(JavaFXMain.java:89)
+com.sun.javafx.application.LauncherImpl.lambda$launchApplication1$10(LauncherImpl.java:865)
+com.sun.javafx.application.PlatformImpl.lambda$runAndWait$12(PlatformImpl.java:455)
+com.sun.javafx.application.PlatformImpl.lambda$runLater$10(PlatformImpl.java:428)
+java.base/java.security.AccessController.doPrivileged(AccessController.java:391)
+com.sun.javafx.application.PlatformImpl.lambda$runLater$11(PlatformImpl.java:427)
+com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:96)
+com.sun.glass.ui.win.WinApplication._runLoop(Native Method)
+com.sun.glass.ui.win.WinApplication.lambda$runLoop$3(WinApplication.java:174)
+java.base/java.lang.Thread.run(Thread.java:832)
+
+[10-11-2020 12:31:45]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:32:00]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:32:15]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:32:30]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:32:55]34.4, 10.4, 448.0, 416.0
+[10-11-2020 12:32:55]X: 2.0515625, Y: 7.568028846153846
+[10-11-2020 12:33:04]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:36:35]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:36:50]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:37:36]34.4, 10.4, 448.0, 416.0
+[10-11-2020 12:37:36]X: 0.9720982142857143, Y: 7.129567307692307
+[10-11-2020 12:38:12]34.4, 10.4, 448.0, 416.0
+[10-11-2020 12:38:12]X: 1.7265625, Y: 5.320913461538462
+[10-11-2020 12:38:23]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:39:20]34.4, 10.4, 612.0, 508.0
+[10-11-2020 12:39:20]X: 2.241013071895425, Y: 5.6588582677165356
+[10-11-2020 12:41:08]34.4, 10.4, 448.0, 416.0
+[10-11-2020 12:41:08]X: 1.6104910714285714, Y: 6.636298076923078
+[10-11-2020 12:41:20]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+
+[10-11-2020 12:41:35]
+Level: INFO
+InvolvedClass: SiemensPLCThread
+Log: IPAddress: 192.168.1.5, Rack: 0, Slot: 0
+Message: Cannot connect to Siemens PLC
+

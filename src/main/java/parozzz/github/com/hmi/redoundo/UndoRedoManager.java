@@ -10,6 +10,8 @@ import java.util.function.Predicate;
 
 public class UndoRedoManager
 {
+    public static final int MAX_SAVED_REDO_ACTIONS = 50;
+
     private final List<RunnableManager> undoRunnableList;
     private final List<RunnableManager> redoRunnableList;
 
@@ -36,6 +38,11 @@ public class UndoRedoManager
 
     public void addAction(Runnable undoRunnable, Runnable redoRunnable, Object data)
     {
+        if(ignoreNew)
+        {
+            return;
+        }
+
         undoRunnableList.add(0, new RunnableManager(undoRunnable, redoRunnable, data));
         if(undoRunnableList.size() > 20) //Max 20 undo actions
         {
@@ -94,11 +101,7 @@ public class UndoRedoManager
         runnableManager.undoRunnable.run();
         ignoreNew = false;
 
-        redoRunnableList.add(0, runnableManager);
-        if(redoRunnableList.size() > 20) //Max 20 redo actions
-        {
-            redoRunnableList.remove(20);
-        }
+        this.addToList(redoRunnableList, runnableManager);
     }
 
     public void redo()
@@ -114,12 +117,23 @@ public class UndoRedoManager
         ignoreNew = true;
         runnableManager.redoRunnable.run();
         ignoreNew = false;
+
+        this.addToList(undoRunnableList, runnableManager);
     }
 
     public void clear()
     {
         undoRunnableList.clear();
         redoRunnableList.clear();
+    }
+
+    private void addToList(List<RunnableManager> list, RunnableManager runnableManager)
+    {
+        list.add(0, runnableManager);
+        if(list.size() > MAX_SAVED_REDO_ACTIONS)
+        {
+            list.remove(MAX_SAVED_REDO_ACTIONS);
+        }
     }
 
     private static class RunnableManager

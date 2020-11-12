@@ -16,6 +16,8 @@
 5) Do a lot of cleanup on data cloning. There is a lot of confusion of what does what (Especially on naming convention)
    and avoid creating waste objects.
 
+6) Redo a big part of the whole "RedoUndo" system. Right now is a bit too clonky and not easily manageable
+
 Control Wrapper Selection
 
 1)☑ Have a "main" selection that will be the main to gather information for the quick setup
