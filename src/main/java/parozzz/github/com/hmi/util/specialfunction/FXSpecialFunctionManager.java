@@ -174,7 +174,7 @@ public final class FXSpecialFunctionManager
             specialFunctionManager = new FXSpecialFunctionManager(targetRegion, containerPane);
         }
 
-        public Builder enableResizing(Resizable resizable, BooleanSupplier canExecuteSupplier,
+        public Builder enableResizing(Resizable resizable,
                 DoubleConsumer newWidthConsumer, DoubleConsumer newHeightConsumer)
         {
             Objects.requireNonNull(specialFunctionManager.containerPane, "ContainerPane is required for Resizing");
@@ -182,7 +182,6 @@ public final class FXSpecialFunctionManager
             specialFunctionManager.resizeFunction = new ResizeFunction(specialFunctionManager, resizable);
 
             var resizeFunction = specialFunctionManager.resizeFunction;
-            resizeFunction.canExecuteSupplier = canExecuteSupplier;
             resizeFunction.newWidthConsumer = newWidthConsumer;
             resizeFunction.newHeightConsumer = newHeightConsumer;
             return this;

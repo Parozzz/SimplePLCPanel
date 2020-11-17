@@ -6,6 +6,7 @@ import javafx.scene.control.*;
 import parozzz.github.com.hmi.FXObject;
 import parozzz.github.com.hmi.controls.ControlContainerPane;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
+import parozzz.github.com.hmi.util.ContextMenuBuilder;
 import parozzz.github.com.hmi.util.FXTextFormatterUtil;
 import parozzz.github.com.hmi.util.FXUtil;
 
@@ -32,37 +33,31 @@ public final class ControlWrapperContextMenuController extends FXObject
     {
         super.setup();
 
+
         var containerStackPane = controlWrapper.getContainerPane();
+        ContextMenuBuilder.builder(contextMenu)
+                .simple("Setup", () -> controlContainerPane.getSetupStage().showStageFor(controlWrapper))
+                .spacer()
+                .simple("To Front", containerStackPane::toFront)
+                .simple("To Back", containerStackPane::toBack)
+                .spacer()
+                .custom(this.createLayoutLabel("X", containerStackPane.layoutXProperty()), false)
+                .custom(this.createLayoutLabel("Y", containerStackPane.layoutYProperty()), false)
+                .spacer()
+                .simple("Center X", this::centerX)
+                .simple("Center Y", this::centerY)
+                .spacer()
+                .simple("Delete", () -> controlContainerPane.deleteControlWrapper(controlWrapper));
 
-        var toFrontMenuItem = FXUtil.createMenuItem("To Front", containerStackPane::toFront);
-        var toBackMenuItem = FXUtil.createMenuItem("To Back", containerStackPane::toBack);
-        var deleteMenuItem = FXUtil.createMenuItem("Delete",
-                () -> controlContainerPane.deleteControlWrapper(controlWrapper));
-        var setupMenuItem = FXUtil.createMenuItem("Setup",
-                () -> controlContainerPane.getSetupStage().showStageFor(controlWrapper));
 
-        var layoutXMenuItem = this.createLayoutContextMenuItem("X", containerStackPane.layoutXProperty());
-        var layoutYMenuItem = this.createLayoutContextMenuItem("Y", containerStackPane.layoutYProperty());
-
-        var centerXMenuItem = FXUtil.createMenuItem("Center X", () ->
+        control.setOnContextMenuRequested(event ->
         {
-            var newLayoutX = (int) Math.floor((controlContainerPane.getMainAnchorPane().getWidth() / 2) - (containerStackPane.getWidth() / 2));
-            containerStackPane.setLayoutX(newLayoutX);
+            //Show only if selected!
+            if(controlWrapper.isSelected())
+            {
+                contextMenu.show(control, event.getScreenX(), event.getScreenY());
+            }
         });
-
-        var centerYMenuItem = FXUtil.createMenuItem("Center Y", () ->
-        {
-            var newLayoutY = (int) Math.floor((controlContainerPane.getMainAnchorPane().getHeight() / 2) - (containerStackPane.getHeight() / 2));
-            containerStackPane.setLayoutY(newLayoutY);
-        });
-
-        contextMenu.getItems().addAll(setupMenuItem, new SeparatorMenuItem(),
-                toFrontMenuItem, toBackMenuItem,
-                new SeparatorMenuItem(), layoutXMenuItem, layoutYMenuItem,
-                new SeparatorMenuItem(), centerXMenuItem, centerYMenuItem,
-                new SeparatorMenuItem(), deleteMenuItem);
-
-        control.setContextMenu(contextMenu);
     }
 
     public void set()
@@ -75,11 +70,8 @@ public final class ControlWrapperContextMenuController extends FXObject
         control.setContextMenu(null);
     }
 
-    private MenuItem createLayoutContextMenuItem(String labelName, DoubleProperty layoutProperty)
+    private Label createLayoutLabel(String labelName, DoubleProperty layoutProperty)
     {
-        var customMenuItem = new CustomMenuItem();
-        customMenuItem.setHideOnClick(false);
-
         var label = new Label(labelName);
         label.setAlignment(Pos.CENTER);
         label.setContentDisplay(ContentDisplay.RIGHT);
@@ -100,9 +92,27 @@ public final class ControlWrapperContextMenuController extends FXObject
         layoutProperty.addListener((observableValue, oldValue, newValue) -> textField
                 .setText("" + (int) Math.floor(newValue.doubleValue())));
 
-        customMenuItem.setContent(label);
+        return label;
+    }
 
-        return customMenuItem;
+    private void centerX()
+    {
+        var containerStackPane = controlWrapper.getContainerPane();
+
+        var newLayoutX = (int) Math.floor(
+                (controlContainerPane.getMainAnchorPane().getWidth() / 2) - (containerStackPane.getWidth() / 2)
+        );
+        containerStackPane.setLayoutX(newLayoutX);
+    }
+
+    private void centerY()
+    {
+        var containerStackPane = controlWrapper.getContainerPane();
+
+        var newLayoutY = (int) Math.floor(
+                (controlContainerPane.getMainAnchorPane().getHeight() / 2) - (containerStackPane.getHeight() / 2)
+        );
+        containerStackPane.setLayoutY(newLayoutY);
     }
 
 }

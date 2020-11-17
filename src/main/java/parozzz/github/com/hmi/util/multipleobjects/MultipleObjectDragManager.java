@@ -54,6 +54,7 @@ public final class MultipleObjectDragManager
     private class ObjectDrag
     {
         private final Region region;
+        private final Object controller;
 
         private final EventHandler<MouseEvent> mousePressedEventHandler;
         private final EventHandler<MouseEvent> dragEventHandler;
@@ -65,10 +66,12 @@ public final class MultipleObjectDragManager
         private ObjectDrag(Region region, Object controller)
         {
             this.region = region;
+            this.controller = controller;
 
             mousePressedEventHandler = mouseEvent ->
             {
-                if(mouseEvent.getButton() != MouseButton.PRIMARY)
+                if(mouseEvent.getButton() != MouseButton.PRIMARY
+                        || this.isControllerResizing())
                 {
                     startX = -1;
                     startY = -1;
@@ -82,8 +85,7 @@ public final class MultipleObjectDragManager
             dragEventHandler = mouseEvent ->
             {
                 if(startX == -1 || startY == -1 ||
-                        mouseEvent.getButton() != MouseButton.PRIMARY ||
-                        (controller instanceof Resizable && ((Resizable) controller).isResizing()))
+                        mouseEvent.getButton() != MouseButton.PRIMARY)
                 {
                     return;
                 }
@@ -174,6 +176,11 @@ public final class MultipleObjectDragManager
             region.removeEventFilter(MouseEvent.MOUSE_PRESSED, mousePressedEventHandler);
             region.removeEventFilter(MouseEvent.MOUSE_DRAGGED, dragEventHandler);
             region.removeEventFilter(MouseEvent.MOUSE_RELEASED, mouseReleaseEventHandler);
+        }
+
+        private boolean isControllerResizing()
+        {
+            return controller instanceof Resizable && ((Resizable) controller).isResizing();
         }
     }
 }

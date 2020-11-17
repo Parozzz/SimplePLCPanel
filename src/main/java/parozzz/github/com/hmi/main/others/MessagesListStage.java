@@ -42,6 +42,12 @@ public class MessagesListStage extends HMIStage<VBox>
         });
     }
 
+    public boolean areMessagesPresent()
+    {
+        return !messagesListView.getItems().isEmpty() ||
+                !MainLogger.getInstance().getMessageQueue().isEmpty();
+    }
+
     private void refreshList()
     {
         var listViewItems = messagesListView.getItems();

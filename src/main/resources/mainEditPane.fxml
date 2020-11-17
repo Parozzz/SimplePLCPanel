@@ -8,13 +8,13 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
 <BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
@@ -25,8 +25,6 @@
                <items>
                   <MenuItem fx:id="saveMenuItem" mnemonicParsing="false" text="Save" />
                   <MenuItem fx:id="settingsMenuItem" mnemonicParsing="false" text="Settings" />
-                  <MenuItem fx:id="pictureBankMenuItem" mnemonicParsing="false" text="Picture Bank" />
-                  <MenuItem fx:id="messagesMenuItem" mnemonicParsing="false" text="Messages" />
                </items>
             </Menu>
             <Menu mnemonicParsing="false" text="Page">
@@ -84,14 +82,32 @@
                   </CustomMenuItem>
                </items>
             </Menu>
-            <Menu mnemonicParsing="false" text="Communication">
+            <Menu mnemonicParsing="false" style="-fx-content-display: right; -fx-graphic-text-gap: 5;" text="Communication">
                <items>
                   <MenuItem fx:id="setupCommunicationMenuItem" mnemonicParsing="false" text="Setup" />
-                  <CustomMenuItem hideOnClick="false" mnemonicParsing="false">
-                     <content>
-                        <RadioButton fx:id="connectedRadioButton" alignment="TOP_RIGHT" graphicTextGap="0.0" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" style="-fx-text-fill: black;" text="Connected" />
-                     </content>
-                  </CustomMenuItem>
+               </items>
+               <graphic>
+                  <Circle fx:id="plcConnectedCircle" fill="RED" radius="5.0" stroke="BLACK" strokeType="INSIDE" />
+               </graphic>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Tools">
+               <items>
+                  <MenuItem fx:id="pictureBankMenuItem" mnemonicParsing="false" text="Picture Bank" />
+               </items>
+            </Menu>
+            <Menu mnemonicParsing="false" style="-fx-content-display: right; -fx-graphic-text-gap: 5;" text="Messages">
+               <graphic>
+                  <Label fx:id="messagePresentLabel" prefHeight="10.0" prefWidth="10.0" style="-fx-background-color: #ffc400;" text="⚠" textOverrun="CLIP">
+                     <font>
+                        <Font name="System Bold" size="16.0" />
+                     </font>
+                     <padding>
+                        <Insets bottom="-5.0" left="1.0" right="1.0" top="-4.0" />
+                     </padding>
+                  </Label>
+               </graphic>
+               <items>
+                  <MenuItem fx:id="showMessageListMenuItem" mnemonicParsing="false" text="Show List" />
                </items>
             </Menu>
          </menus>

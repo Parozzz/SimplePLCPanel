@@ -138,6 +138,7 @@ C:\Users\Admin\Documents\GitHub\SimplePLCPanel\src\main\java\parozzz\github\com\
 C:\Users\Admin\Documents\GitHub\SimplePLCPanel\src\main\java\parozzz\github\com\logger\MainLogger.java
 C:\Users\Admin\Documents\GitHub\SimplePLCPanel\src\main\java\parozzz\github\com\hmi\controls\controlwrapper\setup\impl\address\AddressSetupPane.java
 C:\Users\Admin\Documents\GitHub\SimplePLCPanel\src\main\java\parozzz\github\com\PLC\siemens\data\SiemensS7Data.java
+C:\Users\Admin\Documents\GitHub\SimplePLCPanel\src\main\java\parozzz\github\com\hmi\ChartTest.java
 C:\Users\Admin\Documents\GitHub\SimplePLCPanel\src\main\java\parozzz\github\com\hmi\serialize\parsers\impl\ColorJSONParser.java
 C:\Users\Admin\Documents\GitHub\SimplePLCPanel\src\main\java\parozzz\github\com\PLC\siemens\rwdata\wrappeddata\SiemensS7WrappedData.java
 C:\Users\Admin\Documents\GitHub\SimplePLCPanel\src\main\java\parozzz\github\com\hmi\page\BorderPaneHMIStage.java
@@ -221,6 +222,7 @@ C:\Users\Admin\Documents\GitHub\SimplePLCPanel\src\main\java\parozzz\github\com\
 C:\Users\Admin\Documents\GitHub\SimplePLCPanel\src\main\java\parozzz\github\com\PLC\siemens\packets\readwrite\read\SiemensS7ReadDataPacket.java
 C:\Users\Admin\Documents\GitHub\SimplePLCPanel\src\main\java\parozzz\github\com\util\functionalinterface\primitives\IntBiPredicate.java
 C:\Users\Admin\Documents\GitHub\SimplePLCPanel\src\main\java\parozzz\github\com\hmi\comm\modbustcp\intermediate\word\ModbusTCPWriteWordIntermediate.java
+C:\Users\Admin\Documents\GitHub\SimplePLCPanel\src\main\java\parozzz\github\com\hmi\util\ContextMenuBuilder.java
 C:\Users\Admin\Documents\GitHub\SimplePLCPanel\src\main\java\parozzz\github\com\hmi\controls\controlwrapper\ControlWrapperValue.java
 C:\Users\Admin\Documents\GitHub\SimplePLCPanel\src\main\java\parozzz\github\com\PLC\siemens\data\SiemensS7DataStorage.java
 C:\Users\Admin\Documents\GitHub\SimplePLCPanel\src\main\java\parozzz\github\com\hmi\main\quicksetup\QuickSetupPane.java

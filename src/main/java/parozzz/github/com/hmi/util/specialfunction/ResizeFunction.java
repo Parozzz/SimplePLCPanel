@@ -25,13 +25,8 @@ final class ResizeFunction
     private double xMultiplier;
     private double yMultiplier;
 
-    private double oldHeight;
-    private double oldWidth;
-
     private boolean onEdge;
-    //private boolean resizing;
 
-    BooleanSupplier canExecuteSupplier = () -> true;
     DoubleConsumer newWidthConsumer = t -> { };
     DoubleConsumer newHeightConsumer = t -> { };
 
@@ -61,9 +56,6 @@ final class ResizeFunction
         var resizable = specialFunctionManager.getTargetRegion();
         startWidth = resizable.getWidth();
         startHeight = resizable.getHeight();
-
-        oldWidth = startWidth;
-        oldHeight = startHeight;
 
         startLayoutX = resizable.getLayoutX();
         startLayoutY = resizable.getLayoutY();
@@ -126,8 +118,6 @@ final class ResizeFunction
 
             resizable.setPrefWidth(newWidth);
             newWidthConsumer.accept(newWidth);
-
-            oldWidth = newWidth;
         }
     }
 
@@ -155,13 +145,7 @@ final class ResizeFunction
                 //The min is first in case that value goes lower than zero is then fixed after
                 newLayoutY = Math.min(containerHeight - newHeight, newLayoutY);
                 newLayoutY = Math.max(0, newLayoutY);
-                /*
-                if(newLayoutY < 0)
-                {
-                    newHeight = oldHeight;
-                    newLayoutY = 0;
-                }*/
-                //newLayoutY = Math.max(0, newLayoutY);
+
                 resizable.setLayoutY(newLayoutY);
             }
 
@@ -169,15 +153,13 @@ final class ResizeFunction
 
             resizable.setPrefHeight(newHeight);
             newHeightConsumer.accept(newHeight);
-
-            oldHeight = newHeight;
         }
     }
 
     void onMouseMoved(MouseEvent mouseEvent)
     {
         var targetRegion = specialFunctionManager.getTargetRegion();
-        if(!canExecuteSupplier.getAsBoolean())
+        if(!resizable.canResize())
         {
             return;
         }

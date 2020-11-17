@@ -1,4 +1,5 @@
-1) Quick Setup Width/Height properties only update after have the control re-clicked.
+1)☑ Quick Setup Width/Height properties only update after have the control re-clicked
+   (NVM since when mouse is released all the attributes are refreshed anyway).
 
 2) Add control wrapper duplication
 2.1) Allow CTRL+C , CTRL+V
@@ -11,12 +12,21 @@
      Pressing one icon will allow you to select that specific wrapper.
 3.2) If a wrapper is selected but is not the one on top, decrease the opacity of the others to allow you to see it!
 
-4) Allow a Control Wrappers context menu to appear only if selected (Should help with the [3])
+4)☑ Allow a Control Wrappers context menu to appear only if selected (Should help with the [3])
+4.1)☑ Control wrapper should be draggable only if selected
 
 5) Do a lot of cleanup on data cloning. There is a lot of confusion of what does what (Especially on naming convention)
    and avoid creating waste objects.
 
 6) Redo a big part of the whole "RedoUndo" system. Right now is a bit too clonky and not easily manageable
+
+7)☑ Create a tool part (Which will include the PictureBank and the Messages part)
+7.1)☑ Add a triangle if a new message is present in queue aside the menu (Message have been split in a separate menu)
+
+8) Fix all the UIs that are size-dependant
+8.1) Control Setup Menu really needs a re-done. Is not that good :(
+
+9) Add an alarm page to allow to create alarms
 
 Control Wrapper Selection
 
@@ -30,6 +40,13 @@ Control Wrapper Selection
 3.2) Add options for vertical and horizontal centering (Align based on the center of the object instead of the side)
 3.3) When multiple selected, the default context menu of the control wrapper is NOT shown
 
+NEW Control Panes
+
+Instead of adding a single control, have some pre-made structures.
+
+1) Add an automatic page change system. A board that automagically adds page change buttons inside them!
+
+2) An alarm list (After the alarms are implemented)
 
 MORE Control Wrappers
 

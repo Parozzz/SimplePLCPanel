@@ -2,17 +2,16 @@ package parozzz.github.com.hmi.main.picturebank;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.util.converter.DefaultStringConverter;
 import parozzz.github.com.hmi.page.HMIStage;
+import parozzz.github.com.hmi.util.ContextMenuBuilder;
 import parozzz.github.com.hmi.util.EnumStringConverter;
 import parozzz.github.com.hmi.util.FXImageUtil;
 import parozzz.github.com.hmi.util.FXUtil;
@@ -27,7 +26,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public class PictureBankStage extends HMIStage<VBox>
+public class PictureBankStage extends HMIStage<BorderPane>
 {
     public enum WhiteToleranceEnum
     {
@@ -47,7 +46,10 @@ public class PictureBankStage extends HMIStage<VBox>
     @FXML private ListView<String> fileListView;
     @FXML private ImageView previewImageView;
     @FXML private Button addNewButton;
+
+    @FXML private Label whiteToleranceLabel;
     @FXML private ChoiceBox<WhiteToleranceEnum> whiteToleranceChoiceBox;
+
     @FXML private Button selectImageButton;
 
     private final String directoryPath;
@@ -55,7 +57,7 @@ public class PictureBankStage extends HMIStage<VBox>
 
     public PictureBankStage() throws IOException
     {
-        super("Picture Bank", "pictureBankPane.fxml", VBox.class);
+        super("Picture Bank", "pictureBankPane.fxml", BorderPane.class);
 
         directoryPath = System.getProperty("user.dir") + "\\picture_bank";
     }
@@ -68,6 +70,7 @@ public class PictureBankStage extends HMIStage<VBox>
         super.serializableDataSet.addEnum("WhiteTolerance", whiteToleranceChoiceBox.valueProperty(), WhiteToleranceEnum.class);
 
         super.getStageSetter().setAlwaysOnTop(true)
+                .setResizable(true)
                 .setOnWindowCloseRequest(windowEvent -> this.revertButtonsToDefaultVisibility());
 
         fileListView.setEditable(true);
@@ -83,25 +86,24 @@ public class PictureBankStage extends HMIStage<VBox>
                 }
             };
 
-            var contextMenu = new ContextMenu();
-            listCell.setContextMenu(contextMenu);
-
-            var removeWhiteBackgroundMenuItem = FXUtil.createMenuItem("Remove White Background", this::removeWhiteBackgroundFromSelectedImage);
-            var cloneMenuItem = FXUtil.createMenuItem("Clone", this::cloneSelectedImage);
-            var deleteMenuItem = FXUtil.createMenuItem("Delete", this::removeSelectedImage);
-            contextMenu.getItems().addAll(removeWhiteBackgroundMenuItem, cloneMenuItem, deleteMenuItem);
+            listCell.setContextMenu(ContextMenuBuilder.builder()
+                    .simple("Remove White Background", this::removeWhiteBackgroundFromSelectedImage)
+                    .simple("Clone", this::cloneSelectedImage)
+                    .simple("Delete", this::removeSelectedImage)
+                    .getContextMenu()
+            );
 
             listCell.setConverter(new DefaultStringConverter());
             listCell.setEditable(true);
             listCell.textProperty().addListener((observableValue, oldValue, newValue) ->
             {
-                if (oldValue == null || newValue == null)
+                if(oldValue == null || newValue == null)
                 {
                     return;
                 }
 
                 var file = new File(directoryPath, oldValue);
-                if (file.exists())
+                if(file.exists())
                 {
                     file.renameTo(new File(directoryPath, newValue));
                 }
@@ -112,10 +114,10 @@ public class PictureBankStage extends HMIStage<VBox>
 
         fileListView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) ->
         {
-            if (newValue != null)
+            if(newValue != null)
             {
                 var file = new File(directoryPath, newValue);
-                if (file.exists())
+                if(file.exists())
                 {
                     previewImageView.setImage(new Image(file.toURI().toString()));
                 }
@@ -128,7 +130,7 @@ public class PictureBankStage extends HMIStage<VBox>
             fileChooser.getExtensionFilters().addAll(FXUtil.IMAGE_EXTENSION_FILTER);
 
             var fileList = fileChooser.showOpenMultipleDialog(this.getStageSetter().get()); //Allow to select multiple files...
-            if (fileList == null)
+            if(fileList == null)
             {
                 return;
             }
@@ -136,13 +138,14 @@ public class PictureBankStage extends HMIStage<VBox>
             fileList.stream().filter(Objects::nonNull).forEach(file ->
             {
                 var copyFile = new File(directoryPath, file.getName());
-                if (!copyFile.exists())
+                if(!copyFile.exists())
                 {
                     try
                     {
                         Files.copy(file.toPath(), copyFile.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
                         fileListView.getItems().add(copyFile.getName());
-                    } catch (IOException exception)
+                    }
+                    catch(IOException exception)
                     {
                         MainLogger.getInstance().error("Error while importing picture into picture bank", exception, this);
                     }
@@ -157,14 +160,22 @@ public class PictureBankStage extends HMIStage<VBox>
         selectImageButton.setOnAction(actionEvent ->
         {
             var selectedItem = fileListView.getSelectionModel().getSelectedItem();
-            if (selectFileConsumer != null && selectedItem != null)
+            if(selectFileConsumer == null)
+            {//Something is wrong. In this case, better revert!
+                this.revertButtonsToDefaultVisibility();
+                return;
+            }
+
+            if(selectedItem == null)
+            {//In this case, anything has been selected and wait until it is!
+                return;
+            }
+
+            var file = new File(directoryPath, selectedItem);
+            if(file.exists())
             {
-                var file = new File(directoryPath, selectedItem);
-                if (file.exists())
-                {
-                    selectFileConsumer.accept(file);
-                    this.getStageSetter().close();
-                }
+                selectFileConsumer.accept(file);
+                this.getStageSetter().close();
             }
 
             this.revertButtonsToDefaultVisibility();
@@ -173,15 +184,15 @@ public class PictureBankStage extends HMIStage<VBox>
         selectImageButton.setVisible(false);
 
         var directory = new File(directoryPath);
-        if (!directory.exists())
+        if(!directory.exists())
         {
             directory.mkdirs();
-        } else
+        }else
         {
             var fileList = directory.listFiles();
-            if (fileList != null)
+            if(fileList != null)
             {
-                for (var file : fileList)
+                for(var file : fileList)
                 {
                     fileListView.getItems().add(file.getName());
                 }
@@ -198,7 +209,7 @@ public class PictureBankStage extends HMIStage<VBox>
 
     public URI getImageURI(File file)
     {
-        if (file != null && file.exists() && directoryPath.equals(file.getParent()))
+        if(file != null && file.exists() && directoryPath.equals(file.getParent()))
         {
             return file.toURI();
         }
@@ -209,13 +220,15 @@ public class PictureBankStage extends HMIStage<VBox>
     public URI getImageURI(String fileName)
     {
         return fileName == null
-                ? null
-                : getImageURI(new File(directoryPath, fileName));
+               ? null
+               : getImageURI(new File(directoryPath, fileName));
     }
 
     public void startImageSelection(Consumer<File> consumer)
     {
         addNewButton.setVisible(false);
+        whiteToleranceLabel.setVisible(false);
+        whiteToleranceChoiceBox.setVisible(false);
         selectImageButton.setVisible(true);
 
         this.selectFileConsumer = consumer;
@@ -226,6 +239,8 @@ public class PictureBankStage extends HMIStage<VBox>
     public void revertButtonsToDefaultVisibility()
     {
         addNewButton.setVisible(true);
+        whiteToleranceLabel.setVisible(true);
+        whiteToleranceChoiceBox.setVisible(true);
         selectImageButton.setVisible(false);
 
         selectFileConsumer = null;
@@ -234,11 +249,10 @@ public class PictureBankStage extends HMIStage<VBox>
     private void removeWhiteBackgroundFromSelectedImage()
     {
         var file = this.getSelectedFile();
-        if (file == null)
+        if(file == null)
         {
             return;
         }
-
 
         try
         {
@@ -249,7 +263,8 @@ public class PictureBankStage extends HMIStage<VBox>
             ImageIO.write(bufferedImage, "png", file);
 
             previewImageView.setImage(convertedImage);
-        } catch (Exception exception)
+        }
+        catch(Exception exception)
         {
             MainLogger.getInstance().error("Error while removing white background", exception, this);
         }
@@ -258,13 +273,13 @@ public class PictureBankStage extends HMIStage<VBox>
     private void cloneSelectedImage()
     {
         var file = this.getSelectedFile();
-        if (file == null)
+        if(file == null)
         {
             return;
         }
 
         var fileName = file.getName();
-        for (int x = 1; x < 1024; x++)
+        for(int x = 1; x < 1024; x++)
         {
             var lastDotIndex = fileName.lastIndexOf('.');
 
@@ -272,13 +287,14 @@ public class PictureBankStage extends HMIStage<VBox>
             var fileNameWithoutExtension = fileName.substring(0, lastDotIndex);
 
             var clonedFile = new File(directoryPath, fileNameWithoutExtension + "_" + x + extension);
-            if (!clonedFile.exists())
+            if(!clonedFile.exists())
             {
                 try
                 {
                     Files.copy(file.toPath(), clonedFile.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
                     fileListView.getItems().add(clonedFile.getName());
-                } catch (IOException exception)
+                }
+                catch(IOException exception)
                 {
                     MainLogger.getInstance().error("Error while cloning picture bank image", exception, this);
                 }
@@ -291,7 +307,7 @@ public class PictureBankStage extends HMIStage<VBox>
     private void removeSelectedImage()
     {
         var selectedItem = fileListView.getSelectionModel().getSelectedItem();
-        if (selectedItem != null)
+        if(selectedItem != null)
         {
             new File(directoryPath, selectedItem).delete();
             fileListView.getItems().remove(selectedItem);
@@ -303,10 +319,10 @@ public class PictureBankStage extends HMIStage<VBox>
     private File getSelectedFile()
     {
         var selectedItem = fileListView.getSelectionModel().getSelectedItem();
-        if (selectedItem != null)
+        if(selectedItem != null)
         {
             var file = new File(directoryPath, selectedItem);
-            if (file.exists())
+            if(file.exists())
             {
                 return file;
             }

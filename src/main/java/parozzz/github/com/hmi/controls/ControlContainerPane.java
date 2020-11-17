@@ -26,6 +26,7 @@ import parozzz.github.com.hmi.main.MainEditStage;
 import parozzz.github.com.hmi.serialize.JSONSerializables;
 import parozzz.github.com.hmi.serialize.data.JSONDataArray;
 import parozzz.github.com.hmi.serialize.data.JSONDataMap;
+import parozzz.github.com.hmi.util.ContextMenuBuilder;
 import parozzz.github.com.hmi.util.FXUtil;
 import parozzz.github.com.hmi.util.specialfunction.FXSpecialFunctionManager;
 
@@ -142,7 +143,7 @@ public class ControlContainerPane extends FXController
                 controlContainerDatabase.deletePage(this);
             }
         });
-
+/*
         var backgroundColorLabelMenuItem = FXUtil.createCustomMenuItem(() -> new Label("Background Color"), false);
 
         var backgroundColorMenuItem = FXUtil.createCustomMenuItem(() ->
@@ -170,11 +171,29 @@ public class ControlContainerPane extends FXController
             return button;
         }, false);
 
+
         var menuBottomContextMenu = new ContextMenu(deletePageMenuItem,
                 new SeparatorMenuItem(),
                 backgroundColorLabelMenuItem, backgroundColorMenuItem,
                 new SeparatorMenuItem(),
                 backgroundImageSelectMenuItem, backgroundImageNameMenuItem);
+*/
+        var menuBottomContextMenu = ContextMenuBuilder.builder()
+                .simple("Delete", () ->
+                        new Alert(Alert.AlertType.CONFIRMATION).showAndWait()
+                                .filter(ButtonType.OK::equals)
+                                .ifPresent(buttonType -> controlContainerDatabase.deletePage(this)))
+                .spacer()
+                .custom(new Label("Background Color"), false)
+                .colorPicker(false, colorPicker -> backgroundColorProperty.bindBidirectional(colorPicker.valueProperty()))
+                .spacer()
+                .button("Select Picture", false, () ->
+                {
+                    var pictureBank = this.controlContainerDatabase.getMainEditStage().getPictureBankStage();
+                    pictureBank.startImageSelection(file -> backgroundPictureNameProperty.setValue(file.getName()));
+                })
+                .textField(false, textField -> backgroundPictureNameProperty.bindBidirectional(textField.textProperty()))
+                .getContextMenu();
 
         var menuBottomImageAnchorPane = mainEditBottomImagePane.getAnchorPane();
         menuBottomImageAnchorPane.setOnContextMenuRequested(contextMenuEvent ->

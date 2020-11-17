@@ -1,9 +1,15 @@
 package parozzz.github.com.hmi.main;
 
+import com.sun.javafx.scene.control.ContextMenuContent;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
+import javafx.scene.control.skin.MenuBarSkin;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import parozzz.github.com.Main;
 import parozzz.github.com.StartProperties;
 import parozzz.github.com.hmi.comm.CommunicationStage;
@@ -23,6 +29,8 @@ import parozzz.github.com.hmi.page.BorderPaneHMIStage;
 import parozzz.github.com.hmi.page.HMIStage;
 import parozzz.github.com.hmi.page.HMIStageSetter;
 import parozzz.github.com.hmi.util.FXTextFormatterUtil;
+import parozzz.github.com.hmi.util.FXUtil;
+import parozzz.github.com.util.TrigBoolean;
 import parozzz.github.com.util.Util;
 
 import java.io.IOException;
@@ -39,8 +47,6 @@ public final class MainEditStage extends BorderPaneHMIStage
     //File
     @FXML private MenuItem saveMenuItem;
     @FXML private MenuItem settingsMenuItem;
-    @FXML private MenuItem pictureBankMenuItem;
-    @FXML private MenuItem messagesMenuItem;
 
     //ControlWrapperPage Data
     @FXML private MenuItem createPageMenuItem;
@@ -49,8 +55,15 @@ public final class MainEditStage extends BorderPaneHMIStage
     @FXML private TextField pageHeightTextField;
 
     //Communication
+    @FXML private Circle plcConnectedCircle;
     @FXML private MenuItem setupCommunicationMenuItem;
-    @FXML private RadioButton connectedRadioButton;
+
+    //Tools Menu
+    @FXML private MenuItem pictureBankMenuItem;
+
+    //Messages Menu
+    @FXML private Label messagePresentLabel;
+    @FXML private MenuItem showMessageListMenuItem;
 
     @FXML private StackPane leftStackPane;
     @FXML private StackPane rightStackPane;
@@ -72,6 +85,7 @@ public final class MainEditStage extends BorderPaneHMIStage
     private final ControlWrapperCopyPasteHandler copyPasteHandler;
     private final ReadOnlyControlContainerStage readOnlyControlMainPage;
 
+    private final TrigBoolean messagePresentTrig;
     private ControlContainerPane shownControlContainerPane;
 
     public MainEditStage(SiemensPLCThread plcThread, ModbusTCPThread modbusTCPThread) throws IOException
@@ -89,6 +103,8 @@ public final class MainEditStage extends BorderPaneHMIStage
                 .addFXChild(messagesListStage = new MessagesListStage())
                 .addFXChild(copyPasteHandler = new ControlWrapperCopyPasteHandler(this))
                 .addFXChild(readOnlyControlMainPage = new ReadOnlyControlContainerStage(this));
+
+        this.messagePresentTrig = new TrigBoolean(false);
     }
 
     @Override
@@ -107,20 +123,22 @@ public final class MainEditStage extends BorderPaneHMIStage
 
         //File Menu
         settingsMenuItem.setOnAction(actionEvent -> settingsStage.showStage());
-        pictureBankMenuItem.setOnAction(actionEvent -> pictureBankStage.showStage());
-        messagesMenuItem.setOnAction(actionEvent -> messagesListStage.showStage());
+
         //Communication Menu
         setupCommunicationMenuItem.setOnAction(event -> communicationStage.showStage());
-
-        connectedRadioButton.getStylesheets().add(Util.getResource("stylesheet/plc_connected_radio_button.css").toExternalForm());
-        connectedRadioButton.setFocusTraversable(false);
-        connectedRadioButton.setMouseTransparent(true);
 
         //Setup Menu
         startReadOnlyMenuItem.setOnAction(actionEvent -> this.showReadOnlyControlMainPage(true, setPageFullScreenCheckBox.isSelected()));
 
         //Page Menu
         createPageMenuItem.setOnAction(actionEvent -> controlsPageCreationPage.showStage());
+
+        //Tools Menu
+        pictureBankMenuItem.setOnAction(actionEvent -> pictureBankStage.showStage());
+        messagePresentLabel.setVisible(false);
+
+        //Messages Menu
+        showMessageListMenuItem.setOnAction(event -> messagesListStage.showStage());
 
         zoomTextField.setTextFormatter(FXTextFormatterUtil.simpleInteger(3));
         zoomTextField.textProperty().addListener((observableValue, oldValue, newValue) ->
@@ -198,7 +216,19 @@ public final class MainEditStage extends BorderPaneHMIStage
             var selectedCommunicationManager = communicationStage.getSelectedCommunicationManager();
             if(selectedCommunicationManager != null)
             {
-                connectedRadioButton.setSelected(selectedCommunicationManager.getCommThread().isConnected());
+                var isConnected = selectedCommunicationManager.getCommThread().isConnected();
+                plcConnectedCircle.setFill(isConnected ? Color.GREEN : Color.RED);
+            }
+
+            messagePresentTrig.set(messagesListStage.areMessagesPresent());
+            switch(messagePresentTrig.checkTrig())
+            {
+                case RISING:
+                    messagePresentLabel.setVisible(true);
+                    break;
+                case FALLING:
+                    messagePresentLabel.setVisible(false);
+                    break;
             }
         }
     }

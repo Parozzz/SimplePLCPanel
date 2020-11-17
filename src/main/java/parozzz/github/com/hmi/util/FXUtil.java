@@ -6,11 +6,16 @@ import javafx.animation.Timeline;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Control;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.MenuItem;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
@@ -31,18 +36,9 @@ public class FXUtil
     {
     }
 
-    public static MenuItem createMenuItem(String text, Runnable runnable)
+    public static Background createBackground(Color color)
     {
-        var menuItem = new MenuItem(text);
-        menuItem.setOnAction(actionEvent -> runnable.run());
-        return menuItem;
-    }
-
-    public static CustomMenuItem createCustomMenuItem(Supplier<Control> supplier, boolean hideOnClick)
-    {
-        var customMenuItem = new CustomMenuItem(supplier.get());
-        customMenuItem.setHideOnClick(hideOnClick);
-        return customMenuItem;
+        return new Background(new BackgroundFill(color, CornerRadii.EMPTY, Insets.EMPTY));
     }
 
     public static <T> StringConverter<T> toStringOnlyConverter(Function<T, String> function)

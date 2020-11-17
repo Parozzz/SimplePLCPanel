@@ -153,11 +153,7 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
                 .builder(containerStackPane, controlContainerPane.getMainAnchorPane())
                 .enableDoubleClick(MouseButton.PRIMARY, this,
                         () -> controlContainerPane.getSetupStage().showStageFor(this)) //On double click open
-                .enableResizing(this, () ->
-                {
-                    var baseAttribute = AttributeFetcher.fetch(stateMap.getCurrentState(), BaseAttribute.class);
-                    return !(baseAttribute == null || baseAttribute.getValue(BaseAttribute.ADAPT));
-                }, width ->
+                .enableResizing(this, width ->
                 {
                     stateMap.forEach(wrapperState ->
                     {
@@ -282,6 +278,18 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
     public ControlWrapperExtraFeature getExtraFeature()
     {
         return extraFeature;
+    }
+
+    @Override
+    public final boolean canResize()
+    {
+        if(!selected.get()) //Only allow resizing for selected controls
+        {
+            return false;
+        }
+        //And if they do not have the adapt attribute on
+        var baseAttribute = AttributeFetcher.fetch(stateMap.getCurrentState(), BaseAttribute.class);
+        return !(baseAttribute == null || baseAttribute.getValue(BaseAttribute.ADAPT));
     }
 
     @Override
@@ -415,7 +423,6 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
         var defaultState = this.stateMap.getDefaultState();
         var cloneDefaultState = cloneControlWrapper.getStateMap().getDefaultState();
         cloneDefaultState.getAttributeMap().cloneFromOther(defaultState.getAttributeMap());
-        defaultState.getAttributeMap();
     }
 
     private void setControlVisualProperties(C control, StackPane containerStackPane)

@@ -79,6 +79,7 @@ parozzz\github\com\hmi\comm\siemens\SiemensPLCCommunicationManager.class
 parozzz\github\com\util\TrigBoolean$TrigType.class
 parozzz\github\com\hmi\controls\controlwrapper\impl\textinput\InputWrapper$1.class
 parozzz\github\com\hmi\attribute\impl\ValueAttribute.class
+parozzz\github\com\hmi\main\MainEditStage$1.class
 parozzz\github\com\hmi\serialize\parsers\SimpleJSONObjectParser.class
 parozzz\github\com\hmi\attribute\impl\control\InputDataAttribute.class
 parozzz\github\com\hmi\main\quicksetup\impl\BackgroundQuickSetupPane.class
@@ -189,6 +190,7 @@ parozzz\github\com\hmi\main\picturebank\PictureBankStage$WhiteToleranceEnum.clas
 parozzz\github\com\hmi\controls\controlwrapper\ControlWrapper.class
 parozzz\github\com\hmi\attribute\property\impl\ParsableAttributeProperty.class
 parozzz\github\com\hmi\comm\modbustcp\intermediate\bit\ModbusTCPWriteBitIntermediate.class
+parozzz\github\com\hmi\util\ContextMenuBuilder.class
 parozzz\github\com\hmi\controls\controlwrapper\impl\textinput\InputWrapper.class
 parozzz\github\com\util\LoopThread.class
 parozzz\github\com\hmi\database\ControlDataUpdater.class
