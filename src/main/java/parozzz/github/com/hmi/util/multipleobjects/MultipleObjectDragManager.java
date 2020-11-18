@@ -28,7 +28,7 @@ public final class MultipleObjectDragManager
 
     public void addRegion(Region region, Object controller)
     {
-        var alreadyExists = objectDragSet.stream().anyMatch(objectDrag -> objectDrag.region == region);
+        var alreadyExists = objectDragSet.stream().anyMatch(objectDrag -> objectDrag.draggable == region);
         if(!alreadyExists)
         {
             var objectDrag = new ObjectDrag(region, controller);
@@ -41,7 +41,7 @@ public final class MultipleObjectDragManager
     {
         objectDragSet.removeIf(objectDrag ->
         {
-            if(objectDrag.region == region)
+            if(objectDrag.draggable == region)
             {
                 objectDrag.removeEventHandlers();
                 return true;
@@ -51,9 +51,22 @@ public final class MultipleObjectDragManager
         });
     }
 
-    private class ObjectDrag
+    public ObjectDrag getObjectDragOfController(Object controller)
     {
-        private final Region region;
+        for(var objectDrag : objectDragSet)
+        {
+            if(objectDrag.controller == controller)
+            {
+                return objectDrag;
+            }
+        }
+
+        return null;
+    }
+
+    public class ObjectDrag
+    {
+        private final Region draggable;
         private final Object controller;
 
         private final EventHandler<MouseEvent> mousePressedEventHandler;
@@ -63,9 +76,9 @@ public final class MultipleObjectDragManager
         private double startX;
         private double startY;
 
-        private ObjectDrag(Region region, Object controller)
+        private ObjectDrag(Region draggable, Object controller)
         {
-            this.region = region;
+            this.draggable = draggable;
             this.controller = controller;
 
             mousePressedEventHandler = mouseEvent ->
@@ -95,64 +108,9 @@ public final class MultipleObjectDragManager
                     ((Draggable) controller).setIsDragged(true);
                 }
 
-                var source = mouseEvent.getSource();
-                if(!(source instanceof Region))
-                {
-                    return;
-                }
-
-                var draggable = (Region) source;
-
-                var newLayoutX = draggable.getLayoutX() + (mouseEvent.getX() - startX);
-                newLayoutX = Math.max(0, newLayoutX);
-                newLayoutX = Math.min(regionContainer.getWidth() - draggable.getWidth(), newLayoutX);
-
-                var newLayoutY = draggable.getLayoutY() + (mouseEvent.getY() - startY);
-                newLayoutY = Math.max(0, newLayoutY);
-                newLayoutY = Math.min(regionContainer.getHeight() - draggable.getHeight(), newLayoutY);
-
-                var xDiff = newLayoutX - draggable.getLayoutX();
-                double minXDiff = xDiff;
-
-                var yDiff = newLayoutY - draggable.getLayoutY();
-                var minYDiff = yDiff;
-
-                for(var otherObjectDrag : objectDragSet)
-                {
-                    if(otherObjectDrag == this)
-                    {
-                        continue;
-                    }
-
-                    var otherDraggable = otherObjectDrag.region;
-
-                    if(xDiff != 0)
-                    {
-                        var otherNewLayoutX = otherDraggable.getLayoutX() + xDiff;
-                        otherNewLayoutX = Math.max(0, otherNewLayoutX);
-                        otherNewLayoutX = Math.min(regionContainer.getWidth() - otherDraggable.getWidth(), otherNewLayoutX);
-
-                        var otherXDiff = otherNewLayoutX - otherDraggable.getLayoutX();
-                        minXDiff = MathUtil.findNearestToZero(otherXDiff, minXDiff);//Math.min(otherXDiff, minXDiff);
-                    }
-
-                    if(yDiff != 0)
-                    {
-                        var otherNewLayoutY = otherDraggable.getLayoutY() + yDiff;
-                        otherNewLayoutY = Math.max(0, otherNewLayoutY);
-                        otherNewLayoutY = Math.min(regionContainer.getHeight() - otherDraggable.getHeight(), otherNewLayoutY);
-
-                        var otherYDiff = otherNewLayoutY - otherDraggable.getLayoutY();
-                        minYDiff = MathUtil.findNearestToZero(otherYDiff, minYDiff);//Math.min(otherYDiff, minYDiff);
-                    }
-                }
-
-                for(var objectDrag : objectDragSet)
-                {
-                    var objectDragRegion = objectDrag.region;
-                    objectDragRegion.setLayoutX(objectDragRegion.getLayoutX() + minXDiff);
-                    objectDragRegion.setLayoutY(objectDragRegion.getLayoutY() + minYDiff);
-                }
+                var xDiff = mouseEvent.getX() - startX;
+                var yDiff = mouseEvent.getY() - startY;
+                this.move(xDiff, yDiff);
             };
 
             mouseReleaseEventHandler = mouseEvent ->
@@ -164,18 +122,72 @@ public final class MultipleObjectDragManager
             };
         }
 
-        public void addEventHandlers()
+        public void move(double xDiff, double yDiff)
         {
-            region.addEventFilter(MouseEvent.MOUSE_PRESSED, mousePressedEventHandler);
-            region.addEventFilter(MouseEvent.MOUSE_DRAGGED, dragEventHandler);
-            region.addEventFilter(MouseEvent.MOUSE_RELEASED, mouseReleaseEventHandler);
+            var newLayoutX = draggable.getLayoutX() + xDiff;
+            newLayoutX = Math.max(0, newLayoutX);
+            newLayoutX = Math.min(regionContainer.getWidth() - draggable.getWidth(), newLayoutX);
+
+            var newLayoutY = draggable.getLayoutY() + yDiff;
+            newLayoutY = Math.max(0, newLayoutY);
+            newLayoutY = Math.min(regionContainer.getHeight() - draggable.getHeight(), newLayoutY);
+
+            xDiff = newLayoutX - draggable.getLayoutX();
+            var minXDiff = xDiff;
+
+            yDiff = newLayoutY - draggable.getLayoutY();
+            var minYDiff = yDiff;
+
+            for(var otherObjectDrag : objectDragSet)
+            {
+                if(otherObjectDrag == this)
+                {
+                    continue;
+                }
+
+                var otherDraggable = otherObjectDrag.draggable;
+
+                if(xDiff != 0)
+                {
+                    var otherNewLayoutX = otherDraggable.getLayoutX() + xDiff;
+                    otherNewLayoutX = Math.max(0, otherNewLayoutX);
+                    otherNewLayoutX = Math.min(regionContainer.getWidth() - otherDraggable.getWidth(), otherNewLayoutX);
+
+                    var otherXDiff = otherNewLayoutX - otherDraggable.getLayoutX();
+                    minXDiff = MathUtil.findNearestToZero(otherXDiff, minXDiff);//Math.min(otherXDiff, minXDiff);
+                }
+
+                if(yDiff != 0)
+                {
+                    var otherNewLayoutY = otherDraggable.getLayoutY() + yDiff;
+                    otherNewLayoutY = Math.max(0, otherNewLayoutY);
+                    otherNewLayoutY = Math.min(regionContainer.getHeight() - otherDraggable.getHeight(), otherNewLayoutY);
+
+                    var otherYDiff = otherNewLayoutY - otherDraggable.getLayoutY();
+                    minYDiff = MathUtil.findNearestToZero(otherYDiff, minYDiff);//Math.min(otherYDiff, minYDiff);
+                }
+            }
+
+            for(var objectDrag : objectDragSet)
+            {
+                var draggable = objectDrag.draggable;
+                draggable.setLayoutX(draggable.getLayoutX() + minXDiff);
+                draggable.setLayoutY(draggable.getLayoutY() + minYDiff);
+            }
         }
 
-        public void removeEventHandlers()
+        private void addEventHandlers()
         {
-            region.removeEventFilter(MouseEvent.MOUSE_PRESSED, mousePressedEventHandler);
-            region.removeEventFilter(MouseEvent.MOUSE_DRAGGED, dragEventHandler);
-            region.removeEventFilter(MouseEvent.MOUSE_RELEASED, mouseReleaseEventHandler);
+            draggable.addEventFilter(MouseEvent.MOUSE_PRESSED, mousePressedEventHandler);
+            draggable.addEventFilter(MouseEvent.MOUSE_DRAGGED, dragEventHandler);
+            draggable.addEventFilter(MouseEvent.MOUSE_RELEASED, mouseReleaseEventHandler);
+        }
+
+        private void removeEventHandlers()
+        {
+            draggable.removeEventFilter(MouseEvent.MOUSE_PRESSED, mousePressedEventHandler);
+            draggable.removeEventFilter(MouseEvent.MOUSE_DRAGGED, dragEventHandler);
+            draggable.removeEventFilter(MouseEvent.MOUSE_RELEASED, mouseReleaseEventHandler);
         }
 
         private boolean isControllerResizing()

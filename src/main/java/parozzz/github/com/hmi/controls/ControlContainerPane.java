@@ -143,41 +143,7 @@ public class ControlContainerPane extends FXController
                 controlContainerDatabase.deletePage(this);
             }
         });
-/*
-        var backgroundColorLabelMenuItem = FXUtil.createCustomMenuItem(() -> new Label("Background Color"), false);
 
-        var backgroundColorMenuItem = FXUtil.createCustomMenuItem(() ->
-        {
-            var colorPicker = new ColorPicker();
-            backgroundColorProperty.bindBidirectional(colorPicker.valueProperty());
-            return colorPicker;
-        }, false);
-
-        var backgroundImageNameMenuItem = FXUtil.createCustomMenuItem(() ->
-        {
-            var textField = new TextField();
-            backgroundPictureNameProperty.bindBidirectional(textField.textProperty());
-            return textField;
-        }, false);
-
-        var backgroundImageSelectMenuItem = FXUtil.createCustomMenuItem(() ->
-        {
-            var button = new Button("Select Picture");
-            button.setOnAction(actionEvent ->
-            {
-                var pictureBank = this.controlContainerDatabase.getMainEditStage().getPictureBankStage();
-                pictureBank.startImageSelection(file -> backgroundPictureNameProperty.setValue(file.getName()));
-            });
-            return button;
-        }, false);
-
-
-        var menuBottomContextMenu = new ContextMenu(deletePageMenuItem,
-                new SeparatorMenuItem(),
-                backgroundColorLabelMenuItem, backgroundColorMenuItem,
-                new SeparatorMenuItem(),
-                backgroundImageSelectMenuItem, backgroundImageNameMenuItem);
-*/
         var menuBottomContextMenu = ContextMenuBuilder.builder()
                 .simple("Delete", () ->
                         new Alert(Alert.AlertType.CONFIRMATION).showAndWait()

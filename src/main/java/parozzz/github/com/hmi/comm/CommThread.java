@@ -44,7 +44,15 @@ public abstract class CommThread extends Thread
             {
                 try
                 {
-                    Thread.sleep(10000);
+                    //This should stop the annoying wait for the sleep to finish stuff
+                    for(var x = 0; x < 100; x++)
+                    {
+                        Thread.sleep(100);
+                        if(stop)
+                        {
+                            return;
+                        }
+                    }
                 } catch (InterruptedException interruptedException)
                 {
                     interruptedException.printStackTrace();

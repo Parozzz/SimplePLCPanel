@@ -85,6 +85,12 @@ public final class HMIStageSetter
         return this;
     }
 
+    public HMIStageSetter setMaximized(boolean maximized)
+    {
+        stage.setMaximized(maximized);
+        return this;
+    }
+
     public String getTitle()
     {
         return stage.getTitle();

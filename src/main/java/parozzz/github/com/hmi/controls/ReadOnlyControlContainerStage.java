@@ -1,19 +1,24 @@
 package parozzz.github.com.hmi.controls;
 
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.StageStyle;
+import javafx.stage.WindowEvent;
 import parozzz.github.com.hmi.main.MainEditStage;
 import parozzz.github.com.hmi.page.HMIStage;
 
 public final class ReadOnlyControlContainerStage extends HMIStage<StackPane>
 {
     private final MainEditStage mainEditStage;
+    private final Group group;
+
     private ControlContainerPane controlContainerPane;
     private boolean stopFullScreen = false;
 
@@ -22,6 +27,9 @@ public final class ReadOnlyControlContainerStage extends HMIStage<StackPane>
         super("ReadOnlyControlMainPage", new StackPane());
 
         this.mainEditStage = mainEditStage;
+        super.parent.getChildren().addAll(
+                this.group = new Group()
+        );
     }
 
     @Override
@@ -32,6 +40,7 @@ public final class ReadOnlyControlContainerStage extends HMIStage<StackPane>
         var stage = super.getStageSetter()
                 .initModality(Modality.APPLICATION_MODAL)
                 .initStyle(StageStyle.UNDECORATED)
+                //.setFullScreen(true, "", null)
                 .setAlwaysOnTop(true)
                 .setResizable(true)
                 .get();
@@ -65,6 +74,7 @@ public final class ReadOnlyControlContainerStage extends HMIStage<StackPane>
         stage.setFullScreenExitHint("");
         stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
 
+        super.parent.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
         super.parent.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         super.parent.setAlignment(Pos.CENTER);
     }
@@ -76,13 +86,16 @@ public final class ReadOnlyControlContainerStage extends HMIStage<StackPane>
             if (keyEvent.getCode() == KeyCode.ESCAPE)
             {
                 super.getStageSetter().close();
-                mainEditStage.showStage();
 
                 if (controlContainerPane != null)
                 {
+                    mainEditStage.setShownControlContainerPane(controlContainerPane);
+
                     controlContainerPane.convertToReadWrite();
                     controlContainerPane = null;
                 }
+
+                mainEditStage.showStage();
             }
         });
     }
@@ -106,10 +119,16 @@ public final class ReadOnlyControlContainerStage extends HMIStage<StackPane>
             anchorPane = new AnchorPane();
         }
 
-        var children = super.parent.getChildren();
+        var children = group.getChildren();
         children.clear();
 
-        StackPane.setAlignment(anchorPane, Pos.CENTER);
+        StackPane.setAlignment(anchorPane, null);
         children.add(anchorPane);
+
+        var scaleX = super.parent.getWidth() / anchorPane.getWidth();
+        var scaleY = super.parent.getHeight() / anchorPane.getHeight();
+
+        group.setScaleX(scaleX);
+        group.setScaleY(scaleY);
     }
 }

@@ -6,7 +6,6 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
-import parozzz.github.com.hmi.FXController;
 import parozzz.github.com.hmi.FXObject;
 import parozzz.github.com.hmi.controls.ControlContainerPane;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
@@ -21,7 +20,7 @@ public final class ControlWrappersSelectionManager extends FXObject
     private final MultipleObjectDragManager dragManager;
     private final ObservableList<ControlWrapper<?>> selectedControlWrapperList;
 
-    private ControlWrapper<?> mainControlWrapper;
+    private ControlWrapper<?> mainSelection;
 
     public ControlWrappersSelectionManager(ControlContainerPane controlContainerPane, Region regionContainer)
     {
@@ -51,16 +50,16 @@ public final class ControlWrappersSelectionManager extends FXObject
                     }
                 }
 
-                if(mainControlWrapper != null && !mainControlWrapper.isSelected())
+                if(mainSelection != null && !mainSelection.isSelected())
                 {
-                    mainControlWrapper = null;
+                    mainSelection = null;
                     controlContainerPane.getMainEditStage().getQuickPropertiesVBox().setSelected(null);
                 }
 
-                if(mainControlWrapper == null && finalList.size() != 0)
+                if(mainSelection == null && finalList.size() != 0)
                 {
-                    (mainControlWrapper = finalList.get(0)).setAsMainSelection();
-                    controlContainerPane.getMainEditStage().getQuickPropertiesVBox().setSelected(mainControlWrapper);
+                    (mainSelection = finalList.get(0)).setAsMainSelection();
+                    controlContainerPane.getMainEditStage().getQuickPropertiesVBox().setSelected(mainSelection);
                 }
             }
         });
@@ -86,9 +85,9 @@ public final class ControlWrappersSelectionManager extends FXObject
         });
     }
 
-    public ControlWrapper<?> getMainControlWrapper()
+    public ControlWrapper<?> getMainSelection()
     {
-        return mainControlWrapper;
+        return mainSelection;
     }
 
     public void remove(ControlWrapper<?> controlWrapper)
@@ -139,11 +138,21 @@ public final class ControlWrappersSelectionManager extends FXObject
 
     public void moveAll(double xDiff, double yDiff)
     {
+        if(mainSelection != null)
+        {//This way should take care of moving them all and checking the bounds
+            var objectDrag = dragManager.getObjectDragOfController(mainSelection);
+            if(objectDrag != null)
+            {
+                objectDrag.move(xDiff, yDiff);
+            }
+        }
+
+        /*
         for(var controlWrapper : selectedControlWrapperList)
         {
             var containerPane = controlWrapper.getContainerPane();
             containerPane.setLayoutX(containerPane.getLayoutX() + xDiff);
             containerPane.setLayoutY(containerPane.getLayoutY() + yDiff);
-        }
+        }*/
     }
 }

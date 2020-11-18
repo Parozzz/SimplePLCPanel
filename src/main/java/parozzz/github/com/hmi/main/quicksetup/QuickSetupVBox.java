@@ -1,11 +1,17 @@
 package parozzz.github.com.hmi.main.quicksetup;
 
+import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import parozzz.github.com.hmi.FXController;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.main.quicksetup.impl.*;
+import parozzz.github.com.hmi.util.FXUtil;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -53,10 +59,13 @@ public final class QuickSetupVBox extends FXController
         super.setup();
 
         mainScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        mainScrollPane.setBackground(FXUtil.createBackground(Color.TRANSPARENT));
 
         var scrollVBox = new VBox();
-        this.computeQuickSetupPane(scrollVBox, stateSelectionQuickSetupPane, genericQuickSetupPane,
-                baseQuickSetupPane, backgroundQuickSetupPane, textQuickSetupPane);
+        this.computeQuickSetupPane(scrollVBox,
+                stateSelectionQuickSetupPane, genericQuickSetupPane,
+                baseQuickSetupPane, backgroundQuickSetupPane, textQuickSetupPane
+        );
 
         scrollVBox.setMinSize(0, 0);
         scrollVBox.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);

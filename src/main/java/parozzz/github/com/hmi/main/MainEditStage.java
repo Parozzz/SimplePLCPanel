@@ -10,6 +10,7 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.stage.Screen;
 import parozzz.github.com.Main;
 import parozzz.github.com.StartProperties;
 import parozzz.github.com.hmi.comm.CommunicationStage;
@@ -112,7 +113,9 @@ public final class MainEditStage extends BorderPaneHMIStage
     {
         super.setup();
 
-        super.getStageSetter().setResizable(true);
+        super.getStageSetter()
+                .setResizable(true)
+                .setMaximized(true);
 
         super.serializableDataSet.addString("PageHeight", pageHeightTextField.textProperty())
                 .addString("PageWidth", pageWidthTextField.textProperty())
@@ -161,7 +164,7 @@ public final class MainEditStage extends BorderPaneHMIStage
             if (shownControlContainerPane != null)
             {
                 shownControlContainerPane.getMainAnchorPane().setPrefWidth(newWidth);
-                this.getStageSetter().get().sizeToScene();
+                //this.getStageSetter().get().sizeToScene();
             }
         });
 
@@ -174,7 +177,7 @@ public final class MainEditStage extends BorderPaneHMIStage
             if (shownControlContainerPane != null)
             {
                 shownControlContainerPane.getMainAnchorPane().setPrefHeight(newHeight);
-                this.getStageSetter().get().sizeToScene();
+                //this.getStageSetter().get().sizeToScene();
             }
         });
 
@@ -239,11 +242,12 @@ public final class MainEditStage extends BorderPaneHMIStage
         super.setupComplete();
 
         //On setup complete, if there is any page, open the first.
+        /*
         var pageList = controlContainerDatabase.getPageList();
         if (!pageList.isEmpty())
         {
             this.setShownControlContainerPane(pageList.get(0));
-        }
+        }*/
     }
 
     public CommunicationStage getCommunicationStage()
@@ -313,8 +317,8 @@ public final class MainEditStage extends BorderPaneHMIStage
 
             readOnlyControlMainPage.getStageSetter().setFullScreen(fullScreen, "", null);
 
-            readOnlyControlMainPage.setControlMainPage(pageList.get(0));
             readOnlyControlMainPage.showStage();
+            readOnlyControlMainPage.setControlMainPage(pageList.get(0));
 
             //Close all the pages
             this.getStageSetter().close();
@@ -358,7 +362,7 @@ public final class MainEditStage extends BorderPaneHMIStage
         children.add(anchorPane);
         //centerScrollPane.setContent(anchorPane);
 
-        this.getStageSetter().get().sizeToScene();
+        //this.getStageSetter().get().sizeToScene();
     }
 
     public boolean showPageFullScreen()

@@ -128,6 +128,9 @@
          <BorderPane.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </BorderPane.margin>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
       </StackPane>
    </left>
    <center>
@@ -135,20 +138,29 @@
          <children>
             <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity">
                <children>
-                  <Label fx:id="centerTopLabel" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" text="OPS!">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                  </Label>
+                  <HBox maxHeight="-Infinity" maxWidth="-Infinity" spacing="10.0" StackPane.alignment="CENTER">
+                     <children>
+                        <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Page Selected:">
+                           <font>
+                              <Font size="22.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="centerTopLabel" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" text="OPS!">
+                           <font>
+                              <Font name="System Italic" size="22.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
                </children>
             </StackPane>
-            <StackPane alignment="TOP_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" style="-fx-border-color: lightgray; -fx-border-width: 2 0 0 0;">
+            <StackPane alignment="TOP_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" style="-fx-border-color: lightgray; -fx-border-width: 2 0 0 0;" VBox.vgrow="ALWAYS">
                <children>
-                  <ScrollPane focusTraversable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0">
+                  <ScrollPane fitToHeight="true" fitToWidth="true" focusTraversable="false" hbarPolicy="ALWAYS" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0" vbarPolicy="ALWAYS" StackPane.alignment="CENTER">
                      <content>
                         <Group>
                            <children>
-                              <StackPane fx:id="centerScrollStackPane" alignment="TOP_LEFT" layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="50.0" minWidth="50.0" style="-fx-border-color: darkgray; -fx-border-width: 2;" />
+                              <StackPane fx:id="centerScrollStackPane" layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="50.0" minWidth="50.0" />
                            </children>
                         </Group>
                      </content>
