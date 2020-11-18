@@ -5,13 +5,15 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import parozzz.github.com.hmi.comm.DeviceCommunicationManager;
 import parozzz.github.com.hmi.util.FXTextFormatterUtil;
 import parozzz.github.com.hmi.util.FXUtil;
 import parozzz.github.com.util.concurrent.SettableConcurrentObject;
 
 import java.io.IOException;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -28,7 +30,7 @@ public final class SiemensPLCCommunicationManager extends DeviceCommunicationMan
     @FXML private Button connectButton;
     @FXML private Label modelLabel;
 
-    private final AnchorPane mainAnchorPane;
+    private final StackPane mainStackPane;
 
     private final SettableConcurrentObject<String> modelObject;
     private boolean queryModelNumber = false;
@@ -37,7 +39,7 @@ public final class SiemensPLCCommunicationManager extends DeviceCommunicationMan
     {
         super("SiemensPLCCommunicationManager", plcThread);
 
-        mainAnchorPane = (AnchorPane) FXUtil.loadFXML("siemensCommPane.fxml", this);
+        mainStackPane = (StackPane) FXUtil.loadFXML("siemensCommPane.fxml", this);
 
         this.modelObject = new SettableConcurrentObject<>();
     }
@@ -57,6 +59,10 @@ public final class SiemensPLCCommunicationManager extends DeviceCommunicationMan
         Stream.of(address1TextField, address2TextField, address3TextField, address4TextField).forEach(textField ->
                 textField.setTextFormatter(FXTextFormatterUtil.positiveInteger(3))
         );
+
+        super.setSkipOnNextForDot(address1TextField, address2TextField);
+        super.setSkipOnNextForDot(address2TextField, address3TextField);
+        super.setSkipOnNextForDot(address3TextField, address4TextField);
 
         Stream.of(rackTextField, slotTextField).forEach(textField ->
                 textField.setTextFormatter(FXTextFormatterUtil.positiveInteger(2)))
@@ -113,7 +119,7 @@ public final class SiemensPLCCommunicationManager extends DeviceCommunicationMan
     @Override
     public Parent getParent()
     {
-        return mainAnchorPane;
+        return mainStackPane;
     }
 
     private void setPLCAddress()

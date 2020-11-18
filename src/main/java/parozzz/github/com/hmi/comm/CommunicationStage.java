@@ -3,6 +3,7 @@ package parozzz.github.com.hmi.comm;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import parozzz.github.com.hmi.comm.modbustcp.ModbusTCPCommunicationManager;
 import parozzz.github.com.hmi.comm.modbustcp.ModbusTCPThread;
@@ -18,7 +19,7 @@ public final class CommunicationStage extends HMIStage<VBox>
 {
     @FXML private ChoiceBox<CommunicationType> commTypeChoiceBox;
 
-    @FXML private AnchorPane commManagerAnchorPane;
+    @FXML private StackPane commManagerStackPane;
 
     private final SiemensPLCCommunicationManager siemensPLCCommunicationManager;
     private final ModbusTCPCommunicationManager modbusTCPCommunicationManager;
@@ -37,19 +38,22 @@ public final class CommunicationStage extends HMIStage<VBox>
     {
         super.setup();
 
+        super.getStageSetter()
+                .setResizable(true);
+
         serializableDataSet.addEnum("CommunicationType", commTypeChoiceBox.valueProperty(), CommunicationType.class);
 
         commTypeChoiceBox.setConverter(new EnumStringConverter<>(CommunicationType.class));
         commTypeChoiceBox.getItems().addAll(CommunicationType.values());
         commTypeChoiceBox.valueProperty().addListener((observableValue, oldValue, newValue) ->
         {
-            var children = commManagerAnchorPane.getChildren();
+            var children = commManagerStackPane.getChildren();
+            children.clear();
+
             if (selectedCommunicationManager != null)
             {
                 selectedCommunicationManager.setActive(false);
                 selectedCommunicationManager = null;
-
-                children.clear();
             }
 
             if (newValue != null)

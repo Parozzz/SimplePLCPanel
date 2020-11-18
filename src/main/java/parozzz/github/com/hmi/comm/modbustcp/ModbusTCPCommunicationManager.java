@@ -4,7 +4,9 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import parozzz.github.com.hmi.comm.DeviceCommunicationManager;
 import parozzz.github.com.hmi.util.FXTextFormatterUtil;
 import parozzz.github.com.hmi.util.FXUtil;
@@ -23,13 +25,13 @@ public final class ModbusTCPCommunicationManager extends DeviceCommunicationMana
 
     @FXML private Button connectButton;
 
-    private final AnchorPane mainAnchorPane;
+    private final StackPane mainStackPane;
 
     public ModbusTCPCommunicationManager(ModbusTCPThread thread) throws IOException
     {
         super("ModbusTCPCommunicationManager", thread);
 
-        this.mainAnchorPane = (AnchorPane) FXUtil.loadFXML("modbusTCPCommPane.fxml", this);
+        this.mainStackPane = (StackPane) FXUtil.loadFXML("modbusTCPCommPane.fxml", this);
     }
 
     @Override
@@ -40,6 +42,10 @@ public final class ModbusTCPCommunicationManager extends DeviceCommunicationMana
         Stream.of(address1TextField, address2TextField, address3TextField, address4TextField).forEach(textField ->
                 textField.setTextFormatter(FXTextFormatterUtil.positiveInteger(3))
         );
+
+        super.setSkipOnNextForDot(address1TextField, address2TextField);
+        super.setSkipOnNextForDot(address2TextField, address3TextField);
+        super.setSkipOnNextForDot(address3TextField, address4TextField);
 
         portTextField.setTextFormatter(FXTextFormatterUtil.positiveInteger(5));
 
@@ -76,7 +82,7 @@ public final class ModbusTCPCommunicationManager extends DeviceCommunicationMana
     @Override
     public Parent getParent()
     {
-        return mainAnchorPane;
+        return mainStackPane;
     }
 
     private void setConnectionParameters()

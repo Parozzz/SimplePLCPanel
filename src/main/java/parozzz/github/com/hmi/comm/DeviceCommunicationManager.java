@@ -1,6 +1,8 @@
 package parozzz.github.com.hmi.comm;
 
 import javafx.scene.Parent;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import parozzz.github.com.hmi.FXObject;
 
 import java.io.IOException;
@@ -32,5 +34,16 @@ public abstract class DeviceCommunicationManager<T extends CommThread> extends F
     public boolean isActive()
     {
         return commThread.isActive();
+    }
+
+    protected void setSkipOnNextForDot(TextField textField, TextField nextTextField)
+    {
+        textField.setOnKeyPressed(event ->
+        {
+            if(event.getCode() == KeyCode.DECIMAL)
+            {
+                nextTextField.requestFocus();
+            }
+        });
     }
 }
