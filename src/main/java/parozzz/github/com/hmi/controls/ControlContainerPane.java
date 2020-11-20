@@ -95,7 +95,7 @@ public class ControlContainerPane extends FXController
         super.serializableDataSet.addParsable("BackgroundColor", backgroundColorProperty, JSONSerializables.COLOR)
                 .addString("BackgroundPictureName", backgroundPictureNameProperty);
 
-        mainEditStage.getStageSetter().addEventFilter(KeyEvent.KEY_PRESSED, keyEvent ->
+        mainAnchorPane.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent ->
         {
             if(controlWrappersSelectionManager.isEmpty())
             {
@@ -106,14 +106,17 @@ public class ControlContainerPane extends FXController
             switch(keyCode)
             {
                 case DELETE:
+                    keyEvent.consume();
                     controlWrappersSelectionManager.deleteAll();
                     break;
                 case RIGHT:
                 case LEFT:
+                    keyEvent.consume();
                     controlWrappersSelectionManager.moveAll(keyCode == KeyCode.RIGHT ? 1 : -1, 0d);
                     break;
                 case UP:
                 case DOWN:
+                    keyEvent.consume();
                     controlWrappersSelectionManager.moveAll(0d, keyCode == KeyCode.UP ? -1 : 1);
                     break;
             }

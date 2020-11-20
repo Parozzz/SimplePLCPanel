@@ -30,7 +30,8 @@
 
 10) If i use the arrows, the quick setup is selected and won't work right then. FIX!
 
-11) If i click two times the up arrow, the quick setup menu is selected (Won't allow moving control with arrow. PLS FIX!)
+11)☑ If i click two times the up arrow, the quick setup menu is selected (Won't allow moving control with arrow. PLS FIX!)
+11.1)☑ I have removed completely the possibility to focus indirectly controls inside the quick pane. Maybe find a workaround? (Consume the KeyEvent!)
 
 Control Wrapper Selection
 

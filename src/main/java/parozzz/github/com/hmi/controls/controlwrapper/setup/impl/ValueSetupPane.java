@@ -69,37 +69,23 @@ public final class ValueSetupPane extends SetupPane<ValueAttribute>
         var sliderSkin = new SliderSkin(testSlider);
         testSlider.setSkin(sliderSkin);
 
-        try
+        var thumb = (StackPane) testSlider.lookup(".thumb");
+        thumb.setPadding(new Insets(-1, -1, -1, -1));
+        thumb.setMinSize(45, 30);
+        thumb.setPrefSize(45, 30);
+
+        var label = new Label("0.00");
+        label.setPadding(new Insets(-1, -1, -1, -1));
+        testSlider.valueProperty().addListener((observableValue, oldValue, newValue) ->
         {
-            var thumbField = SliderSkin.class.getDeclaredField("thumb");
-            thumbField.trySetAccessible();
+            var doubleValue = newValue.doubleValue();
+            label.setText("" + Util.format(doubleValue, 2));
+        });
+        thumb.getChildren().add(label);
 
-            var thumb = (StackPane) thumbField.get(sliderSkin);
-            thumb.setPadding(new Insets(-1, -1, -1, -1));
-            thumb.setMinSize(45, 30);
-            thumb.setPrefSize(45, 30);
-
-            var label = new Label("0.00");
-            label.setPadding(new Insets(-1, -1, -1, -1));
-            testSlider.valueProperty().addListener((observableValue, oldValue, newValue) ->
-            {
-                var doubleValue = newValue.doubleValue();
-                label.setText("" + Util.format(doubleValue, 2));
-            });
-            thumb.getChildren().add(label);
-
-
-            var trackField = SliderSkin.class.getDeclaredField("track");
-            trackField.trySetAccessible();
-
-            var track = (StackPane) trackField.get(sliderSkin);
-            track.setCursor(Cursor.CLOSED_HAND);
-            track.setBackground(new Background(new BackgroundFill(Color.GRAY, CornerRadii.EMPTY, Insets.EMPTY)));
-
-        } catch (NoSuchFieldException | IllegalAccessException exception)
-        {
-            exception.printStackTrace();
-        }
+        var track = (StackPane) testSlider.lookup(".track");
+        track.setCursor(Cursor.CLOSED_HAND);
+        track.setBackground(new Background(new BackgroundFill(Color.GRAY, CornerRadii.EMPTY, Insets.EMPTY)));
 
         testSlider.setShowTickMarks(true);
         testSlider.setShowTickLabels(true);
