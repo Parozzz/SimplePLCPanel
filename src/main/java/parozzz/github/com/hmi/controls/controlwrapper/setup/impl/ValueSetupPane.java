@@ -1,16 +1,11 @@
 package parozzz.github.com.hmi.controls.controlwrapper.setup.impl;
 
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
-import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
-import javafx.scene.control.skin.SliderSkin;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import parozzz.github.com.hmi.attribute.impl.ValueAttribute;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.ControlWrapperSetupStage;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.SetupPane;
@@ -24,17 +19,17 @@ import java.io.IOException;
 public final class ValueSetupPane extends SetupPane<ValueAttribute>
 {
     @FXML private ChoiceBox<ValueIntermediateType<?>> valueTypeChoiceBox;
-    @FXML private TextField multiplyByTextField;
+    @FXML private TextField multiplierTextField;
     @FXML private TextField offsetTextField;
     @FXML private Slider testSlider;
 
-    private final AnchorPane mainAnchorPane;
+    private final VBox vBox;
 
     public ValueSetupPane(ControlWrapperSetupStage setupStage) throws IOException
     {
         super(setupStage, "ValueSetupPane", "Value", ValueAttribute.class);
 
-        mainAnchorPane = (AnchorPane) FXUtil.loadFXML("setup/valueSetupPane.fxml", this);
+        vBox = (VBox) FXUtil.loadFXML("setupv2/valueSetupPaneV2.fxml", this);
     }
 
     @Override
@@ -60,12 +55,12 @@ public final class ValueSetupPane extends SetupPane<ValueAttribute>
         }));
         valueTypeChoiceBox.getItems().addAll(ValueIntermediateType.values());
 
-        multiplyByTextField.setTextFormatter(FXTextFormatterUtil.doubleBuilder().getTextFormatter());
-        multiplyByTextField.setEditable(true);
+        multiplierTextField.setTextFormatter(FXTextFormatterUtil.doubleBuilder().getTextFormatter());
+        multiplierTextField.setEditable(true);
 
         offsetTextField.setTextFormatter(FXTextFormatterUtil.doubleBuilder().getTextFormatter());
         offsetTextField.setEditable(true);
-
+/*
         var sliderSkin = new SliderSkin(testSlider);
         testSlider.setSkin(sliderSkin);
 
@@ -77,10 +72,10 @@ public final class ValueSetupPane extends SetupPane<ValueAttribute>
         var label = new Label("0.00");
         label.setPadding(new Insets(-1, -1, -1, -1));
         testSlider.valueProperty().addListener((observableValue, oldValue, newValue) ->
-        {
-            var doubleValue = newValue.doubleValue();
-            label.setText("" + Util.format(doubleValue, 2));
-        });
+                label.setText("" + Util.format(newValue.doubleValue(), 2))
+        );
+
+
         thumb.getChildren().add(label);
 
         var track = (StackPane) testSlider.lookup(".track");
@@ -89,17 +84,17 @@ public final class ValueSetupPane extends SetupPane<ValueAttribute>
 
         testSlider.setShowTickMarks(true);
         testSlider.setShowTickLabels(true);
-
+*/
         super.getAttributeChangerList().create(valueTypeChoiceBox.valueProperty(), ValueAttribute.INTERMEDIATE_TYPE)
-                .createStringToNumber(multiplyByTextField.textProperty(), ValueAttribute.MULTIPLY_BY, Util::parseDoubleOrZero)
+                .createStringToNumber(multiplierTextField.textProperty(), ValueAttribute.MULTIPLY_BY, Util::parseDoubleOrZero)
                 .createStringToNumber(offsetTextField.textProperty(), ValueAttribute.OFFSET, Util::parseDoubleOrZero);
 
         super.computeProperties();
     }
 
     @Override
-    public Parent getMainParent()
+    public Parent getParent()
     {
-        return mainAnchorPane;
+        return vBox;
     }
 }

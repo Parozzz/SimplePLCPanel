@@ -6,7 +6,7 @@ import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
 
 public interface QuickSetupPane
 {
-    Parent getMainParent();
+    Parent getParent();
 
     void onNewControlWrapper(ControlWrapper<?> controlWrapper);
 

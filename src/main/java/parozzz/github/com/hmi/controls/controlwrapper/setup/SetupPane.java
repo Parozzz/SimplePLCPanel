@@ -4,38 +4,40 @@ package parozzz.github.com.hmi.controls.controlwrapper.setup;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Control;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.Tab;
+import javafx.scene.control.*;
 import javafx.scene.effect.SepiaTone;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import parozzz.github.com.hmi.FXObject;
 import parozzz.github.com.hmi.attribute.Attribute;
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.AttributeMap;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.attributechanger.SetupPaneAttributeChangerList;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.extra.ControlWrapperSetupUtil;
+import parozzz.github.com.hmi.util.FXUtil;
 
-public abstract class SetupPane<A extends Attribute> extends FXObject
+public abstract class SetupPane<A extends Attribute> extends FXObject implements SetupButtonSelectable
 {
     private final ControlWrapperSetupStage setupStage;
     private final Class<A> attributeClass;
     private final SetupPaneAttributeChangerList<A> attributeChangerList;
 
-    private final Tab tab;
+    private final Button selectButton;
 
-    public SetupPane(ControlWrapperSetupStage setupStage, String name, String tabName, Class<A> attributeClass)
+    public SetupPane(ControlWrapperSetupStage setupStage, String name, String buttonText, Class<A> attributeClass)
+    {
+        this(setupStage, name, new Button(buttonText), attributeClass);
+    }
+
+    public SetupPane(ControlWrapperSetupStage setupStage, String name, Button selectButton, Class<A> attributeClass)
     {
         super(name);
 
         this.setupStage = setupStage;
         this.attributeClass = attributeClass;
         this.attributeChangerList = new SetupPaneAttributeChangerList<>(this, attributeClass);
-
-        this.tab = new Tab();
-        tab.setText(tabName);
+        this.selectButton = selectButton;
     }
 
     @Override
@@ -43,13 +45,12 @@ public abstract class SetupPane<A extends Attribute> extends FXObject
     {
         super.setup();
 
-        tab.setUserData(this);
+        selectButton.setBackground(FXUtil.createBackground(Color.TRANSPARENT));
+        selectButton.setBorder(FXUtil.createBorder(Color.LIGHTGRAY, 1));
+        selectButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
-        var stackPane = new StackPane();
-        stackPane.setAlignment(Pos.CENTER);
-        stackPane.getChildren().add(this.getMainParent());
-        stackPane.setPadding(new Insets(3));
-        tab.setContent(stackPane);
+        selectButton.setUserData(this);
+        selectButton.setOnAction(actionEvent -> setupStage.showSelectable(this));
     }
 
     public ControlWrapperSetupStage getSetupStage()
@@ -57,12 +58,14 @@ public abstract class SetupPane<A extends Attribute> extends FXObject
         return setupStage;
     }
 
-    protected Tab getTab()
+    @Override
+    public Button getSelectButton()
     {
-        return tab;
+        return selectButton;
     }
 
-    public abstract Parent getMainParent();
+    @Override
+    public abstract Parent getParent();
 
     public boolean hasAttribute(AttributeMap attributeMap)
     {
@@ -148,7 +151,7 @@ public abstract class SetupPane<A extends Attribute> extends FXObject
                     contextMenu.getItems().addAll(setDataToAllStateMenuItem);
                     control.setContextMenu(contextMenu);
                 }
-
+/*
                 if(allowMultipleSelection)
                 {
                     var selectAndWriteMultiple = setupStage.getSelectAndMultipleWrite();
@@ -177,7 +180,7 @@ public abstract class SetupPane<A extends Attribute> extends FXObject
                             }
                         });
                     }
-                }
+                }*/
             }
         });
     }

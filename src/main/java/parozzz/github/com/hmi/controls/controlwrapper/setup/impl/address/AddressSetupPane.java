@@ -25,9 +25,7 @@ public class AddressSetupPane<A extends AddressAttribute> extends SetupPane<A>
     //Labels
 
     @FXML private ChoiceBox<AddressDataType> addressTypeChoiceBox;
-
-    @FXML private StackPane addressSetupStackPane;
-
+    @FXML private StackPane centerStackPane;
     @FXML private TextField textAddressTextField;
 
     private final Class<A> attributeClass;
@@ -45,7 +43,7 @@ public class AddressSetupPane<A extends AddressAttribute> extends SetupPane<A>
 
         this.attributeClass = attributeClass;
         this.global = global;
-        this.mainVBox = (VBox) FXUtil.loadFXML("setup/addressSetupPane.fxml", this);
+        this.mainVBox = (VBox) FXUtil.loadFXML("setupv2/addressSetupPaneV2.fxml", this);
 
         this.siemensAddressPane = new SiemensAddressPane(this);
         this.modbusTCPAddressPane = new ModbusTCPAddressPane(global); //The global one will always be read address
@@ -69,7 +67,7 @@ public class AddressSetupPane<A extends AddressAttribute> extends SetupPane<A>
         {
             textAddressTextField.setText(""); //Reset it just to be sure. In case is populated.
 
-            var children = addressSetupStackPane.getChildren();
+            var children = centerStackPane.getChildren();
             children.clear();
 
             if (newValue == AddressDataType.NONE)
@@ -120,8 +118,8 @@ public class AddressSetupPane<A extends AddressAttribute> extends SetupPane<A>
         if(!global) //Do this after i parse the address pane so all the values inside the attribute changer list are there.
         {
             super.computeProperties();
-            super.getSetupStage().getSelectAndMultipleWrite()
-                    .onSelectingMultiplesChangeListener(selectMultiples -> textAddressTextField.setVisible(!selectMultiples));
+            //super.getSetupStage().getSelectAndMultipleWrite()
+            //        .onSelectingMultiplesChangeListener(selectMultiples -> textAddressTextField.setVisible(!selectMultiples));
         }
         else
         {
@@ -141,7 +139,7 @@ public class AddressSetupPane<A extends AddressAttribute> extends SetupPane<A>
     }
 
     @Override
-    public Parent getMainParent()
+    public Parent getParent()
     {
         return mainVBox;
     }

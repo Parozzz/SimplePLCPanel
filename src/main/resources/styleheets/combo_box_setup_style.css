@@ -1,0 +1,14 @@
+.combo-box {
+	-fx-background-color: transparent;
+	-fx-border-color: lightgray;
+	-fx-padding: -1;
+}
+
+.combo-box .text-input {
+	-fx-background-color: transparent;
+}
+
+.combo-box .arrow-button {
+	-fx-background-color: transparent;
+	-fx-border-color: lightgray;
+}

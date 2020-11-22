@@ -1,0 +1,14 @@
+.spinner {
+	-fx-background-color: transparent;
+	-fx-border-color: lightgray;
+}
+
+.spinner .text-field {
+	-fx-background-color: transparent;
+	-fx-font-size: 14;
+	-fx-padding: -1;
+}
+
+.spinner:focused {
+	-fx-focus-color: mediumslateblue;
+}

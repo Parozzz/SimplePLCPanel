@@ -7,22 +7,16 @@ import javafx.scene.control.skin.TextFieldSkin;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Shape;
 import parozzz.github.com.hmi.attribute.Attribute;
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.AttributeMap;
-import parozzz.github.com.hmi.attribute.impl.BaseAttribute;
-import parozzz.github.com.hmi.attribute.impl.TextAttribute;
-import parozzz.github.com.hmi.attribute.impl.ValueAttribute;
-import parozzz.github.com.hmi.attribute.impl.address.ReadAddressAttribute;
+import parozzz.github.com.hmi.attribute.impl.FontAttribute;
+import parozzz.github.com.hmi.attribute.impl.SizeAttribute;
 import parozzz.github.com.hmi.attribute.impl.address.WriteAddressAttribute;
 import parozzz.github.com.hmi.attribute.impl.control.InputDataAttribute;
 import parozzz.github.com.hmi.controls.ControlContainerPane;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapperType;
-import parozzz.github.com.hmi.controls.controlwrapper.setup.ControlWrapperSetupStage;
 import parozzz.github.com.hmi.util.FXNodeUtil;
 import parozzz.github.com.hmi.util.FXTextFormatterUtil;
 
@@ -60,7 +54,7 @@ public class InputWrapper extends ControlWrapper<TextField>
 
         //STATE SPECIFIC
         stateAttributeList.add(new WriteAddressAttribute());
-        stateAttributeList.add(new BaseAttribute());
+        stateAttributeList.add(new FontAttribute());
     }
 
     @Override
@@ -104,8 +98,8 @@ public class InputWrapper extends ControlWrapper<TextField>
             control.setText(""); //When this changes, to avoid problems clear the text
         }
 
-        var baseAttribute = AttributeFetcher.fetch(attributeMap, BaseAttribute.class);
-        if(baseAttribute != null)
+        var fontAttribute = AttributeFetcher.fetch(attributeMap, FontAttribute.class);
+        if(fontAttribute != null)
         {
             var skin = control.getSkin(); //Seems like setting the skin even if already exists causes some... problems
             if (skin == null) //Set the skin before to be sure that it has it (It's required after)
@@ -113,31 +107,16 @@ public class InputWrapper extends ControlWrapper<TextField>
                 control.setSkin(new TextFieldSkin(control));
             }
 
-            if (baseAttribute.getValue(BaseAttribute.ADAPT))
-            {
-                containerPane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
-                containerPane.setMinSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
-                containerPane.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
-            } else
-            {
-                var width = baseAttribute.getValue(BaseAttribute.WIDTH);
-                var height = baseAttribute.getValue(BaseAttribute.HEIGHT);
-
-                containerPane.setPrefSize(width, height);
-                containerPane.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-                containerPane.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-            }
-
             //control.setShape(baseAttribute.getValue(BaseAttribute.SHAPE_TYPE));
-            control.setAlignment(baseAttribute.getValue(BaseAttribute.TEXT_POSITION));
-            control.setFont(baseAttribute.getFont());
+            control.setAlignment(fontAttribute.getValue(FontAttribute.TEXT_POSITION));
+            control.setFont(fontAttribute.getFont());
 
             var text = FXNodeUtil.getTextFieldText(control);
             if (text != null)
             {
                 //Seems like unbinding stuff that is not meant to cause graphical glitches :(
-                text.setUnderline(baseAttribute.getValue(BaseAttribute.UNDERLINE));
-                text.fillProperty().bind(baseAttribute.getProperty(BaseAttribute.TEXT_COLOR));
+                text.setUnderline(fontAttribute.getValue(FontAttribute.UNDERLINE));
+                text.fillProperty().bind(fontAttribute.getProperty(FontAttribute.TEXT_COLOR));
             }
 
             var caretPath = FXNodeUtil.getCaret(control); //Set this after to have it revert after changing the text fill

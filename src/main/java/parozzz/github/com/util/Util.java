@@ -39,7 +39,7 @@ public final class Util
     {
         try
         {
-            return Enum.valueOf(enumClass, string);
+            return Enum.valueOf(enumClass, string.toUpperCase());
         } catch (IllegalArgumentException exception)
         {
             return null;
@@ -93,8 +93,8 @@ public final class Util
         return Main.class.getResource("/" + resource);
     }
 
-    public static String format(double number, int numberOfDigits)
+    public static String format(double number, int decimals)
     {
-        return String.format("%." + numberOfDigits + "f", number);
+        return String.format("%." + decimals + "f", number);
     }
 }

@@ -26,13 +26,11 @@ import java.io.IOException;
 
 public final class BackgroundSetupPane extends SetupPane<BackgroundAttribute>
 {
+    @FXML private ColorPicker backgroundColorPicker;
+    @FXML private TextField cornerRadiiTextField;
     @FXML private TextField imageNameTextField;
     @FXML private ImageView fileImageView;
     @FXML private Button selectImageFileButton;
-
-    @FXML private ColorPicker backgroundColorPicker;
-    @FXML private ColorPicker borderColorPicker;
-    @FXML private TextField borderWidthTextField;
     @FXML private ToggleButton stretchToggleButton;
 
     private final VBox mainVBox;
@@ -41,11 +39,11 @@ public final class BackgroundSetupPane extends SetupPane<BackgroundAttribute>
     {
         super(setupStage, "BackgroundSetupPane", "Background", BackgroundAttribute.class);
 
-        this.mainVBox = (VBox) FXUtil.loadFXML("setup/backgroundSetupPane.fxml", this);
+        this.mainVBox = (VBox) FXUtil.loadFXML("setupv2/backgroundSetupPaneV2.fxml", this);
     }
 
     @Override
-    public Parent getMainParent()
+    public Parent getParent()
     {
         return mainVBox;
     }
@@ -54,6 +52,8 @@ public final class BackgroundSetupPane extends SetupPane<BackgroundAttribute>
     public void setup()
     {
         super.setup();
+
+        cornerRadiiTextField.setTextFormatter(FXTextFormatterUtil.simpleInteger(2));
 
         imageNameTextField.textProperty().addListener((observableValue, oldValue, newValue) ->
         {
@@ -81,8 +81,6 @@ public final class BackgroundSetupPane extends SetupPane<BackgroundAttribute>
             pictureBank.startImageSelection(file -> imageNameTextField.setText(file.getName()));
         });
 
-        borderWidthTextField.setTextFormatter(FXTextFormatterUtil.simpleInteger(3));
-
         var stretchToggleButtonGraphic = stretchToggleButton.getGraphic();
         if (stretchToggleButtonGraphic instanceof ImageView)
         {
@@ -100,25 +98,21 @@ public final class BackgroundSetupPane extends SetupPane<BackgroundAttribute>
             stretchToggleButton.setBackground(background);
         });
 
-        super.getAttributeChangerList().create(imageNameTextField.textProperty(), BackgroundAttribute.PICTURE_BANK_IMAGE_NAME)
+        super.getAttributeChangerList().createStringToNumber(cornerRadiiTextField.textProperty(), BackgroundAttribute.CORNER_RADII, Util::parseIntOrZero)
                 .create(backgroundColorPicker.valueProperty(), BackgroundAttribute.BACKGROUND_COLOR)
-                .create(borderColorPicker.valueProperty(), BackgroundAttribute.BORDER_COLOR)
-                .createStringToNumber(borderWidthTextField.textProperty(), BackgroundAttribute.BORDER_WIDTH, Util::parseIntOrZero)
+                .create(imageNameTextField.textProperty(), BackgroundAttribute.PICTURE_BANK_IMAGE_NAME)
                 .create(stretchToggleButton.selectedProperty(), BackgroundAttribute.STRETCH_IMAGE);
 
         super.computeProperties();
         //Hide the select file while selecting multiples
-        super.getSetupStage().getSelectAndMultipleWrite()
-                .onSelectingMultiplesChangeListener(selectMultiples -> selectImageFileButton.setVisible(!selectMultiples));
+        //super.getSetupStage().getSelectAndMultipleWrite()
+        //        .onSelectingMultiplesChangeListener(selectMultiples -> selectImageFileButton.setVisible(!selectMultiples));
     }
 
     @Override
     public void setDefault()
     {
         super.setDefault();
-
-        borderWidthTextField.setText("1");
-        borderColorPicker.setValue(Color.BLACK);
     }
 
     @Override

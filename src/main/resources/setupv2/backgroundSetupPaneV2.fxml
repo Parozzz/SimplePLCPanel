@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0" spacing="10.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="10.0">
+         <children>
+            <Label text="Background Color">
+               <font>
+                  <Font size="17.0" />
+               </font>
+            </Label>
+            <ColorPicker fx:id="backgroundColorPicker" style="-fx-background-color: transparent; -fx-border-color: lightgray;" />
+         </children>
+      </HBox>
+      <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="10.0">
+         <children>
+            <Label text="Background Corner Radii">
+               <font>
+                  <Font size="17.0" />
+               </font>
+            </Label>
+            <TextField fx:id="cornerRadiiTextField" prefWidth="65.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;" />
+         </children>
+      </HBox>
+      <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+         <children>
+            <VBox maxHeight="-Infinity" maxWidth="-Infinity">
+               <children>
+                  <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Background Image Path">
+                     <font>
+                        <Font size="17.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="imageNameTextField" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="300.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;" />
+               </children>
+            </VBox>
+         </children>
+      </StackPane>
+      <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0">
+         <children>
+            <StackPane prefHeight="150.0" prefWidth="200.0">
+               <children>
+                  <StackPane maxHeight="-Infinity" maxWidth="-Infinity" style="-fx-border-color: lightgray;">
+                     <children>
+                        <ImageView fx:id="fileImageView" fitHeight="160.0" fitWidth="260.0" pickOnBounds="true" />
+                     </children>
+                  </StackPane>
+               </children>
+            </StackPane>
+            <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+               <children>
+                  <HBox maxHeight="-Infinity" maxWidth="-Infinity" spacing="10.0">
+                     <children>
+                        <Button fx:id="selectImageFileButton" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="Select Picture">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <padding>
+                              <Insets top="-1.0" />
+                           </padding>
+                        </Button>
+                        <ToggleButton fx:id="stretchToggleButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" style="-fx-border-color: darkgray; -fx-border-width: 2;">
+                           <graphic>
+                              <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" />
+                           </graphic>
+                        </ToggleButton>
+                     </children>
+                  </HBox>
+               </children>
+            </StackPane>
+         </children>
+      </VBox>
+   </children>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
+</VBox>

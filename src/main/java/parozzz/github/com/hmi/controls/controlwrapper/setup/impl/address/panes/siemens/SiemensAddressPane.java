@@ -5,7 +5,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import parozzz.github.com.PLC.siemens.data.SiemensS7DataStorage;
 import parozzz.github.com.PLC.siemens.data.SiemensS7ReadableData;
 import parozzz.github.com.PLC.siemens.util.SiemensS7AreaType;
@@ -39,7 +39,7 @@ public final class SiemensAddressPane extends AddressPane
     @FXML TextField stringLengthTextField;
 
     private final AddressSetupPane<? extends AddressAttribute> addressSetupPane;
-    private final AnchorPane mainAnchorPane;
+    private final VBox vBox;
 
     private final SiemensAddressStringParser addressStringParser;
 
@@ -48,7 +48,7 @@ public final class SiemensAddressPane extends AddressPane
         super("SiemensAddressPane", AddressDataType.SIEMENS);
 
         this.addressSetupPane = addressSetupPane;
-        this.mainAnchorPane = (AnchorPane) FXUtil.loadFXML("setup/address/siemensAddressPane.fxml", this);
+        this.vBox = (VBox) FXUtil.loadFXML("setupv2/address/siemensAddressDataPaneV2.fxml", this);
 
         this.addressStringParser = new SiemensAddressStringParser(this);
     }
@@ -122,7 +122,7 @@ public final class SiemensAddressPane extends AddressPane
     @Override
     public Parent getMainParent()
     {
-        return mainAnchorPane;
+        return vBox;
     }
 
     @Override

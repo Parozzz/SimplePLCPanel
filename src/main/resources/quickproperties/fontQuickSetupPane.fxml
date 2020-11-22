@@ -4,14 +4,13 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ColorPicker?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="150.0" style="-fx-border-color: lightgray;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Text">
+      <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Font">
          <VBox.margin>
             <Insets bottom="2.0" />
          </VBox.margin></Label>
@@ -74,50 +73,6 @@
          <VBox.margin>
             <Insets top="2.0" />
          </VBox.margin>
-      </HBox>
-      <Separator prefWidth="200.0" />
-      <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Size">
-         <VBox.margin>
-            <Insets bottom="2.0" top="2.0" />
-         </VBox.margin>
-      </Label>
-      <HBox maxHeight="-Infinity" maxWidth="-Infinity">
-         <children>
-            <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" text="Width">
-               <padding>
-                  <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
-               </padding>
-               <HBox.margin>
-                  <Insets left="5.0" />
-               </HBox.margin>
-            </Label>
-            <TextField fx:id="widthTextField" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
-               <HBox.margin>
-                  <Insets left="8.0" right="5.0" top="3.0" />
-               </HBox.margin>
-               <padding>
-                  <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
-               </padding></TextField>
-         </children>
-      </HBox>
-      <HBox>
-         <children>
-            <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" text="Height">
-               <padding>
-                  <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
-               </padding>
-               <HBox.margin>
-                  <Insets bottom="5.0" left="5.0" top="3.0" />
-               </HBox.margin>
-            </Label>
-            <TextField fx:id="heightTextField" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
-               <HBox.margin>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="3.0" />
-               </HBox.margin>
-               <padding>
-                  <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
-               </padding></TextField>
-         </children>
       </HBox>
    </children>
    <padding>

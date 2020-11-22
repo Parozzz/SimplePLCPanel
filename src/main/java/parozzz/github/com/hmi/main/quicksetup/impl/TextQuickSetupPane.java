@@ -5,10 +5,8 @@ import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
-import org.w3c.dom.Text;
 import parozzz.github.com.hmi.FXObject;
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
-import parozzz.github.com.hmi.attribute.impl.BaseAttribute;
 import parozzz.github.com.hmi.attribute.impl.TextAttribute;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
@@ -40,7 +38,7 @@ public final class TextQuickSetupPane extends FXObject implements QuickSetupPane
         VBox.setMargin(mainVBox, new Insets(2, 0, 0, 0));
     }
 
-    public Parent getMainParent()
+    public Parent getParent()
     {
         return mainVBox;
     }

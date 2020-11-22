@@ -1,11 +1,7 @@
 package parozzz.github.com.hmi.main.quicksetup;
 
-import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import parozzz.github.com.hmi.FXController;
@@ -15,7 +11,6 @@ import parozzz.github.com.hmi.util.FXUtil;
 
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public final class QuickSetupVBox extends FXController
@@ -24,7 +19,8 @@ public final class QuickSetupVBox extends FXController
 
     private final StateSelectionQuickSetupPane stateSelectionQuickSetupPane;
     private final GenericQuickSetupPane genericQuickSetupPane;
-    private final BaseQuickSetupPane baseQuickSetupPane;
+    private final SizeQuickSetupPane sizeQuickSetupPane;
+    private final FontQuickSetupPane fontQuickSetupPane;
     private final BackgroundQuickSetupPane backgroundQuickSetupPane;
     private final TextQuickSetupPane textQuickSetupPane;
 
@@ -48,7 +44,8 @@ public final class QuickSetupVBox extends FXController
 
         this.addFXChild(this.stateSelectionQuickSetupPane = new StateSelectionQuickSetupPane())
                 .addFXChild(this.genericQuickSetupPane = new GenericQuickSetupPane())
-                .addFXChild(this.baseQuickSetupPane = new BaseQuickSetupPane())
+                .addFXChild(this.sizeQuickSetupPane = new SizeQuickSetupPane())
+                .addFXChild(this.fontQuickSetupPane = new FontQuickSetupPane())
                 .addFXChild(this.backgroundQuickSetupPane = new BackgroundQuickSetupPane())
                 .addFXChild(this.textQuickSetupPane = new TextQuickSetupPane());
     }
@@ -64,7 +61,7 @@ public final class QuickSetupVBox extends FXController
         var scrollVBox = new VBox();
         this.computeQuickSetupPane(scrollVBox,
                 stateSelectionQuickSetupPane, genericQuickSetupPane,
-                baseQuickSetupPane, backgroundQuickSetupPane, textQuickSetupPane
+                sizeQuickSetupPane, fontQuickSetupPane, backgroundQuickSetupPane, textQuickSetupPane
         );
 
         scrollVBox.setMinSize(0, 0);
@@ -116,7 +113,7 @@ public final class QuickSetupVBox extends FXController
             stateBinder.clear(); //Without this, values on the control state are cleared on selection change
             quickSetupPaneSet.forEach(quickSetupPane ->
             {
-                quickSetupPane.getMainParent().setVisible(false);
+                quickSetupPane.getParent().setVisible(false);
                 quickSetupPane.clear();
             });
             return;
@@ -124,7 +121,7 @@ public final class QuickSetupVBox extends FXController
 
         quickSetupPaneSet.forEach(quickSetupPane ->
         {
-            quickSetupPane.getMainParent().setVisible(true); //Uphere is better. Below it could hide it again.
+            quickSetupPane.getParent().setVisible(true); //Uphere is better. Below it could hide it again.
             quickSetupPane.onNewControlWrapper(controlWrapper);
         });
     }
@@ -136,7 +133,7 @@ public final class QuickSetupVBox extends FXController
             quickSetupPane.addBinders(stateBinder);
 
             quickSetupPaneSet.add(quickSetupPane);
-            vBox.getChildren().add(quickSetupPane.getMainParent());
+            vBox.getChildren().add(quickSetupPane.getParent());
         }
     }
 }

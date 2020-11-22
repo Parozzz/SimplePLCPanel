@@ -138,6 +138,7 @@ public final class SetupPaneAttributeChanger<A extends Attribute>
                 //It might happen is null, especially for cases where two equal attributes can have different properties
                 if (attributeValue == null)
                 {
+                    undoRedoManager.setIgnoreNew(false);
                     return;
                 }
 

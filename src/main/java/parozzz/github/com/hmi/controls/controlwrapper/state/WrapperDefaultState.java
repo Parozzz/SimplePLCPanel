@@ -4,7 +4,7 @@ final class WrapperDefaultState extends WrapperState
 {
     protected WrapperDefaultState()
     {
-        super(Type.EQUAL, 0, 0);
+        super(0, CompareType.EQUAL, 0, CompareType.EQUAL);
     }
 
     public String getStringVersion()

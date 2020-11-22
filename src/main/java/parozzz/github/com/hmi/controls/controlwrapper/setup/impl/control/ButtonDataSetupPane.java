@@ -17,7 +17,6 @@ import java.io.IOException;
 public class ButtonDataSetupPane extends SetupPane<ButtonDataAttribute>
 {
     @FXML private ChoiceBox<ButtonWrapperType> buttonTypeChoiceBox;
-    @FXML private AnchorPane bottomAnchorPane;
 
     private final VBox mainVBox;
 
@@ -25,7 +24,7 @@ public class ButtonDataSetupPane extends SetupPane<ButtonDataAttribute>
     {
         super(setupPage, "ButtonDataSetupPane", "ButtonData", ButtonDataAttribute.class);
 
-        this.mainVBox = (VBox) FXUtil.loadFXML("setup/buttonDataSetupPane.fxml", this);
+        this.mainVBox = (VBox) FXUtil.loadFXML("setupv2/buttonDataSetupPaneV2.fxml", this);
     }
 
     @Override
@@ -43,7 +42,7 @@ public class ButtonDataSetupPane extends SetupPane<ButtonDataAttribute>
     }
 
     @Override
-    public Parent getMainParent()
+    public Parent getParent()
     {
         return mainVBox;
     }

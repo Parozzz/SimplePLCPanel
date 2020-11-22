@@ -1,134 +1,103 @@
 package parozzz.github.com.hmi.controls.controlwrapper.state;
 
 import parozzz.github.com.hmi.attribute.AttributeMap;
-import parozzz.github.com.util.functionalinterface.primitives.IntTriPredicate;
+import parozzz.github.com.util.functionalinterface.primitives.IntBiPredicate;
 
 import java.util.Objects;
 
 public class WrapperState implements Comparable<WrapperState>
 {
-    private final static String FIRST_COMPARE_PLACEHOLDER = "{first}";
-    private final static String SECOND_COMPARE_PLACEHOLDER = "{second}";
-
-    public enum Type
+    public enum CompareType
     {
-        EQUAL("X=={first}", true, (value, first, second) -> value == first),
-        HIGHER("X>{first}", true, (value, low, high) -> value > low),
-        HIGHER_EQUAL("X>={first}", true, (value, low, high) -> value >= low),
-        LOWER("X<{second}", true, (value, low, high) -> value < high),
-        LOWER_EQUAL("X<={second}", true, (value, low, high) -> value <= high),
-        BETWEEN("{first}<X<{second}", false, (value, low, high) -> value < high && value > low),
-        BETWEEN_EQUAL("{first}<=X<={second}", false, (value, low, high) -> value <= high && value >= low);
+        ALWAYS_TRUE((t1, t2) -> true),
+        EQUAL((t1, t2) -> t1 == t2),
+        HIGHER((t1, t2) -> t1 > t2),
+        HIGHER_EQUAL((t1, t2) -> t1 >= t2),
+        LOWER((t1, t2) -> t1 < t2),
+        LOWER_EQUAL((t1, t2) -> t1 <= t2);
+        //BETWEEN("{first}<X<{second}", false, (value, low, high) -> value < high && value > low),
+        //BETWEEN_EQUAL("{first}<=X<={second}", false, (value, low, high) -> value <= high && value >= low);
 
-        private final String text;
-        private final boolean singleCompare;
-        private final IntTriPredicate predicate;
+        private final IntBiPredicate predicate;
 
-        Type(String text, boolean singleCompare, IntTriPredicate predicate)
+        CompareType(IntBiPredicate predicate)
         {
-            this.text = text;
-            this.singleCompare = singleCompare;
             this.predicate = predicate;
         }
 
-        public String getTextWithoutPlaceholders()
+        public boolean test(int internal, int value)
         {
-            return text.replace(FIRST_COMPARE_PLACEHOLDER, "")
-                    .replace(SECOND_COMPARE_PLACEHOLDER, "");
+            return predicate.test(internal, value);
         }
 
-        public String getTextWithPlaceholders()
+        public String getVisualText()
         {
-            return text;
-        }
-
-        public boolean isSingleCompare()
-        {
-            return singleCompare;
-        }
-
-        public boolean compare(int value, int firstCompare, int secondCompare)
-        {
-            return predicate.test(value, firstCompare, secondCompare);
-        }
-
-        public WrapperState create(int lowerBound, int higherBound)
-        {
-            return lowerBound < higherBound
-                     ? new WrapperState(this, lowerBound, higherBound)
-                     : null;
-        }
-
-        public WrapperState create(int compare)
-        {
-            switch(this)
+            switch (this)
             {
                 case EQUAL:
-                case LOWER:
-                case LOWER_EQUAL:
-                    return new WrapperState(this, compare, 0);
-                case HIGHER:
+                    return "==";
                 case HIGHER_EQUAL:
-                    return new WrapperState(this, 0, compare);
+                case LOWER_EQUAL:
+                    return "<=";
+                case HIGHER:
+                case LOWER:
+                    return "<";
                 default:
-                    return null;
+                    return "";
             }
-        }
-
-        public WrapperState cloneEmpty(WrapperState wrapperState)
-        {
-            var firstCompare = wrapperState.firstCompare;
-            var secondCompare = wrapperState.secondCompare;
-
-            if(firstCompare == secondCompare || secondCompare == 0)
-            {
-                return create(firstCompare);
-            }
-            else if(firstCompare == 0)
-            {
-                return create(secondCompare);
-            }
-
-            return this.create(firstCompare, secondCompare);
         }
     }
 
-    private static String createStringVersion(Type type, int firstCompare, int secondCompare)
+    public static Builder builder()
     {
-        return type.getTextWithPlaceholders().replace(FIRST_COMPARE_PLACEHOLDER, Integer.toString(firstCompare))
-                .replace(SECOND_COMPARE_PLACEHOLDER, Integer.toString(secondCompare));
+        return new Builder();
     }
 
-    private final Type type;
+    private static String createStringVersion(int firstCompare, CompareType firstCompareType,
+            int secondCompare, CompareType secondCompareType)
+    {
+
+        var stringBuilder = new StringBuilder();
+        if (firstCompareType != CompareType.ALWAYS_TRUE)
+        {
+            stringBuilder.append(firstCompare)
+                    .append(firstCompareType.getVisualText());
+        }
+
+        stringBuilder.append("X");
+
+        if (secondCompareType != CompareType.ALWAYS_TRUE)
+        {
+            stringBuilder.append(secondCompareType.getVisualText())
+                    .append(secondCompare);
+        }
+
+        return stringBuilder.toString();
+    }
 
     private final String stringVersion;
     private final AttributeMap attributeMap;
 
     private final int firstCompare;
+    private final CompareType firstCompareType;
     private final int secondCompare;
+    private final CompareType secondCompareType;
 
-    WrapperState(Type type, int firstCompare)
+    WrapperState(int firstCompare, CompareType firstCompareType,
+            int secondCompare, CompareType secondCompareType)
     {
-        this(type, firstCompare, 0);
-    }
-
-    WrapperState(Type type, int firstCompare, int secondCompare)
-    {
-        this.type = type;
         this.firstCompare = firstCompare;
+        this.firstCompareType = firstCompareType;
         this.secondCompare = secondCompare;
-        this.stringVersion = createStringVersion(type, firstCompare, secondCompare);
+        this.secondCompareType = secondCompareType;
+
+        this.stringVersion = createStringVersion(firstCompare, firstCompareType, secondCompare, secondCompareType);
 
         this.attributeMap = new AttributeMap();
     }
 
     //NEED TO DO A WAY TO PARSE A STATE FROM A STRING. SAME FOR A WAY TO TRASFORM IT BACK TO A STRING.
     //OR MAYBE DO SOMETHING FORCED WITH THE GUI?
-
-    public Type getType()
-    {
-        return type;
-    }
 
     public String getStringVersion()
     {
@@ -145,9 +114,19 @@ public class WrapperState implements Comparable<WrapperState>
         return false;
     }
 
+    public CompareType getFirstCompareType()
+    {
+        return firstCompareType;
+    }
+
     public int getFirstCompare()
     {
         return firstCompare;
+    }
+
+    public CompareType getSecondCompareType()
+    {
+        return secondCompareType;
     }
 
     public int getSecondCompare()
@@ -157,12 +136,13 @@ public class WrapperState implements Comparable<WrapperState>
 
     public boolean isActive(int value)
     {
-        return type.compare(value, firstCompare, secondCompare);
+        return firstCompareType.test(firstCompare, value)
+                && firstCompareType.test(secondCompare, value);
     }
 
     public WrapperState cloneEmpty()
     {
-        return type.cloneEmpty(this);
+        return new WrapperState(firstCompare, firstCompareType, secondCompare, secondCompareType);
     }
 
     @Override
@@ -177,23 +157,72 @@ public class WrapperState implements Comparable<WrapperState>
     @Override
     public int compareTo(WrapperState wrapperState)
     {
-        if(wrapperState == this)
+        if (wrapperState == this)
         {
             return 0;
-        }else if(wrapperState.isDefault())
+        } else if (wrapperState.isDefault())
         {
             return 1;
         }
 
         var otherFirstCompare = wrapperState.getFirstCompare();
-        if(firstCompare > otherFirstCompare)
+        if (firstCompare > otherFirstCompare)
         {
             return 1;
-        }else if(firstCompare < otherFirstCompare)
+        } else if (firstCompare < otherFirstCompare)
         {
             return -1;
         }
 
         return 0;
+    }
+
+    public static class Builder
+    {
+        private int firstCompare;
+        private CompareType firstCompareType = CompareType.ALWAYS_TRUE;
+
+        private int secondCompare;
+        private CompareType secondCompareType = CompareType.ALWAYS_TRUE;
+
+        private Builder()
+        {
+
+        }
+
+        public Builder firstCompare(CompareType compareType, int firstCompare)
+        {
+            switch (compareType)
+            {
+                case EQUAL:
+                case HIGHER:
+                case HIGHER_EQUAL:
+                    this.firstCompare = firstCompare;
+                    this.firstCompareType = compareType;
+                    break;
+            }
+
+            return this;
+        }
+
+        public Builder secondCompare(CompareType compareType, int secondCompare)
+        {
+            switch (compareType)
+            {
+                case EQUAL:
+                case LOWER:
+                case LOWER_EQUAL:
+                    this.secondCompare = secondCompare;
+                    this.secondCompareType = compareType;
+                    break;
+            }
+
+            return this;
+        }
+
+        public WrapperState create()
+        {
+            return new WrapperState(firstCompare, firstCompareType, secondCompare, secondCompareType);
+        }
     }
 }

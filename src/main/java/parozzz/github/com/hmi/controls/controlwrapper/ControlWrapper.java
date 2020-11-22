@@ -16,8 +16,9 @@ import parozzz.github.com.hmi.attribute.Attribute;
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.AttributeMap;
 import parozzz.github.com.hmi.attribute.impl.BackgroundAttribute;
-import parozzz.github.com.hmi.attribute.impl.BaseAttribute;
-import parozzz.github.com.hmi.attribute.impl.ExtraFunctionAttribute;
+import parozzz.github.com.hmi.attribute.impl.BorderAttribute;
+import parozzz.github.com.hmi.attribute.impl.ChangePageAttribute;
+import parozzz.github.com.hmi.attribute.impl.SizeAttribute;
 import parozzz.github.com.hmi.controls.ControlContainerPane;
 import parozzz.github.com.hmi.controls.controlwrapper.extra.ChangePageExtraFeature;
 import parozzz.github.com.hmi.controls.controlwrapper.extra.ControlWrapperExtraFeature;
@@ -157,20 +158,20 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
                 {
                     stateMap.forEach(wrapperState ->
                     {
-                        var baseAttribute = AttributeFetcher.fetch(wrapperState, BaseAttribute.class);
+                        var baseAttribute = AttributeFetcher.fetch(wrapperState, SizeAttribute.class);
                         if(baseAttribute != null)
                         {
-                            baseAttribute.setValue(BaseAttribute.WIDTH, (int) Math.floor(width));
+                            baseAttribute.setValue(SizeAttribute.WIDTH, (int) Math.floor(width));
                         }
                     });
                 }, height ->
                 {
                     stateMap.forEach(wrapperState ->
                     {
-                        var baseAttribute = AttributeFetcher.fetch(wrapperState, BaseAttribute.class);
+                        var baseAttribute = AttributeFetcher.fetch(wrapperState, SizeAttribute.class);
                         if(baseAttribute != null)
                         {
-                            baseAttribute.setValue(BaseAttribute.HEIGHT, (int) Math.floor(height));
+                            baseAttribute.setValue(SizeAttribute.HEIGHT, (int) Math.floor(height));
                         }
                     });
                 }).bind();
@@ -288,8 +289,8 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
             return false;
         }
         //And if they do not have the adapt attribute on
-        var baseAttribute = AttributeFetcher.fetch(stateMap.getCurrentState(), BaseAttribute.class);
-        return !(baseAttribute == null || baseAttribute.getValue(BaseAttribute.ADAPT));
+        var baseAttribute = AttributeFetcher.fetch(stateMap.getCurrentState(), SizeAttribute.class);
+        return !(baseAttribute == null || baseAttribute.getValue(SizeAttribute.ADAPT));
     }
 
     @Override
@@ -376,11 +377,13 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
             List<Attribute> globalAttributeList)
     {
         //GLOBALS
-        globalAttributeList.add(new ExtraFunctionAttribute());
+        globalAttributeList.add(new ChangePageAttribute());
 
         //STATE SPECIFIC
         var pictureBank = this.getControlMainPage().getMainEditStage().getPictureBankStage();
+        stateAttributeList.add(new SizeAttribute());
         stateAttributeList.add(new BackgroundAttribute(pictureBank));
+        stateAttributeList.add(new BorderAttribute());
     }
 
     public void applyAttributes()
@@ -395,21 +398,48 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
 
     public void applyAttributes(C control, Pane containerPane, AttributeMap attributeMap)
     {
+        var sizeAttribute = AttributeFetcher.fetch(attributeMap, SizeAttribute.class);
+        if (sizeAttribute != null)
+        {
+            if (sizeAttribute.getValue(SizeAttribute.ADAPT))
+            {
+                containerPane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+                containerPane.setMinSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+                containerPane.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+            } else
+            {
+                var width = sizeAttribute.getValue(SizeAttribute.WIDTH);
+                var height = sizeAttribute.getValue(SizeAttribute.HEIGHT);
+
+                containerPane.setPrefSize(width, height);
+                containerPane.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+                containerPane.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+            }
+        }
+
         var backgroundAttribute = AttributeFetcher.fetch(attributeMap, BackgroundAttribute.class);
         if(backgroundAttribute != null)
         {
-            control.setBorder(backgroundAttribute.getBorder());
             control.setBackground(backgroundAttribute.getBackground());
+        }
+
+        var borderAttribute = AttributeFetcher.fetch(attributeMap, BorderAttribute.class);
+        if(borderAttribute != null)
+        {
+            control.setBorder(borderAttribute.getBorder());
         }
 
         if(control == this.control) //This needs to be set only
         {
-            var extraFunctionAttribute = AttributeFetcher.fetch(globalAttributeMap, ExtraFunctionAttribute.class);
-            if(extraFunctionAttribute != null
-                    && extraFunctionAttribute.getValue(ExtraFunctionAttribute.TYPE) == ControlWrapperExtraFeature.Type.CHANGE_PAGE)
+            var changePageAttribute = AttributeFetcher.fetch(globalAttributeMap, ChangePageAttribute.class);
+            if(changePageAttribute != null)
             {
-                var pageName = extraFunctionAttribute.getValue(ExtraFunctionAttribute.PAGE_NAME);
-                this.setExtraFeature(new ChangePageExtraFeature(this, control, pageName));
+                var enabled = changePageAttribute.getValue(ChangePageAttribute.ENABLED);
+                if(enabled)
+                {
+                    var pageName = changePageAttribute.getValue(ChangePageAttribute.PAGE_NAME);
+                    this.setExtraFeature(new ChangePageExtraFeature(this, control, pageName));
+                }
             }
         }
     }

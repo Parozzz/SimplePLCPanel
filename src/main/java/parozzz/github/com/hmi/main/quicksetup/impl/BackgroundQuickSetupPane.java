@@ -9,7 +9,6 @@ import javafx.scene.paint.Color;
 import parozzz.github.com.hmi.FXObject;
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.impl.BackgroundAttribute;
-import parozzz.github.com.hmi.attribute.impl.BaseAttribute;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
 import parozzz.github.com.hmi.main.quicksetup.QuickSetupPane;
@@ -39,7 +38,7 @@ public final class BackgroundQuickSetupPane extends FXObject implements QuickSet
     }
 
     @Override
-    public Parent getMainParent()
+    public Parent getParent()
     {
         return mainVBox;
     }

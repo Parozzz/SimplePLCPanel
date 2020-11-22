@@ -6,6 +6,8 @@ import javafx.scene.Parent;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import parozzz.github.com.hmi.FXObject;
+import parozzz.github.com.hmi.attribute.AttributeFetcher;
+import parozzz.github.com.hmi.attribute.impl.SizeAttribute;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
 import parozzz.github.com.hmi.main.quicksetup.QuickSetupPane;
@@ -13,17 +15,20 @@ import parozzz.github.com.hmi.main.quicksetup.QuickSetupStateBinder;
 import parozzz.github.com.hmi.util.FXUtil;
 
 import java.io.IOException;
+import java.util.Objects;
 
-public final class GenericQuickSetupPane extends FXObject implements QuickSetupPane
+public final class SizeQuickSetupPane extends FXObject implements QuickSetupPane
 {
-    @FXML private TextField typeTextField;
+    @FXML private TextField widthTextField;
+    @FXML private TextField heightTextField;
 
-    private final VBox mainVBox;
-    public GenericQuickSetupPane() throws IOException
+    private final VBox vBox;
+
+    public SizeQuickSetupPane() throws IOException
     {
-        super("GenericQuickProperties");
+        super("BaseQuickPropertiesPane");
 
-        this.mainVBox = (VBox) FXUtil.loadFXML("quickproperties/genericQuickSetupPane.fxml", this);
+        vBox = (VBox) FXUtil.loadFXML("quickproperties/sizeQuickSetupPane.fxml", this);
     }
 
     @Override
@@ -31,37 +36,38 @@ public final class GenericQuickSetupPane extends FXObject implements QuickSetupP
     {
         super.setup();
 
-        VBox.setMargin(mainVBox, new Insets(2, 0, 0,  0));
-
-        typeTextField.setEditable(false);
+        VBox.setMargin(vBox, new Insets(2, 0, 0, 0));
     }
 
     public Parent getParent()
     {
-        return mainVBox;
+        return vBox;
     }
 
     @Override
     public void onNewControlWrapper(ControlWrapper<?> controlWrapper)
     {
-        typeTextField.setText(controlWrapper.getType().getUserFriendlyName());
+
     }
 
     @Override
     public void onNewWrapperState(WrapperState wrapperState)
     {
-
+        vBox.setVisible(AttributeFetcher.hasAttribute(wrapperState, SizeAttribute.class));
     }
 
     @Override
     public void addBinders(QuickSetupStateBinder stateBinder)
     {
-
+        stateBinder.builder(SizeAttribute.class)
+                .indirect(widthTextField.textProperty(), Integer::parseInt, Objects::toString, SizeAttribute.WIDTH)
+                .indirect(heightTextField.textProperty(), Integer::parseInt, Objects::toString, SizeAttribute.HEIGHT);
     }
 
     @Override
     public void clear()
     {
-        typeTextField.setText("");
+        widthTextField.setText("");
+        heightTextField.setText("");
     }
 }

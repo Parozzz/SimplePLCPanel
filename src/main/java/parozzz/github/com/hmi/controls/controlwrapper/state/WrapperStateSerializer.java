@@ -29,8 +29,9 @@ final class WrapperStateSerializer
     {
         var jsonDataMap = new JSONDataMap();
 
-        jsonDataMap.set("WrapperStateType", wrapperState.getType().name());
+        jsonDataMap.set("FirstCompareType", wrapperState.getFirstCompareType());
         jsonDataMap.set("FirstCompare", wrapperState.getFirstCompare());
+        jsonDataMap.set("SecondCompareType", wrapperState.getFirstCompareType());
         jsonDataMap.set("SecondCompare", wrapperState.getSecondCompare());
         jsonDataMap.set("AttributeMap", wrapperState.getAttributeMap());
 
@@ -39,16 +40,19 @@ final class WrapperStateSerializer
 
     public static void deserialize(JSONDataMap jsonDataMap, Consumer<WrapperState> addStatePredicate)
     {
-        var type = jsonDataMap.getEnum("WrapperStateType", WrapperState.Type.class);
+        var type = jsonDataMap.getEnum("WrapperStateType", WrapperState.CompareType.class);
         if(type == null || jsonDataMap.size() == 1)
         {
             return;
         }
 
         var firstCompare = jsonDataMap.getNumber("FirstCompare").intValue();
-        var secondCompare = jsonDataMap.getNumber("SecondCompare").intValue();
+        var firstCompareType = jsonDataMap.getEnum("FirstCompareType", WrapperState.CompareType.class);
 
-        var wrapperState = new WrapperState(type, firstCompare, secondCompare);
+        var secondCompare = jsonDataMap.getNumber("SecondCompare").intValue();
+        var secondCompareType = jsonDataMap.getEnum("SecondCompareType", WrapperState.CompareType.class);
+
+        var wrapperState = new WrapperState(firstCompare, firstCompareType, secondCompare, secondCompareType);
         addStatePredicate.accept(wrapperState);
         deserializeAttributeMap(jsonDataMap, wrapperState);
     }

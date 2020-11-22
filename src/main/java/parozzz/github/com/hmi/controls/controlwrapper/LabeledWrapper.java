@@ -3,14 +3,15 @@ package parozzz.github.com.hmi.controls.controlwrapper;
 import javafx.scene.control.Labeled;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
+import javafx.scene.text.Text;
 import parozzz.github.com.hmi.attribute.Attribute;
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.AttributeMap;
-import parozzz.github.com.hmi.attribute.impl.BaseAttribute;
+import parozzz.github.com.hmi.attribute.impl.FontAttribute;
+import parozzz.github.com.hmi.attribute.impl.SizeAttribute;
 import parozzz.github.com.hmi.attribute.impl.TextAttribute;
 import parozzz.github.com.hmi.attribute.impl.ValueAttribute;
 import parozzz.github.com.hmi.controls.ControlContainerPane;
-import parozzz.github.com.hmi.controls.controlwrapper.setup.ControlWrapperSetupStage;
 import parozzz.github.com.hmi.util.valueintermediate.ValueIntermediateType;
 
 import java.util.List;
@@ -31,7 +32,8 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
     {
         super.setupAttributeInitializers(stateAttributeList, globalAttributeList);
 
-        stateAttributeList.add(new BaseAttribute());
+        stateAttributeList.add(new FontAttribute());
+        stateAttributeList.add(new SizeAttribute());
     }
 
     @Override
@@ -39,30 +41,13 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
     {
         super.applyAttributes(control, containerPane, attributeMap);
 
-        var baseAttribute = AttributeFetcher.fetch(attributeMap, BaseAttribute.class);
-        if (baseAttribute != null)
+        var fontAttribute = AttributeFetcher.fetch(attributeMap, FontAttribute.class);
+        if (fontAttribute != null)
         {
-            control.setUnderline(baseAttribute.getValue(BaseAttribute.UNDERLINE));
-
-            if (baseAttribute.getValue(BaseAttribute.ADAPT))
-            {
-                containerPane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
-                containerPane.setMinSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
-                containerPane.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
-            } else
-            {
-                var width = baseAttribute.getValue(BaseAttribute.WIDTH);
-                var height = baseAttribute.getValue(BaseAttribute.HEIGHT);
-
-                containerPane.setPrefSize(width, height);
-                containerPane.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-                containerPane.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-            }
-
-            //control.setShape(attribute.getShape());
-            control.setAlignment(baseAttribute.getValue(BaseAttribute.TEXT_POSITION));
-            control.setFont(baseAttribute.getFont());
-            control.setTextFill(baseAttribute.getValue(BaseAttribute.TEXT_COLOR));
+            control.setFont(fontAttribute.getFont());
+            control.setUnderline(fontAttribute.getValue(FontAttribute.UNDERLINE));
+            control.setAlignment(fontAttribute.getValue(FontAttribute.TEXT_POSITION));
+            control.setTextFill(fontAttribute.getValue(FontAttribute.TEXT_COLOR));
         }
     }
 

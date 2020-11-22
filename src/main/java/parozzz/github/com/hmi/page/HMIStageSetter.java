@@ -102,6 +102,18 @@ public final class HMIStageSetter
         return this;
     }
 
+    public HMIStageSetter setWidth(double width)
+    {
+        stage.setWidth(width);
+        return this;
+    }
+
+    public HMIStageSetter setHeight(double height)
+    {
+        stage.setHeight(height);
+        return this;
+    }
+
     public HMIStageSetter setFullScreen(boolean fullScreen, String fullScreenExitHint, KeyCombination keyCombination)
     {
         stage.setFullScreen(fullScreen);
