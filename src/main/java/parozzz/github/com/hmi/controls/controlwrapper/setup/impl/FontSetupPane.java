@@ -23,7 +23,7 @@ import java.util.List;
 
 public final class FontSetupPane extends SetupPane<FontAttribute>
 {
-    private final static List<Integer> SIZE_DEFAULT_CHOICE = List.of(1, 2, 4, 6, 8, 10, 12, 16, 20, 24, 28, 32, 36, 42, 48, 54, 60, 70, 80);
+    public final static List<Integer> SIZE_DEFAULT_CHOICE = List.of(1, 2, 4, 6, 8, 10, 12, 16, 20, 24, 28, 32, 36, 42, 48, 54, 60, 70, 80);
 
     @FXML private Label frontLabel;
 

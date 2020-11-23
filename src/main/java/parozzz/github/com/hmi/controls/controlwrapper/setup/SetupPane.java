@@ -1,13 +1,8 @@
 package parozzz.github.com.hmi.controls.controlwrapper.setup;
 
 
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.effect.SepiaTone;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import parozzz.github.com.hmi.FXObject;
 import parozzz.github.com.hmi.attribute.Attribute;
@@ -15,6 +10,7 @@ import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.AttributeMap;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.attributechanger.SetupPaneAttributeChangerList;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.extra.ControlWrapperSetupUtil;
+import parozzz.github.com.hmi.util.ContextMenuBuilder;
 import parozzz.github.com.hmi.util.FXUtil;
 
 public abstract class SetupPane<A extends Attribute> extends FXObject implements SetupButtonSelectable
@@ -51,6 +47,18 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
 
         selectButton.setUserData(this);
         selectButton.setOnAction(actionEvent -> setupStage.showSelectable(this));
+
+        ContextMenuBuilder.builder()
+                .simple("Write to All", () ->
+                {
+                    var selectedControlWrapper = setupStage.getSelectedControlWrapper();
+                    if(selectedControlWrapper != null)
+                    {
+                        ControlWrapperSetupUtil.writeAttributeChangerListToAllStates(
+                                selectedControlWrapper, attributeClass, attributeChangerList
+                        );
+                    }
+                }).setTo(selectButton);
     }
 
     public ControlWrapperSetupStage getSetupStage()
@@ -86,7 +94,7 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
             selectedControlWrapper.getStateMap().forEach(wrapperState ->
             {
                 var attribute = AttributeFetcher.fetch(wrapperState, attributeClass);
-                if (attribute != null)
+                if(attribute != null)
                 {
                     attributeChangerList.forEach(attributeChanger ->
                             attributeChanger.getPropertyBis().revertToDefaultValues(attribute)
@@ -101,7 +109,7 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
         attributeChangerList.getPropertySet().forEach(property ->
         {
             var bean = property.getBean();
-            if (bean instanceof Control)
+            if(bean instanceof Control)
             {
                 ((Control) bean).setEffect(null);
             }
@@ -110,15 +118,15 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
 
     protected void computeGlobalProperties()
     {
-        this.computeProperties(false, true, false);
+        this.computeProperties(false, true);
     }
 
     protected void computeProperties()
     {
-        this.computeProperties(true, true, true);
+        this.computeProperties(true, true);
     }
 
-    protected void computeProperties(boolean addContextMenu, boolean addUndoRedo, boolean allowMultipleSelection)
+    protected void computeProperties(boolean addContextMenu, boolean addUndoRedo)
     {
         var propertySet = attributeChangerList.getPropertySet();
 
@@ -130,19 +138,19 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
         propertySet.forEach(property ->
         {
             var bean = property.getBean();
-            if (bean instanceof Control)
+            if(bean instanceof Control)
             {
                 var control = (Control) bean;
 
                 if(addContextMenu)
                 {
-                    var setDataToAllStateMenuItem = new MenuItem("Set data to all states");
+                    var setDataToAllStateMenuItem = new MenuItem("Write to All");
                     setDataToAllStateMenuItem.setOnAction(actionEvent ->
                     {
                         var selectedControlWrapper = setupStage.getSelectedControlWrapper();
                         if(selectedControlWrapper != null)
                         {
-                            ControlWrapperSetupUtil.writeAttributeChangerToAllStates(selectedControlWrapper, attributeClass,
+                            ControlWrapperSetupUtil.writeSingleAttributeChangerToAllStates(selectedControlWrapper, attributeClass,
                                     attributeChangerList, property);
                         }
                     });
@@ -151,36 +159,6 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
                     contextMenu.getItems().addAll(setDataToAllStateMenuItem);
                     control.setContextMenu(contextMenu);
                 }
-/*
-                if(allowMultipleSelection)
-                {
-                    var selectAndWriteMultiple = setupStage.getSelectAndMultipleWrite();
-                    selectAndWriteMultiple.onSelectingMultiplesChangeListener(selectingMultiples ->
-                    {
-                        control.setDisable(selectingMultiples);
-                        control.setEffect(null);
-                    });
-
-                    var areaParent = control.getParent();
-                    if (areaParent instanceof StackPane)
-                    {
-                        areaParent.addEventFilter(MouseEvent.MOUSE_PRESSED, mouseEvent ->
-                        {
-                            if (selectAndWriteMultiple.isSelectingMultiples())
-                            {
-                                if (control.getEffect() == null)
-                                {
-                                    selectAndWriteMultiple.addSelected(property, attributeClass, attributeChangerList);
-                                    control.setEffect(new SepiaTone());
-                                } else
-                                {
-                                    selectAndWriteMultiple.removeSelected(property);
-                                    control.setEffect(null);
-                                }
-                            }
-                        });
-                    }
-                }*/
             }
         });
     }

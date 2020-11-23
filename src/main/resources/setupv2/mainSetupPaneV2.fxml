@@ -90,7 +90,7 @@
       </StackPane>
    </top>
    <left>
-      <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0" BorderPane.alignment="TOP_CENTER">
+      <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" BorderPane.alignment="TOP_CENTER">
          <BorderPane.margin>
             <Insets right="5.0" />
          </BorderPane.margin>
@@ -100,7 +100,7 @@
                   <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0">
                      <children>
                         <Button fx:id="createStateButton" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" style="-fx-background-insets: 0; -fx-background-color: transparent; -fx-border-color: lightgray;" text="Create State" />
-                        <TitledPane animated="false" expanded="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" text="Global Attributes" VBox.vgrow="ALWAYS">
+                        <TitledPane fx:id="globalAttributesTitledPane" animated="false" expanded="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" text="Global Attributes" VBox.vgrow="ALWAYS">
                            <content>
                               <VBox fx:id="globalAttributesVBox" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0">
                                  <padding>
@@ -109,7 +109,7 @@
                               </VBox>
                            </content>
                         </TitledPane>
-                        <TitledPane animated="false" expanded="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" text="State Attributes" VBox.vgrow="ALWAYS">
+                        <TitledPane fx:id="stateAttributesTitledPane" animated="false" expanded="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" text="State Attributes" VBox.vgrow="ALWAYS">
                            <content>
                               <VBox fx:id="stateAttributesVBox" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0">
                                  <padding>

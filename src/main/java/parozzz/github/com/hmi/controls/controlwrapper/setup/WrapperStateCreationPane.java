@@ -64,14 +64,14 @@ class WrapperStateCreationPane extends FXObject implements SetupButtonSelectable
 
         firstCompareChoiceBox.setConverter(FXUtil.toStringOnlyConverter(WrapperState.CompareType::getVisualText));
         firstCompareChoiceBox.getItems().addAll(
-                WrapperState.CompareType.ALWAYS_TRUE, WrapperState.CompareType.EQUAL,
-                WrapperState.CompareType.LOWER, WrapperState.CompareType.LOWER_EQUAL
+                WrapperState.CompareType.ALWAYS_TRUE,
+                WrapperState.CompareType.HIGHER, WrapperState.CompareType.HIGHER_EQUAL
         );
 
         secondCompareChoiceBox.setConverter(FXUtil.toStringOnlyConverter(WrapperState.CompareType::getVisualText));
         secondCompareChoiceBox.getItems().addAll(
                 WrapperState.CompareType.ALWAYS_TRUE, WrapperState.CompareType.EQUAL,
-                WrapperState.CompareType.HIGHER, WrapperState.CompareType.HIGHER_EQUAL
+                WrapperState.CompareType.LOWER, WrapperState.CompareType.LOWER_EQUAL
         );
 
         createStateButton.setOnMouseClicked(this::createState);
@@ -177,7 +177,7 @@ class WrapperStateCreationPane extends FXObject implements SetupButtonSelectable
         {
             try
             {
-                var secondCompare = Integer.parseInt(lowerValueTextField.getText());
+                var secondCompare = Integer.parseInt(higherValueTextField.getText());
                 wrapperStateBuilder.secondCompare(secondCompareType, secondCompare);
             } catch (NumberFormatException exception)
             {

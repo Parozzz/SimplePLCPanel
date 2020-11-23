@@ -33,6 +33,8 @@
 11)☑ If i click two times the up arrow, the quick setup menu is selected (Won't allow moving control with arrow. PLS FIX!)
 11.1)☑ I have removed completely the possibility to focus indirectly controls inside the quick pane. Maybe find a workaround? (Consume the KeyEvent!)
 
+12) Create a quick text editor page to allow faster text settings for a specific control
+
 Control Wrapper Selection
 
 1)☑ Have a "main" selection that will be the main to gather information for the quick setup

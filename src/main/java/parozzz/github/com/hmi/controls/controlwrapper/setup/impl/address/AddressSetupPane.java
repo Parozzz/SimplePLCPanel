@@ -72,9 +72,10 @@ public class AddressSetupPane<A extends AddressAttribute> extends SetupPane<A>
 
             if (newValue == AddressDataType.NONE)
             {
-                var emptyAnchorPane = new AnchorPane();
-                emptyAnchorPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-                children.add(emptyAnchorPane);
+                var emptyStackPane = new StackPane();
+                emptyStackPane.setPrefSize(200, 200);
+                emptyStackPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+                children.add(emptyStackPane);
                 return;
             }
 

@@ -137,7 +137,7 @@ public final class SelectAndMultipleWrite extends FXObject
 
         public void writeToAllStates(ControlWrapper<?> controlWrapper)
         {
-            ControlWrapperSetupUtil.writeAttributeChangerToAllStates(controlWrapper, attributeClass, attributeChangerList, property);
+            ControlWrapperSetupUtil.writeSingleAttributeChangerToAllStates(controlWrapper, attributeClass, attributeChangerList, property);
         }
     }
 }

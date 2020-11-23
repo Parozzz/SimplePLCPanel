@@ -88,6 +88,11 @@ public final class ContextMenuBuilder
         return this;
     }
 
+    public void setTo(Control control)
+    {
+        control.setContextMenu(contextMenu);
+    }
+
     public ContextMenu getContextMenu()
     {
         return contextMenu;

@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public final class SetupPaneAttributeChangerList<A extends Attribute>
+public final class SetupPaneAttributeChangerList<A extends Attribute> implements Iterable<SetupPaneAttributeChanger<A>>
 {
     public enum Priority
     {
@@ -129,8 +129,9 @@ public final class SetupPaneAttributeChangerList<A extends Attribute>
                 property, attributeProperty));
     }
 
-    public void forEach(Consumer<SetupPaneAttributeChanger<A>> consumer)
+    @Override
+    public Iterator<SetupPaneAttributeChanger<A>> iterator()
     {
-        attributeChangerList.forEach(consumer);
+        return attributeChangerList.iterator();
     }
 }

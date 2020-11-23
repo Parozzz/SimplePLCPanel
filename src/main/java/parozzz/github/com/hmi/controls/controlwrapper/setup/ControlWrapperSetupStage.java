@@ -6,6 +6,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TitledPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -36,8 +37,12 @@ import java.util.logging.Logger;
 public final class ControlWrapperSetupStage extends BorderPaneHMIStage
 {
     @FXML private Button createStateButton;
+
     @FXML private VBox globalAttributesVBox;
+    @FXML private TitledPane globalAttributesTitledPane;
+
     @FXML private VBox stateAttributesVBox;
+    @FXML private TitledPane stateAttributesTitledPane;
 
     @FXML private Label selectedPageLabel;
     @FXML private StackPane centerStackPane;
@@ -46,30 +51,6 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage
     @FXML private Button deleteStateButton;
 
     @FXML private StackPane previewStackPane;
-    /*
-    @FXML private ChoiceBox<WrapperState> stateSelectionChoiceBox;
-    @FXML
-    private MenuItem deleteStateMenuItem;
-    @FXML
-    private MenuItem createStateMenuItem;
-
-    @FXML
-    private AnchorPane createStateAnchorPane;
-
-    @FXML
-    private StackPane previewStackPane;
-
-    @FXML
-    private TabPane globalTabPane;
-    @FXML
-    private TabPane stateTabPane;
-
-    @FXML private ToggleButton selectMultipleToggleButton;
-    @FXML private ImageView selectMultipleImageView;
-
-    @FXML private Button writeToAllStateButton;
-    @FXML private ImageView writeToAllStateImageView;
-*/
 
     private final ControlContainerPane controlContainerPane;
 
@@ -134,10 +115,8 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage
                 {
                     //selectAndMultipleWrite.clear();
                     stateSetupPaneList.forEach(SetupPane::clearAllControlEffect);
-
                     this.onPageClose();
                 });
-
 
         stateSelectionChoiceBox.setConverter(FXUtil.toStringOnlyConverter(WrapperState::getStringVersion));
         stateSelectionChoiceBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) ->
@@ -150,30 +129,16 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage
                 this.updatePreviewImage(newValue);
             }
         });
-/*
-        createStateMenuItem.setOnAction(actionEvent -> createStateAnchorPane.setVisible(true));
-        deleteStateMenuItem.setOnAction(actionEvent ->
+
+        deleteStateButton.setOnAction(event ->
         {
-            Objects.requireNonNull(selectedControlWrapper, "Trying to delete a WrapperState from the SelectedControlWrapper but is null");
-
-            var wrapperState = stateSelectionChoiceBox.getValue();
-            selectedControlWrapper.getStateMap().removeState(wrapperState);
-
-            this.updateStateSelectionStates();
+            if(selectedControlWrapper != null)
+            {
+                selectedControlWrapper.getStateMap().removeState(stateSelectionChoiceBox.getValue());
+                this.updateStateSelectionBox();
+            }
         });
 
-        var stackPane = new StackPane();
-        stackPane.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        stackPane.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        stackPane.setPrefSize(400, 400);
-
-        var tab = new Tab();
-        tab.setContent(stackPane);
-        globalTabPane.getTabs().add(tab);
-
-        globalTabPane.getStylesheets().add(Util.getResource("stylesheet/tab_pane_header_background.css").toExternalForm());
-        stateTabPane.getStylesheets().add(Util.getResource("stylesheet/tab_pane_header_background.css").toExternalForm());
-*/
         super.getUndoRedoManager().addCondition(data ->
         {
             if (data instanceof SetupButtonSelectable)
@@ -262,6 +227,15 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage
             var newSelectButton = selectable.getSelectButton();
             newSelectButton.setBackground(FXUtil.createBackground(Color.LIMEGREEN));
             selectedPageLabel.setText(newSelectButton.getText());
+
+            if(stateSetupPaneList.contains(selectable))
+            {
+                stateAttributesTitledPane.setExpanded(true);
+            }
+            else if(globalSetupPaneList.contains(selectable))
+            {
+                globalAttributesTitledPane.setExpanded(true);
+            }
         }
 
         this.activeSelectable = selectable;
@@ -400,9 +374,9 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage
             return this;
         }
 
-        public boolean contains(SetupPane<?> setupPane)
+        public boolean contains(Object object)
         {
-            return setupPaneList.contains(setupPane);
+            return setupPaneList.contains(object);
         }
 
         public void forEachValidButton(AttributeMap attributeMap, Consumer<Button> consumer)
