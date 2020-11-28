@@ -10,7 +10,7 @@
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0" spacing="10.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label contentDisplay="RIGHT" graphicTextGap="10.0" text="Enabled">
+      <Label contentDisplay="RIGHT" graphicTextGap="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Enabled">
          <graphic>
             <CheckBox fx:id="enabledCheckBox" mnemonicParsing="false" />
          </graphic>
@@ -20,7 +20,7 @@
       </Label>
       <HBox maxHeight="-Infinity" maxWidth="-Infinity" spacing="10.0">
          <children>
-            <Label text="Page Name">
+            <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Page Name">
                <font>
                   <Font size="18.0" />
                </font>

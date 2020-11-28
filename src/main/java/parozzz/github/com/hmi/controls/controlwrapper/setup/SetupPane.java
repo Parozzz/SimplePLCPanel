@@ -20,13 +20,14 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
     private final SetupPaneAttributeChangerList<A> attributeChangerList;
 
     private final Button selectButton;
+    private final boolean stateBased;
 
-    public SetupPane(ControlWrapperSetupStage setupStage, String name, String buttonText, Class<A> attributeClass)
+    public SetupPane(ControlWrapperSetupStage setupStage, String name, String buttonText, Class<A> attributeClass, boolean stateBased)
     {
-        this(setupStage, name, new Button(buttonText), attributeClass);
+        this(setupStage, name, new Button(buttonText), attributeClass, stateBased);
     }
 
-    public SetupPane(ControlWrapperSetupStage setupStage, String name, Button selectButton, Class<A> attributeClass)
+    public SetupPane(ControlWrapperSetupStage setupStage, String name, Button selectButton, Class<A> attributeClass, boolean stateBased)
     {
         super(name);
 
@@ -34,6 +35,7 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
         this.attributeClass = attributeClass;
         this.attributeChangerList = new SetupPaneAttributeChangerList<>(this, attributeClass);
         this.selectButton = selectButton;
+        this.stateBased = stateBased;
     }
 
     @Override
@@ -42,23 +44,18 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
         super.setup();
 
         selectButton.setBackground(FXUtil.createBackground(Color.TRANSPARENT));
-        selectButton.setBorder(FXUtil.createBorder(Color.LIGHTGRAY, 1));
+        //selectButton.setBorder(FXUtil.createBorder(Color.LIGHTGRAY, 1));
         selectButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
         selectButton.setUserData(this);
         selectButton.setOnAction(actionEvent -> setupStage.showSelectable(this));
 
-        ContextMenuBuilder.builder()
-                .simple("Write to All", () ->
-                {
-                    var selectedControlWrapper = setupStage.getSelectedControlWrapper();
-                    if(selectedControlWrapper != null)
-                    {
-                        ControlWrapperSetupUtil.writeAttributeChangerListToAllStates(
-                                selectedControlWrapper, attributeClass, attributeChangerList
-                        );
-                    }
-                }).setTo(selectButton);
+        if(stateBased)
+        {
+            ContextMenuBuilder.builder()
+                    .simple("Write to All", this::writeToAllStates)
+                    .setTo(selectButton);
+        }
     }
 
     public ControlWrapperSetupStage getSetupStage()
@@ -104,16 +101,13 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
         }
     }
 
-    protected void clearAllControlEffect()
+    public void writeToAllStates()
     {
-        attributeChangerList.getPropertySet().forEach(property ->
+        var selectedControlWrapper = this.setupStage.getSelectedControlWrapper();
+        if(selectedControlWrapper != null)
         {
-            var bean = property.getBean();
-            if(bean instanceof Control)
-            {
-                ((Control) bean).setEffect(null);
-            }
-        });
+            ControlWrapperSetupUtil.writeAttributeChangerListToAllStates(selectedControlWrapper, attributeClass, attributeChangerList);
+        }
     }
 
     protected void computeGlobalProperties()

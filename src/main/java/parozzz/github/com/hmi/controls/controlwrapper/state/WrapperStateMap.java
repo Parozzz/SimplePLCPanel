@@ -139,6 +139,11 @@ public final class WrapperStateMap extends FXObject
         wrapperStateValueChangedConsumerSet.add(consumer);
     }
 
+    public boolean contains(WrapperState wrapperState)
+    {
+        return wrapperStateList.contains(wrapperState);
+    }
+
     @Override
     public JSONDataMap serialize()
     {

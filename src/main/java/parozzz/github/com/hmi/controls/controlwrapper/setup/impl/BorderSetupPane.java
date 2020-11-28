@@ -6,7 +6,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import parozzz.github.com.hmi.attribute.AttributeMap;
-import parozzz.github.com.hmi.attribute.impl.BackgroundAttribute;
 import parozzz.github.com.hmi.attribute.impl.BorderAttribute;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.ControlWrapperSetupStage;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.SetupPane;
@@ -28,9 +27,9 @@ public class BorderSetupPane extends SetupPane<BorderAttribute>
 
     public BorderSetupPane(ControlWrapperSetupStage setupStage) throws IOException
     {
-        super(setupStage, "BorderSetupPane", "Border", BorderAttribute.class);
+        super(setupStage, "BorderSetupPane", "Border", BorderAttribute.class, true);
 
-        this.vBox = (VBox) FXUtil.loadFXML("setupv2/borderSetupPaneV2.fxml", this);
+        this.vBox = (VBox) FXUtil.loadFXML("setup/borderSetupPane.fxml", this);
     }
 
     @Override
@@ -44,7 +43,7 @@ public class BorderSetupPane extends SetupPane<BorderAttribute>
     {
         super.setup();
 
-        borderStyleChoiceBox.setConverter(new EnumStringConverter<>(BorderAttribute.StrokeStyle.class));
+        borderStyleChoiceBox.setConverter(new EnumStringConverter<>(BorderAttribute.StrokeStyle.class).setCapitalize());
         borderStyleChoiceBox.getItems().addAll(BorderAttribute.StrokeStyle.values());
 
         borderWidthTextField.setTextFormatter(FXTextFormatterUtil.simpleInteger(3));
@@ -56,9 +55,6 @@ public class BorderSetupPane extends SetupPane<BorderAttribute>
                 .createStringToNumber(cornerRadiiTextField.textProperty(), BorderAttribute.CORNER_RADII, Util::parseIntOrZero);
 
         super.computeProperties();
-        //Hide the select file while selecting multiples
-        //super.getSetupStage().getSelectAndMultipleWrite()
-        //        .onSelectingMultiplesChangeListener(selectMultiples -> selectImageFileButton.setVisible(!selectMultiples));
     }
 
     @Override

@@ -37,9 +37,9 @@ public final class BackgroundSetupPane extends SetupPane<BackgroundAttribute>
 
     public BackgroundSetupPane(ControlWrapperSetupStage setupStage) throws IOException
     {
-        super(setupStage, "BackgroundSetupPane", "Background", BackgroundAttribute.class);
+        super(setupStage, "BackgroundSetupPane", "Background", BackgroundAttribute.class, true);
 
-        this.mainVBox = (VBox) FXUtil.loadFXML("setupv2/backgroundSetupPaneV2.fxml", this);
+        this.mainVBox = (VBox) FXUtil.loadFXML("setup/backgroundSetupPane.fxml", this);
     }
 
     @Override
@@ -104,9 +104,6 @@ public final class BackgroundSetupPane extends SetupPane<BackgroundAttribute>
                 .create(stretchToggleButton.selectedProperty(), BackgroundAttribute.STRETCH_IMAGE);
 
         super.computeProperties();
-        //Hide the select file while selecting multiples
-        //super.getSetupStage().getSelectAndMultipleWrite()
-        //        .onSelectingMultiplesChangeListener(selectMultiples -> selectImageFileButton.setVisible(!selectMultiples));
     }
 
     @Override

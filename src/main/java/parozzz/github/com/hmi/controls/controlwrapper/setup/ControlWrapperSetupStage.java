@@ -3,26 +3,24 @@ package parozzz.github.com.hmi.controls.controlwrapper.setup;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TitledPane;
+import javafx.scene.control.*;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import parozzz.github.com.hmi.attribute.AttributeMap;
 import parozzz.github.com.hmi.attribute.impl.address.ReadAddressAttribute;
 import parozzz.github.com.hmi.attribute.impl.address.WriteAddressAttribute;
 import parozzz.github.com.hmi.controls.ControlContainerPane;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
+import parozzz.github.com.hmi.controls.controlwrapper.setup.extra.ControlWrapperSetupUtil;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.impl.*;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.impl.address.AddressSetupPane;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.impl.control.ButtonDataSetupPane;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.impl.control.InputDataSetupPane;
 import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
 import parozzz.github.com.hmi.page.BorderPaneHMIStage;
+import parozzz.github.com.hmi.util.ContextMenuBuilder;
 import parozzz.github.com.hmi.util.FXUtil;
 
 import java.io.IOException;
@@ -56,30 +54,20 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage
 
     private final SetupPaneList stateSetupPaneList;
     private final SetupPaneList globalSetupPaneList;
+
     private ControlWrapper<?> selectedControlWrapper;
-
-    //private final SelectAndMultipleWrite selectAndMultipleWrite;
-    private final WrapperStateCreationPane wrapperStateCreationPane;
-
     private SetupButtonSelectable activeSelectable;
 
     public ControlWrapperSetupStage(ControlContainerPane controlContainerPane) throws IOException
     {
-        super("ControlWrapperSetupPage", "setupv2/mainSetupPaneV2.fxml");
+        super("ControlWrapperSetupPage", "setup/mainSetupPane.fxml");
 
         this.controlContainerPane = controlContainerPane;
 
         this.stateSetupPaneList = new SetupPaneList();
         this.globalSetupPaneList = new SetupPaneList();
 
-        this.addFXChild(this.wrapperStateCreationPane = new WrapperStateCreationPane(this, createStateButton));
-        /*
-                .addFXChild(
-                        this.selectAndMultipleWrite = new SelectAndMultipleWrite(
-                                this, selectMultipleToggleButton, selectMultipleImageView, writeToAllStateButton, writeToAllStateImageView
-                        ),
-                        false
-                );*/
+        this.addFXChild(new WrapperStateCreationPane(this, createStateButton));
     }
 
     @Override
@@ -109,14 +97,13 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage
 
         this.getStageSetter().setAlwaysOnTop(true)
                 .setResizable(true)
-                .setWidth(700)
-                .setHeight(700) //To avoid starting extra small
-                .setOnWindowCloseRequest(windowEvent ->
-                {
-                    //selectAndMultipleWrite.clear();
-                    stateSetupPaneList.forEach(SetupPane::clearAllControlEffect);
-                    this.onPageClose();
-                });
+                .setWidth(800)
+                .setHeight(900) //To avoid starting extra small
+                .setOnWindowCloseRequest(windowEvent -> this.onPageClose());
+
+        ContextMenuBuilder.builder()
+                .simple("Write to All", this::writeEntireCurrentStateToAll)
+                .setTo(stateAttributesTitledPane);
 
         stateSelectionChoiceBox.setConverter(FXUtil.toStringOnlyConverter(WrapperState::getStringVersion));
         stateSelectionChoiceBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) ->
@@ -132,7 +119,7 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage
 
         deleteStateButton.setOnAction(event ->
         {
-            if(selectedControlWrapper != null)
+            if (selectedControlWrapper != null)
             {
                 selectedControlWrapper.getStateMap().removeState(stateSelectionChoiceBox.getValue());
                 this.updateStateSelectionBox();
@@ -202,12 +189,6 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage
         return stateSelectionChoiceBox.getValue();
     }
 
-    /*
-        public SelectAndMultipleWrite getSelectAndMultipleWrite()
-        {
-            return selectAndMultipleWrite;
-        }
-    */
     public void showSelectable(SetupButtonSelectable selectable)
     {
         var children = centerStackPane.getChildren();
@@ -228,11 +209,10 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage
             newSelectButton.setBackground(FXUtil.createBackground(Color.LIMEGREEN));
             selectedPageLabel.setText(newSelectButton.getText());
 
-            if(stateSetupPaneList.contains(selectable))
+            if (stateSetupPaneList.contains(selectable))
             {
                 stateAttributesTitledPane.setExpanded(true);
-            }
-            else if(globalSetupPaneList.contains(selectable))
+            } else if (globalSetupPaneList.contains(selectable))
             {
                 globalAttributesTitledPane.setExpanded(true);
             }
@@ -345,6 +325,14 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage
 
         var globalAttributeMap = selectedControlWrapper.getGlobalAttributeMap();
         globalSetupPaneList.populateSetupPanes(globalAttributeMap);
+    }
+
+    private void writeEntireCurrentStateToAll()
+    {
+        for(var setupPane : stateSetupPaneList)
+        {
+            setupPane.writeToAllStates();
+        }
     }
 
     private class SetupPaneList implements Iterable<SetupPane<?>>

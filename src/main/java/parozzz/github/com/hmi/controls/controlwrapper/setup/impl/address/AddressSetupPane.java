@@ -4,7 +4,6 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
@@ -39,11 +38,11 @@ public class AddressSetupPane<A extends AddressAttribute> extends SetupPane<A>
     public AddressSetupPane(ControlWrapperSetupStage setupPage, String tabName,
                             Class<A> attributeClass, boolean global) throws IOException
     {
-        super(setupPage, tabName + "SetupPage", tabName, attributeClass);
+        super(setupPage, tabName + "SetupPage", tabName, attributeClass, !global);
 
         this.attributeClass = attributeClass;
         this.global = global;
-        this.mainVBox = (VBox) FXUtil.loadFXML("setupv2/addressSetupPaneV2.fxml", this);
+        this.mainVBox = (VBox) FXUtil.loadFXML("setup/addressSetupPane.fxml", this);
 
         this.siemensAddressPane = new SiemensAddressPane(this);
         this.modbusTCPAddressPane = new ModbusTCPAddressPane(global); //The global one will always be read address

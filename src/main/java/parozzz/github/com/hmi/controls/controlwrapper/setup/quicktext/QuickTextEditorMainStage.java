@@ -20,7 +20,7 @@ public class QuickTextEditorMainStage extends HMIStage<VBox>
 
     public QuickTextEditorMainStage() throws IOException
     {
-        super("QuickTextEditor", "setupv2/quicktext/quickTextEditorMainPane.fxml", VBox.class);
+        super("QuickTextEditor", "setup/quicktext/quickTextEditorMainPane.fxml", VBox.class);
 
         this.statePaneList = new ArrayList<>();
     }

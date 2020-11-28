@@ -4,7 +4,6 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import parozzz.github.com.hmi.attribute.AttributeMap;
 import parozzz.github.com.hmi.attribute.impl.SizeAttribute;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.ControlWrapperSetupStage;
@@ -26,9 +25,9 @@ public final class SizeSetupPane extends SetupPane<SizeAttribute>
 
     public SizeSetupPane(ControlWrapperSetupStage setupPage) throws IOException
     {
-        super(setupPage, "SizeSetupPane", "Size", SizeAttribute.class);
+        super(setupPage, "SizeSetupPane", "Size", SizeAttribute.class, true);
 
-        this.mainVBox = (VBox) FXUtil.loadFXML("setupv2/sizeSetupPaneV2.fxml", this);
+        this.mainVBox = (VBox) FXUtil.loadFXML("setup/sizeSetupPane.fxml", this);
     }
 
     @Override
@@ -67,46 +66,4 @@ public final class SizeSetupPane extends SetupPane<SizeAttribute>
     {
         return attributeMap.hasAttribute(SizeAttribute.class);
     }
-
-    /*
-    @Override
-    protected void setData(BaseAttribute attribute)
-    {
-        attribute.textColorProperty = textColorPicker.getValue();
-        attribute.underlineProperty = underlineButton.isSelected();
-
-        attribute.fontNameProperty = fontChoiceBox.getSelectionModel().getSelectedItem();
-        attribute.fontWeightProperty = boldTextStyleButton.isSelected() ? FontWeight.BOLD : FontWeight.NORMAL;
-        attribute.fontPostureProperty = italicTextStyleButton.isSelected() ? FontPosture.ITALIC : FontPosture.REGULAR;
-        attribute.fontTextSizeProperty = this.getTextSize();
-
-        attribute.shapeTypeProperty = shapeChoiceBox.getValue();
-
-        attribute.adaptProperty = adaptCheckbox.isSelected();
-        attribute.widthProperty = Integer.parseInt(widthTextField.getText());
-        attribute.heightProperty = Integer.parseInt(heightTextField.getText());
-    }
-
-    @Override
-    protected void loadData(BaseAttribute attribute)
-    {
-        underlineButton.setSelected(attribute.underlineProperty);
-        textColorPicker.setValue(attribute.textColorProperty);
-
-        var index = fontChoiceBox.getItems().indexOf(attribute.fontNameProperty);
-        if (index != -1)
-        {
-            fontChoiceBox.getSelectionModel().select(index);
-        }
-
-        boldTextStyleButton.setSelected(attribute.fontWeightProperty == FontWeight.BOLD);
-        italicTextStyleButton.setSelected(attribute.fontPostureProperty == FontPosture.ITALIC);
-        textSizeComboBox.setValue((int) attribute.fontTextSizeProperty);
-
-        shapeChoiceBox.setValue(attribute.shapeTypeProperty);
-
-        adaptCheckbox.setSelected(attribute.adaptProperty);
-        widthTextField.setText("" + (int) attribute.widthProperty);
-        heightTextField.setText("" + (int) attribute.heightProperty);
-    }*/
 }

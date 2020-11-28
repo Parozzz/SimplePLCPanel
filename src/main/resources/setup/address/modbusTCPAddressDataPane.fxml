@@ -13,7 +13,7 @@
    <children>
       <HBox maxHeight="-Infinity" maxWidth="-Infinity" spacing="10.0">
          <children>
-            <Label text="Data Type">
+            <Label maxWidth="1.7976931348623157E308" text="Data Type">
                <font>
                   <Font size="17.0" />
                </font>
@@ -23,7 +23,7 @@
       </HBox>
       <HBox maxHeight="-Infinity" maxWidth="-Infinity" spacing="10.0">
          <children>
-            <Label text="Length">
+            <Label maxWidth="1.7976931348623157E308" text="Length">
                <font>
                   <Font size="17.0" />
                </font>
@@ -33,39 +33,39 @@
       </HBox>
       <HBox maxHeight="-Infinity" maxWidth="-Infinity" spacing="10.0">
          <children>
-            <Label text="Address">
+            <Label maxWidth="1.7976931348623157E308" text="Address">
                <font>
                   <Font size="17.0" />
                </font>
             </Label>
             <TextField fx:id="addressTextField" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="50.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;">
                <font>
-                  <Font size="14.0" />
+                  <Font size="13.0" />
                </font>
                <padding>
-                  <Insets bottom="-1.0" left="-1.0" right="-1.0" top="-1.0" />
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                </padding>
             </TextField>
          </children>
       </HBox>
       <HBox maxHeight="-Infinity" maxWidth="-Infinity" spacing="10.0">
          <children>
-            <Label fx:id="bitNumberLabel" text="Bit Number">
+            <Label fx:id="bitNumberLabel" maxWidth="1.7976931348623157E308" text="Bit Number">
                <font>
                   <Font size="17.0" />
                </font>
             </Label>
             <TextField fx:id="bitNumberTextField" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="50.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;">
                <font>
-                  <Font size="14.0" />
+                  <Font size="13.0" />
                </font>
                <padding>
-                  <Insets bottom="-1.0" left="-1.0" right="-1.0" top="-1.0" />
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                </padding>
             </TextField>
          </children>
       </HBox>
-      <Label fx:id="signedLabel" contentDisplay="RIGHT" graphicTextGap="10.0" text="Signed">
+      <Label fx:id="signedLabel" contentDisplay="RIGHT" graphicTextGap="10.0" maxWidth="1.7976931348623157E308" text="Signed">
          <graphic>
             <CheckBox fx:id="signedCheckBox" mnemonicParsing="false">
                <font>

@@ -1,5 +1,6 @@
 package parozzz.github.com.hmi.controls.controlwrapper.setup;
 
+import com.jfoenix.controls.JFXButton;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
@@ -27,20 +28,20 @@ class WrapperStateCreationPane extends FXObject implements SetupButtonSelectable
     @FXML private ChoiceBox<WrapperState.CompareType> firstCompareChoiceBox;
     @FXML private ChoiceBox<WrapperState.CompareType> secondCompareChoiceBox;
 
-    @FXML private Button createStateButton;
+    @FXML private JFXButton createStateButton;
 
-    private final ControlWrapperSetupStage setupPage;
+    private final ControlWrapperSetupStage setupStage;
     private final Button selectButton;
     private final VBox vBox;
 
-    public WrapperStateCreationPane(ControlWrapperSetupStage setupPage, Button selectButton) throws IOException
+    public WrapperStateCreationPane(ControlWrapperSetupStage setupStage, Button selectButton) throws IOException
     {
         super("StateCreationPane");
 
-        this.setupPage = setupPage;
+        this.setupStage = setupStage;
         this.selectButton = selectButton;
 
-        vBox = (VBox) FXUtil.loadFXML("setupv2/wrapperStateCreationPaneV2.fxml", this);
+        vBox = (VBox) FXUtil.loadFXML("setup/wrapperStateCreationPane.fxml", this);
     }
 
     @Override
@@ -57,70 +58,43 @@ class WrapperStateCreationPane extends FXObject implements SetupButtonSelectable
             }
         });*/
 
-        selectButton.setOnAction(actionEvent -> setupPage.showSelectable(this));
+        selectButton.setBackground(FXUtil.createBackground(Color.TRANSPARENT));
+        selectButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        selectButton.setUserData(this);
+        selectButton.setOnAction(actionEvent -> setupStage.showSelectable(this));
 
         lowerValueTextField.setTextFormatter(FXTextFormatterUtil.simpleInteger(4));
         higherValueTextField.setTextFormatter(FXTextFormatterUtil.simpleInteger(4));
 
         firstCompareChoiceBox.setConverter(FXUtil.toStringOnlyConverter(WrapperState.CompareType::getVisualText));
         firstCompareChoiceBox.getItems().addAll(
-                WrapperState.CompareType.ALWAYS_TRUE,
                 WrapperState.CompareType.HIGHER, WrapperState.CompareType.HIGHER_EQUAL
         );
+        firstCompareChoiceBox.setValue(WrapperState.CompareType.HIGHER);
 
         secondCompareChoiceBox.setConverter(FXUtil.toStringOnlyConverter(WrapperState.CompareType::getVisualText));
         secondCompareChoiceBox.getItems().addAll(
-                WrapperState.CompareType.ALWAYS_TRUE, WrapperState.CompareType.EQUAL,
+                WrapperState.CompareType.EQUAL,
                 WrapperState.CompareType.LOWER, WrapperState.CompareType.LOWER_EQUAL
         );
-
-        createStateButton.setOnMouseClicked(this::createState);
-/*
-
-        //On visibility reset both the text fields to avoid old values remaining there
-        anchorPane.visibleProperty().addListener((observableValue, oldValue, newValue) ->
+        secondCompareChoiceBox.valueProperty().addListener((observableValue, oldValue, newValue) ->
         {
-            if (newValue != null && newValue)
+            if (newValue == WrapperState.CompareType.EQUAL)
             {
-                lowerStateValueTextField.setText("");
-                higherStateValueTextField.setText("");
+                firstCompareChoiceBox.setValue(WrapperState.CompareType.ALWAYS_TRUE);
+                firstCompareChoiceBox.setVisible(false);
+
+                lowerValueTextField.setText("");
+                lowerValueTextField.setVisible(false);
+            } else
+            {
+                firstCompareChoiceBox.setVisible(true);
+                lowerValueTextField.setVisible(true);
             }
         });
+        secondCompareChoiceBox.setValue(WrapperState.CompareType.LOWER);
 
-        anchorPane.setVisible(false);
-        closeStateCreationButton.setOnAction(actionEvent -> anchorPane.setVisible(false));
-
-        lowerStateValueTextField.setTextFormatter(FXTextFormatterUtil.simpleInteger(4));
-        higherStateValueTextField.setTextFormatter(FXTextFormatterUtil.simpleInteger(4));
-
-        stateCreationSelectChoiceBox.setConverter(new EnumStringConverter<>(WrapperState.CompareType.class));
-        stateCreationSelectChoiceBox.getItems().addAll(WrapperState.CompareType.values());
-        stateCreationSelectChoiceBox.valueProperty().addListener((observableValue, oldValue, newValue) ->
-        {
-            if (newValue != null)
-            {
-                stateTypeLabel.setText(newValue.getTextWithoutPlaceholders());
-                switch (newValue)
-                {
-                    case EQUAL:
-                    case LOWER:
-                    case LOWER_EQUAL:
-                    case HIGHER:
-                    case HIGHER_EQUAL:
-                        stateTypeLabel.setAlignment(Pos.CENTER_RIGHT);
-                        lowerStateValueTextField.setVisible(false);
-                        break;
-                    case BETWEEN:
-                    case BETWEEN_EQUAL:
-                        stateTypeLabel.setAlignment(Pos.CENTER);
-                        lowerStateValueTextField.setVisible(true);
-                        break;
-                }
-            }
-        });
-        stateCreationSelectChoiceBox.setValue(WrapperState.CompareType.EQUAL);
-
-        addStateCreationButton.setOnAction(actionEvent -> this.createState());*/
+        createStateButton.addEventFilter(MouseEvent.MOUSE_PRESSED, this::createState);
     }
 
     @Override
@@ -154,7 +128,7 @@ class WrapperStateCreationPane extends FXObject implements SetupButtonSelectable
 
         if (invalidFirstCompare && invalidSecondCompare)
         {
-            this.createAndShowInvalidTooltip(mouseEvent);
+            this.createAndShowInvalidTooltip(mouseEvent, "Invalid comparison selection");
             return;
         }
 
@@ -168,7 +142,7 @@ class WrapperStateCreationPane extends FXObject implements SetupButtonSelectable
                 wrapperStateBuilder.firstCompare(firstCompareType, firstCompare);
             } catch (NumberFormatException exception)
             {
-                this.createAndShowInvalidTooltip(mouseEvent);
+                this.createAndShowInvalidTooltip(mouseEvent,"Invalid comparison selection");
                 return;
             }
         }
@@ -181,29 +155,41 @@ class WrapperStateCreationPane extends FXObject implements SetupButtonSelectable
                 wrapperStateBuilder.secondCompare(secondCompareType, secondCompare);
             } catch (NumberFormatException exception)
             {
-                this.createAndShowInvalidTooltip(mouseEvent);
+                this.createAndShowInvalidTooltip(mouseEvent,"Invalid comparison selection");
                 return;
             }
         }
 
         var wrapperState = wrapperStateBuilder.create();
 
-        var selectedControlWrapper = setupPage.getSelectedControlWrapper();
+        var selectedControlWrapper = setupStage.getSelectedControlWrapper();
         Objects.requireNonNull(selectedControlWrapper, "Trying to add new state but the SelectedControlWrapper is null");
 
-        selectedControlWrapper.getStateMap().addState(wrapperState);
-        setupPage.updateStateSelectionBox();
+        var stateMap = selectedControlWrapper.getStateMap();
+        if(stateMap.contains(wrapperState))
+        {
+            this.createAndShowInvalidTooltip(mouseEvent, "State duplicate");
+            return;
+        }
+
+        createStateButton.setRipplerFill(Color.DARKGREEN);
+
+        stateMap.addState(wrapperState);
+        setupStage.updateStateSelectionBox();
     }
 
-    private void createAndShowInvalidTooltip(MouseEvent mouseEvent)
+    private void createAndShowInvalidTooltip(MouseEvent mouseEvent, String text)
     {
-        var label = new Label("Invalid comparison selection");
-        label.setFont(Font.font(14));
+        var label = new Label(text);
+        label.setFont(Font.font(12));
         label.setTextFill(Color.RED);
 
         var tooltip = new Tooltip();
         tooltip.setAutoHide(true);
         tooltip.setGraphic(label);
         tooltip.show(createStateButton, mouseEvent.getScreenX(), mouseEvent.getScreenY());
+        tooltip.addEventFilter(MouseEvent.MOUSE_EXITED, event -> tooltip.hide());
+
+        createStateButton.setRipplerFill(Color.DARKRED);
     }
 }

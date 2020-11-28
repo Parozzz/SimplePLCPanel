@@ -35,9 +35,9 @@ public final class TextSetupPane extends SetupPane<TextAttribute>
 
     public TextSetupPane(ControlWrapperSetupStage setupPage) throws IOException
     {
-        super(setupPage, "TextSetupPane", "Custom Text", TextAttribute.class);
+        super(setupPage, "TextSetupPane", "Custom Text", TextAttribute.class, true);
 
-        mainVBox = (VBox) FXUtil.loadFXML("setupv2/textSetupPaneV2.fxml", this);
+        mainVBox = (VBox) FXUtil.loadFXML("setup/textSetupPane.fxml", this);
     }
 
     @Override
@@ -61,9 +61,6 @@ public final class TextSetupPane extends SetupPane<TextAttribute>
                 .create(newLineSpacingComboBox.valueProperty(), TextAttribute.LINE_SPACING);
 
         super.computeProperties();
-
-        //super.getSetupStage().getSelectAndMultipleWrite()
-        //        .onSelectingMultiplesChangeListener(selectMultiples -> appendValuePlaceholderButton.setVisible(!selectMultiples));
     }
 
     @Override

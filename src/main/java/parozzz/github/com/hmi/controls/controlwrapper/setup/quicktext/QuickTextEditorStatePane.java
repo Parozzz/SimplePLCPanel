@@ -4,14 +4,12 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.util.converter.IntegerStringConverter;
 import parozzz.github.com.hmi.FXObject;
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.impl.FontAttribute;
 import parozzz.github.com.hmi.attribute.impl.TextAttribute;
 import parozzz.github.com.hmi.attribute.property.AttributeProperty;
-import parozzz.github.com.hmi.controls.controlwrapper.setup.attributechanger.SetupPaneAttributeChangerList;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.impl.FontSetupPane;
 import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
 import parozzz.github.com.hmi.util.FXUtil;
@@ -45,7 +43,7 @@ public class QuickTextEditorStatePane extends FXObject
 
         this.wrapperState = wrapperState;
 
-        hBox = (HBox) FXUtil.loadFXML("setupv2/quicktext/quickTextStatePane.fxml", this);
+        hBox = (HBox) FXUtil.loadFXML("setup/quicktext/quickTextStatePane.fxml", this);
     }
 
     @Override

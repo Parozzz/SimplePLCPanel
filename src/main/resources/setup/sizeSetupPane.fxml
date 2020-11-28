@@ -29,7 +29,13 @@
                   <Font size="17.0" />
                </font>
             </Label>
-            <TextField fx:id="widthTextField" prefWidth="50.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;" />
+            <TextField fx:id="widthTextField" prefWidth="50.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;">
+               <padding>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+               </padding>
+               <font>
+                  <Font size="13.0" />
+               </font></TextField>
          </children>
       </HBox>
       <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="10.0">
@@ -39,7 +45,13 @@
                   <Font size="17.0" />
                </font>
             </Label>
-            <TextField fx:id="heightTextField" prefWidth="50.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;" />
+            <TextField fx:id="heightTextField" prefWidth="50.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;">
+               <font>
+                  <Font size="13.0" />
+               </font>
+               <padding>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+               </padding></TextField>
          </children>
       </HBox>
    </children>

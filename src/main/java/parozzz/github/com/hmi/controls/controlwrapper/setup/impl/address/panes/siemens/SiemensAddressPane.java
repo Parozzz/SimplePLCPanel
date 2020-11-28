@@ -48,7 +48,7 @@ public final class SiemensAddressPane extends AddressPane
         super("SiemensAddressPane", AddressDataType.SIEMENS);
 
         this.addressSetupPane = addressSetupPane;
-        this.vBox = (VBox) FXUtil.loadFXML("setupv2/address/siemensAddressDataPaneV2.fxml", this);
+        this.vBox = (VBox) FXUtil.loadFXML("setup/address/siemensAddressDataPane.fxml", this);
 
         this.addressStringParser = new SiemensAddressStringParser(this);
     }

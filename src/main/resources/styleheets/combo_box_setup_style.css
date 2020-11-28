@@ -6,6 +6,7 @@
 
 .combo-box .text-input {
 	-fx-background-color: transparent;
+	-fx-font-size: 13;
 }
 
 .combo-box .arrow-button {

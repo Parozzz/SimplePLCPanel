@@ -4,7 +4,6 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -40,9 +39,9 @@ public class InputDataSetupPane extends SetupPane<InputDataAttribute>
 
     public InputDataSetupPane(ControlWrapperSetupStage setupStage) throws IOException
     {
-        super(setupStage, "InputDataSetupPane", "InputData", InputDataAttribute.class);
+        super(setupStage, "InputDataSetupPane", "InputData", InputDataAttribute.class, false);
 
-        vBox = (VBox) FXUtil.loadFXML("setupv2/inputData/inputDataMainPane.fxml", this);
+        vBox = (VBox) FXUtil.loadFXML("setup/inputData/inputDataMainPane.fxml", this);
 
         integerDataPane = new IntegerDataPane();
         realDataPane = new RealDataPane();
@@ -117,7 +116,7 @@ public class InputDataSetupPane extends SetupPane<InputDataAttribute>
 
         public IntegerDataPane() throws IOException
         {
-            super("setupv2/inputData/numericInputDataPaneV2.fxml");
+            super("setup/inputData/numericInputDataPane.fxml");
         }
 
         @Override
@@ -154,7 +153,7 @@ public class InputDataSetupPane extends SetupPane<InputDataAttribute>
 
         public RealDataPane() throws IOException
         {
-            super("setupv2/inputData/numericInputDataPaneV2.fxml");
+            super("setup/inputData/numericInputDataPane.fxml");
         }
 
         @Override
@@ -229,7 +228,7 @@ public class InputDataSetupPane extends SetupPane<InputDataAttribute>
 
         public CharacterDataPane() throws IOException
         {
-            super("setupv2/inputData/stringInputDataPaneV2.fxml");
+            super("setup/inputData/stringInputDataPane.fxml");
         }
 
         @Override

@@ -6,11 +6,12 @@ import java.util.function.Consumer;
 
 final class WrapperStateSerializer
 {
+    public static final String WRAPPER_DEFAULT_STATE_STRING = "YeahBoiiiiiiiiii";
     public static JSONDataMap serializeDefaultState(WrapperState defaultWrapperState)
     {
         var jsonDataMap = new JSONDataMap();
 
-        jsonDataMap.set("WrapperStateType", "DEFAULT_STATE");
+        jsonDataMap.set("WrapperDefaultState", WRAPPER_DEFAULT_STATE_STRING);
         jsonDataMap.set("AttributeMap", defaultWrapperState.getAttributeMap());
 
         return jsonDataMap;
@@ -18,8 +19,8 @@ final class WrapperStateSerializer
 
     public static void deserializeDefaultState(JSONDataMap jsonDataMap, WrapperState defaultWrapperState)
     {
-        var wrapperType = jsonDataMap.getString("WrapperStateType");
-        if ("DEFAULT_STATE".equals(wrapperType))
+        var wrapperType = jsonDataMap.getString("WrapperDefaultState");
+        if (WRAPPER_DEFAULT_STATE_STRING.equals(wrapperType))
         {
             deserializeAttributeMap(jsonDataMap, defaultWrapperState);
         }
@@ -40,12 +41,6 @@ final class WrapperStateSerializer
 
     public static void deserialize(JSONDataMap jsonDataMap, Consumer<WrapperState> addStatePredicate)
     {
-        var type = jsonDataMap.getEnum("WrapperStateType", WrapperState.CompareType.class);
-        if(type == null || jsonDataMap.size() == 1)
-        {
-            return;
-        }
-
         var firstCompare = jsonDataMap.getNumber("FirstCompare").intValue();
         var firstCompareType = jsonDataMap.getEnum("FirstCompareType", WrapperState.CompareType.class);
 

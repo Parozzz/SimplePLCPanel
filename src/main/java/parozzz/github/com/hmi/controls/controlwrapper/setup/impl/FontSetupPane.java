@@ -42,9 +42,9 @@ public final class FontSetupPane extends SetupPane<FontAttribute>
 
     public FontSetupPane(ControlWrapperSetupStage setupPage) throws IOException
     {
-        super(setupPage, "FontSetupPane", "Font", FontAttribute.class);
+        super(setupPage, "FontSetupPane", "Font", FontAttribute.class, true);
 
-        this.vBox = (VBox) FXUtil.loadFXML("setupv2/fontSetupPaneV2.fxml", this);
+        this.vBox = (VBox) FXUtil.loadFXML("setup/fontSetupPane.fxml", this);
     }
 
     @Override

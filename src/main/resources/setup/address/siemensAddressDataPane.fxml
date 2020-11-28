@@ -12,7 +12,7 @@
    <children>
       <HBox maxHeight="-Infinity" maxWidth="-Infinity" spacing="10.0">
          <children>
-            <Label text="Memory Area">
+            <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Memory Area">
                <font>
                   <Font size="17.0" />
                </font>
@@ -22,24 +22,24 @@
       </HBox>
       <HBox maxHeight="-Infinity" maxWidth="-Infinity" spacing="10.0">
          <children>
-            <Label fx:id="dbNumberLabel" text="DB Number">
+            <Label fx:id="dbNumberLabel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="DB Number">
                <font>
                   <Font size="17.0" />
                </font>
             </Label>
             <TextField fx:id="dbTextField" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="50.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;">
                <font>
-                  <Font size="14.0" />
+                  <Font size="13.0" />
                </font>
                <padding>
-                  <Insets bottom="-1.0" left="-1.0" right="-1.0" top="-1.0" />
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                </padding>
             </TextField>
          </children>
       </HBox>
       <HBox maxHeight="-Infinity" maxWidth="-Infinity" spacing="10.0">
          <children>
-            <Label text="Data Type">
+            <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Data Type">
                <font>
                   <Font size="17.0" />
                </font>
@@ -49,51 +49,51 @@
       </HBox>
       <HBox maxHeight="-Infinity" maxWidth="-Infinity" spacing="10.0">
          <children>
-            <Label text="Offset">
+            <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Offset">
                <font>
                   <Font size="17.0" />
                </font>
             </Label>
             <TextField fx:id="offsetTextField" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="50.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;">
                <font>
-                  <Font size="14.0" />
+                  <Font size="13.0" />
                </font>
                <padding>
-                  <Insets bottom="-1.0" left="-1.0" right="-1.0" top="-1.0" />
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                </padding>
             </TextField>
          </children>
       </HBox>
       <HBox maxHeight="-Infinity" maxWidth="-Infinity" spacing="10.0">
          <children>
-            <Label fx:id="bitOffsetLabel" text="Bit Offset">
+            <Label fx:id="bitOffsetLabel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Bit Offset">
                <font>
                   <Font size="17.0" />
                </font>
             </Label>
             <TextField fx:id="bitOffsetTextField" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="50.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;">
                <font>
-                  <Font size="14.0" />
+                  <Font size="13.0" />
                </font>
                <padding>
-                  <Insets bottom="-1.0" left="-1.0" right="-1.0" top="-1.0" />
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                </padding>
             </TextField>
          </children>
       </HBox>
       <HBox maxHeight="-Infinity" maxWidth="-Infinity" spacing="10.0">
          <children>
-            <Label fx:id="stringLengthLabel" text="String Length">
+            <Label fx:id="stringLengthLabel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="String Length">
                <font>
                   <Font size="17.0" />
                </font>
             </Label>
             <TextField fx:id="stringLengthTextField" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="50.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;">
                <font>
-                  <Font size="14.0" />
+                  <Font size="13.0" />
                </font>
                <padding>
-                  <Insets bottom="-1.0" left="-1.0" right="-1.0" top="-1.0" />
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                </padding>
             </TextField>
          </children>

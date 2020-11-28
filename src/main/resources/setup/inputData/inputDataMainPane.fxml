@@ -17,7 +17,7 @@
                   <Insets />
                </StackPane.margin>
                <children>
-                  <Label text="Input Type">
+                  <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Input Type">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font>

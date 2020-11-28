@@ -3,7 +3,6 @@ package parozzz.github.com.hmi.controls.controlwrapper.setup.impl.address.panes.
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import parozzz.github.com.hmi.attribute.impl.address.AddressAttribute;
 import parozzz.github.com.hmi.attribute.impl.address.data.AddressDataType;
@@ -43,7 +42,7 @@ public class ModbusTCPAddressPane extends AddressPane
 
         this.readOnly = readOnly;
 
-        this.vBox = (VBox) FXUtil.loadFXML("setupv2/address/modbusTCPAddressDataPaneV2.fxml", this);
+        this.vBox = (VBox) FXUtil.loadFXML("setup/address/modbusTCPAddressDataPane.fxml", this);
         this.stringParser = new ModbusTCPAddressStringParser(this);
     }
 

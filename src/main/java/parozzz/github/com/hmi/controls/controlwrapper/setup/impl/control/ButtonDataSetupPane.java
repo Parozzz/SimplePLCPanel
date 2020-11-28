@@ -3,7 +3,6 @@ package parozzz.github.com.hmi.controls.controlwrapper.setup.impl.control;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import parozzz.github.com.hmi.attribute.impl.control.ButtonDataAttribute;
 import parozzz.github.com.hmi.controls.controlwrapper.impl.button.ButtonWrapperType;
@@ -22,9 +21,9 @@ public class ButtonDataSetupPane extends SetupPane<ButtonDataAttribute>
 
     public ButtonDataSetupPane(ControlWrapperSetupStage setupPage) throws IOException
     {
-        super(setupPage, "ButtonDataSetupPane", "ButtonData", ButtonDataAttribute.class);
+        super(setupPage, "ButtonDataSetupPane", "ButtonData", ButtonDataAttribute.class, false);
 
-        this.mainVBox = (VBox) FXUtil.loadFXML("setupv2/buttonDataSetupPaneV2.fxml", this);
+        this.mainVBox = (VBox) FXUtil.loadFXML("setup/buttonDataSetupPane.fxml", this);
     }
 
     @Override

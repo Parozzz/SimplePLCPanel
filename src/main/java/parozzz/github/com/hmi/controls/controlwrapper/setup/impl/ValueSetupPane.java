@@ -27,9 +27,9 @@ public final class ValueSetupPane extends SetupPane<ValueAttribute>
 
     public ValueSetupPane(ControlWrapperSetupStage setupStage) throws IOException
     {
-        super(setupStage, "ValueSetupPane", "Value", ValueAttribute.class);
+        super(setupStage, "ValueSetupPane", "Value", ValueAttribute.class, true);
 
-        vBox = (VBox) FXUtil.loadFXML("setupv2/valueSetupPaneV2.fxml", this);
+        vBox = (VBox) FXUtil.loadFXML("setup/valueSetupPane.fxml", this);
     }
 
     @Override

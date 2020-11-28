@@ -78,17 +78,17 @@ public class WrapperState implements Comparable<WrapperState>
     private final String stringVersion;
     private final AttributeMap attributeMap;
 
-    private final int firstCompare;
+    private final short firstCompare;
     private final CompareType firstCompareType;
-    private final int secondCompare;
+    private final short secondCompare;
     private final CompareType secondCompareType;
 
     WrapperState(int firstCompare, CompareType firstCompareType,
             int secondCompare, CompareType secondCompareType)
     {
-        this.firstCompare = firstCompare;
+        this.firstCompare = (short) firstCompare;
         this.firstCompareType = firstCompareType;
-        this.secondCompare = secondCompare;
+        this.secondCompare = (short) secondCompare;
         this.secondCompareType = secondCompareType;
 
         this.stringVersion = createStringVersion(firstCompare, firstCompareType, secondCompare, secondCompareType);
@@ -176,6 +176,32 @@ public class WrapperState implements Comparable<WrapperState>
 
         return 0;
     }
+
+    @Override
+    public boolean equals(Object object)
+    {
+        if (this == object)
+        {
+            return true;
+        }
+
+
+        if (!(object instanceof WrapperState))
+        {
+            return false;
+        }
+
+        var otherWrapperState = (WrapperState) object;
+        return firstCompare == otherWrapperState.firstCompare && firstCompareType == otherWrapperState.firstCompareType
+                && secondCompare == otherWrapperState.secondCompare && secondCompareType == otherWrapperState.secondCompareType;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(firstCompare, firstCompareType, secondCompare, secondCompareType);
+    }
+
 
     public static class Builder
     {
