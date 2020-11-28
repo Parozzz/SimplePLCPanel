@@ -35,10 +35,10 @@ public class AddressSetupPane<A extends AddressAttribute> extends SetupPane<A>
     private final ModbusTCPAddressPane modbusTCPAddressPane;
     private AddressPane selectedAddressPane;
 
-    public AddressSetupPane(ControlWrapperSetupStage setupPage, String tabName,
+    public AddressSetupPane(ControlWrapperSetupStage setupPage, String buttonText,
                             Class<A> attributeClass, boolean global) throws IOException
     {
-        super(setupPage, tabName + "SetupPage", tabName, attributeClass, !global);
+        super(setupPage, buttonText + "SetupPage", buttonText, attributeClass, !global);
 
         this.attributeClass = attributeClass;
         this.global = global;

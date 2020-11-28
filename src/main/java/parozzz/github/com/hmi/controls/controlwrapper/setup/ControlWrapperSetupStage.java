@@ -83,12 +83,12 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage
                     add(new BorderSetupPane(this)).
                     add(new BackgroundSetupPane(this)).
                     add(new ValueSetupPane(this)).
-                    add(new AddressSetupPane<>(this, "WriteAddress", WriteAddressAttribute.class, false));
+                    add(new AddressSetupPane<>(this, "Write Address", WriteAddressAttribute.class, false));
 
             globalSetupPaneList.add(new ButtonDataSetupPane(this)) //I want this first! >:)
                     .add(new InputDataSetupPane(this))
                     .add(new ChangePageSetupPane(this))
-                    .add(new AddressSetupPane<>(this, "ReadAddress", ReadAddressAttribute.class, true)); //I want this last! >:(
+                    .add(new AddressSetupPane<>(this, "Read Address", ReadAddressAttribute.class, true)); //I want this last! >:(
         } catch (IOException exception)
         {
             Logger.getLogger(ControlWrapperSetupStage.class.getSimpleName())
