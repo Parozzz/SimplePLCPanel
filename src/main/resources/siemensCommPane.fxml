@@ -7,8 +7,8 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
-
 
 <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
@@ -27,62 +27,53 @@
                   <Insets bottom="15.0" left="15.0" right="15.0" />
                </VBox.margin>
                <children>
-                  <HBox maxHeight="-Infinity" maxWidth="-Infinity" StackPane.alignment="CENTER">
+                  <HBox maxHeight="-Infinity" maxWidth="-Infinity" spacing="2.0" StackPane.alignment="CENTER">
                      <children>
                         <TextField fx:id="address1TextField" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="25.0" prefWidth="46.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;" HBox.hgrow="ALWAYS">
                            <font>
-                              <Font size="18.0" />
+                              <Font size="13.0" />
                            </font>
                            <padding>
-                              <Insets bottom="-1.0" left="-1.0" right="-1.0" top="-1.0" />
+                              <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                            </padding>
                         </TextField>
-                        <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="." textOverrun="CLIP" HBox.hgrow="ALWAYS">
-                           <font>
-                              <Font size="32.0" />
-                           </font>
-                           <padding>
-                              <Insets bottom="-15.0" />
-                           </padding>
-                        </Label>
+                        <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                           <children>
+                              <Circle radius="2.0" smooth="false" stroke="BLACK" strokeType="INSIDE" StackPane.alignment="BOTTOM_CENTER" />
+                           </children>
+                        </StackPane>
                         <TextField fx:id="address2TextField" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="25.0" prefWidth="46.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;" HBox.hgrow="ALWAYS">
                            <font>
-                              <Font size="18.0" />
+                              <Font size="13.0" />
                            </font>
                            <padding>
-                              <Insets bottom="-1.0" left="-1.0" right="-1.0" top="-1.0" />
+                              <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                            </padding>
                         </TextField>
-                        <Label alignment="CENTER" contentDisplay="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="." textOverrun="CLIP" HBox.hgrow="ALWAYS">
-                           <font>
-                              <Font size="32.0" />
-                           </font>
-                           <padding>
-                              <Insets bottom="-15.0" />
-                           </padding>
-                        </Label>
+                        <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                           <children>
+                              <Circle radius="2.0" smooth="false" stroke="BLACK" strokeType="INSIDE" StackPane.alignment="BOTTOM_CENTER" />
+                           </children>
+                        </StackPane>
                         <TextField fx:id="address3TextField" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="25.0" prefWidth="46.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;" HBox.hgrow="ALWAYS">
                            <font>
-                              <Font size="18.0" />
+                              <Font size="13.0" />
                            </font>
                            <padding>
-                              <Insets bottom="-1.0" left="-1.0" right="-1.0" top="-1.0" />
+                              <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                            </padding>
                         </TextField>
-                        <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="." textOverrun="CLIP" HBox.hgrow="ALWAYS">
-                           <font>
-                              <Font size="32.0" />
-                           </font>
-                           <padding>
-                              <Insets bottom="-15.0" />
-                           </padding>
-                        </Label>
+                        <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                           <children>
+                              <Circle radius="2.0" smooth="false" stroke="BLACK" strokeType="INSIDE" StackPane.alignment="BOTTOM_CENTER" />
+                           </children>
+                        </StackPane>
                         <TextField fx:id="address4TextField" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="25.0" prefWidth="46.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;" HBox.hgrow="ALWAYS">
                            <font>
-                              <Font size="18.0" />
+                              <Font size="13.0" />
                            </font>
                            <padding>
-                              <Insets bottom="-1.0" left="-1.0" right="-1.0" top="-1.0" />
+                              <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                            </padding>
                         </TextField>
                      </children>
@@ -100,10 +91,13 @@
                         </Label>
                         <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
                            <children>
-                              <TextField fx:id="rackTextField" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="100.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;" StackPane.alignment="CENTER">
+                              <TextField fx:id="rackTextField" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="60.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;" StackPane.alignment="CENTER">
                                  <font>
-                                    <Font size="18.0" />
+                                    <Font size="13.0" />
                                  </font>
+                                 <padding>
+                                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                 </padding>
                               </TextField>
                            </children>
                         </StackPane>
@@ -118,10 +112,13 @@
                         </Label>
                         <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
                            <children>
-                              <TextField fx:id="slotTextField" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="100.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;" StackPane.alignment="CENTER">
+                              <TextField fx:id="slotTextField" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="60.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;" StackPane.alignment="CENTER">
                                  <font>
-                                    <Font size="18.0" />
+                                    <Font size="13.0" />
                                  </font>
+                                 <padding>
+                                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                 </padding>
                               </TextField>
                            </children>
                         </StackPane>

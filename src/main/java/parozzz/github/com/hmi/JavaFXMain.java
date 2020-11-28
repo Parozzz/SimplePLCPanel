@@ -41,7 +41,7 @@ public final class JavaFXMain extends Application
             modbusTCPThread = new ModbusTCPThread();
             modbusTCPThread.start();
 
-            hmiManager = new HMIManager(plcThread, modbusTCPThread);
+            hmiManager = new HMIManager(plcThread, modbusTCPThread, this::saveData);
             hmiManager.setup();
             if (saveFile.exists())
             {
@@ -101,7 +101,7 @@ public final class JavaFXMain extends Application
         System.exit(0);
     }
 
-    private void saveData()
+    public void saveData()
     {
         try
         {

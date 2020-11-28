@@ -12,13 +12,13 @@ public final class HMIManager extends FXController
     private final SiemensPLCThread plcThread;
     private final MainEditStage mainEditStage;
 
-    public HMIManager(SiemensPLCThread plcThread, ModbusTCPThread modbusTCPThread) throws IOException
+    public HMIManager(SiemensPLCThread plcThread, ModbusTCPThread modbusTCPThread, Runnable saveDataRunnable) throws IOException
     {
         super("HMIManager");
 
         this.plcThread = plcThread;
 
-        super.addFXChild(this.mainEditStage = new MainEditStage(plcThread, modbusTCPThread));
+        super.addFXChild(this.mainEditStage = new MainEditStage(plcThread, modbusTCPThread, saveDataRunnable));
     }
 
     public SiemensPLCThread getPlcThread()

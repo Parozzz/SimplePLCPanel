@@ -79,7 +79,6 @@ public class InputDataSetupPane extends SetupPane<InputDataAttribute>
                 }
             }
         });
-        inputTypeChoiceBox.setValue(InputWrapper.Type.INTEGER);
 
         super.getAttributeChangerList().create(inputTypeChoiceBox.valueProperty(), InputDataAttribute.TYPE);
 

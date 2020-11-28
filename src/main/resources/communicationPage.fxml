@@ -19,7 +19,11 @@
                         <Font name="System Bold" size="24.0" />
                      </font>
                   </Label>
-                  <ChoiceBox fx:id="commTypeChoiceBox" prefHeight="35.0" prefWidth="140.0" />
+                  <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0">
+                     <children>
+                        <ChoiceBox fx:id="commTypeChoiceBox" prefWidth="140.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;" />
+                     </children>
+                  </StackPane>
                </children>
                <StackPane.margin>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

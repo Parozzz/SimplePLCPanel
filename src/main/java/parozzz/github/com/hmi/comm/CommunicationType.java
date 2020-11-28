@@ -2,6 +2,6 @@ package parozzz.github.com.hmi.comm;
 
 public enum CommunicationType
 {
-    SIEMENS,
+    SIEMENS_S7,
     MODBUS_TCP;
 }

@@ -8,12 +8,12 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.AttributeMap;
 import parozzz.github.com.hmi.attribute.impl.address.ReadAddressAttribute;
 import parozzz.github.com.hmi.attribute.impl.address.WriteAddressAttribute;
 import parozzz.github.com.hmi.controls.ControlContainerPane;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
-import parozzz.github.com.hmi.controls.controlwrapper.setup.extra.ControlWrapperSetupUtil;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.impl.*;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.impl.address.AddressSetupPane;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.impl.control.ButtonDataSetupPane;
@@ -56,7 +56,7 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage
     private final SetupPaneList globalSetupPaneList;
 
     private ControlWrapper<?> selectedControlWrapper;
-    private SetupButtonSelectable activeSelectable;
+    private SetupSelectable activeSelectable;
 
     public ControlWrapperSetupStage(ControlContainerPane controlContainerPane) throws IOException
     {
@@ -128,9 +128,9 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage
 
         super.getUndoRedoManager().addCondition(data ->
         {
-            if (data instanceof SetupButtonSelectable)
+            if (data instanceof SetupSelectable)
             {
-                this.showSelectable((SetupButtonSelectable) data);
+                this.setShownSelectable((SetupSelectable) data);
                 return true;
             }
 
@@ -189,7 +189,7 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage
         return stateSelectionChoiceBox.getValue();
     }
 
-    public void showSelectable(SetupButtonSelectable selectable)
+    public void setShownSelectable(SetupSelectable selectable)
     {
         var children = centerStackPane.getChildren();
         children.clear();
@@ -244,6 +244,12 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage
         this.populateGenericSetupPanes(); //Generics are populated only one time, not state dependant
 
         super.getUndoRedoManager().clear(); //Clear all the redo/undo for a new ControlWrapper
+
+        if (activeSelectable instanceof SetupPane<?>
+                && !AttributeFetcher.hasAttribute(selectedControlWrapper, ((SetupPane<?>) activeSelectable).getAttributeClass()))
+        {
+            this.setShownSelectable(null);
+        }
 
         super.showStage();
     }
@@ -329,7 +335,7 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage
 
     private void writeEntireCurrentStateToAll()
     {
-        for(var setupPane : stateSetupPaneList)
+        for (var setupPane : stateSetupPaneList)
         {
             setupPane.writeToAllStates();
         }

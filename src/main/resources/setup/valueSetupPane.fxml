@@ -21,7 +21,7 @@
                   <Font size="17.0" />
                </font>
             </Label>
-            <ChoiceBox fx:id="valueTypeChoiceBox" prefWidth="150.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;" />
+            <ChoiceBox fx:id="valueTypeChoiceBox" prefWidth="125.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;" />
          </children>
       </HBox>
       <HBox maxHeight="-Infinity" maxWidth="-Infinity" spacing="10.0">

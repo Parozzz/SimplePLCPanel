@@ -2,7 +2,6 @@ package parozzz.github.com.hmi.comm;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import parozzz.github.com.hmi.comm.modbustcp.ModbusTCPCommunicationManager;
@@ -43,7 +42,7 @@ public final class CommunicationStage extends HMIStage<VBox>
 
         serializableDataSet.addEnum("CommunicationType", commTypeChoiceBox.valueProperty(), CommunicationType.class);
 
-        commTypeChoiceBox.setConverter(new EnumStringConverter<>(CommunicationType.class));
+        commTypeChoiceBox.setConverter(new EnumStringConverter<>(CommunicationType.class).setCapitalize());
         commTypeChoiceBox.getItems().addAll(CommunicationType.values());
         commTypeChoiceBox.valueProperty().addListener((observableValue, oldValue, newValue) ->
         {
@@ -71,7 +70,7 @@ public final class CommunicationStage extends HMIStage<VBox>
     {
         super.setDefault();
 
-        commTypeChoiceBox.setValue(CommunicationType.SIEMENS);
+        commTypeChoiceBox.setValue(CommunicationType.SIEMENS_S7);
     }
 
     public DeviceCommunicationManager<?> getSelectedCommunicationManager()
@@ -94,7 +93,7 @@ public final class CommunicationStage extends HMIStage<VBox>
         switch (communicationType)
         {
             default:
-            case SIEMENS:
+            case SIEMENS_S7:
                 return siemensPLCCommunicationManager;
             case MODBUS_TCP:
                 return modbusTCPCommunicationManager;

@@ -18,17 +18,17 @@
                   <Font size="17.0" />
                </font>
             </Label>
-            <ChoiceBox fx:id="typeChoiceBox" prefWidth="150.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;" />
+            <ChoiceBox fx:id="typeChoiceBox" prefWidth="125.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;" />
          </children>
       </HBox>
       <HBox maxHeight="-Infinity" maxWidth="-Infinity" spacing="10.0">
          <children>
-            <Label maxWidth="1.7976931348623157E308" text="Length">
+            <Label fx:id="lengthLabel" maxWidth="1.7976931348623157E308" text="Length">
                <font>
                   <Font size="17.0" />
                </font>
             </Label>
-            <ChoiceBox fx:id="lengthChoiceBox" prefWidth="125.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;" />
+            <ChoiceBox fx:id="lengthChoiceBox" prefWidth="110.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;" />
          </children>
       </HBox>
       <HBox maxHeight="-Infinity" maxWidth="-Infinity" spacing="10.0">
@@ -38,7 +38,7 @@
                   <Font size="17.0" />
                </font>
             </Label>
-            <TextField fx:id="addressTextField" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="50.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;">
+            <TextField fx:id="addressTextField" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="60.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;">
                <font>
                   <Font size="13.0" />
                </font>
@@ -55,7 +55,7 @@
                   <Font size="17.0" />
                </font>
             </Label>
-            <TextField fx:id="bitNumberTextField" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="50.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;">
+            <TextField fx:id="bitNumberTextField" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="60.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;">
                <font>
                   <Font size="13.0" />
                </font>

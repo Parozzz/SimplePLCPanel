@@ -12,6 +12,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import parozzz.github.com.hmi.FXObject;
+import parozzz.github.com.hmi.attribute.Attribute;
 import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
 import parozzz.github.com.hmi.util.FXTextFormatterUtil;
 import parozzz.github.com.hmi.util.FXUtil;
@@ -20,7 +21,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 @SuppressWarnings("unused")
-class WrapperStateCreationPane extends FXObject implements SetupButtonSelectable
+class WrapperStateCreationPane extends FXObject implements SetupSelectable
 {
 
     @FXML private TextField lowerValueTextField;
@@ -61,7 +62,7 @@ class WrapperStateCreationPane extends FXObject implements SetupButtonSelectable
         selectButton.setBackground(FXUtil.createBackground(Color.TRANSPARENT));
         selectButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         selectButton.setUserData(this);
-        selectButton.setOnAction(actionEvent -> setupStage.showSelectable(this));
+        selectButton.setOnAction(actionEvent -> setupStage.setShownSelectable(this));
 
         lowerValueTextField.setTextFormatter(FXTextFormatterUtil.simpleInteger(4));
         higherValueTextField.setTextFormatter(FXTextFormatterUtil.simpleInteger(4));

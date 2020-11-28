@@ -50,6 +50,11 @@ public final class AttributeFetcher
         return stateAttributeMap.getAttribute(attributeClass);
     }
 
+    public static boolean hasAttribute(ControlWrapper<?> controlWrapper, Class<? extends Attribute> attributeClass)
+    {
+        return hasAttribute(controlWrapper.getStateMap().getDefaultState().getAttributeMap(), controlWrapper.getGlobalAttributeMap(), attributeClass);
+    }
+
     public static boolean hasAttribute(WrapperState wrapperState, Class<? extends Attribute> attributeClass)
     {
         return hasAttribute(wrapperState.getAttributeMap(), null, attributeClass);

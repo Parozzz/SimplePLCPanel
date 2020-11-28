@@ -4,6 +4,7 @@ package parozzz.github.com.hmi.controls.controlwrapper.setup;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.paint.Color;
+import org.w3c.dom.Attr;
 import parozzz.github.com.hmi.FXObject;
 import parozzz.github.com.hmi.attribute.Attribute;
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
@@ -13,7 +14,7 @@ import parozzz.github.com.hmi.controls.controlwrapper.setup.extra.ControlWrapper
 import parozzz.github.com.hmi.util.ContextMenuBuilder;
 import parozzz.github.com.hmi.util.FXUtil;
 
-public abstract class SetupPane<A extends Attribute> extends FXObject implements SetupButtonSelectable
+public abstract class SetupPane<A extends Attribute> extends FXObject implements SetupSelectable
 {
     private final ControlWrapperSetupStage setupStage;
     private final Class<A> attributeClass;
@@ -48,7 +49,7 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
         selectButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
         selectButton.setUserData(this);
-        selectButton.setOnAction(actionEvent -> setupStage.showSelectable(this));
+        selectButton.setOnAction(actionEvent -> setupStage.setShownSelectable(this));
 
         if(stateBased)
         {
@@ -71,6 +72,11 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
 
     @Override
     public abstract Parent getParent();
+
+    public final Class<? extends Attribute> getAttributeClass()
+    {
+        return attributeClass;
+    }
 
     public boolean hasAttribute(AttributeMap attributeMap)
     {

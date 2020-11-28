@@ -5,6 +5,8 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.skin.MenuBarSkin;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
@@ -13,6 +15,7 @@ import javafx.scene.shape.Circle;
 import javafx.stage.Screen;
 import parozzz.github.com.Main;
 import parozzz.github.com.StartProperties;
+import parozzz.github.com.hmi.JavaFXMain;
 import parozzz.github.com.hmi.comm.CommunicationStage;
 import parozzz.github.com.hmi.comm.modbustcp.ModbusTCPThread;
 import parozzz.github.com.hmi.comm.siemens.SiemensPLCThread;
@@ -74,6 +77,8 @@ public final class MainEditStage extends BorderPaneHMIStage
     @FXML private VBox centerMainVBox;
     @FXML private StackPane centerScrollStackPane;
 
+    private final Runnable saveDataRunnable;
+
     private final ControlContainerDatabase controlContainerDatabase;
     private final ControlContainerCreationStage controlsPageCreationPage;
     private final DragAndDropPane dragAndDropPane;
@@ -89,9 +94,12 @@ public final class MainEditStage extends BorderPaneHMIStage
     private final TrigBoolean messagePresentTrig;
     private ControlContainerPane shownControlContainerPane;
 
-    public MainEditStage(SiemensPLCThread plcThread, ModbusTCPThread modbusTCPThread) throws IOException
+    public MainEditStage(SiemensPLCThread plcThread, ModbusTCPThread modbusTCPThread,
+            Runnable saveDataRunnable) throws IOException
     {
         super("Menu", "mainEditPane.fxml");
+
+        this.saveDataRunnable = saveDataRunnable;
 
         bottomScrollingPane = new MainEditBottomScrollingPane(bottomScrollingHBox);
         super.addFXChild(controlContainerDatabase = new ControlContainerDatabase(this, plcThread, modbusTCPThread))
@@ -113,9 +121,18 @@ public final class MainEditStage extends BorderPaneHMIStage
     {
         super.setup();
 
-        super.getStageSetter()
-                .setResizable(true)
-                .setMaximized(true);
+        var saveKeyCombination = KeyCombination.keyCombination("CTRL+S");
+
+        super.getStageSetter().setResizable(true)
+                .setMaximized(true)
+                .addEventFilter(KeyEvent.KEY_PRESSED, keyEvent ->
+                {
+                    if(saveKeyCombination.match(keyEvent))
+                    {
+                        saveMenuItem.fire();
+                        keyEvent.consume();
+                    }
+                });
 
         super.serializableDataSet.addString("PageHeight", pageHeightTextField.textProperty())
                 .addString("PageWidth", pageWidthTextField.textProperty())
@@ -126,6 +143,7 @@ public final class MainEditStage extends BorderPaneHMIStage
 
         //File Menu
         settingsMenuItem.setOnAction(actionEvent -> settingsStage.showStage());
+        saveMenuItem.setOnAction(event -> saveDataRunnable.run());
 
         //Communication Menu
         setupCommunicationMenuItem.setOnAction(event -> communicationStage.showStage());
@@ -217,14 +235,14 @@ public final class MainEditStage extends BorderPaneHMIStage
         if (super.every(1000))
         {
             var selectedCommunicationManager = communicationStage.getSelectedCommunicationManager();
-            if(selectedCommunicationManager != null)
+            if (selectedCommunicationManager != null)
             {
                 var isConnected = selectedCommunicationManager.getCommThread().isConnected();
                 plcConnectedCircle.setFill(isConnected ? Color.GREEN : Color.RED);
             }
 
             messagePresentTrig.set(messagesListStage.areMessagesPresent());
-            switch(messagePresentTrig.checkTrig())
+            switch (messagePresentTrig.checkTrig())
             {
                 case RISING:
                     messagePresentLabel.setVisible(true);

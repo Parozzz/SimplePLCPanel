@@ -60,7 +60,7 @@ public final class ControlContainerDatabase extends FXController
         {
             switch (communicationType)
             {
-                case SIEMENS:
+                case SIEMENS_S7:
                     nextControlDataUpdater = siemensPLCDataUpdater;
                     break;
                 case MODBUS_TCP:
@@ -88,7 +88,7 @@ public final class ControlContainerDatabase extends FXController
         //the first time from the listener created in the setup
         switch (mainEditStage.getCommunicationStage().getCommunicationType())
         {
-            case SIEMENS:
+            case SIEMENS_S7:
                 nextControlDataUpdater = siemensPLCDataUpdater;
                 break;
             case MODBUS_TCP:

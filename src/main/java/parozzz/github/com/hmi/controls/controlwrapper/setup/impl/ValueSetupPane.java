@@ -11,6 +11,7 @@ import parozzz.github.com.hmi.controls.controlwrapper.setup.ControlWrapperSetupS
 import parozzz.github.com.hmi.controls.controlwrapper.setup.SetupPane;
 import parozzz.github.com.hmi.util.FXTextFormatterUtil;
 import parozzz.github.com.hmi.util.FXUtil;
+import parozzz.github.com.hmi.util.valueintermediate.ValueIntermediate;
 import parozzz.github.com.hmi.util.valueintermediate.ValueIntermediateType;
 import parozzz.github.com.util.Util;
 
@@ -39,21 +40,27 @@ public final class ValueSetupPane extends SetupPane<ValueAttribute>
 
         valueTypeChoiceBox.setConverter(FXUtil.toStringOnlyConverter(valueIntermediateType ->
         {
-            if (valueIntermediateType == ValueIntermediateType.SHORT)
+            if (valueIntermediateType == ValueIntermediateType.INTEGER)
             {
-                return "Short Integer";
+                return "Word";
             } else if (valueIntermediateType == ValueIntermediateType.LONG)
             {
-                return "Long Integer";
-            } else if (valueIntermediateType == ValueIntermediateType.DOUBLE)
+                return "Double Word";
+            } else if (valueIntermediateType == ValueIntermediateType.FLOAT)
             {
-                return "Double Float";
+                return "Real";
+            } else if(valueIntermediateType ==ValueIntermediateType.DOUBLE)
+            {
+                return "Double Real";
             }
 
             var name = valueIntermediateType.getName().toLowerCase();
             return Util.capitalize(name);
         }));
-        valueTypeChoiceBox.getItems().addAll(ValueIntermediateType.values());
+        valueTypeChoiceBox.getItems().addAll(ValueIntermediateType.BOOLEAN,
+                ValueIntermediateType.INTEGER, ValueIntermediateType.LONG,
+                ValueIntermediateType.FLOAT, ValueIntermediateType.DOUBLE,
+                ValueIntermediateType.HEX, ValueIntermediateType.STRING);
 
         multiplierTextField.setTextFormatter(FXTextFormatterUtil.doubleBuilder().getTextFormatter());
         multiplierTextField.setEditable(true);
