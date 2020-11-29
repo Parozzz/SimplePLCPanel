@@ -13,6 +13,7 @@ import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
 import parozzz.github.com.hmi.main.quicksetup.QuickSetupPane;
 import parozzz.github.com.hmi.main.quicksetup.QuickSetupStateBinder;
 import parozzz.github.com.hmi.util.FXUtil;
+import parozzz.github.com.util.Util;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -60,8 +61,8 @@ public final class SizeQuickSetupPane extends FXObject implements QuickSetupPane
     public void addBinders(QuickSetupStateBinder stateBinder)
     {
         stateBinder.builder(SizeAttribute.class)
-                .indirect(widthTextField.textProperty(), Integer::parseInt, Objects::toString, SizeAttribute.WIDTH)
-                .indirect(heightTextField.textProperty(), Integer::parseInt, Objects::toString, SizeAttribute.HEIGHT);
+                .indirect(widthTextField.textProperty(), Util::parseIntOrZero, Objects::toString, SizeAttribute.WIDTH)
+                .indirect(heightTextField.textProperty(), Util::parseIntOrZero, Objects::toString, SizeAttribute.HEIGHT);
     }
 
     @Override

@@ -43,7 +43,7 @@ public final class QuickSetupStateBinder
 
     public void refreshValues()
     {
-        if(boundWrapperState == null)
+        if (boundWrapperState == null)
         {
             return;
         }
@@ -78,13 +78,13 @@ public final class QuickSetupStateBinder
 
         property.addListener((observable, oldValue, newValue) ->
         {
-            if(boundWrapperState == null || ignoreAttributeUpdate)
+            if (boundWrapperState == null || ignoreAttributeUpdate)
             {
                 return;
             }
 
             var attribute = AttributeFetcher.fetch(boundWrapperState, attributeClass);
-            if(attribute != null)
+            if (attribute != null)
             {
                 var attributeNewValue = quickToAttribute.apply(newValue);
                 attribute.setValue(attributeProperty, attributeNewValue);
@@ -115,7 +115,7 @@ public final class QuickSetupStateBinder
         public void copyFromWrapperState(WrapperState wrapperState)
         {
             var attribute = AttributeFetcher.fetch(wrapperState, attributeClass);
-            if(attribute != null)
+            if (attribute != null)
             {
                 boundPropertySet.forEach(boundProperty -> boundProperty.copyFromAttribute(attribute));
             }

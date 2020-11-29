@@ -40,12 +40,16 @@ public final class ValueSetupPane extends SetupPane<ValueAttribute>
 
         valueTypeChoiceBox.setConverter(FXUtil.toStringOnlyConverter(valueIntermediateType ->
         {
-            if (valueIntermediateType == ValueIntermediateType.INTEGER)
+            if(valueIntermediateType == ValueIntermediateType.SHORT)
             {
                 return "Word";
-            } else if (valueIntermediateType == ValueIntermediateType.LONG)
+            }
+            if (valueIntermediateType == ValueIntermediateType.INTEGER)
             {
                 return "Double Word";
+            } else if (valueIntermediateType == ValueIntermediateType.LONG)
+            {
+                return "Quad Word";
             } else if (valueIntermediateType == ValueIntermediateType.FLOAT)
             {
                 return "Real";
@@ -58,7 +62,7 @@ public final class ValueSetupPane extends SetupPane<ValueAttribute>
             return Util.capitalize(name);
         }));
         valueTypeChoiceBox.getItems().addAll(ValueIntermediateType.BOOLEAN,
-                ValueIntermediateType.INTEGER, ValueIntermediateType.LONG,
+                ValueIntermediateType.SHORT, ValueIntermediateType.INTEGER, ValueIntermediateType.LONG,
                 ValueIntermediateType.FLOAT, ValueIntermediateType.DOUBLE,
                 ValueIntermediateType.HEX, ValueIntermediateType.STRING);
 

@@ -2,9 +2,10 @@
    (NVM since when mouse is released all the attributes are refreshed anyway).
 
 2) Add control wrapper duplication
-2.1) Allow CTRL+C , CTRL+V
-2.2) When duplicate add a little offset to the layoutX and layoutY of the cloned
-2.3) Allow to clone every selected ControlWrapper
+2.1)☑ Allow CTRL+C , CTRL+V
+2.2)☑ When duplicate add a little offset to the layoutX and layoutY of the cloned
+2.3)☑ Allow to clone every selected ControlWrapper
+2.4) Instead of clearing the wrapper to copy, add consecutive offsets to layout
 
 3) Wrappers stacking notice
 3.1) If two or more wrappers are stacked one on top of each others, have a little conversion icon appear
@@ -15,7 +16,7 @@
 4)☑ Allow a Control Wrappers context menu to appear only if selected (Should help with the [3])
 4.1)☑ Control wrapper should be draggable only if selected
 
-5) Do a lot of cleanup on data cloning. There is a lot of confusion of what does what (Especially on naming convention)
+5)Do a lot of cleanup on data cloning. There is a lot of confusion of what does what (Especially on naming convention)
    and avoid creating waste objects.
 
 6) Redo a big part of the whole "RedoUndo" system. Right now is a bit too clonky and not easily manageable
@@ -23,19 +24,20 @@
 7)☑ Create a tool part (Which will include the PictureBank and the Messages part)
 7.1)☑ Add a triangle if a new message is present in queue aside the menu (Message have been split in a separate menu)
 
-8) Fix all the UIs that are size-dependant
-8.1) Control Setup Menu really needs a re-done. Is not that good :(
+8)☑ Fix all the UIs that are size-dependant
+8.1)☑ Control Setup Menu really needs a re-done. Is not that good :(
 
 9) Add an alarm page to allow to create alarms
 
-10) If i use the arrows, the quick setup is selected and won't work right then. FIX!
+10)☑ If i use the arrows, the quick setup is selected and won't work right then. FIX!
 
 11)☑ If i click two times the up arrow, the quick setup menu is selected (Won't allow moving control with arrow. PLS FIX!)
 11.1)☑ I have removed completely the possibility to focus indirectly controls inside the quick pane. Maybe find a workaround? (Consume the KeyEvent!)
 
-12) Create a quick text editor page to allow faster text settings for a specific control
+12)☑ Create a quick text editor page to allow faster text settings for a specific control
 
-13) Add a way to avoid having multiple editor stages (Like the Setup or the QuickTextEditor) open at the same time since they don't update automagically
+13)☑ Add a way to avoid having multiple editor stages (Like the Setup or the QuickTextEditor) open at the same time since they don't update automagically
+N.B. 13) Now every editor stage automatically update with something is changed!
 
 14)☑ Move the ControlWrapperSetupStage from the ControllerPane upper directly inside the MainEditStage (Since you don't need one per pane)
 

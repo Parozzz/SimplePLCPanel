@@ -44,19 +44,15 @@ public final class WrapperStateMap extends FXObject
         var externalValue = controlWrapper.getValue().getOutsideValue();
         externalValue.addNewValueRunnable(() ->
         {
-            var oldWrapperState = currentWrapperState;
             currentWrapperState = Objects.requireNonNull(this.getStateOf(externalValue.asInteger()),
                     "Trying to get a state but is returned null and not default?");
 
-            if(oldWrapperState != currentWrapperState)
-            {
-                controlWrapper.applyAttributes(currentWrapperState.getAttributeMap(), this);
-                //currentWrapperState.getAttributeMap().setAttributesToControlWrapper();
+            controlWrapper.applyAttributes(currentWrapperState.getAttributeMap(), this);
+            //currentWrapperState.getAttributeMap().setAttributesToControlWrapper();
 
-                //This needs to be here after the #setAttributesToControlWrapper because stuff
-                //can depend on attributes to be already set
-                wrapperStateValueChangedConsumerSet.forEach(consumer -> consumer.accept(currentWrapperState));
-            }
+            //This needs to be here after the #setAttributesToControlWrapper because stuff
+            //can depend on attributes to be already set
+            wrapperStateValueChangedConsumerSet.forEach(consumer -> consumer.accept(currentWrapperState));
         });
     }
 
@@ -67,7 +63,7 @@ public final class WrapperStateMap extends FXObject
 
     public void changeCurrentState(WrapperState wrapperState)
     {
-        if(wrapperStateList.contains(wrapperState) || wrapperState == defaultWrapperState)
+        if (wrapperStateList.contains(wrapperState) || wrapperState == defaultWrapperState)
         {
             this.currentWrapperState = wrapperState;
         }
@@ -93,7 +89,7 @@ public final class WrapperStateMap extends FXObject
 
         wrapperStateList.add(wrapperState);
 
-        if(cloneFromDefault) //If this is not used accurately, might lead to broken attribute maps
+        if (cloneFromDefault) //If this is not used accurately, might lead to broken attribute maps
         {
             //This other than clone, it populates the added state with the attribute
             wrapperState.getAttributeMap().cloneFromOther(defaultWrapperState.getAttributeMap());
@@ -118,9 +114,9 @@ public final class WrapperStateMap extends FXObject
         this.requireDefaultInit();
 
         //Since this could be a pretty hot method, better use for loop that are a bit more efficient
-        for(var wrapperState : wrapperStateList)
+        for (var wrapperState : wrapperStateList)
         {
-            if(wrapperState.isActive(state))
+            if (wrapperState.isActive(state))
             {
                 return wrapperState;
             }
@@ -185,14 +181,13 @@ public final class WrapperStateMap extends FXObject
         WrapperStateSerializer.deserializeDefaultState(defaultWrapperStateJSONDataMap, defaultWrapperState);
 
         var jsonArray = jsonDataMap.getArray("WrapperStateList");
-        if(jsonArray != null)
+        if (jsonArray != null)
         {
             jsonArray.stream().filter(JSONObject.class::isInstance)
                     .map(JSONObject.class::cast)
                     .map(JSONDataMap::new)
                     .forEach(wrapperJSONDataMap -> WrapperStateSerializer.deserialize(wrapperJSONDataMap, this::addState));
-        }
-        else
+        } else
         {
             Logger.getLogger(WrapperStateMap.class.getSimpleName()).log(Level.WARNING,
                     "WrapperStateList has not been found for WrapperStateMap");

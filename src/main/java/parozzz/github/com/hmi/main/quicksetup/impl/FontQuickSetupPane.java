@@ -18,6 +18,7 @@ import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
 import parozzz.github.com.hmi.main.quicksetup.QuickSetupPane;
 import parozzz.github.com.hmi.main.quicksetup.QuickSetupStateBinder;
 import parozzz.github.com.hmi.util.FXUtil;
+import parozzz.github.com.util.Util;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -69,7 +70,7 @@ public class FontQuickSetupPane  extends FXObject implements QuickSetupPane
     {
         stateBinder.builder(FontAttribute.class)
                 .direct(textColorPicker.valueProperty(), FontAttribute.TEXT_COLOR)
-                .indirect(textSizeTextField.textProperty(), Integer::parseInt, Objects::toString, FontAttribute.FONT_TEXT_SIZE)
+                .indirect(textSizeTextField.textProperty(), Util::parseIntOrZero, Objects::toString, FontAttribute.FONT_TEXT_SIZE)
                 .direct(boldCheckBox.selectedProperty(), FontAttribute.BOLD_WEIGHT)
                 .direct(italicCheckBox.selectedProperty(), FontAttribute.ITALIC_POSTURE)
                 .direct(underlineCheckBox.selectedProperty(), FontAttribute.UNDERLINE);

@@ -16,12 +16,6 @@ public class ModbusTCPReadQWordIntermediate extends ModbusTCPReadNumberIntermedi
         this.consumer = consumer;
     }
 
-    public void setValue(int value)
-    {   //A Double Word is 8 bytes, so a long contains it all :)
-        //Every new value added, it is added to the actual value by shifting the set value by 16 * (values received)
-        this.value |= (value & 0xFFFF) << (16 * valueCounter ++);
-    }
-
     @Override
     public void parse()
     {
@@ -31,8 +25,8 @@ public class ModbusTCPReadQWordIntermediate extends ModbusTCPReadNumberIntermedi
     @Override
     public void setNextWord(int value)
     {
-        //A Double Word is 8 bytes, so a long contains it all :)
+        //A Quad Word is 8 bytes, so a long contains it all :)
         //Every new value added, it is added to the actual value by shifting the set value by 16 * (values received)
-        this.value &= (value & 0xFFFF) << (16 * valueCounter ++);
+        this.value |= ((long) (value & 0x0000FFFF) << 16 * valueCounter++);
     }
 }
