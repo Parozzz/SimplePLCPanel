@@ -130,8 +130,8 @@ public class InputDataSetupPane extends SetupPane<InputDataAttribute>
             var minValueFactory = this.parseSpinner(minValueSpinner);
             minValueFactory.maxProperty().bind(maxValueSpinner.valueProperty());
 */
-            attributeChangerList.createStringToNumber(maxValueTextField.textProperty(), InputDataAttribute.INTEGER_MAX_VALUE, Util::parseIntOrZero)
-                    .createStringToNumber(minValueTextField.textProperty(), InputDataAttribute.INTEGER_MIN_VALUE, Util::parseIntOrZero);
+            attributeChangerList.createStringToNumber(maxValueTextField.textProperty(), InputDataAttribute.INTEGER_MAX_VALUE, Util::parseLongOrZero)
+                    .createStringToNumber(minValueTextField.textProperty(), InputDataAttribute.INTEGER_MIN_VALUE, Util::parseLongOrZero);
         }
 
         private SpinnerValueFactory.IntegerSpinnerValueFactory parseSpinner(Spinner<Integer> spinner)

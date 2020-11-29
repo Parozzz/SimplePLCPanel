@@ -88,6 +88,23 @@ public final class Util
         }
     }
 
+    public static long parseLongOrZero(String string)
+    {
+        return parseLong(string, 0L);
+    }
+
+    public static long parseLong(String string, long errorValue)
+    {
+        try
+        {
+            return Long.parseLong(string);
+        } catch (NumberFormatException exception)
+        {
+            return errorValue;
+        }
+    }
+
+
     public static URL getResource(String resource)
     {
         return Main.class.getResource("/" + resource);

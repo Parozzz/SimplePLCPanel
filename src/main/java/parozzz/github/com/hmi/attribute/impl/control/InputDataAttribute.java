@@ -12,8 +12,8 @@ public final class InputDataAttribute extends Attribute
 
     public static final AttributeProperty<InputWrapper.Type> TYPE = new EnumAttributeProperty<>("InputType", InputWrapper.Type.INTEGER);
 
-    public static final AttributeProperty<Integer> INTEGER_MAX_VALUE = new NumberAttributeProperty<>("IntegerMaxValue", Integer.MAX_VALUE, Number::intValue);
-    public static final AttributeProperty<Integer> INTEGER_MIN_VALUE = new NumberAttributeProperty<>("IntegerMinValue", Integer.MIN_VALUE, Number::intValue);
+    public static final AttributeProperty<Long> INTEGER_MAX_VALUE = new NumberAttributeProperty<>("IntegerMaxValue", Long.MAX_VALUE, Number::longValue);
+    public static final AttributeProperty<Long> INTEGER_MIN_VALUE = new NumberAttributeProperty<>("IntegerMinValue", Long.MIN_VALUE, Number::longValue);
 
     public static final AttributeProperty<Integer> REAL_MAX_DECIMALS = new NumberAttributeProperty<>("RealMaxDecimals", 10, Number::intValue);
     public static final AttributeProperty<Double> REAL_MAX_VALUE = new NumberAttributeProperty<>("RealMaxValue", Double.MAX_VALUE, Number::doubleValue);

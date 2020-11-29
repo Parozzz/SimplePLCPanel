@@ -40,8 +40,8 @@ public class FXTextFormatterUtil
 
     public static class IntegerTextFormatterBuilder
     {
-        private int minValue = Integer.MIN_VALUE;
-        private int maxValue = Integer.MAX_VALUE;
+        private long minValue = Long.MIN_VALUE;
+        private long maxValue = Long.MAX_VALUE;
         private boolean positiveOnly;
         private String defaultText = "";
 
@@ -77,13 +77,13 @@ public class FXTextFormatterUtil
             return this;
         }
 
-        public IntegerTextFormatterBuilder min(int minValue)
+        public IntegerTextFormatterBuilder min(long minValue)
         {
             this.minValue = positiveOnly && minValue < 0 ? 0 : minValue;
             return this;
         }
 
-        public IntegerTextFormatterBuilder max(int maxValue)
+        public IntegerTextFormatterBuilder max(long maxValue)
         {
             this.maxValue = maxValue;
             return this;
@@ -110,11 +110,11 @@ public class FXTextFormatterUtil
                 }
 
                 //Checks that all the digits are number
-                int intValue;
+                long longValue;
                 try
                 {
-                    intValue = Integer.parseInt(newText);
-                    if (intValue < minValue || intValue > maxValue)
+                    longValue = Long.parseLong(newText);
+                    if (longValue < minValue || longValue > maxValue)
                     {
                         return null;
                     }
