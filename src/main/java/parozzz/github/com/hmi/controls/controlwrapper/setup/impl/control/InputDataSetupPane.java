@@ -57,7 +57,7 @@ public class InputDataSetupPane extends SetupPane<InputDataAttribute>
         realDataPane.setup(super.getAttributeChangerList());
         characterDataPane.setup(super.getAttributeChangerList());
 
-        inputTypeChoiceBox.setConverter(new EnumStringConverter<>(InputWrapper.Type.class));
+        inputTypeChoiceBox.setConverter(new EnumStringConverter<>(InputWrapper.Type.class).setCapitalize());
         inputTypeChoiceBox.getItems().addAll(InputWrapper.Type.values());
         inputTypeChoiceBox.valueProperty().addListener((observableValue, oldValue, newValue) ->
         {
