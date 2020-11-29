@@ -40,7 +40,7 @@ public final class ChangePageSetupPane extends SetupPane<ChangePageAttribute>
             var items = selectPageComboBox.getItems();
             items.clear();
 
-            setupStage.getControlMainPage().getControlContainerDatabase().getPageList()
+            setupStage.getMainEditStage().getControlContainerDatabase().getPageList()
                     .stream().map(ControlContainerPane::getName)
                     .forEach(items::add);
         });

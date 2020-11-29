@@ -58,9 +58,9 @@ public class InputWrapper extends ControlWrapper<TextField>
     }
 
     @Override
-    public void applyAttributes(TextField control, Pane containerPane, AttributeMap attributeMap)
+    public void applyAttributes(TextField control, Pane containerPane, AttributeMap attributeMap, Object involvedObject)
     {
-        super.applyAttributes(control, containerPane, attributeMap);
+        super.applyAttributes(control, containerPane, attributeMap, involvedObject);
 
         var inputDataAttribute = AttributeFetcher.fetch(this.getGlobalAttributeMap(), InputDataAttribute.class);
         if(inputDataAttribute != null)

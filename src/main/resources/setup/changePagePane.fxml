@@ -15,17 +15,17 @@
             <CheckBox fx:id="enabledCheckBox" mnemonicParsing="false" />
          </graphic>
          <font>
-            <Font size="18.0" />
+            <Font size="17.0" />
          </font>
       </Label>
       <HBox maxHeight="-Infinity" maxWidth="-Infinity" spacing="10.0">
          <children>
             <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Page Name">
                <font>
-                  <Font size="18.0" />
+                  <Font size="17.0" />
                </font>
             </Label>
-            <ComboBox fx:id="selectPageComboBox" editable="true" prefHeight="25.0" prefWidth="175.0" stylesheets="@../styleheets/combo_box_setup_style.css" />
+            <ComboBox fx:id="selectPageComboBox" editable="true" prefWidth="175.0" stylesheets="@../styleheets/combo_box_setup_style.css" />
          </children>
       </HBox>
    </children>

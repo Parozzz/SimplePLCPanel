@@ -1,19 +1,23 @@
 package parozzz.github.com.hmi.main.quicksetup;
 
+import javafx.beans.value.ChangeListener;
 import javafx.scene.Parent;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import parozzz.github.com.hmi.FXController;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
+import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapperSpecific;
+import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
 import parozzz.github.com.hmi.main.quicksetup.impl.*;
 import parozzz.github.com.hmi.util.FXUtil;
 
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 
-public final class QuickSetupVBox extends FXController
+public final class QuickSetupVBox extends FXController implements ControlWrapperSpecific
 {
     private final ScrollPane mainScrollPane;
 
@@ -26,21 +30,19 @@ public final class QuickSetupVBox extends FXController
 
     private final QuickSetupStateBinder stateBinder;
     private final Set<QuickSetupPane> quickSetupPaneSet;
+
+    private final ChangeListener<Boolean> validControlWrapperListener;
+    private final Consumer<Object> attributesUpdatedConsumer;
+    private final Consumer<WrapperState> stateChangeConsumer;
+
     private ControlWrapper<?> selectedControlWrapper;
 
     public QuickSetupVBox() throws IOException
     {
         super("QuickProperties");
 
-        this.stateBinder = new QuickSetupStateBinder(() ->
-        {
-            if(selectedControlWrapper != null)
-            {
-                selectedControlWrapper.applyAttributes();
-            }
-        });
+        this.stateBinder = new QuickSetupStateBinder(this);
         this.mainScrollPane = new ScrollPane();
-        this.quickSetupPaneSet = new HashSet<>();
 
         this.addFXChild(this.stateSelectionQuickSetupPane = new StateSelectionQuickSetupPane())
                 .addFXChild(this.genericQuickSetupPane = new GenericQuickSetupPane())
@@ -48,6 +50,26 @@ public final class QuickSetupVBox extends FXController
                 .addFXChild(this.fontQuickSetupPane = new FontQuickSetupPane())
                 .addFXChild(this.backgroundQuickSetupPane = new BackgroundQuickSetupPane())
                 .addFXChild(this.textQuickSetupPane = new TextQuickSetupPane());
+
+        this.quickSetupPaneSet = new HashSet<>();
+
+        this.validControlWrapperListener = (observableValue, oldValue, newValue) ->
+        {
+            if(!newValue)
+            {
+                this.setSelectedControlWrapper(null);
+            }
+        };
+        this.attributesUpdatedConsumer = involvedObject ->
+        {
+            if(involvedObject != this)
+            {
+                stateBinder.setIgnoreAttributeUpdate(true);
+                stateBinder.refreshValues();
+                stateBinder.setIgnoreAttributeUpdate(false);
+            }
+        };
+        this.stateChangeConsumer = stateSelectionQuickSetupPane::changeState;
     }
 
     @Override
@@ -73,7 +95,7 @@ public final class QuickSetupVBox extends FXController
         {
             if(selectedControlWrapper == null || wrapperState == null)
             {
-                stateBinder.clear();
+                stateBinder.setBoundWrapperState(null);
                 return;
             }
 
@@ -89,7 +111,7 @@ public final class QuickSetupVBox extends FXController
     {
         super.setupComplete();
 
-        this.setSelected(null); //Start with a null value (Also set everything invisible)
+        this.setSelectedControlWrapper(null); //Start with a null value (Also set everything invisible)
     }
 
     public Parent getMainParent()
@@ -105,25 +127,47 @@ public final class QuickSetupVBox extends FXController
         }
     }
 
-    public void setSelected(ControlWrapper<?> controlWrapper)
+
+    @Override
+    public void setSelectedControlWrapper(ControlWrapper<?> controlWrapper)
     {
-        this.selectedControlWrapper = controlWrapper;
-        if(selectedControlWrapper == null)
+        if(selectedControlWrapper != null)
         {
-            stateBinder.clear(); //Without this, values on the control state are cleared on selection change
-            quickSetupPaneSet.forEach(quickSetupPane ->
-            {
-                quickSetupPane.getParent().setVisible(false);
-                quickSetupPane.clear();
-            });
+            selectedControlWrapper.validProperty().removeListener(validControlWrapperListener);
+            selectedControlWrapper.removeAttributesUpdatedConsumer(attributesUpdatedConsumer);
+            selectedControlWrapper.getStateMap().removeStateValueChangedConsumer(stateChangeConsumer);
+        }
+
+        this.selectedControlWrapper = controlWrapper;
+        if(controlWrapper == null)
+        {
+            stateBinder.setBoundWrapperState(null); //Without this, values on the control state are cleared on selection change
+            quickSetupPaneSet.forEach(QuickSetupPane::clear);
             return;
         }
 
+        controlWrapper.validProperty().addListener(validControlWrapperListener);
+        controlWrapper.addAttributesUpdatedConsumer(attributesUpdatedConsumer);
+        controlWrapper.getStateMap().addStateValueChangedConsumer(stateChangeConsumer);
         quickSetupPaneSet.forEach(quickSetupPane ->
         {
             quickSetupPane.getParent().setVisible(true); //Uphere is better. Below it could hide it again.
             quickSetupPane.onNewControlWrapper(controlWrapper);
         });
+    }
+
+    @Override
+    public ControlWrapper<?> getSelectedControlWrapper()
+    {
+        return selectedControlWrapper;
+    }
+
+    void updateSelectedWrapperAttributes()
+    {
+        if(selectedControlWrapper != null)
+        {
+            selectedControlWrapper.applyAttributes(this);
+        }
     }
 
     private void computeQuickSetupPane(VBox vBox, QuickSetupPane... quickSetupPanes)
@@ -136,4 +180,5 @@ public final class QuickSetupVBox extends FXController
             vBox.getChildren().add(quickSetupPane.getParent());
         }
     }
+
 }

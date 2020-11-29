@@ -53,13 +53,13 @@ public final class ControlWrappersSelectionManager extends FXObject
                 if(mainSelection != null && !mainSelection.isSelected())
                 {
                     mainSelection = null;
-                    controlContainerPane.getMainEditStage().getQuickPropertiesVBox().setSelected(null);
+                    controlContainerPane.getMainEditStage().getQuickPropertiesVBox().setSelectedControlWrapper(null);
                 }
 
                 if(mainSelection == null && finalList.size() != 0)
                 {
                     (mainSelection = finalList.get(0)).setAsMainSelection();
-                    controlContainerPane.getMainEditStage().getQuickPropertiesVBox().setSelected(mainSelection);
+                    controlContainerPane.getMainEditStage().getQuickPropertiesVBox().setSelectedControlWrapper(mainSelection);
                 }
             }
         });
@@ -80,7 +80,7 @@ public final class ControlWrappersSelectionManager extends FXObject
                 this.selectedControlWrapperList.clear(); //Remove all selected!
 
                 //Also clear the quick properties!
-                controlContainerPane.getMainEditStage().getQuickPropertiesVBox().setSelected(null);
+                controlContainerPane.getMainEditStage().getQuickPropertiesVBox().setSelectedControlWrapper(null);
             }
         });
     }

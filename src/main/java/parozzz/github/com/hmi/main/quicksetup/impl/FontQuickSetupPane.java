@@ -78,6 +78,8 @@ public class FontQuickSetupPane  extends FXObject implements QuickSetupPane
     @Override
     public void clear()
     {
+        QuickSetupPane.super.clear();
+
         textColorPicker.setValue(Color.WHITE);
         textSizeTextField.setText("");
         boldCheckBox.setSelected(false);

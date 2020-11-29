@@ -22,5 +22,6 @@
             <ChoiceBox fx:id="buttonTypeChoiceBox" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefWidth="115.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;" />
          </children>
       </HBox>
+      <Label fx:id="toggleInformationLabel" alignment="CENTER" text="For the toggle button to work properly, &#10;both read and write address needs to be equal" textAlignment="CENTER" />
    </children>
 </VBox>

@@ -8,7 +8,6 @@ import parozzz.github.com.hmi.controls.ControlContainerPane;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.util.ContextMenuBuilder;
 import parozzz.github.com.hmi.util.FXTextFormatterUtil;
-import parozzz.github.com.hmi.util.FXUtil;
 
 public final class ControlWrapperContextMenuController extends FXObject
 {
@@ -36,7 +35,8 @@ public final class ControlWrapperContextMenuController extends FXObject
 
         var containerStackPane = controlWrapper.getContainerPane();
         ContextMenuBuilder.builder(contextMenu)
-                .simple("Setup", () -> controlContainerPane.getSetupStage().showStageFor(controlWrapper))
+                .simple("Setup", () -> controlContainerPane.getSetupStage().setSelectedControlWrapper(controlWrapper))
+                .simple("Text Editor", () -> controlContainerPane.getQuickTextEditorStage().setSelectedControlWrapper(controlWrapper))
                 .spacer()
                 .simple("To Front", containerStackPane::toFront)
                 .simple("To Back", containerStackPane::toBack)
@@ -114,5 +114,4 @@ public final class ControlWrapperContextMenuController extends FXObject
         );
         containerStackPane.setLayoutY(newLayoutY);
     }
-
 }

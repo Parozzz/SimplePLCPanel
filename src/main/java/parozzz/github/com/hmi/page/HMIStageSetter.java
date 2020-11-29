@@ -79,6 +79,11 @@ public final class HMIStageSetter
         return this;
     }
 
+    public boolean isResizable()
+    {
+        return stage.isResizable();
+    }
+
     public HMIStageSetter setResizable(boolean resizable)
     {
         stage.setResizable(resizable);
@@ -152,9 +157,31 @@ public final class HMIStageSetter
         return this;
     }
 
+    public void hide()
+    {
+        this.close();
+    }
+
     public void close()
     {
         stage.close();
+    }
+
+    public void show()
+    {
+        if(stage.isShowing())
+        {
+            if(stage.isIconified())
+            {
+                stage.setIconified(false);
+            }
+
+            var alwaysOnTop = stage.isAlwaysOnTop();
+            stage.setAlwaysOnTop(!alwaysOnTop);
+            stage.setAlwaysOnTop(alwaysOnTop);
+        }
+
+        stage.show();
     }
 
     public Stage get()

@@ -183,7 +183,7 @@ public final class ModbusTCPDataUpdater extends ControlDataUpdater<ModbusTCPThre
         }
 
         var cachedData = ModbusTCPDataPropertyHolder.getCachedDataOf(attribute);
-        if (cachedData.getOffset() <= 0)
+        if (cachedData.getOffset() < 0)
         {
             return null;
         }

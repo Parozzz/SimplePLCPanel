@@ -25,9 +25,9 @@ public class WrapperState implements Comparable<WrapperState>
             this.predicate = predicate;
         }
 
-        public boolean test(int internal, int value)
+        public boolean test(int compare, int value)
         {
-            return predicate.test(internal, value);
+            return predicate.test(value, compare);
         }
 
         public String getVisualText()
@@ -137,7 +137,7 @@ public class WrapperState implements Comparable<WrapperState>
     public boolean isActive(int value)
     {
         return firstCompareType.test(firstCompare, value)
-                && firstCompareType.test(secondCompare, value);
+                && secondCompareType.test(secondCompare, value);
     }
 
     public WrapperState cloneEmpty()

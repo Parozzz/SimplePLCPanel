@@ -63,13 +63,11 @@ public final class BackgroundSetupPane extends SetupPane<BackgroundAttribute>
                 return;
             }
 
-            var imageURI = super.getSetupStage().getControlMainPage().getMainEditStage().getPictureBankStage()
-                    .getImageURI(newValue);
-            if(imageURI != null)
+            var imageURI = super.getSetupStage().getMainEditStage().getPictureBankStage().getImageURI(newValue);
+            if (imageURI != null)
             {
                 fileImageView.setImage(new Image(imageURI.toString()));
-            }
-            else
+            } else
             {
                 fileImageView.setImage(null);
             }
@@ -77,7 +75,7 @@ public final class BackgroundSetupPane extends SetupPane<BackgroundAttribute>
 
         selectImageFileButton.setOnMouseClicked(mouseEvent ->
         {
-            var pictureBank = super.getSetupStage().getControlMainPage().getMainEditStage().getPictureBankStage();
+            var pictureBank = super.getSetupStage().getMainEditStage().getPictureBankStage();
             pictureBank.startImageSelection(file -> imageNameTextField.setText(file.getName()));
         });
 
@@ -91,7 +89,7 @@ public final class BackgroundSetupPane extends SetupPane<BackgroundAttribute>
         stretchToggleButton.selectedProperty().addListener((observableValue, oldValue, newValue) ->
         {
             Background background = Background.EMPTY;
-            if(newValue)
+            if (newValue)
             {
                 background = new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY));
             }

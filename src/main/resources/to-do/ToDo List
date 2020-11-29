@@ -35,6 +35,15 @@
 
 12) Create a quick text editor page to allow faster text settings for a specific control
 
+13) Add a way to avoid having multiple editor stages (Like the Setup or the QuickTextEditor) open at the same time since they don't update automagically
+
+14)☑ Move the ControlWrapperSetupStage from the ControllerPane upper directly inside the MainEditStage (Since you don't need one per pane)
+
+15) Add permanent memory (Numeric or tag based we'll see) using a local SQLite database
+
+16) Add startup functions
+16.1) Connected with 15, allows to write the current startup value (That should be loaded before doing the startup functions) to the plc.
+
 Control Wrapper Selection
 
 1)☑ Have a "main" selection that will be the main to gather information for the quick setup

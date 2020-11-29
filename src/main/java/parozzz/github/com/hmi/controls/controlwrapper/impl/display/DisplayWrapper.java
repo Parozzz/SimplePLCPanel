@@ -39,9 +39,9 @@ public class DisplayWrapper extends LabeledWrapper<Label>
     }
 
     @Override
-    public void applyAttributes(Label control, Pane containerPane, AttributeMap attributeMap)
+    public void applyAttributes(Label control, Pane containerPane, AttributeMap attributeMap, Object involvedObject)
     {
-        super.applyAttributes(control, containerPane, attributeMap);
+        super.applyAttributes(control, containerPane, attributeMap, involvedObject);
 
         String text = "";
 

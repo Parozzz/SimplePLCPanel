@@ -62,6 +62,8 @@ public final class GenericQuickSetupPane extends FXObject implements QuickSetupP
     @Override
     public void clear()
     {
+        QuickSetupPane.super.clear();
+
         typeTextField.setText("");
     }
 }

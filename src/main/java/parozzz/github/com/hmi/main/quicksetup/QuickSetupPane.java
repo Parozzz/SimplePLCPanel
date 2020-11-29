@@ -14,5 +14,8 @@ public interface QuickSetupPane
 
     void addBinders(QuickSetupStateBinder stateBinder);
 
-    void clear();
+    default void clear()
+    {
+        this.getParent().setVisible(false);
+    }
 }

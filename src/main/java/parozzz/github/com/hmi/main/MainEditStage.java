@@ -22,6 +22,8 @@ import parozzz.github.com.hmi.comm.siemens.SiemensPLCThread;
 import parozzz.github.com.hmi.controls.ControlContainerCreationStage;
 import parozzz.github.com.hmi.controls.ControlContainerPane;
 import parozzz.github.com.hmi.controls.ReadOnlyControlContainerStage;
+import parozzz.github.com.hmi.controls.controlwrapper.setup.ControlWrapperSetupStage;
+import parozzz.github.com.hmi.controls.controlwrapper.setup.quicktext.ControlWrapperQuickTextEditorStage;
 import parozzz.github.com.hmi.database.ControlContainerDatabase;
 import parozzz.github.com.hmi.main.dragdrop.DragAndDropPane;
 import parozzz.github.com.hmi.main.others.ControlWrapperCopyPasteHandler;
@@ -81,6 +83,8 @@ public final class MainEditStage extends BorderPaneHMIStage
 
     private final ControlContainerDatabase controlContainerDatabase;
     private final ControlContainerCreationStage controlsPageCreationPage;
+    private final ControlWrapperSetupStage controlWrapperSetupStage;
+    private final ControlWrapperQuickTextEditorStage controlWrapperQuickTextEditorStage;
     private final DragAndDropPane dragAndDropPane;
     private final MainEditBottomScrollingPane bottomScrollingPane;
     private final QuickSetupVBox quickSetupVBox;
@@ -104,6 +108,8 @@ public final class MainEditStage extends BorderPaneHMIStage
         bottomScrollingPane = new MainEditBottomScrollingPane(bottomScrollingHBox);
         super.addFXChild(controlContainerDatabase = new ControlContainerDatabase(this, plcThread, modbusTCPThread))
                 .addFXChild(controlsPageCreationPage = new ControlContainerCreationStage(controlContainerDatabase))
+                .addFXChild(controlWrapperSetupStage = new ControlWrapperSetupStage(this))
+                .addFXChild(controlWrapperQuickTextEditorStage = new ControlWrapperQuickTextEditorStage())
                 .addFXChild(dragAndDropPane = new DragAndDropPane(this))
                 .addFXChild(quickSetupVBox = new QuickSetupVBox())
                 .addFXChild(settingsStage = new SettingsStage())
@@ -268,6 +274,21 @@ public final class MainEditStage extends BorderPaneHMIStage
         }*/
     }
 
+    public ControlContainerDatabase getControlContainerDatabase()
+    {
+        return controlContainerDatabase;
+    }
+
+    public ControlWrapperSetupStage getControlWrapperSetupStage()
+    {
+        return controlWrapperSetupStage;
+    }
+
+    public ControlWrapperQuickTextEditorStage getControlWrapperQuickTextEditorStage()
+    {
+        return controlWrapperQuickTextEditorStage;
+    }
+
     public CommunicationStage getCommunicationStage()
     {
         return communicationStage;
@@ -341,9 +362,7 @@ public final class MainEditStage extends BorderPaneHMIStage
             //Close all the pages
             this.getStageSetter().close();
             settingsStage.getStageSetter().close();
-            pageList.stream().map(ControlContainerPane::getSetupStage)
-                    .map(HMIStage::getStageSetter)
-                    .forEach(HMIStageSetter::close);
+            controlWrapperSetupStage.getStageSetter().close();
         }
     }
 

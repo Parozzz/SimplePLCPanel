@@ -37,42 +37,35 @@ public final class ReadOnlyControlContainerStage extends HMIStage<StackPane>
     {
         super.setup();
 
-        var stage = super.getStageSetter()
-                .initModality(Modality.APPLICATION_MODAL)
+        super.getStageSetter().initModality(Modality.APPLICATION_MODAL)
                 .initStyle(StageStyle.UNDECORATED)
                 //.setFullScreen(true, "", null)
+                .setFullScreen(false, "", null)
                 .setAlwaysOnTop(true)
                 .setResizable(true)
-                .get();
-
-        //This stop the Stage to be closed in any way
-        stage.setOnCloseRequest(windowEvent ->
-        {
-            if(!stopFullScreen)
-            {
-                windowEvent.consume();
-            }
-        });
-
-        stage.addEventHandler(KeyEvent.KEY_PRESSED, keyEvent ->
-        {
-            if (keyEvent.getCode() == KeyCode.F12 && keyEvent.isControlDown())
-            {
-                stopFullScreen = !stopFullScreen;
-                stage.setFullScreen(!stopFullScreen);
-            }
-        });
-
-        stage.fullScreenProperty().addListener((observableValue, oldValue, newValue) ->
-        {
-            if (!stopFullScreen && (newValue == null || !newValue))
-            {
-                stage.setFullScreen(true);
-            }
-        });
-
-        stage.setFullScreenExitHint("");
-        stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
+                .addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, windowEvent ->
+                {
+                    if (!stopFullScreen)
+                    {//This stop the Stage to be closed in any way
+                        windowEvent.consume();
+                    }
+                })
+                .addEventHandler(KeyEvent.KEY_PRESSED, keyEvent ->
+                {
+                    if (keyEvent.getCode() == KeyCode.F12 && keyEvent.isControlDown())
+                    {
+                        stopFullScreen = !stopFullScreen;
+                        super.getStageSetter().setFullScreen(!stopFullScreen, "", null);
+                    }
+                })
+                .get().fullScreenProperty()
+                .addListener((observableValue, oldValue, newValue) ->
+                {
+                    if (!stopFullScreen && (newValue == null || !newValue))
+                    {
+                        super.getStageSetter().setFullScreen(true, "", null);
+                    }
+                });
 
         super.parent.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
         super.parent.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);

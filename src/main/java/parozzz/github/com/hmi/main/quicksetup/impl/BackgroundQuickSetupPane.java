@@ -65,6 +65,8 @@ public final class BackgroundQuickSetupPane extends FXObject implements QuickSet
     @Override
     public void clear()
     {
+        QuickSetupPane.super.clear();
+
         backgroundColorPicker.setValue(Color.WHITE);
     }
 }

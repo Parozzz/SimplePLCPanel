@@ -1,5 +1,6 @@
 package parozzz.github.com.hmi.controls.controlwrapper.setup;
 
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -12,13 +13,14 @@ import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.AttributeMap;
 import parozzz.github.com.hmi.attribute.impl.address.ReadAddressAttribute;
 import parozzz.github.com.hmi.attribute.impl.address.WriteAddressAttribute;
-import parozzz.github.com.hmi.controls.ControlContainerPane;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
+import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapperSpecific;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.impl.*;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.impl.address.AddressSetupPane;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.impl.control.ButtonDataSetupPane;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.impl.control.InputDataSetupPane;
 import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
+import parozzz.github.com.hmi.main.MainEditStage;
 import parozzz.github.com.hmi.page.BorderPaneHMIStage;
 import parozzz.github.com.hmi.util.ContextMenuBuilder;
 import parozzz.github.com.hmi.util.FXUtil;
@@ -32,7 +34,7 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public final class ControlWrapperSetupStage extends BorderPaneHMIStage
+public final class ControlWrapperSetupStage extends BorderPaneHMIStage implements ControlWrapperSpecific
 {
     @FXML private Button createStateButton;
 
@@ -50,24 +52,46 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage
 
     @FXML private StackPane previewStackPane;
 
-    private final ControlContainerPane controlContainerPane;
+    private final MainEditStage mainEditStage;
 
     private final SetupPaneList stateSetupPaneList;
     private final SetupPaneList globalSetupPaneList;
 
+    private final ChangeListener<Boolean> controlWrapperValidListener;
+    private final Consumer<Object> attributesUpdatedConsumer;
+
     private ControlWrapper<?> selectedControlWrapper;
     private SetupSelectable activeSelectable;
+    private boolean ignoreAttributeChanges;
 
-    public ControlWrapperSetupStage(ControlContainerPane controlContainerPane) throws IOException
+    public ControlWrapperSetupStage(MainEditStage mainEditStage) throws IOException
     {
         super("ControlWrapperSetupPage", "setup/mainSetupPane.fxml");
 
-        this.controlContainerPane = controlContainerPane;
+        this.mainEditStage = mainEditStage;
 
         this.stateSetupPaneList = new SetupPaneList();
         this.globalSetupPaneList = new SetupPaneList();
 
         this.addFXChild(new WrapperStateCreationPane(this, createStateButton));
+
+        controlWrapperValidListener = (observableValue, oldValue, newValue) ->
+        {
+            if (!newValue)
+            {
+                this.setSelectedControlWrapper(null);
+            }
+        };
+        attributesUpdatedConsumer = involvedObject ->
+        {
+            if (involvedObject != this)
+            {
+                ignoreAttributeChanges = true;
+                this.populateStateSetupPanes();
+                this.populateGlobalSetupPanes();
+                ignoreAttributeChanges = false;
+            }
+        };
     }
 
     @Override
@@ -99,7 +123,7 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage
                 .setResizable(true)
                 .setWidth(800)
                 .setHeight(900) //To avoid starting extra small
-                .setOnWindowCloseRequest(windowEvent -> this.onPageClose());
+                .setOnWindowCloseRequest(windowEvent -> this.setSelectedControlWrapper(null));
 
         ContextMenuBuilder.builder()
                 .simple("Write to All", this::writeEntireCurrentStateToAll)
@@ -107,15 +131,8 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage
 
         stateSelectionChoiceBox.setConverter(FXUtil.toStringOnlyConverter(WrapperState::getStringVersion));
         stateSelectionChoiceBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) ->
-        {
-            if (newValue != null)
-            {
-                //Populate all the setup panes with the value of the attributes
-                stateSetupPaneList.populateSetupPanes(newValue.getAttributeMap());
-                //And update the preview at the bottom of the page when a new state is selected!
-                this.updatePreviewImage(newValue);
-            }
-        });
+                this.populateStateSetupPanes()
+        );
 
         deleteStateButton.setOnAction(event ->
         {
@@ -151,6 +168,11 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage
         var attributeChangerSet = setupPane.getAttributeChangerList();
         if (attributeChangerSet.isAnyDataChanged())
         {
+            if(ignoreAttributeChanges)
+            {
+                return;
+            }
+
             if (stateSetupPaneList.contains(setupPane))
             {
                 var selectedState = stateSelectionChoiceBox.getValue();
@@ -171,14 +193,67 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage
 
                 attributeChangerSet.resetAllDataChanged();
             }
+
+            selectedControlWrapper.applyAttributes(this);
         }
     }
 
-    public ControlContainerPane getControlMainPage()
+    public MainEditStage getMainEditStage()
     {
-        return controlContainerPane;
+        return mainEditStage;
     }
 
+    @Override
+    public void setSelectedControlWrapper(ControlWrapper<?> controlWrapper)
+    {
+        if (selectedControlWrapper != null) //It means it was already showing
+        {
+            mainEditStage.getQuickPropertiesVBox().refreshValuesIfSelected(selectedControlWrapper);
+
+            selectedControlWrapper.validProperty().removeListener(controlWrapperValidListener);
+            selectedControlWrapper.removeAttributesUpdatedConsumer(attributesUpdatedConsumer);
+            /*
+            //Update the current state of the ControlWrapper to avoid update on next data change.
+            selectedControlWrapper.getStateMap().getCurrentState().getAttributeMap().setAttributesToControlWrapper();
+            selectedControlWrapper.getGlobalAttributeMap().setAttributesToControlWrapper();*/
+            selectedControlWrapper = null;
+        }
+
+        selectedControlWrapper = controlWrapper;
+        if (controlWrapper == null)
+        {
+            super.getStageSetter().close();
+            return;
+        }
+
+        controlWrapper.validProperty().addListener(controlWrapperValidListener);
+        controlWrapper.addAttributesUpdatedConsumer(attributesUpdatedConsumer);
+
+        //Since all the attributes are the same for each state, just compile it for the default state when a new wrapper is being edited
+        var stateAttributeButtonsChildren = stateAttributesVBox.getChildren();
+        stateAttributeButtonsChildren.clear();
+        stateSetupPaneList.forEachValidButton(selectedControlWrapper.getStateMap().getDefaultState().getAttributeMap(),
+                stateAttributeButtonsChildren::add);
+
+        var globalAttributeButtonsChildren = globalAttributesVBox.getChildren();
+        globalAttributeButtonsChildren.clear();
+        globalSetupPaneList.forEachValidButton(controlWrapper.getGlobalAttributeMap(), globalAttributeButtonsChildren::add);
+
+        this.updateStateSelectionBox(); //This also populate state setup panes
+        this.populateGlobalSetupPanes(); //Generics are populated only one time, not state dependant
+
+        super.getUndoRedoManager().clear(); //Clear all the redo/undo for a new ControlWrapper
+
+        if (activeSelectable instanceof SetupPane<?>
+                && !AttributeFetcher.hasAttribute(selectedControlWrapper, ((SetupPane<?>) activeSelectable).getAttributeClass()))
+        {
+            this.setShownSelectable(null);
+        }
+
+        super.showStage();
+    }
+
+    @Override
     public ControlWrapper<?> getSelectedControlWrapper()
     {
         return selectedControlWrapper;
@@ -219,39 +294,6 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage
         }
 
         this.activeSelectable = selectable;
-    }
-
-    public void showStageFor(ControlWrapper<?> controlWrapper)
-    {
-        if (selectedControlWrapper != null) //It means it was already showing
-        {
-            this.onPageClose();
-        }
-
-        selectedControlWrapper = controlWrapper;
-
-        //Since all the attributes are the same for each state, just compile it for the default state when a new wrapper is being edited
-        var stateAttributeButtonsChildren = stateAttributesVBox.getChildren();
-        stateAttributeButtonsChildren.clear();
-        stateSetupPaneList.forEachValidButton(selectedControlWrapper.getStateMap().getDefaultState().getAttributeMap(),
-                stateAttributeButtonsChildren::add);
-
-        var globalAttributeButtonsChildren = globalAttributesVBox.getChildren();
-        globalAttributeButtonsChildren.clear();
-        globalSetupPaneList.forEachValidButton(controlWrapper.getGlobalAttributeMap(), globalAttributeButtonsChildren::add);
-
-        this.updateStateSelectionBox(); //This also populate state setup panes
-        this.populateGenericSetupPanes(); //Generics are populated only one time, not state dependant
-
-        super.getUndoRedoManager().clear(); //Clear all the redo/undo for a new ControlWrapper
-
-        if (activeSelectable instanceof SetupPane<?>
-                && !AttributeFetcher.hasAttribute(selectedControlWrapper, ((SetupPane<?>) activeSelectable).getAttributeClass()))
-        {
-            this.setShownSelectable(null);
-        }
-
-        super.showStage();
     }
 
     public void updatePreviewImage()
@@ -309,25 +351,22 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage
         }
     }
 
-    private void onPageClose()
+    private void populateStateSetupPanes()
     {
-        if (selectedControlWrapper != null)
-        {
-            selectedControlWrapper.applyAttributes();
-            this.controlContainerPane.getMainEditStage().getQuickPropertiesVBox()
-                    .refreshValuesIfSelected(selectedControlWrapper);
-            /*
-            //Update the current state of the ControlWrapper to avoid update on next data change.
-            selectedControlWrapper.getStateMap().getCurrentState().getAttributeMap().setAttributesToControlWrapper();
-            selectedControlWrapper.getGlobalAttributeMap().setAttributesToControlWrapper();*/
+        Objects.requireNonNull(selectedControlWrapper, "Cannot populate StateSetupPanes without a SelectedControlWrapper");
 
-            selectedControlWrapper = null;
+        var wrapperState = stateSelectionChoiceBox.getValue();
+        if (wrapperState != null)
+        {
+            stateSetupPaneList.populateSetupPanes(wrapperState.getAttributeMap());
+            //And update the preview at the bottom of the page when a new state is selected!
+            this.updatePreviewImage(wrapperState);
         }
     }
 
-    private void populateGenericSetupPanes()
+    private void populateGlobalSetupPanes()
     {
-        Objects.requireNonNull(selectedControlWrapper, "Cannot populate GenericSetupPanes without a SelectedControlWrapper");
+        Objects.requireNonNull(selectedControlWrapper, "Cannot populate GlobalSetupPanes without a SelectedControlWrapper");
 
         var globalAttributeMap = selectedControlWrapper.getGlobalAttributeMap();
         globalSetupPaneList.populateSetupPanes(globalAttributeMap);
@@ -353,7 +392,7 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage
         public SetupPaneList add(SetupPane<?> setupPane)
         {
             //This is required otherwise when loading stuff could be undo event if it shouldn't
-            var undoRedoManager = getControlMainPage().getMainEditStage().getUndoRedoManager();
+            var undoRedoManager = mainEditStage.getUndoRedoManager();
             undoRedoManager.setIgnoreNew(true);
 
             setupPane.setup();

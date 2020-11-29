@@ -46,18 +46,19 @@ public abstract class HMIStage<P extends Parent> extends FXController implements
     {
         super.setup();
 
-        var stage = stageSetter.initStyle(StageStyle.DECORATED).setResizable(false).get();
+        stageSetter.initStyle(StageStyle.DECORATED)
+                .setResizable(false);
 
         var undoKeyCombination = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
         var redoKeyCombination = new KeyCodeCombination(KeyCode.Y, KeyCombination.CONTROL_DOWN);
-        stage.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent ->
+        stageSetter.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent ->
         {
             switch (keyEvent.getCode())
             {
                 case F11:
-                    if(stage.isResizable())
+                    if(stageSetter.isResizable())
                     {
-                        stage.setFullScreen(true);
+                        stageSetter.setFullScreen(true, "", null);
                     }
                     break;
             }
@@ -98,7 +99,7 @@ public abstract class HMIStage<P extends Parent> extends FXController implements
 
     public void showStage()
     {
-        stageSetter.get().show();
+        stageSetter.show();
     }
 
     public boolean every(long millis)

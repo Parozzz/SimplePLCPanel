@@ -97,6 +97,7 @@ public class SiemensS7Client
         this.szlPacket = new SiemensS7SzlPacket(this, plcSocket);
     }
 
+
     public int getRack()
     {
         return rack;
@@ -116,7 +117,7 @@ public class SiemensS7Client
     {
         this.debug = debug;
     }
-    
+
     public boolean getDebug()
     {
         return debug;
@@ -125,6 +126,11 @@ public class SiemensS7Client
     public boolean isConnected()
     {
         return connected;
+    }
+
+    public void setConnectionTimeout(int connectionTimeout)
+    {
+        plcSocket.setTimeout(connectionTimeout);
     }
 
     public void setReceiveTimeout(int receiveTimeout)

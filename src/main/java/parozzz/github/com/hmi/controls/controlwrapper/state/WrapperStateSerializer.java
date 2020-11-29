@@ -32,7 +32,7 @@ final class WrapperStateSerializer
 
         jsonDataMap.set("FirstCompareType", wrapperState.getFirstCompareType());
         jsonDataMap.set("FirstCompare", wrapperState.getFirstCompare());
-        jsonDataMap.set("SecondCompareType", wrapperState.getFirstCompareType());
+        jsonDataMap.set("SecondCompareType", wrapperState.getSecondCompareType());
         jsonDataMap.set("SecondCompare", wrapperState.getSecondCompare());
         jsonDataMap.set("AttributeMap", wrapperState.getAttributeMap());
 

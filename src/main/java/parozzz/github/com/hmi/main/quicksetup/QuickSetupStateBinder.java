@@ -4,6 +4,8 @@ import javafx.beans.property.Property;
 import parozzz.github.com.hmi.attribute.Attribute;
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.property.AttributeProperty;
+import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
+import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapperSpecific;
 import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
 
 import java.util.HashMap;
@@ -14,17 +16,23 @@ import java.util.function.Function;
 
 public final class QuickSetupStateBinder
 {
-    private final Runnable propertyUpdatedRunnable;
+    private final QuickSetupVBox quickSetupVBox;
     private final Set<BoundProperty<?, ?>> boundPropertySet;
     private final Map<Class<?>, AttributeBoundPropertySet<?>> attributeBoundPropertySetMap;
 
     private WrapperState boundWrapperState;
+    private boolean ignoreAttributeUpdate;
 
-    QuickSetupStateBinder(Runnable propertyUpdatedRunnable)
+    QuickSetupStateBinder(QuickSetupVBox quickSetupVBox)
     {
-        this.propertyUpdatedRunnable = propertyUpdatedRunnable;
+        this.quickSetupVBox = quickSetupVBox;
         this.boundPropertySet = new HashSet<>();
         this.attributeBoundPropertySetMap = new HashMap<>();
+    }
+
+    public void setIgnoreAttributeUpdate(boolean ignoreAttributeUpdate)
+    {
+        this.ignoreAttributeUpdate = ignoreAttributeUpdate;
     }
 
     public void setBoundWrapperState(WrapperState wrapperState)
@@ -35,14 +43,14 @@ public final class QuickSetupStateBinder
 
     public void refreshValues()
     {
+        if(boundWrapperState == null)
+        {
+            return;
+        }
+
         attributeBoundPropertySetMap.values().forEach(attributeBoundPropertySet ->
                 attributeBoundPropertySet.copyFromWrapperState(boundWrapperState)
         );
-    }
-
-    public void clear()
-    {
-        this.boundWrapperState = null;
     }
 
     public <A extends Attribute> Builder<A> builder(Class<A> attributeClass)
@@ -70,7 +78,7 @@ public final class QuickSetupStateBinder
 
         property.addListener((observable, oldValue, newValue) ->
         {
-            if(boundWrapperState == null)
+            if(boundWrapperState == null || ignoreAttributeUpdate)
             {
                 return;
             }
@@ -80,11 +88,9 @@ public final class QuickSetupStateBinder
             {
                 var attributeNewValue = quickToAttribute.apply(newValue);
                 attribute.setValue(attributeProperty, attributeNewValue);
+                attribute.updateInternals(); //Update internals first to allow some attribute to have their values refreshed
 
-                //Update internals first to allow some attribute to have their values refreshed
-                attribute.updateInternals();
-
-                propertyUpdatedRunnable.run();
+                quickSetupVBox.updateSelectedWrapperAttributes();
             }
         });
 

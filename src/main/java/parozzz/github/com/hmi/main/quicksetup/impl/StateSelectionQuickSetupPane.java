@@ -40,6 +40,11 @@ public final class StateSelectionQuickSetupPane extends FXObject implements Quic
         stateChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> stateChangeConsumer.accept(newValue));
     }
 
+    public void changeState(WrapperState wrapperState)
+    {
+        stateChoiceBox.setValue(wrapperState);
+    }
+
     public void setStateChangeConsumer(Consumer<WrapperState> consumer)
     {
         this.stateChangeConsumer = consumer;
@@ -49,12 +54,6 @@ public final class StateSelectionQuickSetupPane extends FXObject implements Quic
     public void addBinders(QuickSetupStateBinder stateBinder)
     {
 
-    }
-
-    @Override
-    public void clear()
-    {
-        stateChoiceBox.getItems().clear();
     }
 
     public Parent getParent()
@@ -78,4 +77,13 @@ public final class StateSelectionQuickSetupPane extends FXObject implements Quic
     {
 
     }
+
+    @Override
+    public void clear()
+    {
+        QuickSetupPane.super.clear();
+
+        stateChoiceBox.getItems().clear();
+    }
+
 }

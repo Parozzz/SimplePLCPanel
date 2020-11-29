@@ -148,7 +148,7 @@ public final class ControlContainerDatabase extends FXController
 
         try
         {
-            var controlMainPage = new ControlContainerPane(this, mainEditStage, name,
+            var controlMainPage = new ControlContainerPane(mainEditStage, this, name,
                     controlWrapper ->
                     {
                         controlWrapperSet.add(controlWrapper);

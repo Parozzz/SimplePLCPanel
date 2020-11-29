@@ -35,11 +35,8 @@ public final class JavaFXMain extends Application
             saveFile = new File(System.getProperty("user.dir"), "saves.json");
             saveFile.createNewFile();
 
-            plcThread = new SiemensPLCThread();
-            plcThread.start();
-
-            modbusTCPThread = new ModbusTCPThread();
-            modbusTCPThread.start();
+            (plcThread = new SiemensPLCThread()).start();
+            (modbusTCPThread = new ModbusTCPThread()).start();
 
             hmiManager = new HMIManager(plcThread, modbusTCPThread, this::saveData);
             hmiManager.setup();

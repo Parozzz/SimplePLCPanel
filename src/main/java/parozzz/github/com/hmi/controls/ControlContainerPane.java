@@ -19,6 +19,7 @@ import parozzz.github.com.hmi.FXController;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapperType;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.ControlWrapperSetupStage;
+import parozzz.github.com.hmi.controls.controlwrapper.setup.quicktext.ControlWrapperQuickTextEditorStage;
 import parozzz.github.com.hmi.controls.others.ControlWrappersSelectionManager;
 import parozzz.github.com.hmi.database.ControlContainerDatabase;
 import parozzz.github.com.hmi.main.MainEditBottomScrollingPane;
@@ -44,15 +45,13 @@ public class ControlContainerPane extends FXController
 {
     private final AtomicInteger controlWrapperIdentifier = new AtomicInteger();
 
-    private final ControlContainerDatabase controlContainerDatabase;
     private final MainEditStage mainEditStage;
+    private final ControlContainerDatabase controlContainerDatabase;
     private final String name;
     private final Consumer<ControlWrapper<?>> newControlWrapperConsumer;
     private final Consumer<ControlWrapper<?>> deleteControlWrapperConsumer;
 
     private final AnchorPane mainAnchorPane;
-
-    private final ControlWrapperSetupStage controlWrapperSetupStage;
     private final MainEditBottomScrollingPane.ImagePane mainEditBottomImagePane;
 
     private final Property<Color> backgroundColorProperty;
@@ -61,7 +60,7 @@ public class ControlContainerPane extends FXController
     private final Set<ControlWrapper<?>> controlWrapperSet;
     private final ControlWrappersSelectionManager controlWrappersSelectionManager;
 
-    public ControlContainerPane(ControlContainerDatabase controlContainerDatabase, MainEditStage mainEditStage,
+    public ControlContainerPane(MainEditStage mainEditStage, ControlContainerDatabase controlContainerDatabase,
             String name,
             Consumer<ControlWrapper<?>> newControlWrapperConsumer,
             Consumer<ControlWrapper<?>> deleteControlWrapperConsumer) throws IOException
@@ -76,8 +75,7 @@ public class ControlContainerPane extends FXController
 
         this.mainAnchorPane = new AnchorPane();
 
-        super.addFXChild(controlWrapperSetupStage = new ControlWrapperSetupStage(this))
-                .addFXChild(controlWrappersSelectionManager = new ControlWrappersSelectionManager(this, mainAnchorPane));
+        super.addFXChild(controlWrappersSelectionManager = new ControlWrappersSelectionManager(this, mainAnchorPane));
 
         this.mainEditBottomImagePane = new MainEditBottomScrollingPane.ImagePane(this);
 
@@ -97,13 +95,13 @@ public class ControlContainerPane extends FXController
 
         mainAnchorPane.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent ->
         {
-            if(controlWrappersSelectionManager.isEmpty())
+            if (controlWrappersSelectionManager.isEmpty())
             {
                 return;
             }
 
             var keyCode = keyEvent.getCode();
-            switch(keyCode)
+            switch (keyCode)
             {
                 case DELETE:
                     keyEvent.consume();
@@ -129,7 +127,7 @@ public class ControlContainerPane extends FXController
         mainAnchorPane.setBorder(Border.EMPTY);
         mainAnchorPane.visibleProperty().addListener((observableValue, oldValue, newValue) ->
         {
-            if(newValue)
+            if (newValue)
             {
                 var width = mainEditStage.getPageWidth();
                 var height = mainEditStage.getPageHeight();
@@ -141,7 +139,7 @@ public class ControlContainerPane extends FXController
         deletePageMenuItem.setOnAction(actionEvent ->
         {
             var optional = new Alert(Alert.AlertType.CONFIRMATION).showAndWait();
-            if(optional.isPresent() && optional.get() == ButtonType.OK)
+            if (optional.isPresent() && optional.get() == ButtonType.OK)
             {
                 controlContainerDatabase.deletePage(this);
             }
@@ -223,7 +221,12 @@ public class ControlContainerPane extends FXController
 
     public ControlWrapperSetupStage getSetupStage()
     {
-        return controlWrapperSetupStage;
+        return mainEditStage.getControlWrapperSetupStage();
+    }
+
+    public ControlWrapperQuickTextEditorStage getQuickTextEditorStage()
+    {
+        return mainEditStage.getControlWrapperQuickTextEditorStage();
     }
 
     public AnchorPane getMainAnchorPane()
@@ -265,7 +268,7 @@ public class ControlContainerPane extends FXController
     {
         var controlWrapper = wrapperType.createWrapper(this);
         controlWrapper.setup();
-        if(setDefault)
+        if (setDefault)
         {
             controlWrapper.setDefault();
             controlWrapper.setupComplete();
@@ -281,6 +284,17 @@ public class ControlContainerPane extends FXController
         return controlWrapper;
     }
 
+    private void addControlWrapper(ControlWrapper<?> controlWrapper)
+    {
+        controlWrapperSet.add(controlWrapper);
+        mainAnchorPane.getChildren().add(controlWrapper.getContainerPane());
+        super.addFXChild(controlWrapper, false);
+
+        controlWrapper.validProperty().setValue(true);
+
+        newControlWrapperConsumer.accept(controlWrapper);
+    }
+
     public void deleteControlWrapper(ControlWrapper<?> controlWrapper)
     {
         super.removeFXChild(controlWrapper);
@@ -289,19 +303,12 @@ public class ControlContainerPane extends FXController
 
         deleteControlWrapperConsumer.accept(controlWrapper);
 
+        controlWrapper.validProperty().setValue(false);
+
         var undoRedoManager = this.controlContainerDatabase.getMainEditStage().getUndoRedoManager();
         undoRedoManager.addAction(() -> this.addControlWrapper(controlWrapper),
                 () -> this.deleteControlWrapper(controlWrapper),
                 this);
-    }
-
-    private void addControlWrapper(ControlWrapper<?> controlWrapper)
-    {
-        controlWrapperSet.add(controlWrapper);
-        mainAnchorPane.getChildren().add(controlWrapper.getContainerPane());
-        super.addFXChild(controlWrapper, false);
-
-        newControlWrapperConsumer.accept(controlWrapper);
     }
 
     public void setBackgroundColor(Color color)
@@ -341,7 +348,7 @@ public class ControlContainerPane extends FXController
         super.deserialize(jsonDataMap);
 
         var controlJSONArray = jsonDataMap.getArray("Controls");
-        if(controlJSONArray != null)
+        if (controlJSONArray != null)
         {
             //This is necessary otherwise you would be able to cancel stuff from serialization
             var undoRedoManager = this.getMainEditStage().getUndoRedoManager();
@@ -355,7 +362,7 @@ public class ControlContainerPane extends FXController
                         var wrapperTypeName = controlJSONDataMap.getString("WrapperType");
 
                         var wrapperType = ControlWrapperType.getFromName(wrapperTypeName);
-                        if(wrapperType != null)
+                        if (wrapperType != null)
                         {
                             var controlWrapper = this.createControlWrapper(wrapperType, false);
                             controlWrapper.deserialize(controlJSONDataMap);
@@ -363,7 +370,7 @@ public class ControlContainerPane extends FXController
                     });
 
             undoRedoManager.setIgnoreNew(false);
-        }else
+        } else
         {
             Logger.getLogger(ControlContainerPane.class.getSimpleName())
                     .log(Level.WARNING, "Controls JSONArray has not been found while de-serializing");
@@ -376,10 +383,10 @@ public class ControlContainerPane extends FXController
         var pictureName = backgroundPictureNameProperty.getValue();
 
         List<BackgroundImage> backgroundImageList = Collections.emptyList();
-        if(pictureName != null && !pictureName.isEmpty())
+        if (pictureName != null && !pictureName.isEmpty())
         {
             var imageURI = this.controlContainerDatabase.getMainEditStage().getPictureBankStage().getImageURI(pictureName);
-            if(imageURI != null)
+            if (imageURI != null)
             {
                 var backgroundImage = new BackgroundImage(new Image(imageURI.toString()),
                         BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER,
@@ -389,7 +396,7 @@ public class ControlContainerPane extends FXController
         }
 
         List<BackgroundFill> backgroundFillList = Collections.emptyList();
-        if(color != null)
+        if (color != null)
         {
             backgroundFillList = Collections.singletonList(new BackgroundFill(color, CornerRadii.EMPTY, Insets.EMPTY));
         }

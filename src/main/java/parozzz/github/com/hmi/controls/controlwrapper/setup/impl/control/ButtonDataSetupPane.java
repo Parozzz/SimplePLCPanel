@@ -3,6 +3,7 @@ package parozzz.github.com.hmi.controls.controlwrapper.setup.impl.control;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import parozzz.github.com.hmi.attribute.impl.control.ButtonDataAttribute;
 import parozzz.github.com.hmi.controls.controlwrapper.impl.button.ButtonWrapperType;
@@ -16,6 +17,7 @@ import java.io.IOException;
 public class ButtonDataSetupPane extends SetupPane<ButtonDataAttribute>
 {
     @FXML private ChoiceBox<ButtonWrapperType> buttonTypeChoiceBox;
+    @FXML private Label toggleInformationLabel;
 
     private final VBox mainVBox;
 
@@ -34,7 +36,9 @@ public class ButtonDataSetupPane extends SetupPane<ButtonDataAttribute>
         buttonTypeChoiceBox.setConverter(new EnumStringConverter<>(ButtonWrapperType.class).setCapitalize());
         buttonTypeChoiceBox.getItems().addAll(ButtonWrapperType.values());
         buttonTypeChoiceBox.setValue(ButtonWrapperType.NORMAL);
-
+        buttonTypeChoiceBox.valueProperty().addListener((observableValue, oldValue, newValue) ->
+                toggleInformationLabel.setVisible(newValue == ButtonWrapperType.TOGGLE)
+        );
         super.getAttributeChangerList().create(buttonTypeChoiceBox.valueProperty(), ButtonDataAttribute.TYPE);
 
         super.computeGlobalProperties();

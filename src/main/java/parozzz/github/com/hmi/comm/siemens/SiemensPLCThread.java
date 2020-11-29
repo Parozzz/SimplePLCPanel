@@ -97,11 +97,7 @@ public final class SiemensPLCThread extends CommThread implements Loggable
 
         try
         {
-            if (!connect())
-            {
-                Thread.onSpinWait();
-                return;
-            }
+            connect();
         } catch (SiemensS7Error.SiemensS7Exception exception)
         {
             if (exception.getError() == SiemensS7Error.TCPConnectionFailed)
@@ -115,7 +111,7 @@ public final class SiemensPLCThread extends CommThread implements Loggable
 
         if(!isConnected())
         {
-            Thread.sleep(10000);
+            this.sleepWithStopCheck(10);
             return;
         }
 
@@ -205,6 +201,7 @@ public final class SiemensPLCThread extends CommThread implements Loggable
             }
 
             client = new SiemensS7Client(ipAddress, rack, slot);
+            client.setConnectionTimeout(1000);
             newConnectionParams = false;
         }
 

@@ -65,6 +65,8 @@ public final class TextQuickSetupPane extends FXObject implements QuickSetupPane
     @Override
     public void clear()
     {
+        QuickSetupPane.super.clear();
+
         textTextArea.setText("");
     }
 }

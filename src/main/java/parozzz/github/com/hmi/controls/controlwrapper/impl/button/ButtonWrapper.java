@@ -42,9 +42,9 @@ public final class ButtonWrapper
     }
 
     @Override
-    public void applyAttributes(Button control, Pane containerPane, AttributeMap attributeMap)
+    public void applyAttributes(Button control, Pane containerPane, AttributeMap attributeMap, Object involvedObject)
     {
-        super.applyAttributes(control, containerPane, attributeMap);
+        super.applyAttributes(control, containerPane, attributeMap, involvedObject);
 
         String text = "";
 

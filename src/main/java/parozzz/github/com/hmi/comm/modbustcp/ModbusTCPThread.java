@@ -149,7 +149,7 @@ public final class ModbusTCPThread extends CommThread implements Loggable
 
             if (!masterConnection.isConnected())
             {
-                Thread.sleep(10000);
+                this.sleepWithStopCheck(10);
                 return;
             }
         }

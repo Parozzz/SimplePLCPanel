@@ -67,6 +67,8 @@ public final class SizeQuickSetupPane extends FXObject implements QuickSetupPane
     @Override
     public void clear()
     {
+        QuickSetupPane.super.clear();
+
         widthTextField.setText("");
         heightTextField.setText("");
     }

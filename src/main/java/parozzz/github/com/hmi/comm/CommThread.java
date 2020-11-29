@@ -42,28 +42,15 @@ public abstract class CommThread extends Thread
 
             if(!active)
             {
-                try
-                {
-                    //This should stop the annoying wait for the sleep to finish stuff
-                    for(var x = 0; x < 100; x++)
-                    {
-                        Thread.sleep(100);
-                        if(stop)
-                        {
-                            return;
-                        }
-                    }
-                } catch (InterruptedException interruptedException)
-                {
-                    interruptedException.printStackTrace();
-                }
-
                 if(oldActive && this.isConnected())
                 {
                     this.disconnect();
                 }
 
                 oldActive = false;
+
+                //This should stop the annoying wait for the sleep to finish stuff
+                this.sleepWithStopCheck(10);
                 continue;
             }
 
@@ -93,5 +80,32 @@ public abstract class CommThread extends Thread
     public abstract boolean isConnected();
 
     public abstract void loop() throws Exception;
+
+    protected void sleepWithStopCheck(int seconds)
+    {
+        var wasActive = this.active;
+        try
+        {
+            //This should stop the annoying wait for the sleep to finish stuff
+            for(var x = 0; x < seconds; x++)
+            {
+                Thread.sleep(1000);
+                //In case the thread come active from inactivity, break from here!
+                if(!wasActive && active)
+                {
+                    break;
+                }
+
+                if(stop)
+                {
+                    return;
+                }
+            }
+        } catch (InterruptedException interruptedException)
+        {
+            interruptedException.printStackTrace();
+        }
+
+    }
 
 }

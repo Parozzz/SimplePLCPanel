@@ -233,7 +233,7 @@ public class PictureBankStage extends HMIStage<BorderPane>
 
         this.selectFileConsumer = consumer;
 
-        this.getStageSetter().get().show();
+        this.getStageSetter().show();
     }
 
     public void revertButtonsToDefaultVisibility()

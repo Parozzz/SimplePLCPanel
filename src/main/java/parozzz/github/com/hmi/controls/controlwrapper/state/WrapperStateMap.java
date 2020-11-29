@@ -44,14 +44,19 @@ public final class WrapperStateMap extends FXObject
         var externalValue = controlWrapper.getValue().getOutsideValue();
         externalValue.addNewValueRunnable(() ->
         {
+            var oldWrapperState = currentWrapperState;
             currentWrapperState = Objects.requireNonNull(this.getStateOf(externalValue.asInteger()),
                     "Trying to get a state but is returned null and not default?");
-            controlWrapper.applyAttributes(currentWrapperState.getAttributeMap());
-            //currentWrapperState.getAttributeMap().setAttributesToControlWrapper();
 
-            //This needs to be here after the #setAttributesToControlWrapper because stuff
-            //can depend on attributes to be already set
-            wrapperStateValueChangedConsumerSet.forEach(consumer -> consumer.accept(currentWrapperState));
+            if(oldWrapperState != currentWrapperState)
+            {
+                controlWrapper.applyAttributes(currentWrapperState.getAttributeMap(), this);
+                //currentWrapperState.getAttributeMap().setAttributesToControlWrapper();
+
+                //This needs to be here after the #setAttributesToControlWrapper because stuff
+                //can depend on attributes to be already set
+                wrapperStateValueChangedConsumerSet.forEach(consumer -> consumer.accept(currentWrapperState));
+            }
         });
     }
 
@@ -132,6 +137,11 @@ public final class WrapperStateMap extends FXObject
     {
         consumer.accept(defaultWrapperState);
         this.forEachNoDefault(consumer);
+    }
+
+    public void removeStateValueChangedConsumer(Consumer<WrapperState> consumer)
+    {
+        wrapperStateValueChangedConsumerSet.remove(consumer);
     }
 
     public void addStateValueChangedConsumer(Consumer<WrapperState> consumer)

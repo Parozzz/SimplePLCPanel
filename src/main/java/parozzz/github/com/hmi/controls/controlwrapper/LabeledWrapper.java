@@ -37,9 +37,9 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
     }
 
     @Override
-    public void applyAttributes(C control, Pane containerPane, AttributeMap attributeMap)
+    public void applyAttributes(C control, Pane containerPane, AttributeMap attributeMap, Object involvedObject)
     {
-        super.applyAttributes(control, containerPane, attributeMap);
+        super.applyAttributes(control, containerPane, attributeMap, involvedObject);
 
         var fontAttribute = AttributeFetcher.fetch(attributeMap, FontAttribute.class);
         if (fontAttribute != null)
