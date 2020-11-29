@@ -16,6 +16,6 @@ public class ModbusTCPWriteDWordIntermediate extends ModbusTCPWriteNumberInterme
     @Override
     public int getNextWord()
     {
-        return (value >> (valueCounter * 16)) & 0xFFFF;
+        return (value >> (valueCounter++ * 16) & 0xFFFF);
     }
 }
