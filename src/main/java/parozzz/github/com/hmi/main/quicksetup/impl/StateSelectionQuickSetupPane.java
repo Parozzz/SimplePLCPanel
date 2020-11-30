@@ -85,5 +85,4 @@ public final class StateSelectionQuickSetupPane extends FXObject implements Quic
 
         stateChoiceBox.getItems().clear();
     }
-
 }

@@ -56,10 +56,12 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
     {
         super.setup();
 
-        super.getStateMap().addStateValueChangedConsumer((newState, oldState, state) ->
+        super.getStateMap().addStateValueChangedConsumer((stateMap, oldState, changeType) ->
         {
-            var textAttribute = AttributeFetcher.fetch(newState, TextAttribute.class);
-            var valueAttribute = AttributeFetcher.fetch(newState, ValueAttribute.class);
+            var currentState = stateMap.getCurrentState();
+
+            var textAttribute = AttributeFetcher.fetch(currentState, TextAttribute.class);
+            var valueAttribute = AttributeFetcher.fetch(currentState, ValueAttribute.class);
             if (textAttribute != null && valueAttribute != null)
             {
                 var text = textAttribute.getValue(TextAttribute.TEXT);

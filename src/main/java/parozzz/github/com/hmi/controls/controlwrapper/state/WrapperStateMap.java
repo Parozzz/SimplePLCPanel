@@ -18,7 +18,9 @@ public final class WrapperStateMap extends FXObject
 
     private final List<WrapperState> wrapperStateList;
     private final WrapperState defaultWrapperState;
+
     private WrapperState currentWrapperState;
+    private int numericState;
 
     private final Set<WrapperStateChangedConsumer> wrapperStateChangedConsumerList;
 
@@ -44,23 +46,8 @@ public final class WrapperStateMap extends FXObject
         var externalValue = controlWrapper.getValue().getOutsideValue();
         externalValue.addNewValueRunnable(() ->
         {
-            var state = externalValue.asInteger();
-
-            var oldWrapperState = currentWrapperState;
-            currentWrapperState = Objects.requireNonNull(this.getStateOf(state),
-                    "Trying to get a state but is returned null and not default?");
-
-            //Apply attributes only if the state is actually changed!
-            if(!currentWrapperState.equals(oldWrapperState)) //Using current as primary since the old can be null!
-            {
-                controlWrapper.applyAttributes(currentWrapperState.getAttributeMap(), this);
-            }
-
-            //This needs to be here after the #setAttributesToControlWrapper because stuff
-            //can depend on attributes to be already set
-            wrapperStateChangedConsumerList.forEach(consumer ->
-                    consumer.stateChanged(currentWrapperState, oldWrapperState, state)
-            );
+            numericState = externalValue.asInteger();
+            this.parseState(WrapperStateChangedConsumer.ChangeType.STATE_CHANGED);
         });
     }
 
@@ -102,6 +89,8 @@ public final class WrapperStateMap extends FXObject
             //This other than clone, it populates the added state with the attribute
             wrapperState.getAttributeMap().cloneFromOther(defaultWrapperState.getAttributeMap());
         }
+
+        this.parseState(WrapperStateChangedConsumer.ChangeType.ADD); //In case a new state is added that is more valid than others, it should be updated immediately!
     }
 
     public void removeState(WrapperState wrapperState)
@@ -109,6 +98,13 @@ public final class WrapperStateMap extends FXObject
         this.requireDefaultInit();
 
         wrapperStateList.remove(wrapperState);
+        this.parseState(WrapperStateChangedConsumer.ChangeType.REMOVE); //In case something changes, reparse.
+    }
+
+    public int getNumericState()
+    {
+        this.requireDefaultInit();
+        return numericState;
     }
 
     public WrapperState getCurrentState()
@@ -156,6 +152,25 @@ public final class WrapperStateMap extends FXObject
     public boolean contains(WrapperState wrapperState)
     {
         return wrapperStateList.contains(wrapperState);
+    }
+
+    private void parseState(WrapperStateChangedConsumer.ChangeType changeType)
+    {
+        var oldWrapperState = currentWrapperState;
+        currentWrapperState = Objects.requireNonNull(this.getStateOf(numericState),
+                "Trying to get a state but is returned null and not default?");
+
+        //Apply attributes only if the state is actually changed!
+        if(!currentWrapperState.equals(oldWrapperState)) //Using current as primary since the old can be null!
+        {
+            controlWrapper.applyAttributes(currentWrapperState.getAttributeMap(), this);
+        }
+
+        //This needs to be here after the #setAttributesToControlWrapper because stuff
+        //can depend on attributes to be already set
+        wrapperStateChangedConsumerList.forEach(consumer ->
+                consumer.stateChanged(this, oldWrapperState, changeType)
+        );
     }
 
     @Override

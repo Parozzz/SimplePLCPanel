@@ -70,8 +70,20 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
                 stateBinder.setIgnoreAttributeUpdate(false);
             }
         };
-        this.stateChangeConsumer = (newState, oldState, state) ->
-                stateSelectionQuickSetupPane.changeState(newState);
+        //Since this is trigged also when a state is added/removed it should be gucci here
+        this.stateChangeConsumer = (stateMap, oldState, changeType) ->
+        {
+            switch(changeType)
+            {
+                case ADD:
+                case REMOVE:
+                    stateSelectionQuickSetupPane.onNewControlWrapper(selectedControlWrapper);
+                    break;
+            }
+
+            stateSelectionQuickSetupPane.changeState(stateMap.getCurrentState());
+        };
+
     }
 
     @Override
