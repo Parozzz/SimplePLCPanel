@@ -9,6 +9,7 @@ import parozzz.github.com.hmi.FXController;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapperSpecific;
 import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
+import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperStateChangedConsumer;
 import parozzz.github.com.hmi.main.quicksetup.impl.*;
 import parozzz.github.com.hmi.util.FXUtil;
 
@@ -33,7 +34,7 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
 
     private final ChangeListener<Boolean> validControlWrapperListener;
     private final Consumer<Object> attributesUpdatedConsumer;
-    private final Consumer<WrapperState> stateChangeConsumer;
+    private final WrapperStateChangedConsumer stateChangeConsumer;
 
     private ControlWrapper<?> selectedControlWrapper;
 
@@ -69,7 +70,8 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
                 stateBinder.setIgnoreAttributeUpdate(false);
             }
         };
-        this.stateChangeConsumer = stateSelectionQuickSetupPane::changeState;
+        this.stateChangeConsumer = (newState, oldState, state) ->
+                stateSelectionQuickSetupPane.changeState(newState);
     }
 
     @Override

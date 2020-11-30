@@ -20,7 +20,7 @@ public final class WrapperStateMap extends FXObject
     private final WrapperState defaultWrapperState;
     private WrapperState currentWrapperState;
 
-    private final Set<Consumer<WrapperState>> wrapperStateValueChangedConsumerSet;
+    private final Set<WrapperStateChangedConsumer> wrapperStateChangedConsumerList;
 
     private boolean defaultWrapperStateInitialized = false;
 
@@ -33,7 +33,7 @@ public final class WrapperStateMap extends FXObject
         this.wrapperStateList = new LinkedList<>();
         this.defaultWrapperState = new WrapperDefaultState();
 
-        this.wrapperStateValueChangedConsumerSet = new HashSet<>();
+        this.wrapperStateChangedConsumerList = new HashSet<>();
     }
 
     @Override
@@ -44,15 +44,23 @@ public final class WrapperStateMap extends FXObject
         var externalValue = controlWrapper.getValue().getOutsideValue();
         externalValue.addNewValueRunnable(() ->
         {
-            currentWrapperState = Objects.requireNonNull(this.getStateOf(externalValue.asInteger()),
+            var state = externalValue.asInteger();
+
+            var oldWrapperState = currentWrapperState;
+            currentWrapperState = Objects.requireNonNull(this.getStateOf(state),
                     "Trying to get a state but is returned null and not default?");
 
-            controlWrapper.applyAttributes(currentWrapperState.getAttributeMap(), this);
-            //currentWrapperState.getAttributeMap().setAttributesToControlWrapper();
+            //Apply attributes only if the state is actually changed!
+            if(!currentWrapperState.equals(oldWrapperState)) //Using current as primary since the old can be null!
+            {
+                controlWrapper.applyAttributes(currentWrapperState.getAttributeMap(), this);
+            }
 
             //This needs to be here after the #setAttributesToControlWrapper because stuff
             //can depend on attributes to be already set
-            wrapperStateValueChangedConsumerSet.forEach(consumer -> consumer.accept(currentWrapperState));
+            wrapperStateChangedConsumerList.forEach(consumer ->
+                    consumer.stateChanged(currentWrapperState, oldWrapperState, state)
+            );
         });
     }
 
@@ -135,14 +143,14 @@ public final class WrapperStateMap extends FXObject
         this.forEachNoDefault(consumer);
     }
 
-    public void removeStateValueChangedConsumer(Consumer<WrapperState> consumer)
+    public void addStateValueChangedConsumer(WrapperStateChangedConsumer consumer)
     {
-        wrapperStateValueChangedConsumerSet.remove(consumer);
+        wrapperStateChangedConsumerList.add(consumer);
     }
 
-    public void addStateValueChangedConsumer(Consumer<WrapperState> consumer)
+    public void removeStateValueChangedConsumer(WrapperStateChangedConsumer consumer)
     {
-        wrapperStateValueChangedConsumerSet.add(consumer);
+        wrapperStateChangedConsumerList.remove(consumer);
     }
 
     public boolean contains(WrapperState wrapperState)

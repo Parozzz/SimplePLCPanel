@@ -10,6 +10,8 @@ import parozzz.github.com.hmi.attribute.Attribute;
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.AttributeMap;
 import parozzz.github.com.hmi.attribute.impl.FontAttribute;
+import parozzz.github.com.hmi.attribute.impl.TextAttribute;
+import parozzz.github.com.hmi.attribute.impl.ValueAttribute;
 import parozzz.github.com.hmi.attribute.impl.address.WriteAddressAttribute;
 import parozzz.github.com.hmi.attribute.impl.control.InputDataAttribute;
 import parozzz.github.com.hmi.controls.ControlContainerPane;
@@ -17,6 +19,7 @@ import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapperType;
 import parozzz.github.com.hmi.util.FXNodeUtil;
 import parozzz.github.com.hmi.util.FXTextFormatterUtil;
+import parozzz.github.com.hmi.util.valueintermediate.ValueIntermediateType;
 
 import java.util.List;
 
