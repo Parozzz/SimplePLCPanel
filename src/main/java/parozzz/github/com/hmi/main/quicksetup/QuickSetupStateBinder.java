@@ -4,8 +4,6 @@ import javafx.beans.property.Property;
 import parozzz.github.com.hmi.attribute.Attribute;
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.property.AttributeProperty;
-import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
-import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapperSpecific;
 import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
 
 import java.util.HashMap;
@@ -88,7 +86,7 @@ public final class QuickSetupStateBinder
             {
                 var attributeNewValue = quickToAttribute.apply(newValue);
                 attribute.setValue(attributeProperty, attributeNewValue);
-                attribute.updateInternals(); //Update internals first to allow some attribute to have their values refreshed
+                attribute.update(); //Update internals first to allow some attribute to have their values refreshed
 
                 quickSetupVBox.updateSelectedWrapperAttributes();
             }

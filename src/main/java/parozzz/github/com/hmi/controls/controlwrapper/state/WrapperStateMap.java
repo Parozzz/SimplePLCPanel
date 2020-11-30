@@ -2,6 +2,7 @@ package parozzz.github.com.hmi.controls.controlwrapper.state;
 
 import org.json.simple.JSONObject;
 import parozzz.github.com.hmi.FXObject;
+import parozzz.github.com.hmi.attribute.Attribute;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.serialize.data.JSONDataArray;
 import parozzz.github.com.hmi.serialize.data.JSONDataMap;
@@ -18,13 +19,14 @@ public final class WrapperStateMap extends FXObject
 
     private final List<WrapperState> wrapperStateList;
     private final WrapperState defaultWrapperState;
+    private List<Attribute> emptyAttributeList;
 
     private WrapperState currentWrapperState;
     private int numericState;
 
     private final Set<WrapperStateChangedConsumer> wrapperStateChangedConsumerList;
 
-    private boolean defaultWrapperStateInitialized = false;
+    private boolean emptyAttributeListInitialized = false;
 
     public WrapperStateMap(ControlWrapper<?> controlWrapper)
     {
@@ -64,30 +66,47 @@ public final class WrapperStateMap extends FXObject
         }
     }
 
+    public void initEmptyAttributes(List<Attribute> emptyAttributeList)
+    {
+        Validate.needFalse("Trying to initialize empty attributes twice", emptyAttributeListInitialized);
+        emptyAttributeListInitialized = true;
+
+        this.emptyAttributeList = Collections.unmodifiableList(emptyAttributeList);
+
+        //Initialization of default state!
+        emptyAttributeList.forEach(attribute ->
+        {
+            var clonedAttribute = attribute.cloneAsDefaultWithSameControlWrapper();
+            defaultWrapperState.getAttributeMap().addAttribute(clonedAttribute);
+        });
+    }
+    /*
     public void initDefaultState(Consumer<WrapperState> initDefaultStateConsumer)
     {
-        Validate.needFalse("Trying to initialize default wrapper state twice", defaultWrapperStateInitialized);
-        defaultWrapperStateInitialized = true;
+        Validate.needFalse("Trying to initialize default wrapper state twice", emptyAttributeListInitialized);
+        emptyAttributeListInitialized = true;
 
         //Is not needed to add the default to the state set since is manager differently
         initDefaultStateConsumer.accept(defaultWrapperState);
-    }
+    }*/
 
     public void addState(WrapperState wrapperState)
     {
         this.addState(wrapperState, true);
     }
 
-    public void addState(WrapperState wrapperState, boolean cloneFromDefault)
+    public void addState(WrapperState wrapperState, boolean initWithEmptyAttributes)
     {
         this.requireDefaultInit();
 
         wrapperStateList.add(wrapperState);
-
-        if (cloneFromDefault) //If this is not used accurately, might lead to broken attribute maps
+        if (initWithEmptyAttributes) //If this is not used accurately, might lead to broken attribute maps
         {
-            //This other than clone, it populates the added state with the attribute
-            wrapperState.getAttributeMap().cloneFromOther(defaultWrapperState.getAttributeMap());
+            emptyAttributeList.forEach(emptyAttribute ->
+            {
+                var clonedAttribute = emptyAttribute.cloneAsDefaultWithSameControlWrapper();
+                wrapperState.getAttributeMap().addAttribute(clonedAttribute);
+            });
         }
 
         this.parseState(WrapperStateChangedConsumer.ChangeType.ADD); //In case a new state is added that is more valid than others, it should be updated immediately!
@@ -209,7 +228,11 @@ public final class WrapperStateMap extends FXObject
             jsonArray.stream().filter(JSONObject.class::isInstance)
                     .map(JSONObject.class::cast)
                     .map(JSONDataMap::new)
-                    .forEach(wrapperJSONDataMap -> WrapperStateSerializer.deserialize(wrapperJSONDataMap, this::addState));
+                    .forEach(wrapperJSONDataMap ->
+                    {
+                        var wrapperState = WrapperStateSerializer.deserialize(this, wrapperJSONDataMap);
+                        this.addState(wrapperState, false);
+                    });
         } else
         {
             Logger.getLogger(WrapperStateMap.class.getSimpleName()).log(Level.WARNING,
@@ -220,7 +243,7 @@ public final class WrapperStateMap extends FXObject
 
     private void requireDefaultInit()
     {
-        Validate.needTrue("Trying to execute operation on a non initialized default WrapperState", defaultWrapperStateInitialized);
+        Validate.needTrue("Trying to execute operation on a non initialized default WrapperState", emptyAttributeListInitialized);
     }
 
 }

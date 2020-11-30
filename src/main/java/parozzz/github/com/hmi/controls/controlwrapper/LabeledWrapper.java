@@ -2,8 +2,6 @@ package parozzz.github.com.hmi.controls.controlwrapper;
 
 import javafx.scene.control.Labeled;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
-import javafx.scene.text.Text;
 import parozzz.github.com.hmi.attribute.Attribute;
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.AttributeMap;
@@ -27,13 +25,27 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
     }
 
     @Override
-    protected void setupAttributeInitializers(List<Attribute> stateAttributeList,
+    protected void registerAttributeInitializers(ControlWrapperAttributeInitializer<C> attributeInitializer)
+    {
+        super.registerAttributeInitializers(attributeInitializer);
+
+        attributeInitializer.addState(new FontAttribute(this), (attribute, control, containerPane) ->
+        {
+            control.setFont(attribute.getFont());
+            control.setUnderline(attribute.getValue(FontAttribute.UNDERLINE));
+            control.setAlignment(attribute.getValue(FontAttribute.TEXT_POSITION));
+            control.setTextFill(attribute.getValue(FontAttribute.TEXT_COLOR));
+        });
+    }
+
+    /*
+    @Override
+    protected void registerAttributeInitializers(List<Attribute> stateAttributeList,
             List<Attribute> globalAttributeList)
     {
-        super.setupAttributeInitializers(stateAttributeList, globalAttributeList);
+        super.registerAttributeInitializers(stateAttributeList, globalAttributeList);
 
-        stateAttributeList.add(new FontAttribute());
-        stateAttributeList.add(new SizeAttribute());
+        stateAttributeList.add(new FontAttribute(this));
     }
 
     @Override
@@ -50,7 +62,7 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
             control.setTextFill(fontAttribute.getValue(FontAttribute.TEXT_COLOR));
         }
     }
-
+*/
     @Override
     public void setup()
     {

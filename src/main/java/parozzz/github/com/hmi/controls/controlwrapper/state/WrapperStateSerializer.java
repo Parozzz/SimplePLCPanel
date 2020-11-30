@@ -39,7 +39,7 @@ final class WrapperStateSerializer
         return jsonDataMap;
     }
 
-    public static void deserialize(JSONDataMap jsonDataMap, Consumer<WrapperState> addStatePredicate)
+    public static WrapperState deserialize(WrapperStateMap wrapperStateMap, JSONDataMap jsonDataMap)
     {
         var firstCompare = jsonDataMap.getNumber("FirstCompare").intValue();
         var firstCompareType = jsonDataMap.getEnum("FirstCompareType", WrapperState.CompareType.class);
@@ -47,9 +47,10 @@ final class WrapperStateSerializer
         var secondCompare = jsonDataMap.getNumber("SecondCompare").intValue();
         var secondCompareType = jsonDataMap.getEnum("SecondCompareType", WrapperState.CompareType.class);
 
-        var wrapperState = new WrapperState(firstCompare, firstCompareType, secondCompare, secondCompareType);
-        addStatePredicate.accept(wrapperState);
+        var wrapperState = new WrapperState(wrapperStateMap,
+                firstCompare, firstCompareType, secondCompare, secondCompareType);
         deserializeAttributeMap(jsonDataMap, wrapperState);
+        return wrapperState;
     }
 
     private static void deserializeAttributeMap(JSONDataMap jsonDataMap, WrapperState wrapperState)

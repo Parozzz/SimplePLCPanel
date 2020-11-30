@@ -7,7 +7,10 @@ import parozzz.github.com.hmi.attribute.property.AttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.EnumAttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.ParsableAttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.primitives.NumberAttributeProperty;
+import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.serialize.JSONSerializables;
+
+import javax.naming.ldap.Control;
 
 public class BorderAttribute extends Attribute
 {
@@ -33,9 +36,9 @@ public class BorderAttribute extends Attribute
 
     private Border border;
 
-    public BorderAttribute()
+    public BorderAttribute(ControlWrapper<?> controlWrapper)
     {
-        super(ATTRIBUTE_NAME);
+        super(controlWrapper, ATTRIBUTE_NAME, BorderAttribute::new);
 
         super.getAttributePropertyManager().addAll(COLOR, WIDTH, STROKE_STYLE, CORNER_RADII);
     }
@@ -46,7 +49,7 @@ public class BorderAttribute extends Attribute
     }
 
     @Override
-    public void updateInternals()
+    public void update()
     {
         var borderColor = this.getValue(COLOR);
         var borderWidth = this.getValue(WIDTH);
@@ -55,11 +58,5 @@ public class BorderAttribute extends Attribute
         this.border = new Border(
                 new BorderStroke(borderColor, strokeStyle.borderStrokeStyle, new CornerRadii(cornerRadii), new BorderWidths(borderWidth))
         );
-    }
-
-    @Override
-    public BorderAttribute cloneEmpty()
-    {
-        return new BorderAttribute();
     }
 }

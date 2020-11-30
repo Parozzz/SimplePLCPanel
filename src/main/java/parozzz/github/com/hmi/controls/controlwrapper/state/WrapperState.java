@@ -1,6 +1,8 @@
 package parozzz.github.com.hmi.controls.controlwrapper.state;
 
+import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.AttributeMap;
+import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.util.functionalinterface.primitives.IntBiPredicate;
 
 import java.util.Objects;
@@ -32,7 +34,7 @@ public class WrapperState implements Comparable<WrapperState>
 
         public String getVisualText()
         {
-            switch (this)
+            switch(this)
             {
                 case EQUAL:
                     return "==";
@@ -58,7 +60,7 @@ public class WrapperState implements Comparable<WrapperState>
     {
 
         var stringBuilder = new StringBuilder();
-        if (firstCompareType != CompareType.ALWAYS_TRUE)
+        if(firstCompareType != CompareType.ALWAYS_TRUE)
         {
             stringBuilder.append(firstCompare)
                     .append(firstCompareType.getVisualText());
@@ -66,7 +68,7 @@ public class WrapperState implements Comparable<WrapperState>
 
         stringBuilder.append("X");
 
-        if (secondCompareType != CompareType.ALWAYS_TRUE)
+        if(secondCompareType != CompareType.ALWAYS_TRUE)
         {
             stringBuilder.append(secondCompareType.getVisualText())
                     .append(secondCompare);
@@ -75,6 +77,7 @@ public class WrapperState implements Comparable<WrapperState>
         return stringBuilder.toString();
     }
 
+    private final WrapperStateMap wrapperStateMap;
     private final String stringVersion;
     private final AttributeMap attributeMap;
 
@@ -83,9 +86,12 @@ public class WrapperState implements Comparable<WrapperState>
     private final short secondCompare;
     private final CompareType secondCompareType;
 
-    WrapperState(int firstCompare, CompareType firstCompareType,
+    WrapperState(WrapperStateMap wrapperStateMap,
+            int firstCompare, CompareType firstCompareType,
             int secondCompare, CompareType secondCompareType)
     {
+        this.wrapperStateMap = wrapperStateMap;
+
         this.firstCompare = (short) firstCompare;
         this.firstCompareType = firstCompareType;
         this.secondCompare = (short) secondCompare;
@@ -98,6 +104,11 @@ public class WrapperState implements Comparable<WrapperState>
 
     //NEED TO DO A WAY TO PARSE A STATE FROM A STRING. SAME FOR A WAY TO TRASFORM IT BACK TO A STRING.
     //OR MAYBE DO SOMETHING FORCED WITH THE GUI?
+
+    public WrapperStateMap getStateMap()
+    {
+        return wrapperStateMap;
+    }
 
     public String getStringVersion()
     {
@@ -140,36 +151,64 @@ public class WrapperState implements Comparable<WrapperState>
                 && secondCompareType.test(secondCompare, value);
     }
 
-    public WrapperState cloneEmpty()
+    public WrapperState createEmpty()
     {
         return new WrapperState(firstCompare, firstCompareType, secondCompare, secondCompareType);
     }
 
+    public WrapperState clone(ControlWrapper<?> controlWrapper)
+    {
+        var cloneWrapperState = this.createEmpty();
+
+        attributeMap.forEach(attribute ->
+        {
+            var cloneAttribute = attribute.clone(controlWrapper);
+            cloneWrapperState.attributeMap.addAttribute(cloneAttribute);
+        });
+
+        return cloneWrapperState;
+    }
+
+    public void copyInto(WrapperState pasteWrapperState)
+    {
+        Objects.requireNonNull(pasteWrapperState, "Trying to parse into a null state.");
+
+        this.attributeMap.forEach(attribute ->
+        {
+            var pasteAttribute = AttributeFetcher.fetch(pasteWrapperState.getAttributeMap(), attribute.getClass());
+            if(pasteAttribute != null)
+            {
+                attribute.copyInto(pasteAttribute);
+            }
+        });
+    }
+
+    /*
     @Override
     public WrapperState clone()
     {
-        var clonedWrapperState = this.cloneEmpty();
+        var clonedWrapperState = this.createEmpty();
         Objects.requireNonNull(clonedWrapperState, "Trying to clone an invalid state.");
         clonedWrapperState.getAttributeMap().cloneFromOther(attributeMap);
         return clonedWrapperState;
     }
-
+*/
     @Override
     public int compareTo(WrapperState wrapperState)
     {
-        if (wrapperState == this)
+        if(wrapperState == this)
         {
             return 0;
-        } else if (wrapperState.isDefault())
+        }else if(wrapperState.isDefault())
         {
             return 1;
         }
 
         var otherFirstCompare = wrapperState.getFirstCompare();
-        if (firstCompare > otherFirstCompare)
+        if(firstCompare > otherFirstCompare)
         {
             return 1;
-        } else if (firstCompare < otherFirstCompare)
+        }else if(firstCompare < otherFirstCompare)
         {
             return -1;
         }
@@ -180,13 +219,13 @@ public class WrapperState implements Comparable<WrapperState>
     @Override
     public boolean equals(Object object)
     {
-        if (this == object)
+        if(this == object)
         {
             return true;
         }
 
 
-        if (!(object instanceof WrapperState))
+        if(!(object instanceof WrapperState))
         {
             return false;
         }
@@ -218,7 +257,7 @@ public class WrapperState implements Comparable<WrapperState>
 
         public Builder firstCompare(CompareType compareType, int firstCompare)
         {
-            switch (compareType)
+            switch(compareType)
             {
                 case EQUAL:
                 case HIGHER:
@@ -233,7 +272,7 @@ public class WrapperState implements Comparable<WrapperState>
 
         public Builder secondCompare(CompareType compareType, int secondCompare)
         {
-            switch (compareType)
+            switch(compareType)
             {
                 case EQUAL:
                 case LOWER:

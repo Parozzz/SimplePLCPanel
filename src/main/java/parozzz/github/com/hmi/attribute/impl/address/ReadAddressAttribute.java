@@ -1,16 +1,12 @@
 package parozzz.github.com.hmi.attribute.impl.address;
 
+import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
+
 public class ReadAddressAttribute extends AddressAttribute
 {
     public static final String ATTRIBUTE_NAME = "READ_ADDRESS_ATTRIBUTE";
-    public ReadAddressAttribute()
+    public ReadAddressAttribute(ControlWrapper<?> controlWrapper)
     {
-        super(ATTRIBUTE_NAME);
-    }
-
-    @Override
-    public AddressAttribute cloneEmpty()
-    {
-        return new ReadAddressAttribute();
+        super(controlWrapper, ATTRIBUTE_NAME, ReadAddressAttribute::new);
     }
 }

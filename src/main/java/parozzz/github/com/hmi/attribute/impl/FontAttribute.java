@@ -12,6 +12,7 @@ import parozzz.github.com.hmi.attribute.property.impl.ParsableAttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.primitives.BooleanAttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.primitives.NumberAttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.primitives.StringAttributeProperty;
+import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.serialize.JSONSerializables;
 
 public final class FontAttribute extends Attribute
@@ -30,9 +31,9 @@ public final class FontAttribute extends Attribute
 
     private Font font;
 
-    public FontAttribute()
+    public FontAttribute(ControlWrapper<?> controlWrapper)
     {
-        super(ATTRIBUTE_NAME);
+        super(controlWrapper, ATTRIBUTE_NAME, FontAttribute::new);
 
         super.getAttributePropertyManager().addAll(TEXT_COLOR, TEXT_POSITION, UNDERLINE, FONT_NAME, BOLD_WEIGHT, ITALIC_POSTURE, STRIKETHROUGH, FONT_TEXT_SIZE);
 
@@ -44,18 +45,12 @@ public final class FontAttribute extends Attribute
     }
 
     @Override
-    public void updateInternals()
+    public void update()
     {
         var fontName = this.getValue(FONT_NAME);
         var fontWeight = this.getValue(BOLD_WEIGHT) ? FontWeight.BOLD : FontWeight.NORMAL;
         var fontPosture = this.getValue(ITALIC_POSTURE) ? FontPosture.ITALIC : FontPosture.REGULAR;
         var fontTextSize = this.getValue(FONT_TEXT_SIZE);
         this.font = Font.font(fontName, fontWeight, fontPosture, fontTextSize);
-    }
-
-    @Override
-    public FontAttribute cloneEmpty()
-    {
-        return new FontAttribute();
     }
 }

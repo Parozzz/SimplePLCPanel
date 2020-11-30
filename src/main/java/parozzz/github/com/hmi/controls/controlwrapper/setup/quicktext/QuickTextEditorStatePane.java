@@ -111,7 +111,7 @@ class QuickTextEditorStatePane extends FXObject
         if (textAttribute != null)
         {
             textAttribute.setValue(attributeProperty, value);
-            textAttribute.updateInternals();
+            textAttribute.update();
 
             editorStage.applyAttributesToSelectedControlWrapper();
         }
@@ -135,7 +135,7 @@ class QuickTextEditorStatePane extends FXObject
         if (fontAttribute != null)
         {
             fontAttribute.setValue(attributeProperty, value);
-            fontAttribute.updateInternals();
+            fontAttribute.update();
 
             editorStage.applyAttributesToSelectedControlWrapper();
         }

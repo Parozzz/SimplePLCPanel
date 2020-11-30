@@ -10,6 +10,7 @@ import parozzz.github.com.hmi.attribute.property.impl.ParsableAttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.primitives.BooleanAttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.primitives.NumberAttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.primitives.StringAttributeProperty;
+import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.main.picturebank.PictureBankStage;
 import parozzz.github.com.hmi.serialize.JSONSerializables;
 
@@ -28,9 +29,9 @@ public class BackgroundAttribute extends Attribute
     private final PictureBankStage pictureBank;
     private Background background;
 
-    public BackgroundAttribute(PictureBankStage pictureBank)
+    public BackgroundAttribute(ControlWrapper<?> controlWrapper, PictureBankStage pictureBank)
     {
-        super(ATTRIBUTE_NAME);
+        super(controlWrapper, ATTRIBUTE_NAME, t -> new BackgroundAttribute(t, pictureBank));
 
         this.pictureBank = pictureBank;
 
@@ -43,7 +44,7 @@ public class BackgroundAttribute extends Attribute
     }
 
     @Override
-    public void updateInternals()
+    public void update()
     {
         //Reset the image in case is not valid below
         Image image = null;
@@ -78,11 +79,5 @@ public class BackgroundAttribute extends Attribute
         var cornerRadii = this.getValue(CORNER_RADII);
         var backgroundFill = new BackgroundFill(backgroundColor, new CornerRadii(cornerRadii), Insets.EMPTY);
         background = new Background(Collections.singletonList(backgroundFill), backgroundImageList);
-    }
-
-    @Override
-    public BackgroundAttribute cloneEmpty()
-    {
-        return new BackgroundAttribute(pictureBank);
     }
 }

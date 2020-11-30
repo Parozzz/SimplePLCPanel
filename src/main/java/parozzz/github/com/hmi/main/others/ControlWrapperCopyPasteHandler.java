@@ -62,6 +62,7 @@ public class ControlWrapperCopyPasteHandler extends FXObject
 
     private void pasteSavedWrappers(ControlContainerPane controlContainerPane)
     {
+        var pasteList = new ArrayList<ControlWrapper<?>>();
         for(var controlWrapper : copySelectionList)
         {
             var wrapperType = controlWrapper.getType();
@@ -71,10 +72,12 @@ public class ControlWrapperCopyPasteHandler extends FXObject
 
             var newControlWrapper = controlContainerPane.createControlWrapper(wrapperType);
             newControlWrapper.getContainerPane().relocate(layoutX + 10, layoutY + 10);
-            controlWrapper.cloneInto(newControlWrapper);
+            controlWrapper.copyInto(newControlWrapper);
             newControlWrapper.applyAttributes(this);
+            pasteList.add(newControlWrapper);
         }
 
         copySelectionList.clear();
+        copySelectionList.addAll(pasteList);
     }
 }

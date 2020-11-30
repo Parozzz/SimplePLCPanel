@@ -161,7 +161,7 @@ public final class SetupPaneAttributeChanger<A extends Attribute>
                 var propertyValue = property.getValue();
                 attribute.setValue(attributeProperty, propertyToAttributeConvert.apply(propertyValue));
                 //In case i set data to the attribute, i update all the internal values
-                attribute.updateInternals();
+                attribute.update();
             } catch (Exception exception)
             {
                 logger.log(Level.WARNING,

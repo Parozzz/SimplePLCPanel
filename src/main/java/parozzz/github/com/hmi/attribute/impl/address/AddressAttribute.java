@@ -4,7 +4,10 @@ import parozzz.github.com.hmi.attribute.Attribute;
 import parozzz.github.com.hmi.attribute.impl.address.data.AddressDataType;
 import parozzz.github.com.hmi.attribute.property.AttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.FunctionAttributeProperty;
+import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.serialize.data.JSONDataMap;
+
+import java.util.function.Function;
 
 public abstract class AddressAttribute extends Attribute
 {
@@ -14,9 +17,10 @@ public abstract class AddressAttribute extends Attribute
     );
 
     private boolean deserializing;
-    public AddressAttribute(String name)
+    public AddressAttribute(ControlWrapper<?> controlWrapper, String name,
+            Function<ControlWrapper<?>, AddressAttribute> creatorFunction)
     {
-        super(name);
+        super(controlWrapper, name, creatorFunction);
 
         var attributePropertyManager = super.getAttributePropertyManager();
         attributePropertyManager.addAll(DATA_TYPE);
@@ -46,7 +50,7 @@ public abstract class AddressAttribute extends Attribute
     }
 
     @Override
-    public void updateInternals()
+    public void update()
     {
 
     }
@@ -66,7 +70,4 @@ public abstract class AddressAttribute extends Attribute
 
         deserializing = false;
     }
-
-    @Override
-    public abstract AddressAttribute cloneEmpty();
 }

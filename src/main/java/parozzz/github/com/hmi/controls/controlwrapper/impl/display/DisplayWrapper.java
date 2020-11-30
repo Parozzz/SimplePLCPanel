@@ -8,12 +8,9 @@ import parozzz.github.com.hmi.attribute.AttributeMap;
 import parozzz.github.com.hmi.attribute.impl.TextAttribute;
 import parozzz.github.com.hmi.attribute.impl.ValueAttribute;
 import parozzz.github.com.hmi.attribute.impl.address.ReadAddressAttribute;
-import parozzz.github.com.hmi.attribute.impl.address.WriteAddressAttribute;
-import parozzz.github.com.hmi.attribute.impl.control.ButtonDataAttribute;
 import parozzz.github.com.hmi.controls.ControlContainerPane;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapperType;
 import parozzz.github.com.hmi.controls.controlwrapper.LabeledWrapper;
-import parozzz.github.com.hmi.controls.controlwrapper.setup.ControlWrapperSetupStage;
 
 import java.util.List;
 
@@ -25,17 +22,17 @@ public class DisplayWrapper extends LabeledWrapper<Label>
     }
 
     @Override
-    protected void setupAttributeInitializers(List<Attribute> stateAttributeList,
+    protected void registerAttributeInitializers(List<Attribute> stateAttributeList,
             List<Attribute> globalAttributeList)
     {
-        super.setupAttributeInitializers(stateAttributeList, globalAttributeList);
+        super.registerAttributeInitializers(stateAttributeList, globalAttributeList);
 
         //GENERICS
-        globalAttributeList.add(new ReadAddressAttribute());
+        globalAttributeList.add(new ReadAddressAttribute(this));
 
         //STATE SPECIFIC
-        stateAttributeList.add(new TextAttribute());
-        stateAttributeList.add(new ValueAttribute());
+        stateAttributeList.add(new TextAttribute(this));
+        stateAttributeList.add(new ValueAttribute(this));
     }
 
     @Override

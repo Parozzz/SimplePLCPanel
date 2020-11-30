@@ -54,14 +54,14 @@ public final class AttributeMap extends FXController
             classToAttributeMap.put(attribute.getClass(), attribute);
 
             //When adding a new attribute, update internals values to create startup data
-            attribute.updateInternals();
+            attribute.update();
 
             return true;
         }
 
         return false;
     }
-
+/*
     public void addOrReplaceAttribute(Attribute attribute)
     {
         var attributeClass = attribute.getClass();
@@ -72,7 +72,7 @@ public final class AttributeMap extends FXController
 
         this.addAttribute(attribute);
     }
-
+*/
     <T> T getAttribute(Class<T> attributeClass)
     {
         var attribute = classToAttributeMap.get(attributeClass);
@@ -120,13 +120,14 @@ public final class AttributeMap extends FXController
         attributeSet.forEach(consumer);
     }
 
+    /*
     public void cloneFromOther(AttributeMap otherAttributeMap)
     {
         for (var otherAttribute : otherAttributeMap.attributeSet)
         {
             this.addOrReplaceAttribute(otherAttribute.clone());
         }
-    }
+    }*/
 
     /*
     private static class AttributeWrapper<A extends Attribute>

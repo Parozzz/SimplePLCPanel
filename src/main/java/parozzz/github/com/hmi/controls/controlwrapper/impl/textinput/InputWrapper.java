@@ -10,8 +10,6 @@ import parozzz.github.com.hmi.attribute.Attribute;
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.AttributeMap;
 import parozzz.github.com.hmi.attribute.impl.FontAttribute;
-import parozzz.github.com.hmi.attribute.impl.TextAttribute;
-import parozzz.github.com.hmi.attribute.impl.ValueAttribute;
 import parozzz.github.com.hmi.attribute.impl.address.WriteAddressAttribute;
 import parozzz.github.com.hmi.attribute.impl.control.InputDataAttribute;
 import parozzz.github.com.hmi.controls.ControlContainerPane;
@@ -19,7 +17,6 @@ import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapperType;
 import parozzz.github.com.hmi.util.FXNodeUtil;
 import parozzz.github.com.hmi.util.FXTextFormatterUtil;
-import parozzz.github.com.hmi.util.valueintermediate.ValueIntermediateType;
 
 import java.util.List;
 
@@ -45,17 +42,17 @@ public class InputWrapper extends ControlWrapper<TextField>
     }
 
     @Override
-    protected void setupAttributeInitializers(List<Attribute> stateAttributeList,
+    protected void registerAttributeInitializers(List<Attribute> stateAttributeList,
             List<Attribute> globalAttributeList)
     {
-        super.setupAttributeInitializers(stateAttributeList, globalAttributeList);
+        super.registerAttributeInitializers(stateAttributeList, globalAttributeList);
 
         //GENERICS
-        globalAttributeList.add(new InputDataAttribute());
+        globalAttributeList.add(new InputDataAttribute(this));
 
         //STATE SPECIFIC
-        stateAttributeList.add(new WriteAddressAttribute());
-        stateAttributeList.add(new FontAttribute());
+        stateAttributeList.add(new WriteAddressAttribute(this));
+        stateAttributeList.add(new FontAttribute(this));
     }
 
     @Override
