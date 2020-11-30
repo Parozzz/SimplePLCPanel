@@ -12,6 +12,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public final class WrapperStateMap extends FXObject
 {
@@ -19,7 +20,9 @@ public final class WrapperStateMap extends FXObject
 
     private final List<WrapperState> wrapperStateList;
     private final WrapperState defaultWrapperState;
+
     private List<Attribute> emptyAttributeList;
+    private List<Class<? extends Attribute>> attributeClassList = Collections.EMPTY_LIST;
 
     private WrapperState currentWrapperState;
     private int numericState;
@@ -72,6 +75,7 @@ public final class WrapperStateMap extends FXObject
         emptyAttributeListInitialized = true;
 
         this.emptyAttributeList = Collections.unmodifiableList(emptyAttributeList);
+        this.attributeClassList = emptyAttributeList.stream().map(Attribute::getClass).collect(Collectors.toUnmodifiableList());
 
         //Initialization of default state!
         emptyAttributeList.forEach(attribute ->
@@ -171,6 +175,11 @@ public final class WrapperStateMap extends FXObject
     public boolean contains(WrapperState wrapperState)
     {
         return wrapperStateList.contains(wrapperState);
+    }
+
+    public List<Class<? extends Attribute>> getAttributeClassList()
+    {
+        return attributeClassList;
     }
 
     private void parseState(WrapperStateChangedConsumer.ChangeType changeType)

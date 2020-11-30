@@ -4,26 +4,29 @@ import javafx.scene.control.Control;
 import javafx.scene.layout.Pane;
 import parozzz.github.com.hmi.attribute.Attribute;
 
-@FunctionalInterface
-public interface ControlWrapperAttributeUpdateConsumer<A extends Attribute, C extends Control>
-{
-    void update(UpdateData<A, C> updateData);
+import java.util.List;
 
-    class UpdateData<A, C>
+@FunctionalInterface
+public interface ControlWrapperAttributeUpdateConsumer<C extends Control>
+{
+    void update(UpdateData<C> updateData);
+
+    class UpdateData<C>
     {
-        private final A attribute;
         private final C control;
         private final Pane containerPane;
-        public UpdateData(A attribute, C control, Pane containerPane)
+        private final List<Class<? extends Attribute>> attributeClassList;
+
+        public UpdateData(C control, Pane containerPane, Class<? extends Attribute>[] attributeClasses)
         {
-            this.attribute = attribute;
             this.control = control;
             this.containerPane = containerPane;
+            this.attributeClassList = List.of(attributeClasses);
         }
 
-        public A getAttribute()
+        public List<Class<? extends Attribute>> getAttributeClassList()
         {
-            return attribute;
+            return attributeClassList;
         }
 
         public C getControl()

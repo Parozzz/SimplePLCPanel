@@ -29,13 +29,28 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
     {
         super.registerAttributeInitializers(attributeInitializer);
 
-        attributeInitializer.addState(new FontAttribute(this), (attribute, control, containerPane) ->
-        {
-            control.setFont(attribute.getFont());
-            control.setUnderline(attribute.getValue(FontAttribute.UNDERLINE));
-            control.setAlignment(attribute.getValue(FontAttribute.TEXT_POSITION));
-            control.setTextFill(attribute.getValue(FontAttribute.TEXT_COLOR));
-        });
+        attributeInitializer.addState(new FontAttribute(this))
+                .addAttributeUpdateConsumer(updateData ->
+                {
+                    var control = updateData.getControl();
+
+                    for(var attributeClass : updateData.getAttributeClassList())
+                    {
+                        var attribute = AttributeFetcher.fetch(this, attributeClass);
+                        if(attribute == null)
+                        {
+                            continue;
+                        }
+
+                        if(FontAttribute.class.isAssignableFrom(attributeClass))
+                        {
+                            control.setFont(((FontAttribute) attribute).getFont());
+                            control.setUnderline(attribute.getValue(FontAttribute.UNDERLINE));
+                            control.setAlignment(attribute.getValue(FontAttribute.TEXT_POSITION));
+                            control.setTextFill(attribute.getValue(FontAttribute.TEXT_COLOR));
+                        }
+                    }
+                });
     }
 
     /*

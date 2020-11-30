@@ -31,19 +31,55 @@ public final class ButtonWrapper
     {
         super.registerAttributeInitializers(attributeInitializer);
 
-        attributeInitializer.addGlobal(new ReadAddressAttribute(this));
-        attributeInitializer.addGlobal(new ButtonDataAttribute(this));
+        attributeInitializer.addGlobal(new ReadAddressAttribute(this))
+                .addGlobal(new ButtonDataAttribute(this))
+                .addState(new WriteAddressAttribute(this))
+                .addState(new TextAttribute(this))
+                .addState(new ValueAttribute(this))
+                .addAttributeUpdateConsumer(updateData ->
+                {
+                    var control = updateData.getControl();
 
-        attributeInitializer.addState(new WriteAddressAttribute(this));
-        attributeInitializer.addState(new TextAttribute(this), (attribute, control, containerPane) ->
-        {
-            var valueAttribute = AttributeFetcher.fetch(
-        });
+                    TextAttribute textAttribute = null;
+                    ValueAttribute valueAttribute = null;
 
-        attributeInitializer.addState(new ValueAttribute(this), (attribute, control, containerPane) ->
-        {
+                    for(var attributeClass : updateData.getAttributeClassList())
+                    {
+                        var attribute = AttributeFetcher.fetch(this, attributeClass);
+                        if (attribute == null)
+                        {
+                            continue;
+                        }
 
-        });
+                        if(attribute instanceof TextAttribute)
+                        {
+                            textAttribute = (TextAttribute) attribute;
+                        }
+                        else if(attribute instanceof ValueAttribute)
+                        {
+                            valueAttribute = (ValueAttribute) attribute;
+                        }
+                    }
+
+                    if(textAttribute == null)
+                    {
+                        textAttribute = AttributeFetcher.fetch(this, TextAttribute.class);
+                    }
+
+                    if(valueAttribute == null)
+                    {
+                        valueAttribute = AttributeFetcher.fetch(this, ValueAttribute.class);
+                    }
+
+                    if (textAttribute != null && valueAttribute != null)
+                    {
+                        control.setTextAlignment(textAttribute.getValue(TextAttribute.TEXT_ALIGNMENT));
+                        control.setLineSpacing(textAttribute.getValue(TextAttribute.LINE_SPACING));
+
+                        var text = textAttribute.getValue(TextAttribute.TEXT);
+                        super.setParsedTextPlaceholders(control, text, valueAttribute);
+                    }
+                });
     }
 
     /*
@@ -63,7 +99,7 @@ public final class ButtonWrapper
         stateAttributeList.add(new TextAttribute(this));
         stateAttributeList.add(new ValueAttribute(this));
     }
-*/
+
     @Override
     public void applyAttributes(Button control, Pane containerPane, AttributeMap attributeMap, Object involvedObject)
     {
@@ -72,7 +108,7 @@ public final class ButtonWrapper
         String text = "";
 
         var textAttribute = AttributeFetcher.fetch(attributeMap, TextAttribute.class);
-        if(textAttribute != null)
+        if (textAttribute != null)
         {
             control.setTextAlignment(textAttribute.getValue(TextAttribute.TEXT_ALIGNMENT));
             control.setLineSpacing(textAttribute.getValue(TextAttribute.LINE_SPACING));
@@ -81,12 +117,12 @@ public final class ButtonWrapper
         }
 
         var valueAttribute = AttributeFetcher.fetch(attributeMap, ValueAttribute.class);
-        if(valueAttribute != null)
+        if (valueAttribute != null)
         {
             super.setParsedTextPlaceholders(control, text, valueAttribute);
         }
 
-    }
+    }*/
 
     @Override
     public void setup()

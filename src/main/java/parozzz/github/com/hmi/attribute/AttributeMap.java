@@ -2,10 +2,7 @@ package parozzz.github.com.hmi.attribute;
 
 import parozzz.github.com.hmi.FXController;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 public final class AttributeMap extends FXController
@@ -40,6 +37,11 @@ public final class AttributeMap extends FXController
         return this.addAttributeWrapper(attributeWrapper);
     }
 */
+    public void addAll(Collection<Attribute> collection)
+    {
+        collection.forEach(this::addAttribute);
+    }
+
     public boolean addAttribute(Attribute attribute)
     {
         if (classToAttributeMap.containsKey(attribute.getClass()))

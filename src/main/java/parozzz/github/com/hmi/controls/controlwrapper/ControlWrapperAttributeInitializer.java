@@ -3,10 +3,7 @@ package parozzz.github.com.hmi.controls.controlwrapper;
 import javafx.scene.control.Control;
 import parozzz.github.com.hmi.attribute.Attribute;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public final class ControlWrapperAttributeInitializer<C extends Control>
 {
@@ -14,7 +11,7 @@ public final class ControlWrapperAttributeInitializer<C extends Control>
 
     private final List<Attribute> stateAttributeList;
     private final List<Attribute> globalAttributeList;
-    private final Map<Class<? extends Attribute>, ControlWrapperAttributeUpdateConsumer<?, C>> attributeSetConsumerMap;
+    private final Set<ControlWrapperAttributeUpdateConsumer<C>> attributeUpdateConsumerSet;
 
     public ControlWrapperAttributeInitializer(ControlWrapper<C> controlWrapper)
     {
@@ -23,28 +20,34 @@ public final class ControlWrapperAttributeInitializer<C extends Control>
         this.stateAttributeList = new ArrayList<>();
         this.globalAttributeList = new ArrayList<>();
 
-        this.attributeSetConsumerMap = new HashMap<>();
+        this.attributeUpdateConsumerSet = new HashSet<>();
     }
 
-    public <A extends Attribute> void addState(A attribute, ControlWrapperAttributeUpdateConsumer<A, C> setConsumer)
-    {
-        this.addState(attribute);
-        attributeSetConsumerMap.put(attribute.getClass(), setConsumer);
-    }
-
-    public void addState(Attribute attribute)
+    public ControlWrapperAttributeInitializer<C> addState(Attribute attribute)
     {
         stateAttributeList.add(attribute);
+        return this;
     }
 
-    public <A extends Attribute> void addGlobal(A attribute, ControlWrapperAttributeUpdateConsumer<A, C> setConsumer)
-    {
-        this.addGlobal(attribute);
-        attributeSetConsumerMap.put(attribute.getClass(), setConsumer);
-    }
-
-    public  void addGlobal(Attribute attribute)
+    public  ControlWrapperAttributeInitializer<C> addGlobal(Attribute attribute)
     {
         globalAttributeList.add(attribute);
+        return this;
+    }
+
+    public ControlWrapperAttributeInitializer<C> addAttributeUpdateConsumer(ControlWrapperAttributeUpdateConsumer<C> attributeUpdateConsumer)
+    {
+        attributeUpdateConsumerSet.add(attributeUpdateConsumer);
+        return this;
+    }
+
+    public List<Attribute> getStateAttributeList()
+    {
+        return stateAttributeList;
+    }
+
+    public List<Attribute> getGlobalAttributeList()
+    {
+        return globalAttributeList;
     }
 }

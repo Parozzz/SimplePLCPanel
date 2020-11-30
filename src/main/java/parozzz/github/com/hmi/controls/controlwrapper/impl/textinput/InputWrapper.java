@@ -2,6 +2,7 @@ package parozzz.github.com.hmi.controls.controlwrapper.impl.textinput;
 
 import com.sun.javafx.scene.control.skin.FXVK;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.skin.TextFieldSkin;
 import javafx.scene.layout.Pane;
@@ -10,10 +11,14 @@ import parozzz.github.com.hmi.attribute.Attribute;
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.AttributeMap;
 import parozzz.github.com.hmi.attribute.impl.FontAttribute;
+import parozzz.github.com.hmi.attribute.impl.TextAttribute;
+import parozzz.github.com.hmi.attribute.impl.ValueAttribute;
+import parozzz.github.com.hmi.attribute.impl.address.ReadAddressAttribute;
 import parozzz.github.com.hmi.attribute.impl.address.WriteAddressAttribute;
 import parozzz.github.com.hmi.attribute.impl.control.InputDataAttribute;
 import parozzz.github.com.hmi.controls.ControlContainerPane;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
+import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapperAttributeInitializer;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapperType;
 import parozzz.github.com.hmi.util.FXNodeUtil;
 import parozzz.github.com.hmi.util.FXTextFormatterUtil;
@@ -42,6 +47,87 @@ public class InputWrapper extends ControlWrapper<TextField>
     }
 
     @Override
+    protected void registerAttributeInitializers(ControlWrapperAttributeInitializer<TextField> attributeInitializer)
+    {
+        super.registerAttributeInitializers(attributeInitializer);
+
+        attributeInitializer.addGlobal(new InputDataAttribute(this))
+                .addState(new WriteAddressAttribute(this))
+                .addState(new FontAttribute(this))
+                .addAttributeUpdateConsumer(updateData ->
+                {
+                    var control = updateData.getControl();
+
+                    for (var attributeClass : updateData.getAttributeClassList())
+                    {
+                        var attribute = AttributeFetcher.fetch(this, attributeClass);
+                        if (attribute == null)
+                        {
+                            continue;
+                        }
+
+                        if (InputDataAttribute.class.isAssignableFrom(attributeClass))
+                        {
+                            switch (attribute.getValue(InputDataAttribute.TYPE))
+                            {
+                                case INTEGER:
+                                    control.getProperties().put(FXVK.VK_TYPE_PROP_KEY, FXVK.Type.NUMERIC.ordinal());
+                                    control.setTextFormatter(
+                                            FXTextFormatterUtil.integerBuilder()
+                                                    .max(attribute.getValue(InputDataAttribute.INTEGER_MAX_VALUE))
+                                                    .min(attribute.getValue(InputDataAttribute.INTEGER_MIN_VALUE))
+                                                    .getTextFormatter()
+                                    );
+                                    break;
+                                case REAL:
+                                    control.getProperties().put(FXVK.VK_TYPE_PROP_KEY, FXVK.Type.NUMERIC.ordinal());
+                                    control.setTextFormatter(
+                                            FXTextFormatterUtil.doubleBuilder()
+                                                    .maxDecimals(attribute.getValue(InputDataAttribute.REAL_MAX_DECIMALS))
+                                                    .max(attribute.getValue(InputDataAttribute.REAL_MAX_VALUE))
+                                                    .min(attribute.getValue(InputDataAttribute.REAL_MIN_VALUE))
+                                                    .getTextFormatter()
+                                    );
+                                    break;
+                                case STRING:
+                                    control.getProperties().put(FXVK.VK_TYPE_PROP_KEY, FXVK.Type.TEXT.ordinal());
+                                    control.setTextFormatter(
+                                            FXTextFormatterUtil.limited(attribute.getValue(InputDataAttribute.CHARACTER_LIMIT))
+                                    );
+                                    break;
+                            }
+
+                            control.setText(""); //When this changes, to avoid problems clear the text
+                        } else if (FontAttribute.class.isAssignableFrom(attributeClass))
+                        {
+                            var skin = control.getSkin(); //Seems like setting the skin even if already exists causes some... problems
+                            if (skin == null) //Set the skin before to be sure that it has it (It's required after)
+                            {
+                                control.setSkin(new TextFieldSkin(control));
+                            }
+
+                            control.setFont(((FontAttribute) attribute).getFont());
+                            control.setAlignment(attribute.getValue(FontAttribute.TEXT_POSITION));
+
+                            var text = FXNodeUtil.getTextFieldText(control);
+                            if (text != null)
+                            {
+                                //Seems like unbinding stuff that is not meant to cause graphical glitches :(
+                                text.setUnderline(attribute.getValue(FontAttribute.UNDERLINE));
+                                text.fillProperty().bind(attribute.getProperty(FontAttribute.TEXT_COLOR));
+                            }
+
+                            var caretPath = FXNodeUtil.getCaret(control); //Set this after to have it revert after changing the text fill
+                            if (caretPath != null)
+                            {
+                                caretPath.fillProperty().bind(new SimpleObjectProperty<>(Color.BLACK));
+                            }
+                        }
+                    }
+                });
+    }
+/*
+    @Override
     protected void registerAttributeInitializers(List<Attribute> stateAttributeList,
             List<Attribute> globalAttributeList)
     {
@@ -61,7 +147,7 @@ public class InputWrapper extends ControlWrapper<TextField>
         super.applyAttributes(control, containerPane, attributeMap, involvedObject);
 
         var inputDataAttribute = AttributeFetcher.fetch(this.getGlobalAttributeMap(), InputDataAttribute.class);
-        if(inputDataAttribute != null)
+        if (inputDataAttribute != null)
         {
             var type = inputDataAttribute.getValue(InputDataAttribute.TYPE);
             switch (type)
@@ -97,7 +183,7 @@ public class InputWrapper extends ControlWrapper<TextField>
         }
 
         var fontAttribute = AttributeFetcher.fetch(attributeMap, FontAttribute.class);
-        if(fontAttribute != null)
+        if (fontAttribute != null)
         {
             var skin = control.getSkin(); //Seems like setting the skin even if already exists causes some... problems
             if (skin == null) //Set the skin before to be sure that it has it (It's required after)
@@ -123,7 +209,7 @@ public class InputWrapper extends ControlWrapper<TextField>
                 caretPath.fillProperty().bind(new SimpleObjectProperty<>(Color.BLACK));
             }
         }
-    }
+    }*/
 }
 
         /*
