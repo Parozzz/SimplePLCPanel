@@ -153,11 +153,21 @@ public final class ControlContainerDatabase extends FXController
                     {
                         controlWrapperSet.add(controlWrapper);
                         immutableControlWrapperSet = Collections.unmodifiableSet(controlWrapperSet);
+
+                        if(selectedControlDataUpdater != null)
+                        {
+                            selectedControlDataUpdater.bindControlWrapper(controlWrapper);
+                        }
                     },
                     controlWrapper ->
                     {
                         controlWrapperSet.remove(controlWrapper);
                         immutableControlWrapperSet = Collections.unmodifiableSet(controlWrapperSet);
+
+                        if(selectedControlDataUpdater != null)
+                        {
+                            selectedControlDataUpdater.unbindControlWrapper(controlWrapper);
+                        }
                     });
             controlMainPage.setup();
 
