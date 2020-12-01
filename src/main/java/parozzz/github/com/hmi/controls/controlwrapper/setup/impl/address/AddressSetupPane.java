@@ -7,6 +7,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.impl.address.AddressAttribute;
 import parozzz.github.com.hmi.attribute.impl.address.data.AddressDataType;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.ControlWrapperSetupStage;
@@ -27,7 +28,6 @@ public class AddressSetupPane<A extends AddressAttribute> extends SetupPane<A>
     @FXML private StackPane centerStackPane;
     @FXML private TextField textAddressTextField;
 
-    private final Class<A> attributeClass;
     private final boolean global;
     private final VBox mainVBox;
 
@@ -36,11 +36,10 @@ public class AddressSetupPane<A extends AddressAttribute> extends SetupPane<A>
     private AddressPane selectedAddressPane;
 
     public AddressSetupPane(ControlWrapperSetupStage setupPage, String buttonText,
-                            Class<A> attributeClass, boolean global) throws IOException
+                            AttributeType<A> attributeType, boolean global) throws IOException
     {
-        super(setupPage, buttonText + "SetupPage", buttonText, attributeClass, !global);
+        super(setupPage, buttonText + "SetupPage", buttonText, attributeType, !global);
 
-        this.attributeClass = attributeClass;
         this.global = global;
         this.mainVBox = (VBox) FXUtil.loadFXML("setup/addressSetupPane.fxml", this);
 
@@ -84,7 +83,7 @@ public class AddressSetupPane<A extends AddressAttribute> extends SetupPane<A>
             var selectedControlWrapper = super.getSetupStage().getSelectedControlWrapper();
             var selectedWrapperState = super.getSetupStage().getSelectedWrapperState();
             if (selectedControlWrapper == null || selectedWrapperState == null
-                    || (attribute = AttributeFetcher.fetch(selectedControlWrapper, selectedWrapperState, attributeClass)) == null)
+                    || (attribute = AttributeFetcher.fetch(selectedControlWrapper, super.getAttributeType())) == null)
             {
                 addressTypeChoiceBox.setValue(AddressDataType.NONE);
                 return;

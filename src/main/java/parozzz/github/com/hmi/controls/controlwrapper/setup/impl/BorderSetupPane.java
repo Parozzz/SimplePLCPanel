@@ -2,10 +2,12 @@ package parozzz.github.com.hmi.controls.controlwrapper.setup.impl;
 
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
-import javafx.scene.control.*;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ColorPicker;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import parozzz.github.com.hmi.attribute.AttributeMap;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.impl.BorderAttribute;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.ControlWrapperSetupStage;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.SetupPane;
@@ -27,7 +29,7 @@ public class BorderSetupPane extends SetupPane<BorderAttribute>
 
     public BorderSetupPane(ControlWrapperSetupStage setupStage) throws IOException
     {
-        super(setupStage, "BorderSetupPane", "Border", BorderAttribute.class, true);
+        super(setupStage, "BorderSetupPane", "Border", AttributeType.BORDER, true);
 
         this.vBox = (VBox) FXUtil.loadFXML("setup/borderSetupPane.fxml", this);
     }
@@ -67,11 +69,4 @@ public class BorderSetupPane extends SetupPane<BorderAttribute>
         borderStyleChoiceBox.setValue(BorderAttribute.StrokeStyle.SOLID);
         cornerRadiiTextField.setText("1");
     }
-
-    @Override
-    public boolean hasAttribute(AttributeMap attributeMap)
-    {
-        return attributeMap.hasAttribute(BorderAttribute.class);
-    }
-
 }

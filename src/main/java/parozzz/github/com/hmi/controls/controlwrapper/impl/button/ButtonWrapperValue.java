@@ -4,6 +4,7 @@ import javafx.scene.control.Button;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.impl.control.ButtonDataAttribute;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapperValue;
@@ -43,7 +44,7 @@ public final class ButtonWrapperValue extends ControlWrapperValue<Button>
                 return;
             }
 
-            var attribute = AttributeFetcher.fetch(controlWrapper, ButtonDataAttribute.class);
+            var attribute = AttributeFetcher.fetch(controlWrapper, AttributeType.BUTTON_DATA);
             Objects.requireNonNull(attribute, "ButtonWrapper must have a ButtonDataAttribute");
 
             switch (attribute.getValue(ButtonDataAttribute.TYPE))
@@ -73,7 +74,7 @@ public final class ButtonWrapperValue extends ControlWrapperValue<Button>
                 return;
             }
 
-            var attribute = AttributeFetcher.fetch(controlWrapper, ButtonDataAttribute.class);
+            var attribute = AttributeFetcher.fetch(controlWrapper, AttributeType.BUTTON_DATA);
             Objects.requireNonNull(attribute, "ButtonWrapper must have a ButtonDataAttribute");
             if (attribute.getValue(ButtonDataAttribute.TYPE) == ButtonWrapperType.NORMAL)
             {

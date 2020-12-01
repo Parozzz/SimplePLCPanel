@@ -7,21 +7,25 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Control;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextBoundsType;
 import parozzz.github.com.hmi.FXController;
-import parozzz.github.com.hmi.attribute.Attribute;
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.AttributeMap;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.impl.BackgroundAttribute;
 import parozzz.github.com.hmi.attribute.impl.BorderAttribute;
 import parozzz.github.com.hmi.attribute.impl.ChangePageAttribute;
 import parozzz.github.com.hmi.attribute.impl.SizeAttribute;
 import parozzz.github.com.hmi.controls.ControlContainerPane;
+import parozzz.github.com.hmi.controls.controlwrapper.attributes.ControlWrapperAttributeInitializer;
+import parozzz.github.com.hmi.controls.controlwrapper.attributes.ControlWrapperAttributeManager;
 import parozzz.github.com.hmi.controls.controlwrapper.extra.ChangePageExtraFeature;
 import parozzz.github.com.hmi.controls.controlwrapper.extra.ControlWrapperExtraFeature;
 import parozzz.github.com.hmi.controls.controlwrapper.others.ControlWrapperBorderCreator;
@@ -29,13 +33,13 @@ import parozzz.github.com.hmi.controls.controlwrapper.others.ControlWrapperConte
 import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
 import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperStateMap;
 import parozzz.github.com.hmi.serialize.data.JSONDataMap;
-import parozzz.github.com.hmi.util.*;
+import parozzz.github.com.hmi.util.DoubleClickable;
+import parozzz.github.com.hmi.util.Draggable;
+import parozzz.github.com.hmi.util.Resizable;
 import parozzz.github.com.hmi.util.specialfunction.FXSpecialFunctionManager;
 import parozzz.github.com.util.TrigBoolean;
 
-import java.util.*;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public abstract class ControlWrapper<C extends Control> extends FXController implements Resizable, Draggable, DoubleClickable
@@ -56,8 +60,7 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
 
     private final AttributeMap globalAttributeMap; //This will stay here, but is still for a future. WIP
     private final ControlWrapperContextMenuController contextMenuController;
-
-    private final Map<Class<? extends Attribute>, Consumer<? extends Attribute>> attributeUpdateConsumerMap;
+    private final ControlWrapperAttributeManager<C> attributeManager;
 
     private final TrigBoolean selected;
     private final TrigBoolean mainSelection;
@@ -66,8 +69,6 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
     private EventHandler<MouseEvent> mouseReleasedEventHandler;
 
     private final BooleanProperty validProperty;
-    private final Set<Consumer<Object>> attributeUpdatedRunnableSet;
-
     private boolean readOnly = false;
     private boolean isDragged;
     private boolean resizing;
@@ -85,16 +86,14 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
 
         this.addFXChild(this.value = valueSupplierCreator.apply(this, control))
                 .addFXChild(this.stateMap = new WrapperStateMap(this))
-                .addFXChild(this.globalAttributeMap = new AttributeMap("GenericAttributeMap"))
-                .addFXChild(this.contextMenuController = new ControlWrapperContextMenuController(this, control, controlContainerPane));
-
-        this.attributeUpdateConsumerMap = new HashMap<>();
+                .addFXChild(this.globalAttributeMap = new AttributeMap(this, "GenericAttributeMap"))
+                .addFXChild(this.contextMenuController = new ControlWrapperContextMenuController(this, control, controlContainerPane))
+                .addFXChild(this.attributeManager = new ControlWrapperAttributeManager<>(this, control));
 
         this.selected = new TrigBoolean(false);
         this.mainSelection = new TrigBoolean(false);
 
         this.validProperty = new SimpleBooleanProperty();
-        this.attributeUpdatedRunnableSet = new HashSet<>();
     }
 
     @Override
@@ -109,9 +108,10 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
 
         var attributeInitializer = new ControlWrapperAttributeInitializer<>(this);
         this.registerAttributeInitializers(attributeInitializer);
+        attributeManager.initialize(attributeInitializer);
 
-        globalAttributeMap.addAll(attributeInitializer.getGlobalAttributeList());
-        stateMap.initEmptyAttributes(attributeInitializer.getStateAttributeList());
+        globalAttributeMap.parseAttributes(attributeManager, false);
+        stateMap.initDefaultState(attributeManager);
 
         /*
         var stateAttributeList = new ArrayList<Attribute>();
@@ -127,7 +127,7 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
         Stream.of(containerStackPane.widthProperty(), containerStackPane.heightProperty()).forEach(property ->
                 property.addListener((observableValue, oldValue, newValue) ->
                 {
-                    if (selected.get())
+                    if(selected.get())
                     {
                         ControlWrapperBorderCreator.applySelectedBorder(this);
                     }
@@ -138,7 +138,7 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
         {
             var selectionManager = controlContainerPane.getSelectionManager();
             //In this system, if i have control down and there is no selected the first will be added and deleted right away
-            if (!mouseEvent.isControlDown() && selectionManager.isEmpty())
+            if(!mouseEvent.isControlDown() && selectionManager.isEmpty())
             {
                 selectionManager.set(this);
             }
@@ -149,22 +149,22 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
 
         containerStackPane.addEventFilter(MouseEvent.MOUSE_RELEASED, mouseReleasedEventHandler = mouseEvent ->
         {
-            if (isDragged)
+            if(isDragged)
             {
                 return;
             }
 
             var selectionManager = controlContainerPane.getSelectionManager();
-            if (mouseEvent.isControlDown())
+            if(mouseEvent.isControlDown())
             {
-                if (selected.get())
+                if(selected.get())
                 {
                     selectionManager.remove(this);
-                } else
+                }else
                 {
                     selectionManager.add(this);
                 }
-            } else
+            }else
             {
                 selectionManager.set(this);
             }
@@ -178,20 +178,20 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
                 {
                     stateMap.forEach(wrapperState ->
                     {
-                        var baseAttribute = AttributeFetcher.fetch(wrapperState, SizeAttribute.class);
-                        if (baseAttribute != null)
+                        var attribute = AttributeFetcher.fetch(this, AttributeType.SIZE);
+                        if(attribute != null)
                         {
-                            baseAttribute.setValue(SizeAttribute.WIDTH, (int) Math.floor(width));
+                            attribute.setValue(SizeAttribute.WIDTH, (int) Math.floor(width));
                         }
                     });
                 }, height ->
                 {
                     stateMap.forEach(wrapperState ->
                     {
-                        var baseAttribute = AttributeFetcher.fetch(wrapperState, SizeAttribute.class);
-                        if (baseAttribute != null)
+                        var attribute = AttributeFetcher.fetch(this, AttributeType.SIZE);
+                        if(attribute != null)
                         {
-                            baseAttribute.setValue(SizeAttribute.HEIGHT, (int) Math.floor(height));
+                            attribute.setValue(SizeAttribute.HEIGHT, (int) Math.floor(height));
                         }
                     });
                 }).bind();
@@ -202,10 +202,10 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
     {
         super.loop();
 
-        if (!readOnly)
+        if(!readOnly)
         {
             var trigType = selected.checkTrig();
-            switch (trigType)
+            switch(trigType)
             {
                 case FALLING:
                     ControlWrapperBorderCreator.applyDashedBorder(this);
@@ -215,7 +215,7 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
                     break;
             }
 
-            if (mainSelection.checkTrig() == TrigBoolean.TrigType.RISING)
+            if(mainSelection.checkTrig() == TrigBoolean.TrigType.RISING)
             {
                 ControlWrapperBorderCreator.applySelectedBorder(this);
             }
@@ -227,7 +227,7 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
     {
         super.setupComplete();
 
-        this.applyAttributes(null);
+        attributeManager.updateAllAttributes();
         ControlWrapperBorderCreator.applyDashedBorder(this);
     }
 
@@ -261,19 +261,14 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
         return globalAttributeMap;
     }
 
+    public ControlWrapperAttributeManager<C> getAttributeManager()
+    {
+        return attributeManager;
+    }
+
     public BooleanProperty validProperty()
     {
         return validProperty;
-    }
-
-    public void addAttributesUpdatedConsumer(Consumer<Object> runnable)
-    {
-        attributeUpdatedRunnableSet.add(runnable);
-    }
-
-    public void removeAttributesUpdatedConsumer(Consumer<Object> runnable)
-    {
-        attributeUpdatedRunnableSet.remove(runnable);
     }
 
     public boolean isSelected()
@@ -284,7 +279,7 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
     public void setSelected(boolean selected)
     {
         this.selected.set(selected);
-        if (!selected)
+        if(!selected)
         {
             this.mainSelection.set(false);
         }
@@ -302,7 +297,7 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
 
     public void setExtraFeature(ControlWrapperExtraFeature extraFeature)
     {
-        if (this.extraFeature != null)
+        if(this.extraFeature != null)
         {
             this.extraFeature.unbind();
         }
@@ -319,13 +314,13 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
     @Override
     public final boolean canResize()
     {
-        if (!selected.get()) //Only allow resizing for selected controls
+        if(!selected.get()) //Only allow resizing for selected controls
         {
             return false;
         }
         //And if they do not have the adapt attribute on
-        var baseAttribute = AttributeFetcher.fetch(stateMap.getCurrentState(), SizeAttribute.class);
-        return !(baseAttribute == null || baseAttribute.getValue(SizeAttribute.ADAPT));
+        var sizeAttribute = AttributeFetcher.fetch(this, AttributeType.SIZE);
+        return !(sizeAttribute == null || sizeAttribute.getValue(SizeAttribute.ADAPT));
     }
 
     @Override
@@ -388,7 +383,7 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
 
         var containerStackPane = new StackPane(newControl);
         this.setControlVisualProperties(newControl, containerStackPane);
-        this.applyAttributes(newControl, containerStackPane, wrapperState.getAttributeMap(), null);
+        attributeManager.setAllAttributesTo(newControl, containerStackPane);
         return containerStackPane;
     }
 
@@ -411,43 +406,40 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
     protected void registerAttributeInitializers(ControlWrapperAttributeInitializer<C> attributeInitializer)
     {
         //GLOBAL
-        var pictureBank = this.getControlMainPage().getMainEditStage().getPictureBankStage();
-        attributeInitializer.addGlobal(new ChangePageAttribute(this))
-                .addState(new SizeAttribute(this))
-                .addState(new BackgroundAttribute(this, pictureBank))
-                .addState(new BorderAttribute(this))
+        attributeInitializer.addGlobals(AttributeType.CHANGE_PAGE)
+                .addStates(AttributeType.SIZE, AttributeType.BACKGROUND, AttributeType.BORDER)
                 .addAttributeUpdateConsumer(updateData ->
                 {
                     var control = updateData.getControl();
                     var containerPane = updateData.getContainerPane();
 
-                    for(var attributeClass : updateData.getAttributeClassList())
+                    for(var attributeType : updateData.getAttributeTypeList())
                     {
-                        var attribute = AttributeFetcher.fetch(this, attributeClass);
-                        if (attribute == null)
+                        var attribute = AttributeFetcher.fetch(this, attributeType);
+                        if(attribute == null)
                         {
                             continue;
                         }
 
-                        if (attribute instanceof ChangePageAttribute)
+                        if(attribute instanceof ChangePageAttribute)
                         {
-                            if (control == this.control) //This needs to be set only if is the same control as the one inside the controlwrapper
+                            if(control == this.control) //This needs to be set only if is the same control as the one inside the controlwrapper
                             {
                                 var enabled = attribute.getValue(ChangePageAttribute.ENABLED);
-                                if (enabled)
+                                if(enabled)
                                 {
                                     var pageName = attribute.getValue(ChangePageAttribute.PAGE_NAME);
                                     this.setExtraFeature(new ChangePageExtraFeature(this, control, pageName));
                                 }
                             }
-                        } else if (attribute instanceof SizeAttribute)
+                        }else if(attribute instanceof SizeAttribute)
                         {
-                            if (attribute.getValue(SizeAttribute.ADAPT))
+                            if(attribute.getValue(SizeAttribute.ADAPT))
                             {
                                 containerPane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
                                 containerPane.setMinSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
                                 containerPane.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
-                            } else
+                            }else
                             {
                                 var width = attribute.getValue(SizeAttribute.WIDTH);
                                 var height = attribute.getValue(SizeAttribute.HEIGHT);
@@ -456,11 +448,11 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
                                 containerPane.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
                                 containerPane.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
                             }
-                        } else if (attribute instanceof BackgroundAttribute)
+                        }else if(attribute instanceof BackgroundAttribute)
                         {
                             var backgroundAttribute = (BackgroundAttribute) attribute;
                             control.setBackground(backgroundAttribute.getBackground());
-                        } else if (attribute instanceof BorderAttribute)
+                        }else if(attribute instanceof BorderAttribute)
                         {
                             var borderAttribute = (BorderAttribute) attribute;
                             control.setBorder(borderAttribute.getBorder());
@@ -468,7 +460,7 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
                     }
                 });
     }
-    
+
     /*
     protected void registerAttributeInitializers(List<Attribute> stateAttributeList,
             List<Attribute> globalAttributeList)
@@ -551,6 +543,7 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
         }
     }
 */
+    /*
     @Override
     public ControlWrapper<C> clone()
     {
@@ -565,21 +558,11 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
         stateMap.getDefaultState().copyInto(pasteDefaultState);
         return cloneControlWrapper;
     }
-
+*/
     public void copyInto(ControlWrapper<?> pasteControlWrapper)
     {
-        stateMap.forEachNoDefault(wrapperState ->
-        {
-            var pasteWrapperState = wrapperState.createEmpty();
-            wrapperState.getAttributeMap().forEach(attribute ->
-            {
-                var clone = attribute.clone(pasteControlWrapper);
-                pasteWrapperState.getAttributeMap().addAttribute(clone);
-            });
-        });
-
-        var pasteDefaultState = pasteControlWrapper.getStateMap().getDefaultState();
-        stateMap.getDefaultState().copyInto(pasteDefaultState);
+        this.stateMap.copyInto(pasteControlWrapper.stateMap);
+        this.globalAttributeMap.copyInto(pasteControlWrapper.globalAttributeMap);
     }
 
     /*
@@ -607,7 +590,7 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
             change.next();
             change.getAddedSubList().forEach(addedNode ->
             {
-                if (addedNode instanceof Text)
+                if(addedNode instanceof Text)
                 {
                     var text = (Text) addedNode;
                     text.setBoundsType(TextBoundsType.VISUAL);

@@ -8,7 +8,8 @@ import parozzz.github.com.hmi.util.Draggable;
 import parozzz.github.com.hmi.util.Resizable;
 import parozzz.github.com.util.MathUtil;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 public final class MultipleObjectDragManager
 {

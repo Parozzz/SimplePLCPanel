@@ -8,6 +8,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import parozzz.github.com.hmi.FXObject;
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.impl.BackgroundAttribute;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
@@ -21,12 +22,12 @@ public final class BackgroundQuickSetupPane extends FXObject implements QuickSet
 {
     @FXML private ColorPicker backgroundColorPicker;
 
-    private final VBox mainVBox;
+    private final VBox vBox;
     public BackgroundQuickSetupPane() throws IOException
     {
         super("BackgroundQuickSetupPane");
 
-        this.mainVBox = (VBox) FXUtil.loadFXML("quickproperties/backgroundQuickSetupPane.fxml", this);
+        this.vBox = (VBox) FXUtil.loadFXML("quickproperties/backgroundQuickSetupPane.fxml", this);
     }
 
     @Override
@@ -34,31 +35,25 @@ public final class BackgroundQuickSetupPane extends FXObject implements QuickSet
     {
         super.setup();
 
-        VBox.setMargin(mainVBox, new Insets(2, 0, 0, 0));
+        VBox.setMargin(vBox, new Insets(2, 0, 0, 0));
     }
 
     @Override
     public Parent getParent()
     {
-        return mainVBox;
+        return vBox;
     }
 
     @Override
     public void onNewControlWrapper(ControlWrapper<?> controlWrapper)
     {
-
-    }
-
-    @Override
-    public void onNewWrapperState(WrapperState wrapperState)
-    {
-        mainVBox.setVisible(AttributeFetcher.hasAttribute(wrapperState, BackgroundAttribute.class));
+        vBox.setVisible(controlWrapper.getAttributeManager().hasType(AttributeType.BACKGROUND));
     }
 
     @Override
     public void addBinders(QuickSetupStateBinder stateBinder)
     {
-        stateBinder.builder(BackgroundAttribute.class)
+        stateBinder.builder(AttributeType.BACKGROUND)
                 .direct(backgroundColorPicker.valueProperty(), BackgroundAttribute.BACKGROUND_COLOR);
     }
 

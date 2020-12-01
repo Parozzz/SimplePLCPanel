@@ -2,9 +2,10 @@ package parozzz.github.com.hmi.controls.controlwrapper.setup.impl;
 
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
-import javafx.scene.control.*;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
-import parozzz.github.com.hmi.attribute.AttributeMap;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.impl.SizeAttribute;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.ControlWrapperSetupStage;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.SetupPane;
@@ -25,7 +26,7 @@ public final class SizeSetupPane extends SetupPane<SizeAttribute>
 
     public SizeSetupPane(ControlWrapperSetupStage setupPage) throws IOException
     {
-        super(setupPage, "SizeSetupPane", "Size", SizeAttribute.class, true);
+        super(setupPage, "SizeSetupPane", "Size", AttributeType.SIZE, true);
 
         this.mainVBox = (VBox) FXUtil.loadFXML("setup/sizeSetupPane.fxml", this);
     }
@@ -61,9 +62,4 @@ public final class SizeSetupPane extends SetupPane<SizeAttribute>
         return mainVBox;
     }
 
-    @Override
-    public boolean hasAttribute(AttributeMap attributeMap)
-    {
-        return attributeMap.hasAttribute(SizeAttribute.class);
-    }
 }

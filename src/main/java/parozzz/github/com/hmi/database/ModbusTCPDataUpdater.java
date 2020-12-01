@@ -1,6 +1,7 @@
 package parozzz.github.com.hmi.database;
 
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.impl.address.AddressAttribute;
 import parozzz.github.com.hmi.attribute.impl.address.ReadAddressAttribute;
 import parozzz.github.com.hmi.attribute.impl.address.WriteAddressAttribute;
@@ -76,7 +77,7 @@ public final class ModbusTCPDataUpdater extends ControlDataUpdater<ModbusTCPThre
         {
             if (newValueControlWrapperSet.remove(controlWrapper))
             {
-                var writeCachedData = this.getCachedData(AttributeFetcher.fetch(controlWrapper, WriteAddressAttribute.class));
+                var writeCachedData = this.getCachedData(AttributeFetcher.fetch(controlWrapper, AttributeType.WRITE_ADDRESS));
                 if (writeCachedData != null)
                 {
                     var offset = writeCachedData.getOffset();
@@ -106,7 +107,7 @@ public final class ModbusTCPDataUpdater extends ControlDataUpdater<ModbusTCPThre
                 //Parse write values here!
             }
 
-            var readCachedData = this.getCachedData(AttributeFetcher.fetch(controlWrapper, ReadAddressAttribute.class));
+            var readCachedData = this.getCachedData(AttributeFetcher.fetch(controlWrapper, AttributeType.READ_ADDRESS));
             if (readCachedData != null)
             {
                 var offset = readCachedData.getOffset();

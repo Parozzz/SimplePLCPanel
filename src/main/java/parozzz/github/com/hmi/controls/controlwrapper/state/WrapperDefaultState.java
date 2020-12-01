@@ -2,9 +2,9 @@ package parozzz.github.com.hmi.controls.controlwrapper.state;
 
 final class WrapperDefaultState extends WrapperState
 {
-    protected WrapperDefaultState()
+    protected WrapperDefaultState(WrapperStateMap wrapperStateMap)
     {
-        super(0, CompareType.EQUAL, 0, CompareType.EQUAL);
+        super(wrapperStateMap, 0, CompareType.EQUAL, 0, CompareType.EQUAL);
     }
 
     public String getStringVersion()

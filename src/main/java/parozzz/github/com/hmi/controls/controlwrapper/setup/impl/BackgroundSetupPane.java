@@ -14,7 +14,7 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import parozzz.github.com.hmi.attribute.AttributeMap;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.impl.BackgroundAttribute;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.ControlWrapperSetupStage;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.SetupPane;
@@ -37,7 +37,7 @@ public final class BackgroundSetupPane extends SetupPane<BackgroundAttribute>
 
     public BackgroundSetupPane(ControlWrapperSetupStage setupStage) throws IOException
     {
-        super(setupStage, "BackgroundSetupPane", "Background", BackgroundAttribute.class, true);
+        super(setupStage, "BackgroundSetupPane", "Background", AttributeType.BACKGROUND, true);
 
         this.mainVBox = (VBox) FXUtil.loadFXML("setup/backgroundSetupPane.fxml", this);
     }
@@ -109,11 +109,4 @@ public final class BackgroundSetupPane extends SetupPane<BackgroundAttribute>
     {
         super.setDefault();
     }
-
-    @Override
-    public boolean hasAttribute(AttributeMap attributeMap)
-    {
-        return attributeMap.hasAttribute(BackgroundAttribute.class);
-    }
-
 }

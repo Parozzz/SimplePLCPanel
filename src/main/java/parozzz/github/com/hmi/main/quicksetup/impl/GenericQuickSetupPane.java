@@ -48,12 +48,6 @@ public final class GenericQuickSetupPane extends FXObject implements QuickSetupP
     }
 
     @Override
-    public void onNewWrapperState(WrapperState wrapperState)
-    {
-
-    }
-
-    @Override
     public void addBinders(QuickSetupStateBinder stateBinder)
     {
 

@@ -5,12 +5,12 @@ import javafx.fxml.FXML;
 import javafx.scene.layout.VBox;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapperSpecific;
+import parozzz.github.com.hmi.controls.controlwrapper.attributes.ControlWrapperGenericAttributeUpdateConsumer;
 import parozzz.github.com.hmi.page.HMIStage;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class ControlWrapperQuickTextEditorStage extends HMIStage<VBox> implements ControlWrapperSpecific
 {
@@ -22,7 +22,7 @@ public class ControlWrapperQuickTextEditorStage extends HMIStage<VBox> implement
     private final List<QuickTextEditorStatePane> statePaneList;
 
     private final ChangeListener<Boolean> controlWrapperValidListener;
-    private final Consumer<Object> attributesUpdatedConsumer;
+    private final ControlWrapperGenericAttributeUpdateConsumer attributeUpdatedConsumer;
     private ControlWrapper<?> selectedControlWrapper;
     private boolean ignoreAttributeUpdate;
 
@@ -38,14 +38,11 @@ public class ControlWrapperQuickTextEditorStage extends HMIStage<VBox> implement
                 this.setSelectedControlWrapper(null);
             }
         };
-        attributesUpdatedConsumer = involvedObject ->
+        attributeUpdatedConsumer = updateData ->
         {
-          if(involvedObject != this)
-          {
-              ignoreAttributeUpdate = true;
-              statePaneList.forEach(QuickTextEditorStatePane::refreshValues);
-              ignoreAttributeUpdate = false;
-          }
+            ignoreAttributeUpdate = true;
+            statePaneList.forEach(QuickTextEditorStatePane::refreshValues);
+            ignoreAttributeUpdate = false;
         };
     }
 
@@ -67,7 +64,7 @@ public class ControlWrapperQuickTextEditorStage extends HMIStage<VBox> implement
         if(selectedControlWrapper != null)
         {
             selectedControlWrapper.validProperty().removeListener(controlWrapperValidListener);
-            selectedControlWrapper.removeAttributesUpdatedConsumer(attributesUpdatedConsumer);
+            selectedControlWrapper.getAttributeManager().removeGenericUpdateConsumer(attributeUpdatedConsumer);
         }
 
         this.selectedControlWrapper = controlWrapper;
@@ -78,7 +75,7 @@ public class ControlWrapperQuickTextEditorStage extends HMIStage<VBox> implement
         }
 
         controlWrapper.validProperty().addListener(controlWrapperValidListener);
-        controlWrapper.addAttributesUpdatedConsumer(attributesUpdatedConsumer);
+        controlWrapper.getAttributeManager().addGenericUpdateConsumer(attributeUpdatedConsumer);
         controlWrapper.getStateMap().forEach(wrapperState ->
         {
             try
@@ -106,13 +103,5 @@ public class ControlWrapperQuickTextEditorStage extends HMIStage<VBox> implement
     public ControlWrapper<?> getSelectedControlWrapper()
     {
         return selectedControlWrapper;
-    }
-
-    void applyAttributesToSelectedControlWrapper()
-    {
-        if(selectedControlWrapper != null && !ignoreAttributeUpdate)
-        {
-            selectedControlWrapper.applyAttributes(this);
-        }
     }
 }

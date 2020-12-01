@@ -1,10 +1,8 @@
 package parozzz.github.com.hmi.util.specialfunction;
 
-import javafx.application.Platform;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import parozzz.github.com.hmi.util.DoubleClickable;
-import parozzz.github.com.hmi.util.FXUtil;
 
 final class DoubleClickFunction
 {

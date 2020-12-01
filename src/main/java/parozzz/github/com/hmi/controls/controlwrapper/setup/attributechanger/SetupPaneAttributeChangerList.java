@@ -2,34 +2,35 @@ package parozzz.github.com.hmi.controls.controlwrapper.setup.attributechanger;
 
 import javafx.beans.property.Property;
 import parozzz.github.com.hmi.attribute.Attribute;
-import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.AttributeMap;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.property.AttributeProperty;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.SetupPane;
 import parozzz.github.com.util.Validate;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public final class SetupPaneAttributeChangerList<A extends Attribute> implements Iterable<SetupPaneAttributeChanger<A>>
 {
     public enum Priority
     {
-        HIGH, MEDIUM, LOW;
+        HIGH,
+        MEDIUM,
+        LOW;
     }
 
     private final SetupPane<A> setupPane;
-    private final Class<A> attributeClass;
+    private final AttributeType<A> attributeType;
     private final List<SetupPaneAttributeChanger<A>> attributeChangerList;
     private final Map<Property<?>, SetupPaneAttributeChanger<A>> propertyToAttributeChangerMap;
 
     private boolean complete = false;
 
-    public SetupPaneAttributeChangerList(SetupPane<A> setupPane, Class<A> attributeClass)
+    public SetupPaneAttributeChangerList(SetupPane<A> setupPane, AttributeType<A> attributeType)
     {
         this.setupPane = setupPane;
-        this.attributeClass = attributeClass;
+        this.attributeType = attributeType;
 
         this.attributeChangerList = new LinkedList<>();
         this.propertyToAttributeChangerMap = new HashMap<>();
@@ -53,9 +54,9 @@ public final class SetupPaneAttributeChangerList<A extends Attribute> implements
     //This should be a pretty hot method, better be safe with a reliable for loop than a stream
     public boolean isAnyDataChanged()
     {
-        for (var attributeChanger : attributeChangerList)
+        for(var attributeChanger : attributeChangerList)
         {
-            if (attributeChanger.isDataChanged())
+            if(attributeChanger.isDataChanged())
             {
                 return true;
             }
@@ -76,30 +77,32 @@ public final class SetupPaneAttributeChangerList<A extends Attribute> implements
 
     public void setDataToAttribute(AttributeMap attributeMap, boolean forceSet)
     {
-        var attribute = AttributeFetcher.fetch(attributeMap, attributeClass);
-        if (attribute != null)
+        var attribute = attributeMap.get(attributeType);
+        if(attribute == null)
         {
-            //I am copying the list because attribute could change it while iterating here
-            for (var attributeChanger : attributeChangerList)
+            return;
+        }
+        //I am copying the list because attribute could change it while iterating here
+        for(var attributeChanger : attributeChangerList)
+        {
+            if(attributeChanger.isDataChanged() || forceSet)
             {
-                if (attributeChanger.isDataChanged() || forceSet)
-                {
-                    attributeChanger.setDataToAttribute(attribute);
-                }
+                attributeChanger.setDataToAttribute(attribute);
             }
         }
     }
 
     public void copyDataFromAttribute(AttributeMap attributeMap)
     {
-        var attribute = AttributeFetcher.fetch(attributeMap, attributeClass);
-        if (attribute != null)
+        var attribute = attributeMap.get(attributeType);
+        if(attribute == null)
         {
-            //I am copying the list because attribute could change it while iterating here
-            for (var attributeChanger : attributeChangerList)
-            {
-                attributeChanger.copyDataFromAttribute(attribute);
-            }
+            return;
+        }
+        //I am copying the list because attribute could change it while iterating here
+        for(var attributeChanger : attributeChangerList)
+        {
+            attributeChanger.copyDataFromAttribute(attribute);
         }
     }
 
@@ -112,7 +115,7 @@ public final class SetupPaneAttributeChangerList<A extends Attribute> implements
                 attributeToPropertyConvert, Number::toString));
     }
 
-    public <V, H> SetupPaneAttributeChangerList<A> create( Property<H> property,
+    public <V, H> SetupPaneAttributeChangerList<A> create(Property<H> property,
             AttributeProperty<V> attributeProperty,
             Function<V, H> propertyToAttributeConvert,
             Function<H, V> attributeToPropertyConvert)
@@ -123,7 +126,7 @@ public final class SetupPaneAttributeChangerList<A extends Attribute> implements
     }
 
     public <V> SetupPaneAttributeChangerList<A> create(Property<V> property,
-                                                       AttributeProperty<V> attributeProperty)
+            AttributeProperty<V> attributeProperty)
     {
         return this.add(new SetupPaneAttributeChanger<>(setupPane,
                 property, attributeProperty));

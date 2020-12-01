@@ -2,7 +2,7 @@ package parozzz.github.com.hmi.main.quicksetup;
 
 import javafx.beans.property.Property;
 import parozzz.github.com.hmi.attribute.Attribute;
-import parozzz.github.com.hmi.attribute.AttributeFetcher;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.property.AttributeProperty;
 import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
 
@@ -16,7 +16,7 @@ public final class QuickSetupStateBinder
 {
     private final QuickSetupVBox quickSetupVBox;
     private final Set<BoundProperty<?, ?>> boundPropertySet;
-    private final Map<Class<?>, AttributeBoundPropertySet<?>> attributeBoundPropertySetMap;
+    private final Map<AttributeType<?>, BoundAttributePropertySet<?>> attributeBoundPropertySetMap;
 
     private WrapperState boundWrapperState;
     private boolean ignoreAttributeUpdate;
@@ -36,72 +36,79 @@ public final class QuickSetupStateBinder
     public void setBoundWrapperState(WrapperState wrapperState)
     {
         this.boundWrapperState = wrapperState;
-        this.refreshValues();
+        this.updateAll();
     }
 
-    public void refreshValues()
+    public void updateValueOf(AttributeType<?> attributeType)
     {
-        if (boundWrapperState == null)
+        if(boundWrapperState != null)
         {
-            return;
+            var boundAttributeProperty = attributeBoundPropertySetMap.get(attributeType);
+            if(boundAttributeProperty != null)
+            {
+                boundAttributeProperty.copyFromWrapperState(boundWrapperState);
+            }
         }
 
-        attributeBoundPropertySetMap.values().forEach(attributeBoundPropertySet ->
-                attributeBoundPropertySet.copyFromWrapperState(boundWrapperState)
-        );
     }
 
-    public <A extends Attribute> Builder<A> builder(Class<A> attributeClass)
+    public void updateAll()
     {
-        return new Builder<>(attributeClass);
+        if(boundWrapperState != null)
+        {
+            attributeBoundPropertySetMap.values().forEach(boundAttributePropertySet ->
+                    boundAttributePropertySet.copyFromWrapperState(boundWrapperState)
+            );
+        }
     }
 
-    public <T, A extends Attribute> void addDirectProperty(Property<T> property, Class<A> attributeClass,
-            AttributeProperty<T> attributeProperty)
+    public <A extends Attribute> Builder<A> builder(AttributeType<A> attributeType)
+    {
+        return new Builder<>(attributeType);
+    }
+
+    public <T, A extends Attribute> void addDirectProperty(Property<T> property,
+            AttributeType<A> attributeType, AttributeProperty<T> attributeProperty)
     {
         this.addIndirectProperty(property, Function.identity(), Function.identity(),
-                attributeClass, attributeProperty);
+                attributeType, attributeProperty);
     }
 
     public <T, H, A extends Attribute> void addIndirectProperty(Property<H> property,
             Function<H, T> quickToAttribute, Function<T, H> attributeToQuick,
-            Class<A> attributeClass, AttributeProperty<T> attributeProperty)
+            AttributeType<A> attributeType, AttributeProperty<T> attributeProperty)
     {
         var boundProperty = new BoundProperty<>(property, attributeProperty, attributeToQuick);
         boundPropertySet.add(boundProperty);
 
-        attributeBoundPropertySetMap.computeIfAbsent(attributeClass,
-                t -> new AttributeBoundPropertySet<>((Class<A>) t)
-        ).add(boundProperty);
+        attributeBoundPropertySetMap.computeIfAbsent(attributeType, BoundAttributePropertySet::new)
+                .add(boundProperty);
 
         property.addListener((observable, oldValue, newValue) ->
         {
-            if (boundWrapperState == null || ignoreAttributeUpdate)
+            if(boundWrapperState == null || ignoreAttributeUpdate)
             {
                 return;
             }
 
-            var attribute = AttributeFetcher.fetch(boundWrapperState, attributeClass);
-            if (attribute != null)
+            var attribute = boundWrapperState.getAttributeMap().get(attributeType);
+            if(attribute != null)
             {
                 var attributeNewValue = quickToAttribute.apply(newValue);
                 attribute.setValue(attributeProperty, attributeNewValue);
-                attribute.update(); //Update internals first to allow some attribute to have their values refreshed
-
-                quickSetupVBox.updateSelectedWrapperAttributes();
             }
         });
 
     }
 
-    private static class AttributeBoundPropertySet<A extends Attribute>
+    private static class BoundAttributePropertySet<A extends Attribute>
     {
-        private final Class<A> attributeClass;
+        private final AttributeType<A> attributeType;
         private final Set<BoundProperty<?, ?>> boundPropertySet;
 
-        public AttributeBoundPropertySet(Class<A> attributeClass)
+        public BoundAttributePropertySet(AttributeType<A> attributeType)
         {
-            this.attributeClass = attributeClass;
+            this.attributeType = attributeType;
             this.boundPropertySet = new HashSet<>();
         }
 
@@ -112,8 +119,8 @@ public final class QuickSetupStateBinder
 
         public void copyFromWrapperState(WrapperState wrapperState)
         {
-            var attribute = AttributeFetcher.fetch(wrapperState, attributeClass);
-            if (attribute != null)
+            var attribute = wrapperState.getAttributeMap().get(attributeType);
+            if(attribute != null)
             {
                 boundPropertySet.forEach(boundProperty -> boundProperty.copyFromAttribute(attribute));
             }
@@ -143,11 +150,11 @@ public final class QuickSetupStateBinder
 
     public class Builder<A extends Attribute>
     {
-        private final Class<A> attributeClass;
+        private final AttributeType<A> attributeType;
 
-        public Builder(Class<A> attributeClass)
+        public Builder(AttributeType<A> attributeType)
         {
-            this.attributeClass = attributeClass;
+            this.attributeType = attributeType;
         }
 
         public <T, H> Builder<A> indirect(Property<H> property,
@@ -155,13 +162,13 @@ public final class QuickSetupStateBinder
                 AttributeProperty<T> attributeProperty)
         {
             QuickSetupStateBinder.this.addIndirectProperty(property, quickToAttribute, attributeToQuick,
-                    attributeClass, attributeProperty);
+                    attributeType, attributeProperty);
             return this;
         }
 
         public <T> Builder<A> direct(Property<T> property, AttributeProperty<T> attributeProperty)
         {
-            QuickSetupStateBinder.this.addDirectProperty(property, attributeClass, attributeProperty);
+            QuickSetupStateBinder.this.addDirectProperty(property, attributeType, attributeProperty);
             return this;
         }
     }

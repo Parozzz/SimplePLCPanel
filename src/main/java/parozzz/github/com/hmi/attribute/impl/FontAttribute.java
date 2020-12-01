@@ -6,13 +6,14 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import parozzz.github.com.hmi.attribute.Attribute;
+import parozzz.github.com.hmi.attribute.AttributeMap;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.property.AttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.EnumAttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.ParsableAttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.primitives.BooleanAttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.primitives.NumberAttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.primitives.StringAttributeProperty;
-import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.serialize.JSONSerializables;
 
 public final class FontAttribute extends Attribute
@@ -31,12 +32,12 @@ public final class FontAttribute extends Attribute
 
     private Font font;
 
-    public FontAttribute(ControlWrapper<?> controlWrapper)
+    public FontAttribute(AttributeMap attributeMap)
     {
-        super(controlWrapper, ATTRIBUTE_NAME, FontAttribute::new);
+        super(attributeMap, AttributeType.FONT, ATTRIBUTE_NAME);
 
         super.getAttributePropertyManager().addAll(TEXT_COLOR, TEXT_POSITION, UNDERLINE, FONT_NAME, BOLD_WEIGHT, ITALIC_POSTURE, STRIKETHROUGH, FONT_TEXT_SIZE);
-
+        this.update(); //Have the font not to be null on startup!
     }
 
     public Font getFont()

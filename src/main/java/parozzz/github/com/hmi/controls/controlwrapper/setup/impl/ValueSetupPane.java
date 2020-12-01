@@ -5,13 +5,13 @@ import javafx.scene.Parent;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.*;
+import javafx.scene.layout.VBox;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.impl.ValueAttribute;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.ControlWrapperSetupStage;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.SetupPane;
 import parozzz.github.com.hmi.util.FXTextFormatterUtil;
 import parozzz.github.com.hmi.util.FXUtil;
-import parozzz.github.com.hmi.util.valueintermediate.ValueIntermediate;
 import parozzz.github.com.hmi.util.valueintermediate.ValueIntermediateType;
 import parozzz.github.com.util.Util;
 
@@ -28,7 +28,7 @@ public final class ValueSetupPane extends SetupPane<ValueAttribute>
 
     public ValueSetupPane(ControlWrapperSetupStage setupStage) throws IOException
     {
-        super(setupStage, "ValueSetupPane", "Value", ValueAttribute.class, true);
+        super(setupStage, "ValueSetupPane", "Value", AttributeType.VALUE, true);
 
         vBox = (VBox) FXUtil.loadFXML("setup/valueSetupPane.fxml", this);
     }

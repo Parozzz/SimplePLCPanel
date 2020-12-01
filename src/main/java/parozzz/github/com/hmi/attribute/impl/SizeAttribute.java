@@ -1,19 +1,11 @@
 package parozzz.github.com.hmi.attribute.impl;
 
-import javafx.geometry.Pos;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
 import parozzz.github.com.hmi.attribute.Attribute;
+import parozzz.github.com.hmi.attribute.AttributeMap;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.property.AttributeProperty;
-import parozzz.github.com.hmi.attribute.property.impl.EnumAttributeProperty;
-import parozzz.github.com.hmi.attribute.property.impl.ParsableAttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.primitives.BooleanAttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.primitives.NumberAttributeProperty;
-import parozzz.github.com.hmi.attribute.property.impl.primitives.StringAttributeProperty;
-import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
-import parozzz.github.com.hmi.serialize.JSONSerializables;
 
 public final class SizeAttribute extends Attribute
 {
@@ -23,9 +15,9 @@ public final class SizeAttribute extends Attribute
     public static final AttributeProperty<Integer> WIDTH = new NumberAttributeProperty<>("Width", 80, Number::intValue);
     public static final AttributeProperty<Integer> HEIGHT = new NumberAttributeProperty<>("Height", 50, Number::intValue);
 
-    public SizeAttribute(ControlWrapper<?> controlWrapper)
+    public SizeAttribute(AttributeMap attributeMap)
     {
-        super(controlWrapper, ATTRIBUTE_NAME, SizeAttribute::new);
+        super(attributeMap, AttributeType.SIZE, ATTRIBUTE_NAME);
 
         super.getAttributePropertyManager().addAll(ADAPT, WIDTH, HEIGHT);
 

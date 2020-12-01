@@ -1,22 +1,15 @@
 package parozzz.github.com.hmi.controls.controlwrapper.impl.display;
 
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Pane;
-import parozzz.github.com.hmi.attribute.Attribute;
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
-import parozzz.github.com.hmi.attribute.AttributeMap;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.impl.TextAttribute;
 import parozzz.github.com.hmi.attribute.impl.ValueAttribute;
 import parozzz.github.com.hmi.attribute.impl.address.ReadAddressAttribute;
-import parozzz.github.com.hmi.attribute.impl.address.WriteAddressAttribute;
-import parozzz.github.com.hmi.attribute.impl.control.ButtonDataAttribute;
 import parozzz.github.com.hmi.controls.ControlContainerPane;
-import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapperAttributeInitializer;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapperType;
 import parozzz.github.com.hmi.controls.controlwrapper.LabeledWrapper;
-
-import java.util.List;
+import parozzz.github.com.hmi.controls.controlwrapper.attributes.ControlWrapperAttributeInitializer;
 
 public class DisplayWrapper extends LabeledWrapper<Label>
 {
@@ -30,9 +23,8 @@ public class DisplayWrapper extends LabeledWrapper<Label>
     {
         super.registerAttributeInitializers(attributeInitializer);
 
-        attributeInitializer.addGlobal(new ReadAddressAttribute(this))
-                .addState(new TextAttribute(this))
-                .addState(new ValueAttribute(this))
+        attributeInitializer.addGlobals(AttributeType.READ_ADDRESS)
+                .addStates(AttributeType.TEXT, AttributeType.VALUE)
                 .addAttributeUpdateConsumer(updateData ->
                 {
                     var control = updateData.getControl();
@@ -40,9 +32,9 @@ public class DisplayWrapper extends LabeledWrapper<Label>
                     TextAttribute textAttribute = null;
                     ValueAttribute valueAttribute = null;
 
-                    for(var attributeClass : updateData.getAttributeClassList())
+                    for(var attributeType : updateData.getAttributeTypeList())
                     {
-                        var attribute = AttributeFetcher.fetch(this, attributeClass);
+                        var attribute = AttributeFetcher.fetch(this, attributeType);
                         if (attribute == null)
                         {
                             continue;
@@ -60,12 +52,12 @@ public class DisplayWrapper extends LabeledWrapper<Label>
 
                     if(textAttribute == null)
                     {
-                        textAttribute = AttributeFetcher.fetch(this, TextAttribute.class);
+                        textAttribute = AttributeFetcher.fetch(this, AttributeType.TEXT);
                     }
 
                     if(valueAttribute == null)
                     {
-                        valueAttribute = AttributeFetcher.fetch(this, ValueAttribute.class);
+                        valueAttribute = AttributeFetcher.fetch(this, AttributeType.VALUE);
                     }
 
                     if (textAttribute != null && valueAttribute != null)

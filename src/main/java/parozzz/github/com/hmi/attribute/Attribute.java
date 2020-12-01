@@ -4,25 +4,35 @@ import javafx.beans.property.Property;
 import parozzz.github.com.hmi.FXObject;
 import parozzz.github.com.hmi.attribute.property.AttributeProperty;
 import parozzz.github.com.hmi.attribute.property.AttributePropertyManager;
-import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.serialize.data.JSONDataMap;
-
-import java.util.function.Function;
+import parozzz.github.com.util.Validate;
 
 public abstract class Attribute extends FXObject// implements Cloneable
 {
-    protected final ControlWrapper<?> controlWrapper;
+    protected final AttributeMap attributeMap;
     private final AttributePropertyManager attributePropertyManager;
-    private final Function<ControlWrapper<?>, ? extends Attribute> creatorFunction;
+    private final AttributeType<?> attributeType;
 
-    public Attribute(ControlWrapper<?> controlWrapper, String name,
-            Function<ControlWrapper<?>, ? extends Attribute> creatorFunction)
+    public Attribute(AttributeMap attributeMap,
+            AttributeType<?> attributeType, String name)
     {
         super(name);
 
-        this.controlWrapper = controlWrapper;
+        this.attributeMap = attributeMap;
         this.attributePropertyManager = new AttributePropertyManager(this);
-        this.creatorFunction = creatorFunction;
+        //This is here in case of human error
+        Validate.needTrue("Invalid Attribute Type", attributeType.getAttributeClass().isAssignableFrom(this.getClass()));
+        this.attributeType = attributeType;
+    }
+
+    public AttributeType<?> getType()
+    {
+        return attributeType;
+    }
+
+    public AttributeMap getAttributeMap()
+    {
+        return attributeMap;
     }
 
     public <P> Property<P> getProperty(AttributeProperty<P> attributeProperty)
@@ -51,7 +61,7 @@ public abstract class Attribute extends FXObject// implements Cloneable
     }
 
     public abstract void update();
-
+/*
     public final Attribute cloneAsDefault(ControlWrapper<?> controlWrapper)
     {
         return creatorFunction.apply(controlWrapper);
@@ -68,7 +78,7 @@ public abstract class Attribute extends FXObject// implements Cloneable
         this.copyInto(copy);
         return copy;
     }
-
+*/
     public void copyInto(Attribute pasteAttribute)
     {
         attributePropertyManager.forEachPropertyBis(propertyBis ->

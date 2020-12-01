@@ -5,6 +5,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.impl.control.ButtonDataAttribute;
 import parozzz.github.com.hmi.controls.controlwrapper.impl.button.ButtonWrapperType;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.ControlWrapperSetupStage;
@@ -23,7 +24,7 @@ public class ButtonDataSetupPane extends SetupPane<ButtonDataAttribute>
 
     public ButtonDataSetupPane(ControlWrapperSetupStage setupPage) throws IOException
     {
-        super(setupPage, "ButtonDataSetupPane", "Button Data", ButtonDataAttribute.class, false);
+        super(setupPage, "ButtonDataSetupPane", "Button Data", AttributeType.BUTTON_DATA, false);
 
         this.mainVBox = (VBox) FXUtil.loadFXML("setup/buttonDataSetupPane.fxml", this);
     }

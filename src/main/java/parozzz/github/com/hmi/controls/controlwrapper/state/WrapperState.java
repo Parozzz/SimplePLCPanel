@@ -1,8 +1,6 @@
 package parozzz.github.com.hmi.controls.controlwrapper.state;
 
-import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.AttributeMap;
-import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.util.functionalinterface.primitives.IntBiPredicate;
 
 import java.util.Objects;
@@ -50,11 +48,6 @@ public class WrapperState implements Comparable<WrapperState>
         }
     }
 
-    public static Builder builder()
-    {
-        return new Builder();
-    }
-
     private static String createStringVersion(int firstCompare, CompareType firstCompareType,
             int secondCompare, CompareType secondCompareType)
     {
@@ -99,7 +92,7 @@ public class WrapperState implements Comparable<WrapperState>
 
         this.stringVersion = createStringVersion(firstCompare, firstCompareType, secondCompare, secondCompareType);
 
-        this.attributeMap = new AttributeMap();
+        this.attributeMap = new AttributeMap(wrapperStateMap.getControlWrapper());
     }
 
     //NEED TO DO A WAY TO PARSE A STATE FROM A STRING. SAME FOR A WAY TO TRASFORM IT BACK TO A STRING.
@@ -150,7 +143,7 @@ public class WrapperState implements Comparable<WrapperState>
         return firstCompareType.test(firstCompare, value)
                 && secondCompareType.test(secondCompare, value);
     }
-
+/*
     public WrapperState createEmpty()
     {
         return new WrapperState(firstCompare, firstCompareType, secondCompare, secondCompareType);
@@ -168,19 +161,11 @@ public class WrapperState implements Comparable<WrapperState>
 
         return cloneWrapperState;
     }
-
+*/
     public void copyInto(WrapperState pasteWrapperState)
     {
         Objects.requireNonNull(pasteWrapperState, "Trying to parse into a null state.");
-
-        this.attributeMap.forEach(attribute ->
-        {
-            var pasteAttribute = AttributeFetcher.fetch(pasteWrapperState.getAttributeMap(), attribute.getClass());
-            if(pasteAttribute != null)
-            {
-                attribute.copyInto(pasteAttribute);
-            }
-        });
+        this.attributeMap.copyInto(pasteWrapperState.attributeMap);
     }
 
     /*
@@ -241,18 +226,19 @@ public class WrapperState implements Comparable<WrapperState>
         return Objects.hash(firstCompare, firstCompareType, secondCompare, secondCompareType);
     }
 
-
     public static class Builder
     {
+        private final WrapperStateMap wrapperStateMap;
+
         private int firstCompare;
         private CompareType firstCompareType = CompareType.ALWAYS_TRUE;
 
         private int secondCompare;
         private CompareType secondCompareType = CompareType.ALWAYS_TRUE;
 
-        private Builder()
+        Builder(WrapperStateMap wrapperStateMap)
         {
-
+            this.wrapperStateMap = wrapperStateMap;
         }
 
         public Builder firstCompare(CompareType compareType, int firstCompare)
@@ -287,7 +273,7 @@ public class WrapperState implements Comparable<WrapperState>
 
         public WrapperState create()
         {
-            return new WrapperState(firstCompare, firstCompareType, secondCompare, secondCompareType);
+            return wrapperStateMap.createState(firstCompare, firstCompareType, secondCompare, secondCompareType);
         }
     }
 }

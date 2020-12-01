@@ -1,12 +1,11 @@
 package parozzz.github.com.hmi.attribute.impl;
 
 import parozzz.github.com.hmi.attribute.Attribute;
+import parozzz.github.com.hmi.attribute.AttributeMap;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.property.AttributeProperty;
-import parozzz.github.com.hmi.attribute.property.impl.EnumAttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.primitives.BooleanAttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.primitives.StringAttributeProperty;
-import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
-import parozzz.github.com.hmi.controls.controlwrapper.extra.ControlWrapperExtraFeature;
 
 public final class ChangePageAttribute extends Attribute
 {
@@ -15,9 +14,9 @@ public final class ChangePageAttribute extends Attribute
     public final static AttributeProperty<Boolean> ENABLED = new BooleanAttributeProperty("Enabled", false);
     public final static AttributeProperty<String> PAGE_NAME = new StringAttributeProperty("PageName", "");
 
-    public ChangePageAttribute(ControlWrapper<?> controlWrapper)
+    public ChangePageAttribute(AttributeMap attributeMap)
     {
-        super(controlWrapper, ATTRIBUTE_NAME, ChangePageAttribute::new);
+        super(attributeMap, AttributeType.CHANGE_PAGE, ATTRIBUTE_NAME);
 
         super.getAttributePropertyManager().addAll(ENABLED, PAGE_NAME);
     }

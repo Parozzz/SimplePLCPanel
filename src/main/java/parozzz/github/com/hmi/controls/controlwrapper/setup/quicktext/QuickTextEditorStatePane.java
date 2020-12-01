@@ -7,6 +7,7 @@ import javafx.scene.layout.HBox;
 import javafx.util.converter.IntegerStringConverter;
 import parozzz.github.com.hmi.FXObject;
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.impl.FontAttribute;
 import parozzz.github.com.hmi.attribute.impl.TextAttribute;
 import parozzz.github.com.hmi.attribute.property.AttributeProperty;
@@ -94,10 +95,8 @@ class QuickTextEditorStatePane extends FXObject
 
     private <T> T getFromTextAttribute(AttributeProperty<T> attributeProperty)
     {
-        var textAttribute = AttributeFetcher.fetch(wrapperState, TextAttribute.class);
-        Objects.requireNonNull(textAttribute);
-        return textAttribute.getValue(attributeProperty);
-
+        var attribute = wrapperState.getAttributeMap().get(AttributeType.TEXT);
+        return Objects.requireNonNull(attribute).getValue(attributeProperty);
     }
 
     private <T> void setToTextAttribute(AttributeProperty<T> attributeProperty, T value)
@@ -107,21 +106,14 @@ class QuickTextEditorStatePane extends FXObject
             return;
         }
 
-        var textAttribute = AttributeFetcher.fetch(wrapperState, TextAttribute.class);
-        if (textAttribute != null)
-        {
-            textAttribute.setValue(attributeProperty, value);
-            textAttribute.update();
-
-            editorStage.applyAttributesToSelectedControlWrapper();
-        }
+        var attribute = wrapperState.getAttributeMap().get(AttributeType.TEXT);
+        Objects.requireNonNull(attribute).setValue(attributeProperty, value);
     }
 
     private <T> T getFromFontAttribute(AttributeProperty<T> attributeProperty)
     {
-        var fontAttribute = AttributeFetcher.fetch(wrapperState, FontAttribute.class);
-        Objects.requireNonNull(fontAttribute);
-        return fontAttribute.getValue(attributeProperty);
+        var attribute = wrapperState.getAttributeMap().get(AttributeType.FONT);
+        return Objects.requireNonNull(attribute).getValue(attributeProperty);
     }
 
     private <T> void setToFontAttribute(AttributeProperty<T> attributeProperty, T value)
@@ -131,13 +123,7 @@ class QuickTextEditorStatePane extends FXObject
             return;
         }
 
-        var fontAttribute = AttributeFetcher.fetch(wrapperState, FontAttribute.class);
-        if (fontAttribute != null)
-        {
-            fontAttribute.setValue(attributeProperty, value);
-            fontAttribute.update();
-
-            editorStage.applyAttributesToSelectedControlWrapper();
-        }
+        var attribute = wrapperState.getAttributeMap().get(AttributeType.FONT);
+        Objects.requireNonNull(attribute).setValue(attributeProperty, value);
     }
 }

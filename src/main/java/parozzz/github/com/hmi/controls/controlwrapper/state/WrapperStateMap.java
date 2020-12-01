@@ -2,8 +2,8 @@ package parozzz.github.com.hmi.controls.controlwrapper.state;
 
 import org.json.simple.JSONObject;
 import parozzz.github.com.hmi.FXObject;
-import parozzz.github.com.hmi.attribute.Attribute;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
+import parozzz.github.com.hmi.controls.controlwrapper.attributes.ControlWrapperAttributeManager;
 import parozzz.github.com.hmi.serialize.data.JSONDataArray;
 import parozzz.github.com.hmi.serialize.data.JSONDataMap;
 import parozzz.github.com.util.Validate;
@@ -12,7 +12,6 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public final class WrapperStateMap extends FXObject
 {
@@ -21,15 +20,12 @@ public final class WrapperStateMap extends FXObject
     private final List<WrapperState> wrapperStateList;
     private final WrapperState defaultWrapperState;
 
-    private List<Attribute> emptyAttributeList;
-    private List<Class<? extends Attribute>> attributeClassList = Collections.EMPTY_LIST;
-
     private WrapperState currentWrapperState;
     private int numericState;
 
     private final Set<WrapperStateChangedConsumer> wrapperStateChangedConsumerList;
 
-    private boolean emptyAttributeListInitialized = false;
+    private boolean defaultStateInitialized = false;
 
     public WrapperStateMap(ControlWrapper<?> controlWrapper)
     {
@@ -38,7 +34,7 @@ public final class WrapperStateMap extends FXObject
         this.controlWrapper = controlWrapper;
 
         this.wrapperStateList = new LinkedList<>();
-        this.defaultWrapperState = new WrapperDefaultState();
+        this.defaultWrapperState = new WrapperDefaultState(this);
 
         this.wrapperStateChangedConsumerList = new HashSet<>();
     }
@@ -56,6 +52,11 @@ public final class WrapperStateMap extends FXObject
         });
     }
 
+    public ControlWrapper<?> getControlWrapper()
+    {
+        return controlWrapper;
+    }
+
     public WrapperState getDefaultState()
     {
         return defaultWrapperState;
@@ -63,26 +64,19 @@ public final class WrapperStateMap extends FXObject
 
     public void changeCurrentState(WrapperState wrapperState)
     {
+        this.requireDefaultInit();
         if (wrapperStateList.contains(wrapperState) || wrapperState == defaultWrapperState)
         {
             this.currentWrapperState = wrapperState;
         }
     }
 
-    public void initEmptyAttributes(List<Attribute> emptyAttributeList)
+    public void initDefaultState(ControlWrapperAttributeManager<?> attributeManager)
     {
-        Validate.needFalse("Trying to initialize empty attributes twice", emptyAttributeListInitialized);
-        emptyAttributeListInitialized = true;
+        Validate.needFalse("Trying to initialize empty attributes twice", defaultStateInitialized);
+        defaultStateInitialized = true;
 
-        this.emptyAttributeList = Collections.unmodifiableList(emptyAttributeList);
-        this.attributeClassList = emptyAttributeList.stream().map(Attribute::getClass).collect(Collectors.toUnmodifiableList());
-
-        //Initialization of default state!
-        emptyAttributeList.forEach(attribute ->
-        {
-            var clonedAttribute = attribute.cloneAsDefaultWithSameControlWrapper();
-            defaultWrapperState.getAttributeMap().addAttribute(clonedAttribute);
-        });
+        defaultWrapperState.getAttributeMap().parseAttributes(attributeManager, true);
     }
     /*
     public void initDefaultState(Consumer<WrapperState> initDefaultStateConsumer)
@@ -92,7 +86,7 @@ public final class WrapperStateMap extends FXObject
 
         //Is not needed to add the default to the state set since is manager differently
         initDefaultStateConsumer.accept(defaultWrapperState);
-    }*/
+    }
 
     public void addState(WrapperState wrapperState)
     {
@@ -114,6 +108,49 @@ public final class WrapperStateMap extends FXObject
         }
 
         this.parseState(WrapperStateChangedConsumer.ChangeType.ADD); //In case a new state is added that is more valid than others, it should be updated immediately!
+    }
+*/
+
+    public WrapperState createState(WrapperState wrapperState)
+    {
+        return this.createState(
+                wrapperState.getFirstCompare(), wrapperState.getFirstCompareType(),
+                wrapperState.getSecondCompare(), wrapperState.getSecondCompareType()
+        );
+    }
+
+    public WrapperState createState(int firstCompare, WrapperState.CompareType firstCompareType,
+            int secondCompare, WrapperState.CompareType secondCompareType)
+    {
+        var wrapperState = new WrapperState(
+                this,
+                firstCompare, firstCompareType,
+                secondCompare, secondCompareType
+        );
+        return this.addState(wrapperState) ? wrapperState : null;
+    }
+
+    public WrapperState.Builder stateBuilder()
+    {
+        return new WrapperState.Builder(this);
+    }
+
+    private boolean addState(WrapperState wrapperState)
+    {
+        this.requireDefaultInit();
+
+        if(wrapperStateList.contains(wrapperState))
+        {
+            return false;
+        }
+
+        wrapperStateList.add(wrapperState);
+
+        var attributeManager = controlWrapper.getAttributeManager();
+        wrapperState.getAttributeMap().parseAttributes(attributeManager, true);
+
+        this.parseState(WrapperStateChangedConsumer.ChangeType.ADD); //In case a new state is added that is more valid than others, it should be updated immediately!
+        return true;
     }
 
     public void removeState(WrapperState wrapperState)
@@ -151,6 +188,17 @@ public final class WrapperStateMap extends FXObject
         return defaultWrapperState;
     }
 
+    public void copyInto(WrapperStateMap pasteStateMap)
+    {
+        wrapperStateList.forEach(wrapperState ->
+        {
+            var pasteWrapperState = pasteStateMap.createState(wrapperState);
+            wrapperState.copyInto(pasteWrapperState);
+        });
+
+        defaultWrapperState.copyInto(pasteStateMap.getDefaultState());
+    }
+
     public void forEachNoDefault(Consumer<WrapperState> consumer)
     {
         wrapperStateList.forEach(consumer);
@@ -177,11 +225,6 @@ public final class WrapperStateMap extends FXObject
         return wrapperStateList.contains(wrapperState);
     }
 
-    public List<Class<? extends Attribute>> getAttributeClassList()
-    {
-        return attributeClassList;
-    }
-
     private void parseState(WrapperStateChangedConsumer.ChangeType changeType)
     {
         var oldWrapperState = currentWrapperState;
@@ -191,7 +234,8 @@ public final class WrapperStateMap extends FXObject
         //Apply attributes only if the state is actually changed!
         if(!currentWrapperState.equals(oldWrapperState)) //Using current as primary since the old can be null!
         {
-            controlWrapper.applyAttributes(currentWrapperState.getAttributeMap(), this);
+            controlWrapper.getAttributeManager().updateAllAttributes();
+            //controlWrapper.applyAttributes(currentWrapperState.getAttributeMap(), this);
         }
 
         //This needs to be here after the #setAttributesToControlWrapper because stuff
@@ -239,8 +283,7 @@ public final class WrapperStateMap extends FXObject
                     .map(JSONDataMap::new)
                     .forEach(wrapperJSONDataMap ->
                     {
-                        var wrapperState = WrapperStateSerializer.deserialize(this, wrapperJSONDataMap);
-                        this.addState(wrapperState, false);
+                        WrapperStateSerializer.deserializeAndAddState(this, wrapperJSONDataMap);
                     });
         } else
         {
@@ -252,7 +295,7 @@ public final class WrapperStateMap extends FXObject
 
     private void requireDefaultInit()
     {
-        Validate.needTrue("Trying to execute operation on a non initialized default WrapperState", emptyAttributeListInitialized);
+        Validate.needTrue("Trying to execute operation on a non initialized default WrapperState", defaultStateInitialized);
     }
 
 }

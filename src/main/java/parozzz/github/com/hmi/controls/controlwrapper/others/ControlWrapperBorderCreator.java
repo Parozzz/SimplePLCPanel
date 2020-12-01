@@ -5,7 +5,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 import javafx.scene.shape.StrokeType;
-import parozzz.github.com.hmi.FXObject;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 
 import java.util.ArrayList;

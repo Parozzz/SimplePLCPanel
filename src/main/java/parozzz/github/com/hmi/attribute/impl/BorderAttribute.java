@@ -3,14 +3,13 @@ package parozzz.github.com.hmi.attribute.impl;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import parozzz.github.com.hmi.attribute.Attribute;
+import parozzz.github.com.hmi.attribute.AttributeMap;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.property.AttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.EnumAttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.ParsableAttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.primitives.NumberAttributeProperty;
-import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.serialize.JSONSerializables;
-
-import javax.naming.ldap.Control;
 
 public class BorderAttribute extends Attribute
 {
@@ -36,11 +35,12 @@ public class BorderAttribute extends Attribute
 
     private Border border;
 
-    public BorderAttribute(ControlWrapper<?> controlWrapper)
+    public BorderAttribute(AttributeMap attributeMap)
     {
-        super(controlWrapper, ATTRIBUTE_NAME, BorderAttribute::new);
+        super(attributeMap, AttributeType.BORDER, ATTRIBUTE_NAME);
 
         super.getAttributePropertyManager().addAll(COLOR, WIDTH, STROKE_STYLE, CORNER_RADII);
+        this.update(); //Have the border not to be null at startup
     }
 
     public Border getBorder()

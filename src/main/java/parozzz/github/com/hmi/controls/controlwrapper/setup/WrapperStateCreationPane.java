@@ -4,15 +4,11 @@ import com.jfoenix.controls.JFXButton;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import parozzz.github.com.hmi.FXObject;
-import parozzz.github.com.hmi.attribute.Attribute;
 import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
 import parozzz.github.com.hmi.util.FXTextFormatterUtil;
 import parozzz.github.com.hmi.util.FXUtil;
@@ -121,6 +117,9 @@ class WrapperStateCreationPane extends FXObject implements SetupSelectable
 
     private void createState(MouseEvent mouseEvent)
     {
+        var selectedControlWrapper = setupStage.getSelectedControlWrapper();
+        Objects.requireNonNull(selectedControlWrapper, "Trying to add new state but the SelectedControlWrapper is null");
+
         var firstCompareType = firstCompareChoiceBox.getValue();
         var invalidFirstCompare = firstCompareType == null || firstCompareType == WrapperState.CompareType.ALWAYS_TRUE;
 
@@ -133,8 +132,7 @@ class WrapperStateCreationPane extends FXObject implements SetupSelectable
             return;
         }
 
-        var wrapperStateBuilder = WrapperState.builder();
-
+        var wrapperStateBuilder = selectedControlWrapper.getStateMap().stateBuilder();
         if (!invalidFirstCompare)
         {
             try
@@ -162,20 +160,13 @@ class WrapperStateCreationPane extends FXObject implements SetupSelectable
         }
 
         var wrapperState = wrapperStateBuilder.create();
-
-        var selectedControlWrapper = setupStage.getSelectedControlWrapper();
-        Objects.requireNonNull(selectedControlWrapper, "Trying to add new state but the SelectedControlWrapper is null");
-
-        var stateMap = selectedControlWrapper.getStateMap();
-        if(stateMap.contains(wrapperState))
+        if(wrapperState == null)
         {
             this.createAndShowInvalidTooltip(mouseEvent, "State duplicate");
             return;
         }
 
         createStateButton.setRipplerFill(Color.DARKGREEN);
-
-        stateMap.addState(wrapperState);
         setupStage.updateStateSelectionBox();
     }
 

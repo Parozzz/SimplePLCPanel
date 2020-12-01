@@ -8,8 +8,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import parozzz.github.com.hmi.controls.ControlContainerPane;
-import parozzz.github.com.hmi.util.FXUtil;
 import parozzz.github.com.hmi.util.DoubleClickable;
+import parozzz.github.com.hmi.util.FXUtil;
 
 import java.io.IOException;
 

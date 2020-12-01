@@ -1,13 +1,12 @@
 package parozzz.github.com.hmi.attribute.impl.address;
 
 import parozzz.github.com.hmi.attribute.Attribute;
+import parozzz.github.com.hmi.attribute.AttributeMap;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.impl.address.data.AddressDataType;
 import parozzz.github.com.hmi.attribute.property.AttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.FunctionAttributeProperty;
-import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.serialize.data.JSONDataMap;
-
-import java.util.function.Function;
 
 public abstract class AddressAttribute extends Attribute
 {
@@ -17,10 +16,10 @@ public abstract class AddressAttribute extends Attribute
     );
 
     private boolean deserializing;
-    public AddressAttribute(ControlWrapper<?> controlWrapper, String name,
-            Function<ControlWrapper<?>, AddressAttribute> creatorFunction)
+    public AddressAttribute(AttributeMap attributeMap, AttributeType<? extends AddressAttribute> attributeType,
+            String name)
     {
-        super(controlWrapper, name, creatorFunction);
+        super(attributeMap, attributeType, name);
 
         var attributePropertyManager = super.getAttributePropertyManager();
         attributePropertyManager.addAll(DATA_TYPE);

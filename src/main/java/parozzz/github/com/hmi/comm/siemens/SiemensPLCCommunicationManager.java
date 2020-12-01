@@ -6,14 +6,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import parozzz.github.com.hmi.comm.DeviceCommunicationManager;
 import parozzz.github.com.hmi.util.FXTextFormatterUtil;
 import parozzz.github.com.hmi.util.FXUtil;
 import parozzz.github.com.util.concurrent.SettableConcurrentObject;
 
 import java.io.IOException;
-import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;

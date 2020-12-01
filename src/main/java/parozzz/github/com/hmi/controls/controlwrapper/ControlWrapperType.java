@@ -8,7 +8,6 @@ import parozzz.github.com.hmi.controls.ControlContainerPane;
 import parozzz.github.com.hmi.controls.controlwrapper.impl.button.ButtonWrapper;
 import parozzz.github.com.hmi.controls.controlwrapper.impl.display.DisplayWrapper;
 import parozzz.github.com.hmi.controls.controlwrapper.impl.textinput.InputWrapper;
-import parozzz.github.com.hmi.controls.controlwrapper.setup.ControlWrapperSetupStage;
 
 import java.util.HashMap;
 import java.util.Map;

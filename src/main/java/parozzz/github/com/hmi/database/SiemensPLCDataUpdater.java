@@ -6,6 +6,7 @@ import parozzz.github.com.PLC.siemens.data.SiemensS7ReadableData;
 import parozzz.github.com.PLC.siemens.data.primitives.*;
 import parozzz.github.com.PLC.siemens.util.SiemensS7AreaType;
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.impl.address.AddressAttribute;
 import parozzz.github.com.hmi.attribute.impl.address.ReadAddressAttribute;
 import parozzz.github.com.hmi.attribute.impl.address.WriteAddressAttribute;
@@ -59,7 +60,7 @@ final class SiemensPLCDataUpdater extends ControlDataUpdater<SiemensPLCThread>
             if (newValueControlWrapperSet.remove(controlWrapper))
             {
                 //First write then read
-                var writeAddressAllData = this.getAddressData(AttributeFetcher.fetch(controlWrapper, WriteAddressAttribute.class));
+                var writeAddressAllData = this.getAddressData(AttributeFetcher.fetch(controlWrapper, AttributeType.WRITE_ADDRESS));
                 if (writeAddressAllData != null)
                 {
                     var internalValue = controlWrapper.getValue().getInternalValue();
@@ -67,7 +68,7 @@ final class SiemensPLCDataUpdater extends ControlDataUpdater<SiemensPLCThread>
                 }
             }
 
-            var readAddressAllData = this.getAddressData(AttributeFetcher.fetch(controlWrapper, ReadAddressAttribute.class));
+            var readAddressAllData = this.getAddressData(AttributeFetcher.fetch(controlWrapper, AttributeType.READ_ADDRESS));
             if (readAddressAllData != null)
             {
                 var externalValue = controlWrapper.getValue().getOutsideValue();

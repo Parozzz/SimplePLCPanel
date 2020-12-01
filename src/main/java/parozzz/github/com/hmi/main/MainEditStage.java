@@ -1,21 +1,18 @@
 package parozzz.github.com.hmi.main;
 
-import com.sun.javafx.scene.control.ContextMenuContent;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
-import javafx.scene.control.*;
-import javafx.scene.control.skin.MenuBarSkin;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.stage.Screen;
 import parozzz.github.com.Main;
 import parozzz.github.com.StartProperties;
-import parozzz.github.com.hmi.JavaFXMain;
 import parozzz.github.com.hmi.comm.CommunicationStage;
 import parozzz.github.com.hmi.comm.modbustcp.ModbusTCPThread;
 import parozzz.github.com.hmi.comm.siemens.SiemensPLCThread;
@@ -32,10 +29,7 @@ import parozzz.github.com.hmi.main.picturebank.PictureBankStage;
 import parozzz.github.com.hmi.main.quicksetup.QuickSetupVBox;
 import parozzz.github.com.hmi.main.settings.SettingsStage;
 import parozzz.github.com.hmi.page.BorderPaneHMIStage;
-import parozzz.github.com.hmi.page.HMIStage;
-import parozzz.github.com.hmi.page.HMIStageSetter;
 import parozzz.github.com.hmi.util.FXTextFormatterUtil;
-import parozzz.github.com.hmi.util.FXUtil;
 import parozzz.github.com.util.TrigBoolean;
 import parozzz.github.com.util.Util;
 

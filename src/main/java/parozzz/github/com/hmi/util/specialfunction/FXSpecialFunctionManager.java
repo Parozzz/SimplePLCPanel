@@ -9,7 +9,6 @@ import parozzz.github.com.hmi.util.DoubleClickable;
 import parozzz.github.com.hmi.util.Resizable;
 
 import java.util.Objects;
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleConsumer;
 
 public final class FXSpecialFunctionManager

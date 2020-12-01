@@ -73,12 +73,6 @@ public final class StateSelectionQuickSetupPane extends FXObject implements Quic
     }
 
     @Override
-    public void onNewWrapperState(WrapperState wrapperState)
-    {
-
-    }
-
-    @Override
     public void clear()
     {
         QuickSetupPane.super.clear();

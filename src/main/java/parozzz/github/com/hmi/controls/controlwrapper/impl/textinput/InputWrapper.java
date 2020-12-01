@@ -2,28 +2,19 @@ package parozzz.github.com.hmi.controls.controlwrapper.impl.textinput;
 
 import com.sun.javafx.scene.control.skin.FXVK;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.skin.TextFieldSkin;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import parozzz.github.com.hmi.attribute.Attribute;
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
-import parozzz.github.com.hmi.attribute.AttributeMap;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.impl.FontAttribute;
-import parozzz.github.com.hmi.attribute.impl.TextAttribute;
-import parozzz.github.com.hmi.attribute.impl.ValueAttribute;
-import parozzz.github.com.hmi.attribute.impl.address.ReadAddressAttribute;
-import parozzz.github.com.hmi.attribute.impl.address.WriteAddressAttribute;
 import parozzz.github.com.hmi.attribute.impl.control.InputDataAttribute;
 import parozzz.github.com.hmi.controls.ControlContainerPane;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
-import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapperAttributeInitializer;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapperType;
+import parozzz.github.com.hmi.controls.controlwrapper.attributes.ControlWrapperAttributeInitializer;
 import parozzz.github.com.hmi.util.FXNodeUtil;
 import parozzz.github.com.hmi.util.FXTextFormatterUtil;
-
-import java.util.List;
 
 public class InputWrapper extends ControlWrapper<TextField>
 {
@@ -51,22 +42,21 @@ public class InputWrapper extends ControlWrapper<TextField>
     {
         super.registerAttributeInitializers(attributeInitializer);
 
-        attributeInitializer.addGlobal(new InputDataAttribute(this))
-                .addState(new WriteAddressAttribute(this))
-                .addState(new FontAttribute(this))
+        attributeInitializer.addGlobals(AttributeType.INPUT_DATA)
+                .addStates(AttributeType.WRITE_ADDRESS, AttributeType.FONT)
                 .addAttributeUpdateConsumer(updateData ->
                 {
                     var control = updateData.getControl();
 
-                    for (var attributeClass : updateData.getAttributeClassList())
+                    for (var attributeType : updateData.getAttributeTypeList())
                     {
-                        var attribute = AttributeFetcher.fetch(this, attributeClass);
+                        var attribute = AttributeFetcher.fetch(this, attributeType);
                         if (attribute == null)
                         {
                             continue;
                         }
 
-                        if (InputDataAttribute.class.isAssignableFrom(attributeClass))
+                        if (attribute instanceof InputDataAttribute)
                         {
                             switch (attribute.getValue(InputDataAttribute.TYPE))
                             {
@@ -98,7 +88,7 @@ public class InputWrapper extends ControlWrapper<TextField>
                             }
 
                             control.setText(""); //When this changes, to avoid problems clear the text
-                        } else if (FontAttribute.class.isAssignableFrom(attributeClass))
+                        } else if (attribute instanceof FontAttribute)
                         {
                             var skin = control.getSkin(); //Seems like setting the skin even if already exists causes some... problems
                             if (skin == null) //Set the skin before to be sure that it has it (It's required after)

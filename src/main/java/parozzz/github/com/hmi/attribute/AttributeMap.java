@@ -1,28 +1,63 @@
 package parozzz.github.com.hmi.attribute;
 
 import parozzz.github.com.hmi.FXController;
+import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
+import parozzz.github.com.hmi.controls.controlwrapper.attributes.ControlWrapperAttributeManager;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public final class AttributeMap extends FXController
 {
-    private final Map<Class<?>, Attribute> classToAttributeMap;
+    private final ControlWrapper<?> controlWrapper;
+    private final Map<AttributeType<?>, Attribute> typeToAttributeMap;
     private final Set<Attribute> attributeSet;
 
-    public AttributeMap()
+    public AttributeMap (ControlWrapper<?> controlWrapper)
     {
-        this("AttributeMap");
+        this(controlWrapper, "AttributeMap");
     }
 
-    public AttributeMap(String name)
+    public AttributeMap(ControlWrapper<?> controlWrapper, String name)
     {
         super(name);
 
-        this.classToAttributeMap = new HashMap<>();
+        this.controlWrapper = controlWrapper;
+        this.typeToAttributeMap = new HashMap<>();
         this.attributeSet = new HashSet<>();
     }
 
+    public void parseAttributes(ControlWrapperAttributeManager<?> attributeManager, boolean state)
+    {
+        typeToAttributeMap.clear();
+        attributeSet.clear();
+
+        if(state)
+        {
+            attributeManager.forEachStateType(attributeType ->
+            {
+                var attribute = attributeType.create(this);
+                typeToAttributeMap.put(attributeType, attribute);
+                attributeSet.add(attribute);
+
+                super.addFXChild(attribute);
+            });
+        }
+        else
+        {
+            attributeManager.forEachGlobalType(attributeType ->
+            {
+                var attribute = attributeType.create(this);
+                typeToAttributeMap.put(attributeType, attribute);
+                attributeSet.add(attribute);
+
+                super.addFXChild(attribute);
+            });
+        }
+    }
 
     /*
     public <A extends Attribute> boolean addAttribute(A attribute)
@@ -37,7 +72,12 @@ public final class AttributeMap extends FXController
         return this.addAttributeWrapper(attributeWrapper);
     }
 */
-    public void addAll(Collection<Attribute> collection)
+    public ControlWrapper<?> getControlWrapper()
+    {
+        return controlWrapper;
+    }
+
+    /*public void addAll(Collection<Attribute> collection)
     {
         collection.forEach(this::addAttribute);
     }
@@ -62,7 +102,7 @@ public final class AttributeMap extends FXController
         }
 
         return false;
-    }
+    }*/
 /*
     public void addOrReplaceAttribute(Attribute attribute)
     {
@@ -75,41 +115,58 @@ public final class AttributeMap extends FXController
         this.addAttribute(attribute);
     }
 */
-    <T> T getAttribute(Class<T> attributeClass)
+    public <T extends Attribute> T get(AttributeType<T> attributeType)
     {
-        var attribute = classToAttributeMap.get(attributeClass);
+        var attributeClass = attributeType.getAttributeClass();
+
+        var attribute = typeToAttributeMap.get(attributeType);
         return attributeClass.isInstance(attribute)
                 ? attributeClass.cast(attribute)
                 : null;
     }
 
-    public boolean hasAttribute(Attribute attribute)
+    public boolean contains(Attribute attribute)
     {
         return attributeSet.contains(attribute);
     }
 
-    public boolean hasAttribute(Class<? extends Attribute> attributeClass)
+    public boolean hasType(AttributeType<?> attributeType)
     {
-        return classToAttributeMap.containsKey(attributeClass);
+        return typeToAttributeMap.containsKey(attributeType);
     }
 
+    public void copyInto(AttributeMap pasteAttributeMap)
+    {
+        attributeSet.forEach(attribute ->
+        {
+            var attributeType = attribute.getType();
+
+            var pasteAttribute = pasteAttributeMap.get(attributeType);
+            if(pasteAttribute != null)
+            {
+                attribute.copyInto(pasteAttribute);
+            }
+        });
+    }
+/*
     public void removeAttribute(Class<?> attributeClass)
     {
-        var attribute = classToAttributeMap.get(attributeClass);
+        var attribute = typeToAttributeMap.get(attributeClass);
         if (attribute != null)
         {
             this.removeAttribute(attribute);
         }
     }
-
+*/
+    /*
     public void removeAttribute(Attribute attribute)
     {
         if (attributeSet.remove(attribute))
         {
             super.removeFXChild(attribute);
-            classToAttributeMap.remove(attribute.getClass());
+            typeToAttributeMap.remove(attribute.getClass());
         }
-    }
+    }*/
 
     /*
     public void setAttributesToControlWrapper()

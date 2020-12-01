@@ -1,13 +1,31 @@
 package parozzz.github.com.hmi.attribute;
 
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
-import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
-
-import java.util.Objects;
 
 public final class AttributeFetcher
 {
+    public static <A extends Attribute> A fetch(ControlWrapper<?> controlWrapper, AttributeType<A> attributeType)
+    {
+        var attributeManager = controlWrapper.getAttributeManager();
 
+        AttributeMap attributeMap;
+        if(attributeManager.hasStateType(attributeType))
+        {
+            attributeMap = controlWrapper.getStateMap().getCurrentState().getAttributeMap();
+        }
+        else if(attributeManager.hasGlobalType(attributeType))
+        {
+            attributeMap = controlWrapper.getGlobalAttributeMap();
+        }
+        else
+        {
+            return null;
+        }
+
+        return attributeMap.get(attributeType);
+    }
+
+    /*
     public static <A extends Attribute> A fetch(ControlWrapper<?> controlWrapper, WrapperState wrapperState,
             Class<A> attributeClass)
     {
@@ -49,27 +67,11 @@ public final class AttributeFetcher
         Objects.requireNonNull(stateAttributeMap, "Trying to fetch an attribute but the StateAttributeMap is null");
         return stateAttributeMap.getAttribute(attributeClass);
     }
-
-    public static boolean hasAttribute(ControlWrapper<?> controlWrapper, Class<? extends Attribute> attributeClass)
+*/
+    public static boolean hasAttribute(ControlWrapper<?> controlWrapper, AttributeType<?> attributeType)
     {
-        return hasAttribute(controlWrapper.getStateMap().getDefaultState().getAttributeMap(), controlWrapper.getGlobalAttributeMap(), attributeClass);
-    }
-
-    public static boolean hasAttribute(WrapperState wrapperState, Class<? extends Attribute> attributeClass)
-    {
-        return hasAttribute(wrapperState.getAttributeMap(), null, attributeClass);
-    }
-
-    public static boolean hasAttribute(AttributeMap stateAttributeMap, AttributeMap globalAttributeMap,
-            Class<? extends Attribute> attributeClass)
-    {
-        if(globalAttributeMap != null && globalAttributeMap.hasAttribute(attributeClass))
-        {
-            return true;
-        }
-
-        Objects.requireNonNull(stateAttributeMap, "Trying to check \"hasAttribute\" but the StateAttributeMap is null");
-        return stateAttributeMap.hasAttribute(attributeClass);
+        var attributeManager = controlWrapper.getAttributeManager();
+        return attributeManager.hasType(attributeType);
     }
 
     private AttributeFetcher() {}

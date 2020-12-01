@@ -1,9 +1,10 @@
 package parozzz.github.com.hmi.attribute.impl.control;
 
 import parozzz.github.com.hmi.attribute.Attribute;
+import parozzz.github.com.hmi.attribute.AttributeMap;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.property.AttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.EnumAttributeProperty;
-import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.controls.controlwrapper.impl.button.ButtonWrapperType;
 
 public final class ButtonDataAttribute extends Attribute
@@ -12,9 +13,9 @@ public final class ButtonDataAttribute extends Attribute
 
     public static final AttributeProperty<ButtonWrapperType> TYPE = new EnumAttributeProperty<>("ButtonWrapperType", ButtonWrapperType.NORMAL);
 
-    public ButtonDataAttribute(ControlWrapper<?> controlWrapper)
+    public ButtonDataAttribute(AttributeMap attributeMap)
     {
-        super(controlWrapper, ATTRIBUTE_NAME, ButtonDataAttribute::new);
+        super(attributeMap, AttributeType.BUTTON_DATA, ATTRIBUTE_NAME);
 
         super.getAttributePropertyManager().addAll(TYPE);
     }

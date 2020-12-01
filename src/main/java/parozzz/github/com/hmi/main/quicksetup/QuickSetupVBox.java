@@ -8,7 +8,8 @@ import javafx.scene.paint.Color;
 import parozzz.github.com.hmi.FXController;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapperSpecific;
-import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
+import parozzz.github.com.hmi.controls.controlwrapper.attributes.ControlWrapperAttributeUpdateConsumer;
+import parozzz.github.com.hmi.controls.controlwrapper.attributes.ControlWrapperGenericAttributeUpdateConsumer;
 import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperStateChangedConsumer;
 import parozzz.github.com.hmi.main.quicksetup.impl.*;
 import parozzz.github.com.hmi.util.FXUtil;
@@ -16,7 +17,6 @@ import parozzz.github.com.hmi.util.FXUtil;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Consumer;
 
 public final class QuickSetupVBox extends FXController implements ControlWrapperSpecific
 {
@@ -33,7 +33,7 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
     private final Set<QuickSetupPane> quickSetupPaneSet;
 
     private final ChangeListener<Boolean> validControlWrapperListener;
-    private final Consumer<Object> attributesUpdatedConsumer;
+    private final ControlWrapperGenericAttributeUpdateConsumer attributeUpdatedConsumer;
     private final WrapperStateChangedConsumer stateChangeConsumer;
 
     private ControlWrapper<?> selectedControlWrapper;
@@ -61,13 +61,11 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
                 this.setSelectedControlWrapper(null);
             }
         };
-        this.attributesUpdatedConsumer = involvedObject ->
+        this.attributeUpdatedConsumer = updateData ->
         {
-            if(involvedObject != this)
+            for(var attributeType : updateData.getAttributeTypeList())
             {
-                stateBinder.setIgnoreAttributeUpdate(true);
-                stateBinder.refreshValues();
-                stateBinder.setIgnoreAttributeUpdate(false);
+                stateBinder.updateValueOf(attributeType);
             }
         };
         //Since this is trigged also when a state is added/removed it should be gucci here
@@ -114,9 +112,7 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
             }
 
             selectedControlWrapper.getStateMap().changeCurrentState(wrapperState);
-
             stateBinder.setBoundWrapperState(wrapperState);
-            quickSetupPaneSet.forEach(quickSetupPane -> quickSetupPane.onNewWrapperState(wrapperState));
         });
     }
 
@@ -137,7 +133,7 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
     {
         if(selectedControlWrapper != null && selectedControlWrapper == controlWrapper)
         {
-            stateBinder.refreshValues();
+            stateBinder.updateAll();
         }
     }
 
@@ -148,7 +144,7 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
         if(selectedControlWrapper != null)
         {
             selectedControlWrapper.validProperty().removeListener(validControlWrapperListener);
-            selectedControlWrapper.removeAttributesUpdatedConsumer(attributesUpdatedConsumer);
+            selectedControlWrapper.getAttributeManager().removeGenericUpdateConsumer(attributeUpdatedConsumer);
             selectedControlWrapper.getStateMap().removeStateValueChangedConsumer(stateChangeConsumer);
         }
 
@@ -161,7 +157,7 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
         }
 
         controlWrapper.validProperty().addListener(validControlWrapperListener);
-        controlWrapper.addAttributesUpdatedConsumer(attributesUpdatedConsumer);
+        controlWrapper.getAttributeManager().addGenericUpdateConsumer(attributeUpdatedConsumer);
         controlWrapper.getStateMap().addStateValueChangedConsumer(stateChangeConsumer);
         quickSetupPaneSet.forEach(quickSetupPane ->
         {
@@ -174,14 +170,6 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
     public ControlWrapper<?> getSelectedControlWrapper()
     {
         return selectedControlWrapper;
-    }
-
-    void updateSelectedWrapperAttributes()
-    {
-        if(selectedControlWrapper != null)
-        {
-            selectedControlWrapper.applyAttributes(this);
-        }
     }
 
     private void computeQuickSetupPane(VBox vBox, QuickSetupPane... quickSetupPanes)

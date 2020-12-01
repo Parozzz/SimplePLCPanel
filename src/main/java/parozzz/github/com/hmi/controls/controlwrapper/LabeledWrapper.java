@@ -1,18 +1,16 @@
 package parozzz.github.com.hmi.controls.controlwrapper;
 
 import javafx.scene.control.Labeled;
-import javafx.scene.layout.Pane;
-import parozzz.github.com.hmi.attribute.Attribute;
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
-import parozzz.github.com.hmi.attribute.AttributeMap;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.impl.FontAttribute;
-import parozzz.github.com.hmi.attribute.impl.SizeAttribute;
 import parozzz.github.com.hmi.attribute.impl.TextAttribute;
 import parozzz.github.com.hmi.attribute.impl.ValueAttribute;
 import parozzz.github.com.hmi.controls.ControlContainerPane;
+import parozzz.github.com.hmi.controls.controlwrapper.attributes.ControlWrapperAttributeInitializer;
+import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperStateChangedConsumer;
 import parozzz.github.com.hmi.util.valueintermediate.ValueIntermediateType;
 
-import java.util.List;
 import java.util.function.BiFunction;
 
 public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C>
@@ -29,20 +27,20 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
     {
         super.registerAttributeInitializers(attributeInitializer);
 
-        attributeInitializer.addState(new FontAttribute(this))
+        attributeInitializer.addStates(AttributeType.FONT)
                 .addAttributeUpdateConsumer(updateData ->
                 {
                     var control = updateData.getControl();
 
-                    for(var attributeClass : updateData.getAttributeClassList())
+                    for(var attributeType : updateData.getAttributeTypeList())
                     {
-                        var attribute = AttributeFetcher.fetch(this, attributeClass);
+                        var attribute = AttributeFetcher.fetch(this, attributeType);
                         if(attribute == null)
                         {
                             continue;
                         }
 
-                        if(FontAttribute.class.isAssignableFrom(attributeClass))
+                        if(attribute instanceof FontAttribute)
                         {
                             control.setFont(((FontAttribute) attribute).getFont());
                             control.setUnderline(attribute.getValue(FontAttribute.UNDERLINE));
@@ -85,11 +83,18 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
 
         super.getStateMap().addStateValueChangedConsumer((stateMap, oldState, changeType) ->
         {
+            if(changeType != WrapperStateChangedConsumer.ChangeType.STATE_CHANGED)
+            {
+                return;
+            }
+
             var currentState = stateMap.getCurrentState();
 
-            var textAttribute = AttributeFetcher.fetch(currentState, TextAttribute.class);
-            var valueAttribute = AttributeFetcher.fetch(currentState, ValueAttribute.class);
-            if (textAttribute != null && valueAttribute != null)
+            var attributeMap = currentState.getAttributeMap();
+
+            var textAttribute = attributeMap.get(AttributeType.TEXT);
+            var valueAttribute = attributeMap.get(AttributeType.VALUE);
+            if(textAttribute != null && valueAttribute != null)
             {
                 var text = textAttribute.getValue(TextAttribute.TEXT);
                 this.setParsedTextPlaceholders(super.control, text, valueAttribute);
@@ -103,16 +108,16 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
         var multiplyBy = valueAttribute.getValue(ValueAttribute.MULTIPLY_BY);
         var offset = valueAttribute.getValue(ValueAttribute.OFFSET);
 
-        var languageSettings = super.getControlMainPage().getMainEditStage().getSettingsStage().getLanguage();
-
         //Use external value here ... WTF i was thinking?
         String stringPlaceholder;
-        if (parseAs == ValueIntermediateType.BOOLEAN)
+        if(parseAs == ValueIntermediateType.BOOLEAN)
         {
+            var languageSettings = super.getControlMainPage().getMainEditStage()
+                    .getSettingsStage().getLanguage();
             stringPlaceholder = super.getValue().getOutsideValue().asBoolean()
-                    ? languageSettings.getONBooleanPlaceholder()
-                    : languageSettings.getOFFBooleanPlaceholder();
-        } else
+                                ? languageSettings.getONBooleanPlaceholder()
+                                : languageSettings.getOFFBooleanPlaceholder();
+        }else
         {
             var doubleValue = (super.getValue().getOutsideValue().asDouble() + offset) * multiplyBy;
             stringPlaceholder = parseAs.convertNumber(doubleValue).toString();

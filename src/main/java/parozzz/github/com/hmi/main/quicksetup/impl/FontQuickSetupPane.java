@@ -10,9 +10,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import parozzz.github.com.hmi.FXObject;
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.impl.FontAttribute;
-import parozzz.github.com.hmi.attribute.impl.SizeAttribute;
-import parozzz.github.com.hmi.attribute.impl.TextAttribute;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
 import parozzz.github.com.hmi.main.quicksetup.QuickSetupPane;
@@ -56,19 +55,13 @@ public class FontQuickSetupPane  extends FXObject implements QuickSetupPane
     @Override
     public void onNewControlWrapper(ControlWrapper<?> controlWrapper)
     {
-
-    }
-
-    @Override
-    public void onNewWrapperState(WrapperState wrapperState)
-    {
-        vBox.setVisible(AttributeFetcher.hasAttribute(wrapperState, FontAttribute.class));
+        vBox.setVisible(controlWrapper.getAttributeManager().hasType(AttributeType.FONT));
     }
 
     @Override
     public void addBinders(QuickSetupStateBinder stateBinder)
     {
-        stateBinder.builder(FontAttribute.class)
+        stateBinder.builder(AttributeType.FONT)
                 .direct(textColorPicker.valueProperty(), FontAttribute.TEXT_COLOR)
                 .indirect(textSizeTextField.textProperty(), Util::parseIntOrZero, Objects::toString, FontAttribute.FONT_TEXT_SIZE)
                 .direct(boldCheckBox.selectedProperty(), FontAttribute.BOLD_WEIGHT)

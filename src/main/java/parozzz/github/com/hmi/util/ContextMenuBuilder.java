@@ -4,7 +4,6 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public final class ContextMenuBuilder
 {

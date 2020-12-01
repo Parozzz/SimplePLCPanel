@@ -9,7 +9,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.util.converter.IntegerStringConverter;
-import parozzz.github.com.hmi.attribute.AttributeMap;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.impl.TextAttribute;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.ControlWrapperSetupStage;
@@ -35,7 +35,7 @@ public final class TextSetupPane extends SetupPane<TextAttribute>
 
     public TextSetupPane(ControlWrapperSetupStage setupPage) throws IOException
     {
-        super(setupPage, "TextSetupPane", "Custom Text", TextAttribute.class, true);
+        super(setupPage, "TextSetupPane", "Custom Text", AttributeType.TEXT, true);
 
         mainVBox = (VBox) FXUtil.loadFXML("setup/textSetupPane.fxml", this);
     }
@@ -81,9 +81,4 @@ public final class TextSetupPane extends SetupPane<TextAttribute>
         return mainVBox;
     }
 
-    @Override
-    public boolean hasAttribute(AttributeMap attributeMap)
-    {
-        return attributeMap.hasAttribute(TextAttribute.class);
-    }
 }

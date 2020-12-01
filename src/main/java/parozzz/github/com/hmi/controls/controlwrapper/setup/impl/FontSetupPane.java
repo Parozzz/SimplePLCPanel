@@ -10,7 +10,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.util.converter.IntegerStringConverter;
-import parozzz.github.com.hmi.attribute.AttributeMap;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.impl.FontAttribute;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.ControlWrapperSetupStage;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.SetupPane;
@@ -42,7 +42,7 @@ public final class FontSetupPane extends SetupPane<FontAttribute>
 
     public FontSetupPane(ControlWrapperSetupStage setupPage) throws IOException
     {
-        super(setupPage, "FontSetupPane", "Font", FontAttribute.class, true);
+        super(setupPage, "FontSetupPane", "Font", AttributeType.FONT, true);
 
         this.vBox = (VBox) FXUtil.loadFXML("setup/fontSetupPane.fxml", this);
     }
@@ -127,11 +127,4 @@ public final class FontSetupPane extends SetupPane<FontAttribute>
     {
         return vBox;
     }
-
-    @Override
-    public boolean hasAttribute(AttributeMap attributeMap)
-    {
-        return attributeMap.hasAttribute(FontAttribute.class);
-    }
-
 }

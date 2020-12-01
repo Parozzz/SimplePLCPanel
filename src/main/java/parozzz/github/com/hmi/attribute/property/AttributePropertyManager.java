@@ -3,7 +3,6 @@ package parozzz.github.com.hmi.attribute.property;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import parozzz.github.com.hmi.attribute.Attribute;
-import parozzz.github.com.hmi.attribute.AttributeMap;
 import parozzz.github.com.hmi.serialize.data.JSONDataMap;
 import parozzz.github.com.util.Validate;
 
@@ -43,9 +42,12 @@ public class AttributePropertyManager
         Validate.needFalse("Trying to add an attribute with the same key twice. Key: ", key, attributePropertyKeyMap.containsKey(key));
 
         var property = new SimpleObjectProperty<>(attributeProperty.getDefaultValue());
-        property.addListener((observable, oldValue, newValue) ->
-                attribute.update()
-        );
+        property.addListener((observable, oldValue, newValue) -> {
+            attribute.update();
+
+            var attributeType = attribute.getType();
+            attribute.getAttributeMap().getControlWrapper().getAttributeManager().updateAttribute(attributeType);
+        });
 
         attributePropertyMap.put(attributeProperty, property);
 

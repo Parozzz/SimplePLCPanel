@@ -2,7 +2,10 @@ package parozzz.github.com.hmi.controls.controlwrapper.setup.impl.address.panes.
 
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
-import javafx.scene.control.*;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import parozzz.github.com.hmi.attribute.impl.address.AddressAttribute;
 import parozzz.github.com.hmi.attribute.impl.address.data.AddressDataType;

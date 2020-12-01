@@ -10,8 +10,6 @@ public interface QuickSetupPane
 
     void onNewControlWrapper(ControlWrapper<?> controlWrapper);
 
-    void onNewWrapperState(WrapperState wrapperState);
-
     void addBinders(QuickSetupStateBinder stateBinder);
 
     default void clear()

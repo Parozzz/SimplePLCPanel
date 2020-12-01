@@ -2,13 +2,15 @@ package parozzz.github.com.hmi.controls.controlwrapper.setup;
 
 
 import javafx.scene.Parent;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Control;
+import javafx.scene.control.MenuItem;
 import javafx.scene.paint.Color;
-import org.w3c.dom.Attr;
 import parozzz.github.com.hmi.FXObject;
 import parozzz.github.com.hmi.attribute.Attribute;
-import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.AttributeMap;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.attributechanger.SetupPaneAttributeChangerList;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.extra.ControlWrapperSetupUtil;
 import parozzz.github.com.hmi.util.ContextMenuBuilder;
@@ -17,24 +19,26 @@ import parozzz.github.com.hmi.util.FXUtil;
 public abstract class SetupPane<A extends Attribute> extends FXObject implements SetupSelectable
 {
     private final ControlWrapperSetupStage setupStage;
-    private final Class<A> attributeClass;
+    private final AttributeType<A> attributeType;
     private final SetupPaneAttributeChangerList<A> attributeChangerList;
 
     private final Button selectButton;
     private final boolean stateBased;
 
-    public SetupPane(ControlWrapperSetupStage setupStage, String name, String buttonText, Class<A> attributeClass, boolean stateBased)
+    public SetupPane(ControlWrapperSetupStage setupStage, String name, String buttonText,
+            AttributeType<A> attributeType, boolean stateBased)
     {
-        this(setupStage, name, new Button(buttonText), attributeClass, stateBased);
+        this(setupStage, name, new Button(buttonText), attributeType, stateBased);
     }
 
-    public SetupPane(ControlWrapperSetupStage setupStage, String name, Button selectButton, Class<A> attributeClass, boolean stateBased)
+    public SetupPane(ControlWrapperSetupStage setupStage, String name, Button selectButton,
+            AttributeType<A> attributeType, boolean stateBased)
     {
         super(name);
 
         this.setupStage = setupStage;
-        this.attributeClass = attributeClass;
-        this.attributeChangerList = new SetupPaneAttributeChangerList<>(this, attributeClass);
+        this.attributeType = attributeType;
+        this.attributeChangerList = new SetupPaneAttributeChangerList<>(this, attributeType);
         this.selectButton = selectButton;
         this.stateBased = stateBased;
     }
@@ -73,14 +77,14 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
     @Override
     public abstract Parent getParent();
 
-    public final Class<? extends Attribute> getAttributeClass()
+    public final AttributeType<A> getAttributeType()
     {
-        return attributeClass;
+        return attributeType;
     }
 
     public boolean hasAttribute(AttributeMap attributeMap)
     {
-        return attributeMap.hasAttribute(attributeClass);
+        return attributeMap.hasType(attributeType);
     }
 
     public SetupPaneAttributeChangerList<A> getAttributeChangerList()
@@ -96,7 +100,7 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
             //Set the changed data to ALL the states of the wrapper
             selectedControlWrapper.getStateMap().forEach(wrapperState ->
             {
-                var attribute = AttributeFetcher.fetch(wrapperState, attributeClass);
+                var attribute = wrapperState.getAttributeMap().get(attributeType);
                 if(attribute != null)
                 {
                     attributeChangerList.forEach(attributeChanger ->
@@ -112,7 +116,9 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
         var selectedControlWrapper = this.setupStage.getSelectedControlWrapper();
         if(selectedControlWrapper != null)
         {
-            ControlWrapperSetupUtil.writeAttributeChangerListToAllStates(selectedControlWrapper, attributeClass, attributeChangerList);
+            ControlWrapperSetupUtil.writeAttributeChangerListToAllStates(
+                    selectedControlWrapper, attributeType, attributeChangerList
+            );
         }
     }
 
@@ -150,8 +156,10 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
                         var selectedControlWrapper = setupStage.getSelectedControlWrapper();
                         if(selectedControlWrapper != null)
                         {
-                            ControlWrapperSetupUtil.writeSingleAttributeChangerToAllStates(selectedControlWrapper, attributeClass,
-                                    attributeChangerList, property);
+                            ControlWrapperSetupUtil.writeSingleAttributeChangerToAllStates(
+                                    selectedControlWrapper, attributeType,
+                                    attributeChangerList, property
+                            );
                         }
                     });
 

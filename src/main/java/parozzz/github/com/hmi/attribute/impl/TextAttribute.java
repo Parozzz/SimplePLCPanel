@@ -2,10 +2,11 @@ package parozzz.github.com.hmi.attribute.impl;
 
 import javafx.scene.text.TextAlignment;
 import parozzz.github.com.hmi.attribute.Attribute;
+import parozzz.github.com.hmi.attribute.AttributeMap;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.property.impl.EnumAttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.primitives.NumberAttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.primitives.StringAttributeProperty;
-import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 
 public class TextAttribute extends Attribute
 {
@@ -15,9 +16,9 @@ public class TextAttribute extends Attribute
     public static final EnumAttributeProperty<TextAlignment> TEXT_ALIGNMENT = new EnumAttributeProperty<>("TextAlignment", TextAlignment.CENTER);
     public static final NumberAttributeProperty<Integer> LINE_SPACING = new NumberAttributeProperty<>("LineSpacing", 0, Number::intValue);
 
-    public TextAttribute(ControlWrapper<?> controlWrapper)
+    public TextAttribute(AttributeMap attributeMap)
     {
-        super(controlWrapper, ATTRIBUTE_NAME, TextAttribute::new);
+        super(attributeMap, AttributeType.TEXT, ATTRIBUTE_NAME);
 
         super.getAttributePropertyManager().addAll(TEXT, TEXT_ALIGNMENT, LINE_SPACING);
     }

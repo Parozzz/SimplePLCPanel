@@ -1,10 +1,11 @@
 package parozzz.github.com.hmi.attribute.impl.control;
 
 import parozzz.github.com.hmi.attribute.Attribute;
+import parozzz.github.com.hmi.attribute.AttributeMap;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.property.AttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.EnumAttributeProperty;
 import parozzz.github.com.hmi.attribute.property.impl.primitives.NumberAttributeProperty;
-import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.controls.controlwrapper.impl.textinput.InputWrapper;
 
 public final class InputDataAttribute extends Attribute
@@ -22,9 +23,9 @@ public final class InputDataAttribute extends Attribute
 
     public static final AttributeProperty<Integer> CHARACTER_LIMIT = new NumberAttributeProperty<>("CharacterLimit", 1, Number::intValue);
 
-    public InputDataAttribute(ControlWrapper<?> controlWrapper)
+    public InputDataAttribute(AttributeMap attributeMap)
     {
-        super(controlWrapper, ATTRIBUTE_NAME, InputDataAttribute::new);
+        super(attributeMap, AttributeType.INPUT_DATA, ATTRIBUTE_NAME);
 
         super.getAttributePropertyManager().addAll(TYPE, INTEGER_MAX_VALUE, INTEGER_MIN_VALUE,
                 REAL_MAX_DECIMALS, REAL_MAX_VALUE, REAL_MIN_VALUE,

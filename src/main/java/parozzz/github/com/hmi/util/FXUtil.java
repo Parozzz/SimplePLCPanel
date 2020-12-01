@@ -9,8 +9,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.Control;
-import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -23,7 +21,6 @@ import parozzz.github.com.util.Util;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class FXUtil
 {

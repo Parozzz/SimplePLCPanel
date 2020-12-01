@@ -2,14 +2,9 @@
 
 <?import com.jfoenix.controls.JFXButton?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.ChoiceBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0" spacing="10.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <HBox fx:id="createStateHBox" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" spacing="5.0" style="-fx-background-color: -fx-background;">

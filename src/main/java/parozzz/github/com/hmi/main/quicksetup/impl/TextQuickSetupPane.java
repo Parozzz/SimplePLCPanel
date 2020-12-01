@@ -6,7 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 import parozzz.github.com.hmi.FXObject;
-import parozzz.github.com.hmi.attribute.AttributeFetcher;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.impl.TextAttribute;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
@@ -21,13 +21,13 @@ public final class TextQuickSetupPane extends FXObject implements QuickSetupPane
     @FXML
     private TextArea textTextArea;
 
-    private final VBox mainVBox;
+    private final VBox vBox;
 
     public TextQuickSetupPane() throws IOException
     {
         super("TextQuickPropertiesPane");
 
-        this.mainVBox = (VBox) FXUtil.loadFXML("quickproperties/textQuickSetupPane.fxml", this);
+        this.vBox = (VBox) FXUtil.loadFXML("quickproperties/textQuickSetupPane.fxml", this);
     }
 
     @Override
@@ -35,30 +35,24 @@ public final class TextQuickSetupPane extends FXObject implements QuickSetupPane
     {
         super.setup();
 
-        VBox.setMargin(mainVBox, new Insets(2, 0, 0, 0));
+        VBox.setMargin(vBox, new Insets(2, 0, 0, 0));
     }
 
     public Parent getParent()
     {
-        return mainVBox;
+        return vBox;
     }
 
     @Override
     public void onNewControlWrapper(ControlWrapper<?> controlWrapper)
     {
-
-    }
-
-    @Override
-    public void onNewWrapperState(WrapperState wrapperState)
-    {
-        mainVBox.setVisible(AttributeFetcher.hasAttribute(wrapperState, TextAttribute.class));
+        vBox.setVisible(controlWrapper.getAttributeManager().hasType(AttributeType.TEXT));
     }
 
     @Override
     public void addBinders(QuickSetupStateBinder stateBinder)
     {
-        stateBinder.builder(TextAttribute.class)
+        stateBinder.builder(AttributeType.TEXT)
                 .direct(textTextArea.textProperty(), TextAttribute.TEXT);
     }
 

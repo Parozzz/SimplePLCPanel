@@ -5,7 +5,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import parozzz.github.com.hmi.util.Resizable;
 
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleConsumer;
 
 final class ResizeFunction

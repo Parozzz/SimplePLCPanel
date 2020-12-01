@@ -3,10 +3,14 @@ package parozzz.github.com.hmi.controls.controlwrapper.setup.impl.control;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.control.*;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.impl.control.InputDataAttribute;
 import parozzz.github.com.hmi.controls.controlwrapper.impl.textinput.InputWrapper;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.ControlWrapperSetupStage;
@@ -39,7 +43,7 @@ public class InputDataSetupPane extends SetupPane<InputDataAttribute>
 
     public InputDataSetupPane(ControlWrapperSetupStage setupStage) throws IOException
     {
-        super(setupStage, "InputDataSetupPane", "Input Data", InputDataAttribute.class, false);
+        super(setupStage, "InputDataSetupPane", "Input Data", AttributeType.INPUT_DATA, false);
 
         vBox = (VBox) FXUtil.loadFXML("setup/inputData/inputDataMainPane.fxml", this);
 

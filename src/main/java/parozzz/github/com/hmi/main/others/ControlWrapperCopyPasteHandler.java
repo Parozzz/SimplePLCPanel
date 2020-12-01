@@ -73,7 +73,7 @@ public class ControlWrapperCopyPasteHandler extends FXObject
             var newControlWrapper = controlContainerPane.createControlWrapper(wrapperType);
             newControlWrapper.getContainerPane().relocate(layoutX + 10, layoutY + 10);
             controlWrapper.copyInto(newControlWrapper);
-            newControlWrapper.applyAttributes(this);
+            newControlWrapper.getAttributeManager().updateAllAttributes();
             pasteList.add(newControlWrapper);
         }
 
