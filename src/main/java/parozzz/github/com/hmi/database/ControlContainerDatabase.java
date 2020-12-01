@@ -16,7 +16,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public final class ControlContainerDatabase extends FXController
+public final class ControlContainerDatabase extends FXController implements Iterable<ControlContainerPane>
 {
     private final static Logger logger = Logger.getLogger(ControlContainerDatabase.class.getSimpleName());
 
@@ -274,5 +274,11 @@ public final class ControlContainerDatabase extends FXController
             logger.log(Level.WARNING, "Pages JSONArray has not been found while de-serializing");
         }
 
+    }
+
+    @Override
+    public Iterator<ControlContainerPane> iterator()
+    {
+        return controlsPageMap.values().iterator();
     }
 }

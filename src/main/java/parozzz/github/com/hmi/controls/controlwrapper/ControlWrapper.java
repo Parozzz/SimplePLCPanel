@@ -104,6 +104,7 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
         serializableDataSet.addInt("LayoutX", containerStackPane.layoutXProperty())
                 .addInt("LayoutY", containerStackPane.layoutYProperty());
 
+
         this.setControlVisualProperties(control, containerStackPane);
 
         var attributeInitializer = new ControlWrapperAttributeInitializer<>(this);

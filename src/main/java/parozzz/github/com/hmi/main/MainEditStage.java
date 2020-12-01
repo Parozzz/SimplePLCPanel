@@ -177,26 +177,39 @@ public final class MainEditStage extends BorderPaneHMIStage
         pageWidthTextField.textProperty().addListener((observableValue, oldValue, newValue) ->
         {
             var newWidth = Util.parseInt(newValue, 640);
-
+            for(var controlContainerPage : controlContainerDatabase)
+            {
+                var anchorPane = controlContainerPage.getMainAnchorPane();
+                anchorPane.setPrefWidth(newWidth);
+                anchorPane.setMaxWidth(newWidth);
+            }
+            /*
             controlContainerDatabase.getPageList().forEach(controlMainPage -> controlMainPage.getMainAnchorPane().setPrefWidth(newWidth));
             if (shownControlContainerPane != null)
             {
                 shownControlContainerPane.getMainAnchorPane().setPrefWidth(newWidth);
                 //this.getStageSetter().get().sizeToScene();
-            }
+            }*/
         });
 
         pageHeightTextField.setTextFormatter(FXTextFormatterUtil.simpleInteger(4));
         pageHeightTextField.textProperty().addListener((observableValue, oldValue, newValue) ->
         {
             var newHeight = Util.parseInt(newValue, 480);
+            for(var controlContainerPage : controlContainerDatabase)
+            {
+                var anchorPane = controlContainerPage.getMainAnchorPane();
+                anchorPane.setPrefHeight(newHeight);
+                anchorPane.setMaxHeight(newHeight);
+            }
 
+            /*
             controlContainerDatabase.getPageList().forEach(controlMainPage -> controlMainPage.getMainAnchorPane().setPrefHeight(newHeight));
             if (shownControlContainerPane != null)
             {
                 shownControlContainerPane.getMainAnchorPane().setPrefHeight(newHeight);
                 //this.getStageSetter().get().sizeToScene();
-            }
+            }*/
         });
 
         leftStackPane.getChildren().add(dragAndDropPane.getMainVBox());
