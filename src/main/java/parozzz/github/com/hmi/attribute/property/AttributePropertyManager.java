@@ -83,11 +83,6 @@ public class AttributePropertyManager
         return attributePropertyKeyMap.get(key);
     }
 
-    public void forEachKeyProperty(BiConsumer<String, AttributeProperty<?>> action)
-    {
-        attributePropertyKeyMap.forEach(action);
-    }
-
     public void forEachPropertyBis(Consumer<PropertyBis<?>> consumer)
     {
         propertyBisSet.forEach(consumer);

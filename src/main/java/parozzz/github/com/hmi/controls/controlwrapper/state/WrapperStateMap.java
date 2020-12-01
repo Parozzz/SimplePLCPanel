@@ -78,38 +78,6 @@ public final class WrapperStateMap extends FXObject
 
         defaultWrapperState.getAttributeMap().parseAttributes(attributeManager, true);
     }
-    /*
-    public void initDefaultState(Consumer<WrapperState> initDefaultStateConsumer)
-    {
-        Validate.needFalse("Trying to initialize default wrapper state twice", emptyAttributeListInitialized);
-        emptyAttributeListInitialized = true;
-
-        //Is not needed to add the default to the state set since is manager differently
-        initDefaultStateConsumer.accept(defaultWrapperState);
-    }
-
-    public void addState(WrapperState wrapperState)
-    {
-        this.addState(wrapperState, true);
-    }
-
-    public void addState(WrapperState wrapperState, boolean initWithEmptyAttributes)
-    {
-        this.requireDefaultInit();
-
-        wrapperStateList.add(wrapperState);
-        if (initWithEmptyAttributes) //If this is not used accurately, might lead to broken attribute maps
-        {
-            emptyAttributeList.forEach(emptyAttribute ->
-            {
-                var clonedAttribute = emptyAttribute.cloneAsDefaultWithSameControlWrapper();
-                wrapperState.getAttributeMap().addAttribute(clonedAttribute);
-            });
-        }
-
-        this.parseState(WrapperStateChangedConsumer.ChangeType.ADD); //In case a new state is added that is more valid than others, it should be updated immediately!
-    }
-*/
 
     public WrapperState createState(WrapperState wrapperState)
     {

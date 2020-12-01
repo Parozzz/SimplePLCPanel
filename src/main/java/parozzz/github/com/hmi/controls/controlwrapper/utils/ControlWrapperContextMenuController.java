@@ -1,4 +1,4 @@
-package parozzz.github.com.hmi.controls.controlwrapper.others;
+package parozzz.github.com.hmi.controls.controlwrapper.utils;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.geometry.Pos;

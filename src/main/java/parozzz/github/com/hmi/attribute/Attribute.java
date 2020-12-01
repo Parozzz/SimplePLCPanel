@@ -61,24 +61,7 @@ public abstract class Attribute extends FXObject// implements Cloneable
     }
 
     public abstract void update();
-/*
-    public final Attribute cloneAsDefault(ControlWrapper<?> controlWrapper)
-    {
-        return creatorFunction.apply(controlWrapper);
-    }
 
-    public Attribute cloneAsDefaultWithSameControlWrapper()
-    {
-        return cloneAsDefault(this.controlWrapper);
-    }
-
-    public Attribute clone(ControlWrapper<?> controlWrapper)
-    {
-        var copy = this.cloneAsDefault(controlWrapper);
-        this.copyInto(copy);
-        return copy;
-    }
-*/
     public void copyInto(Attribute pasteAttribute)
     {
         attributePropertyManager.forEachPropertyBis(propertyBis ->
@@ -95,48 +78,6 @@ public abstract class Attribute extends FXObject// implements Cloneable
             }
         });
     }
-    /*
-    public Attribute clone(ControlWrapper<?> controlWrapper)
-    {
-        var clone = this.createEmpty(controlWrapper);
-        attributePropertyManager.forEachPropertyBis(propertyBis ->
-        {
-            //This should be fine since if they have the same attribute property, they have the same type!
-            //Otherwise something is not working properly ... (And now a check is in place >:) )
-            var attributeProperty = propertyBis.getAttributeProperty();
-            Property property = propertyBis.getProperty();
-
-            Property cloneProperty = clone.getAttributePropertyManager().getByAttributeProperty(attributeProperty);
-            if(cloneProperty != null)
-            {
-                cloneProperty.setValue(property.getValue());
-            }
-        });
-
-        return clone;
-    }
-*/
-    /*
-    public Attribute clone()
-    {
-
-        va clone = this.cloneEmpty();
-        attributePropertyManager.forEachPropertyBis(propertyBis ->
-        {
-            //This should be fine since if they have the same attribute property, they have the same type!
-            //Otherwise something is not working properly ... (And now a check is in place >:) )
-            var attributeProperty = propertyBis.getAttributeProperty();
-            Property property = propertyBis.getProperty();
-
-            Property cloneProperty = clone.getAttributePropertyManager().getByAttributeProperty(attributeProperty);
-            if(cloneProperty != null)
-            {
-                cloneProperty.setValue(property.getValue());
-            }
-        });
-
-        return clone;
-    }*/
 
     @Override
     public JSONDataMap serialize()

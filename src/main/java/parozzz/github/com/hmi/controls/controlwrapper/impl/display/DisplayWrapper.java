@@ -32,7 +32,7 @@ public class DisplayWrapper extends LabeledWrapper<Label>
                     TextAttribute textAttribute = null;
                     ValueAttribute valueAttribute = null;
 
-                    for(var attributeType : updateData.getAttributeTypeList())
+                    for (var attributeType : updateData.getAttributeTypeList())
                     {
                         var attribute = AttributeFetcher.fetch(this, attributeType);
                         if (attribute == null)
@@ -40,22 +40,21 @@ public class DisplayWrapper extends LabeledWrapper<Label>
                             continue;
                         }
 
-                        if(attribute instanceof TextAttribute)
+                        if (attribute instanceof TextAttribute)
                         {
                             textAttribute = (TextAttribute) attribute;
-                        }
-                        else if(attribute instanceof ValueAttribute)
+                        } else if (attribute instanceof ValueAttribute)
                         {
                             valueAttribute = (ValueAttribute) attribute;
                         }
                     }
 
-                    if(textAttribute == null)
+                    if (textAttribute == null)
                     {
                         textAttribute = AttributeFetcher.fetch(this, AttributeType.TEXT);
                     }
 
-                    if(valueAttribute == null)
+                    if (valueAttribute == null)
                     {
                         valueAttribute = AttributeFetcher.fetch(this, AttributeType.VALUE);
                     }
@@ -71,45 +70,4 @@ public class DisplayWrapper extends LabeledWrapper<Label>
                 });
     }
 
-/*
-    @Override
-    protected void registerAttributeInitializers(List<Attribute> stateAttributeList,
-            List<Attribute> globalAttributeList)
-    {
-        super.registerAttributeInitializers(stateAttributeList, globalAttributeList);
-
-
-        //GENERICS
-        globalAttributeList.add(new ReadAddressAttribute(this));
-
-        //STATE SPECIFIC
-        stateAttributeList.add(new TextAttribute(this));
-        stateAttributeList.add(new ValueAttribute(this));
-    }
-
-    @Override
-    public void applyAttributes(Label control, Pane containerPane, AttributeMap attributeMap, Object involvedObject)
-    {
-        super.applyAttributes(control, containerPane, attributeMap, involvedObject);
-
-        String text = "";
-
-        var textAttribute = AttributeFetcher.fetch(attributeMap, TextAttribute.class);
-        if (textAttribute != null)
-        {
-            text = textAttribute.getValue(TextAttribute.TEXT);
-            //var placeholderType = textAttribute.getValue(TextAttribute.TEXT_PLACEHOLDER_TYPE);
-            //super.setParsedTextPlaceholders(control, text, placeholderType);
-
-            control.setTextAlignment(textAttribute.getValue(TextAttribute.TEXT_ALIGNMENT));
-            control.setLineSpacing(textAttribute.getValue(TextAttribute.LINE_SPACING));
-        }
-
-        var valueAttribute = AttributeFetcher.fetch(attributeMap, ValueAttribute.class);
-        if (valueAttribute != null)
-        {
-            super.setParsedTextPlaceholders(control, text, valueAttribute);
-        }
-    }
-*/
 }

@@ -51,31 +51,6 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
                 });
     }
 
-    /*
-    @Override
-    protected void registerAttributeInitializers(List<Attribute> stateAttributeList,
-            List<Attribute> globalAttributeList)
-    {
-        super.registerAttributeInitializers(stateAttributeList, globalAttributeList);
-
-        stateAttributeList.add(new FontAttribute(this));
-    }
-
-    @Override
-    public void applyAttributes(C control, Pane containerPane, AttributeMap attributeMap, Object involvedObject)
-    {
-        super.applyAttributes(control, containerPane, attributeMap, involvedObject);
-
-        var fontAttribute = AttributeFetcher.fetch(attributeMap, FontAttribute.class);
-        if (fontAttribute != null)
-        {
-            control.setFont(fontAttribute.getFont());
-            control.setUnderline(fontAttribute.getValue(FontAttribute.UNDERLINE));
-            control.setAlignment(fontAttribute.getValue(FontAttribute.TEXT_POSITION));
-            control.setTextFill(fontAttribute.getValue(FontAttribute.TEXT_COLOR));
-        }
-    }
-*/
     @Override
     public void setup()
     {

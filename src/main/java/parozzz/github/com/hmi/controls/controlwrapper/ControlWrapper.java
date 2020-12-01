@@ -28,8 +28,8 @@ import parozzz.github.com.hmi.controls.controlwrapper.attributes.ControlWrapperA
 import parozzz.github.com.hmi.controls.controlwrapper.attributes.ControlWrapperAttributeManager;
 import parozzz.github.com.hmi.controls.controlwrapper.extra.ChangePageExtraFeature;
 import parozzz.github.com.hmi.controls.controlwrapper.extra.ControlWrapperExtraFeature;
-import parozzz.github.com.hmi.controls.controlwrapper.others.ControlWrapperBorderCreator;
-import parozzz.github.com.hmi.controls.controlwrapper.others.ControlWrapperContextMenuController;
+import parozzz.github.com.hmi.controls.controlwrapper.utils.ControlWrapperBorderCreator;
+import parozzz.github.com.hmi.controls.controlwrapper.utils.ControlWrapperContextMenuController;
 import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
 import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperStateMap;
 import parozzz.github.com.hmi.serialize.data.JSONDataMap;
@@ -113,17 +113,6 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
         globalAttributeMap.parseAttributes(attributeManager, false);
         stateMap.initDefaultState(attributeManager);
 
-        /*
-        var stateAttributeList = new ArrayList<Attribute>();
-        var globalAttributeList = new ArrayList<Attribute>();
-
-        this.registerAttributeInitializers(stateAttributeList, globalAttributeList);
-        //Initialize the consumer inside the DefaultState for the control of this wrapper
-        stateMap.initDefaultState(wrapperState ->
-                stateAttributeList.forEach(wrapperState.getAttributeMap()::addAttribute));
-
-        globalAttributeList.forEach(globalAttributeMap::addAttribute);
-*/
         Stream.of(containerStackPane.widthProperty(), containerStackPane.heightProperty()).forEach(property ->
                 property.addListener((observableValue, oldValue, newValue) ->
                 {
@@ -144,7 +133,6 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
             }
 
             //No quick properties selection here. Is managed by the selection manager!
-            //controlContainerPane.getMainEditStage().getQuickPropertiesVBox().setSelected(this);
         });
 
         containerStackPane.addEventFilter(MouseEvent.MOUSE_RELEASED, mouseReleasedEventHandler = mouseEvent ->
@@ -461,122 +449,12 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
                 });
     }
 
-    /*
-    protected void registerAttributeInitializers(List<Attribute> stateAttributeList,
-            List<Attribute> globalAttributeList)
-    {
-        //GLOBALS
-        globalAttributeList.add(new ChangePageAttribute(this));
-
-        //STATE SPECIFIC
-        var pictureBank = this.getControlMainPage().getMainEditStage().getPictureBankStage();
-        stateAttributeList.add(new SizeAttribute(this));
-        stateAttributeList.add(new BackgroundAttribute(this, pictureBank));
-        stateAttributeList.add(new BorderAttribute(this));
-    }
-
-    private <A extends Attribute> void registerAttributeConsumer(Class<A> attributeClass, Consumer<A> consumer)
-    {
-        attributeUpdateConsumerMap.put(attributeClass, consumer);
-    }
-
-    public void applyAttributes(Object involvedObject)
-    {
-        this.applyAttributes(stateMap.getCurrentState().getAttributeMap(), involvedObject);
-    }
-
-    public void applyAttributes(AttributeMap attributeMap, Object involvedObject)
-    {
-        this.applyAttributes(control, containerStackPane, attributeMap, involvedObject);
-    }
-
-    public void applyAttributes(C control, Pane containerPane, AttributeMap attributeMap, Object involvedObject)
-    {
-        if (involvedObject != null)
-        {
-            attributeUpdatedRunnableSet.forEach(consumer -> consumer.accept(involvedObject));
-        }
-
-        var sizeAttribute = AttributeFetcher.fetch(attributeMap, SizeAttribute.class);
-        if (sizeAttribute != null)
-        {
-            if (sizeAttribute.getValue(SizeAttribute.ADAPT))
-            {
-                containerPane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
-                containerPane.setMinSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
-                containerPane.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
-            } else
-            {
-                var width = sizeAttribute.getValue(SizeAttribute.WIDTH);
-                var height = sizeAttribute.getValue(SizeAttribute.HEIGHT);
-
-                containerPane.setPrefSize(width, height);
-                containerPane.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-                containerPane.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-            }
-        }
-
-        var backgroundAttribute = AttributeFetcher.fetch(attributeMap, BackgroundAttribute.class);
-        if (backgroundAttribute != null)
-        {
-            control.setBackground(backgroundAttribute.getBackground());
-        }
-
-        var borderAttribute = AttributeFetcher.fetch(attributeMap, BorderAttribute.class);
-        if (borderAttribute != null)
-        {
-            control.setBorder(borderAttribute.getBorder());
-        }
-
-        if (control == this.control) //This needs to be set only
-        {
-            var changePageAttribute = AttributeFetcher.fetch(globalAttributeMap, ChangePageAttribute.class);
-            if (changePageAttribute != null)
-            {
-                var enabled = changePageAttribute.getValue(ChangePageAttribute.ENABLED);
-                if (enabled)
-                {
-                    var pageName = changePageAttribute.getValue(ChangePageAttribute.PAGE_NAME);
-                    this.setExtraFeature(new ChangePageExtraFeature(this, control, pageName));
-                }
-            }
-        }
-    }
-*/
-    /*
-    @Override
-    public ControlWrapper<C> clone()
-    {
-        var cloneControlWrapper = wrapperType.createWrapper(controlContainerPane);
-        stateMap.forEachNoDefault(wrapperState ->
-        {
-            var cloneWrapperState = wrapperState.clone(cloneControlWrapper);
-            cloneControlWrapper.stateMap.addState(cloneWrapperState, false);
-        });
-
-        var pasteDefaultState = cloneControlWrapper.stateMap.getDefaultState();
-        stateMap.getDefaultState().copyInto(pasteDefaultState);
-        return cloneControlWrapper;
-    }
-*/
     public void copyInto(ControlWrapper<?> pasteControlWrapper)
     {
         this.stateMap.copyInto(pasteControlWrapper.stateMap);
         this.globalAttributeMap.copyInto(pasteControlWrapper.globalAttributeMap);
     }
 
-    /*
-    public void cloneInto(ControlWrapper<?> cloneControlWrapper)
-    {
-        this.stateMap.forEachNoDefault(wrapperState ->
-                cloneControlWrapper.getStateMap().addState(wrapperState.clone(), false)
-        );
-
-        var defaultState = this.stateMap.getDefaultState();
-        var cloneDefaultState = cloneControlWrapper.getStateMap().getDefaultState();
-        cloneDefaultState.getAttributeMap().cloneFromOther(defaultState.getAttributeMap());
-    }
-*/
     private void setControlVisualProperties(C control, StackPane containerStackPane)
     {
         control.setMinSize(10, 10);

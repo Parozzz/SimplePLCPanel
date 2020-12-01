@@ -143,41 +143,13 @@ public class WrapperState implements Comparable<WrapperState>
         return firstCompareType.test(firstCompare, value)
                 && secondCompareType.test(secondCompare, value);
     }
-/*
-    public WrapperState createEmpty()
-    {
-        return new WrapperState(firstCompare, firstCompareType, secondCompare, secondCompareType);
-    }
 
-    public WrapperState clone(ControlWrapper<?> controlWrapper)
-    {
-        var cloneWrapperState = this.createEmpty();
-
-        attributeMap.forEach(attribute ->
-        {
-            var cloneAttribute = attribute.clone(controlWrapper);
-            cloneWrapperState.attributeMap.addAttribute(cloneAttribute);
-        });
-
-        return cloneWrapperState;
-    }
-*/
     public void copyInto(WrapperState pasteWrapperState)
     {
         Objects.requireNonNull(pasteWrapperState, "Trying to parse into a null state.");
         this.attributeMap.copyInto(pasteWrapperState.attributeMap);
     }
 
-    /*
-    @Override
-    public WrapperState clone()
-    {
-        var clonedWrapperState = this.createEmpty();
-        Objects.requireNonNull(clonedWrapperState, "Trying to clone an invalid state.");
-        clonedWrapperState.getAttributeMap().cloneFromOther(attributeMap);
-        return clonedWrapperState;
-    }
-*/
     @Override
     public int compareTo(WrapperState wrapperState)
     {

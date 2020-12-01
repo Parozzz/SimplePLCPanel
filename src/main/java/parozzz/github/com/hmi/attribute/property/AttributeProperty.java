@@ -9,13 +9,11 @@ public abstract class AttributeProperty<T>
 {
     protected final String key;
     protected final T defaultValue;
-    //protected final Property<T> property;
 
     public AttributeProperty(String key, T defaultValue)
     {
         this.key = key;
         this.defaultValue = defaultValue;
-        //this.property = new SimpleObjectProperty<>(defaultValue);
     }
 
     public String getKey()
@@ -42,10 +40,4 @@ public abstract class AttributeProperty<T>
     public abstract void serializeInto(Property<T> property, JSONDataMap jsonDataMap);
 
     public abstract void deserializeFrom(Property<T> property, JSONDataMap jsonDataMap);
-
-    @FunctionalInterface
-    public interface ChangeHandler<T>
-    {
-        void handle(T oldValue, T newValue);
-    }
 }
