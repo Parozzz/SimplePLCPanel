@@ -51,7 +51,18 @@ final class WrapperStateSerializer
                 firstCompare, firstCompareType,
                 secondCompare, secondCompareType
         );
-        MainLogger.getInstance().error("Deserializing a wrapper state has created a duplicate", new IllegalStateException(), null);
+
+
+        if(wrapperState == null)
+        {
+            var controlWrapper = wrapperStateMap.getControlWrapper();
+            MainLogger.getInstance().error(
+                    "Deserializing a wrapper state has created a duplicate.",
+                    new IllegalStateException(), controlWrapper
+            );
+            return;
+        }
+
         deserializeAttributeMap(jsonDataMap, wrapperState);
     }
 

@@ -34,6 +34,8 @@ public class ButtonDataSetupPane extends SetupPane<ButtonDataAttribute>
     {
         super.setup();
 
+        toggleInformationLabel.setVisible(false); //Start as not visible :)
+
         buttonTypeChoiceBox.setConverter(new EnumStringConverter<>(ButtonWrapperType.class).setCapitalize());
         buttonTypeChoiceBox.getItems().addAll(ButtonWrapperType.values());
         buttonTypeChoiceBox.setValue(ButtonWrapperType.NORMAL);

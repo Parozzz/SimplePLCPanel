@@ -62,6 +62,7 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
     private final ControlWrapperContextMenuController contextMenuController;
     private final ControlWrapperAttributeManager<C> attributeManager;
 
+    private final boolean stateless;
     private final TrigBoolean selected;
     private final TrigBoolean mainSelection;
 
@@ -74,7 +75,7 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
     private boolean resizing;
 
     public ControlWrapper(ControlContainerPane controlContainerPane, ControlWrapperType<C, ?> wrapperType,
-            BiFunction<ControlWrapper<C>, C, ControlWrapperValue<C>> valueSupplierCreator)
+            BiFunction<ControlWrapper<C>, C, ControlWrapperValue<C>> valueSupplierCreator, boolean stateless)
     {
         super("ControlWrapper_" + controlContainerPane.getNextControlWrapperIdentifier());
 
@@ -90,6 +91,7 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
                 .addFXChild(this.contextMenuController = new ControlWrapperContextMenuController(this, control, controlContainerPane))
                 .addFXChild(this.attributeManager = new ControlWrapperAttributeManager<>(this, control));
 
+        this.stateless = stateless;
         this.selected = new TrigBoolean(false);
         this.mainSelection = new TrigBoolean(false);
 
@@ -260,6 +262,11 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
         return validProperty;
     }
 
+    public boolean isStateless()
+    {
+        return stateless;
+    }
+
     public boolean isSelected()
     {
         return selected.get();
@@ -394,60 +401,67 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
 
     protected void registerAttributeInitializers(ControlWrapperAttributeInitializer<C> attributeInitializer)
     {
-        //GLOBAL
-        attributeInitializer.addGlobals(AttributeType.CHANGE_PAGE)
-                .addStates(AttributeType.SIZE, AttributeType.BACKGROUND, AttributeType.BORDER)
-                .addAttributeUpdateConsumer(updateData ->
+        if(stateless)
+        {
+            attributeInitializer.addGlobals(AttributeType.CHANGE_PAGE, AttributeType.SIZE,
+                    AttributeType.BACKGROUND, AttributeType.BORDER);
+        }else
+        {
+            attributeInitializer.addGlobals(AttributeType.CHANGE_PAGE)
+                    .addStates(AttributeType.SIZE, AttributeType.BACKGROUND, AttributeType.BORDER);
+        }
+
+        attributeInitializer.addAttributeUpdateConsumer(updateData ->
+        {
+            var control = updateData.getControl();
+            var containerPane = updateData.getContainerPane();
+
+            for(var attributeType : updateData.getAttributeTypeList())
+            {
+                var attribute = AttributeFetcher.fetch(this, attributeType);
+                if(attribute == null)
                 {
-                    var control = updateData.getControl();
-                    var containerPane = updateData.getContainerPane();
+                    continue;
+                }
 
-                    for(var attributeType : updateData.getAttributeTypeList())
+                if(attribute instanceof ChangePageAttribute)
+                {
+                    if(control == this.control) //This needs to be set only if is the same control as the one inside the controlwrapper
                     {
-                        var attribute = AttributeFetcher.fetch(this, attributeType);
-                        if(attribute == null)
+                        var enabled = attribute.getValue(ChangePageAttribute.ENABLED);
+                        if(enabled)
                         {
-                            continue;
-                        }
-
-                        if(attribute instanceof ChangePageAttribute)
-                        {
-                            if(control == this.control) //This needs to be set only if is the same control as the one inside the controlwrapper
-                            {
-                                var enabled = attribute.getValue(ChangePageAttribute.ENABLED);
-                                if(enabled)
-                                {
-                                    var pageName = attribute.getValue(ChangePageAttribute.PAGE_NAME);
-                                    this.setExtraFeature(new ChangePageExtraFeature(this, control, pageName));
-                                }
-                            }
-                        }else if(attribute instanceof SizeAttribute)
-                        {
-                            if(attribute.getValue(SizeAttribute.ADAPT))
-                            {
-                                containerPane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
-                                containerPane.setMinSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
-                                containerPane.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
-                            }else
-                            {
-                                var width = attribute.getValue(SizeAttribute.WIDTH);
-                                var height = attribute.getValue(SizeAttribute.HEIGHT);
-
-                                containerPane.setPrefSize(width, height);
-                                containerPane.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-                                containerPane.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-                            }
-                        }else if(attribute instanceof BackgroundAttribute)
-                        {
-                            var backgroundAttribute = (BackgroundAttribute) attribute;
-                            control.setBackground(backgroundAttribute.getBackground());
-                        }else if(attribute instanceof BorderAttribute)
-                        {
-                            var borderAttribute = (BorderAttribute) attribute;
-                            control.setBorder(borderAttribute.getBorder());
+                            var pageName = attribute.getValue(ChangePageAttribute.PAGE_NAME);
+                            this.setExtraFeature(new ChangePageExtraFeature(this, control, pageName));
                         }
                     }
-                });
+                }else if(attribute instanceof SizeAttribute)
+                {
+                    if(attribute.getValue(SizeAttribute.ADAPT))
+                    {
+                        containerPane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+                        containerPane.setMinSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+                        containerPane.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+                    }else
+                    {
+                        var width = attribute.getValue(SizeAttribute.WIDTH);
+                        var height = attribute.getValue(SizeAttribute.HEIGHT);
+
+                        containerPane.setPrefSize(width, height);
+                        containerPane.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+                        containerPane.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+                    }
+                }else if(attribute instanceof BackgroundAttribute)
+                {
+                    var backgroundAttribute = (BackgroundAttribute) attribute;
+                    control.setBackground(backgroundAttribute.getBackground());
+                }else if(attribute instanceof BorderAttribute)
+                {
+                    var borderAttribute = (BorderAttribute) attribute;
+                    control.setBorder(borderAttribute.getBorder());
+                }
+            }
+        });
     }
 
     public void copyInto(ControlWrapper<?> pasteControlWrapper)

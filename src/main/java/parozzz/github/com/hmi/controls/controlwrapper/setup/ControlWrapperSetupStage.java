@@ -42,6 +42,9 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
     private Button createStateButton;
 
     @FXML
+    private VBox attributesVBox;
+
+    @FXML
     private VBox globalAttributesVBox;
     @FXML
     private TitledPane globalAttributesTitledPane;
@@ -57,14 +60,15 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
     private StackPane centerStackPane;
 
     @FXML
+    private Label stateLabel;
+    @FXML
     private ChoiceBox<WrapperState> stateSelectionChoiceBox;
     @FXML
     private Button deleteStateButton;
 
     private final MainEditStage mainEditStage;
 
-    private final SetupPaneList stateSetupPaneList;
-    private final SetupPaneList globalSetupPaneList;
+    private final SetupPaneList setupPaneList;
 
     private final ChangeListener<Boolean> controlWrapperValidListener;
     private final ControlWrapperGenericAttributeUpdateConsumer attributesUpdatedConsumer;
@@ -79,8 +83,7 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
 
         this.mainEditStage = mainEditStage;
 
-        this.stateSetupPaneList = new SetupPaneList();
-        this.globalSetupPaneList = new SetupPaneList();
+        this.setupPaneList = new SetupPaneList();
 
         this.addFXChild(new WrapperStateCreationPane(this, createStateButton));
 
@@ -107,8 +110,7 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
             ignoreAttributeChanges = true;
             for(var attributeType : updateData.getAttributeTypeList())
             {
-                stateSetupPaneList.populateOf(selectedWrapperState.getAttributeMap(), attributeType);
-                globalSetupPaneList.populateOf(selectedControlWrapper.getGlobalAttributeMap(), attributeType);
+                setupPaneList.populateOf(selectedControlWrapper, selectedWrapperState, attributeType);
             }
             ignoreAttributeChanges = false;
         };
@@ -121,29 +123,27 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
 
         try
         {
-            stateSetupPaneList.add(new SizeSetupPane(this)).
+            setupPaneList.add(new SizeSetupPane(this)).
                     add(new FontSetupPane(this)).
                     add(new TextSetupPane(this)).
                     add(new BorderSetupPane(this)).
                     add(new BackgroundSetupPane(this)).
                     add(new ValueSetupPane(this)).
-                    add(new AddressSetupPane<>(this, "Write Address", AttributeType.WRITE_ADDRESS, false));
-
-            globalSetupPaneList.add(new ButtonDataSetupPane(this)) //I want this first! >:)
-                    .add(new InputDataSetupPane(this))
-                    .add(new ChangePageSetupPane(this))
-                    .add(new AddressSetupPane<>(this, "Read Address", AttributeType.READ_ADDRESS, true)); //I want this last! >:(
+                    add(new ButtonDataSetupPane(this)). //I want this first! >:(
+                    add(new InputDataSetupPane(this)).
+                    add(new ChangePageSetupPane(this)).
+                    add(new AddressSetupPane<>(this, "Write Address", AttributeType.WRITE_ADDRESS, false)).
+                    add(new AddressSetupPane<>(this, "Read Address", AttributeType.READ_ADDRESS, true)); //I want this last! >:(
         }
         catch(IOException exception)
         {
-            Logger.getLogger(ControlWrapperSetupStage.class.getSimpleName())
-                    .log(Level.WARNING, "Exception while loading ControlWrapperSetupPage", exception);
+            MainLogger.getInstance().error("Error while loading Setup Panes", exception, this);
         }
 
         this.getStageSetter().setAlwaysOnTop(true)
                 .setResizable(true)
-                .setWidth(600)
-                .setHeight(550) //To avoid starting extra small
+                .setWidth(615)
+                .setHeight(615) //To avoid starting extra small
                 .setOnWindowCloseRequest(windowEvent -> this.setSelectedControlWrapper(null));
 
         ContextMenuBuilder.builder()
@@ -184,6 +184,11 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
             return;
         }
 
+        if(selectedControlWrapper == null)
+        {
+            return;
+        }
+
         var setupPane = (SetupPane<?>) activeSelectable;
 
         var attributeChangerSet = setupPane.getAttributeChangerList();
@@ -194,7 +199,10 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
                 return;
             }
 
-            if(stateSetupPaneList.contains(setupPane))
+            var attributeType = setupPane.getAttributeType();
+            var attributeManager = selectedControlWrapper.getAttributeManager();
+
+            if(attributeManager.hasStateType(attributeType))
             {
                 var selectedState = stateSelectionChoiceBox.getValue();
                 attributeChangerSet.setDataToAttribute(selectedState.getAttributeMap(), false);
@@ -202,7 +210,7 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
                 //this.updatePreviewImage();
 
                 attributeChangerSet.resetAllDataChanged();
-            }else if(globalSetupPaneList.contains(setupPane))
+            }else if(attributeManager.hasGlobalType(attributeType))
             {
                 var globalAttributeMap = selectedControlWrapper.getGlobalAttributeMap();
                 attributeChangerSet.setDataToAttribute(globalAttributeMap, false);
@@ -231,10 +239,7 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
 
             selectedControlWrapper.validProperty().removeListener(controlWrapperValidListener);
             selectedControlWrapper.getAttributeManager().removeGenericUpdateConsumer(attributesUpdatedConsumer);
-            /*
-            //Update the current state of the ControlWrapper to avoid update on next data change.
-            selectedControlWrapper.getStateMap().getCurrentState().getAttributeMap().setAttributesToControlWrapper();
-            selectedControlWrapper.getGlobalAttributeMap().setAttributesToControlWrapper();*/
+
             selectedControlWrapper = null;
         }
 
@@ -245,19 +250,16 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
             return;
         }
 
+        //If a control wrapper is stateless, i will disable all stuff state related!
+        var stateless = controlWrapper.isStateless();
+        stateLabel.setDisable(stateless);
+        stateSelectionChoiceBox.setDisable(stateless);
+        deleteStateButton.setDisable(stateless);
+
         controlWrapper.validProperty().addListener(controlWrapperValidListener);
         controlWrapper.getAttributeManager().addGenericUpdateConsumer(attributesUpdatedConsumer);
 
-        //Since all the attributes are the same for each state, just compile it for the default state when a new wrapper is being edited
-        var stateAttributeButtonsChildren = stateAttributesVBox.getChildren();
-        stateAttributeButtonsChildren.clear();
-        stateSetupPaneList.forEachValidButton(selectedControlWrapper.getStateMap().getDefaultState().getAttributeMap(),
-                stateAttributeButtonsChildren::add);
-
-        var globalAttributeButtonsChildren = globalAttributesVBox.getChildren();
-        globalAttributeButtonsChildren.clear();
-        globalSetupPaneList.forEachValidButton(controlWrapper.getGlobalAttributeMap(), globalAttributeButtonsChildren::add);
-
+        this.populateButtonPanes();
         this.updateStateSelectionBox(); //This also populate state setup panes
         this.populateGlobalSetupPanes(); //Generics are populated only one time, not state dependant
 
@@ -305,58 +307,24 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
             newSelectButton.setBackground(FXUtil.createBackground(Color.LIMEGREEN));
             selectedPageLabel.setText(newSelectButton.getText());
 
-            if(stateSetupPaneList.contains(selectable))
+            if(selectedControlWrapper != null && selectable instanceof SetupPane<?>)
             {
-                stateAttributesTitledPane.setExpanded(true);
-            }else if(globalSetupPaneList.contains(selectable))
-            {
-                globalAttributesTitledPane.setExpanded(true);
+                var attributeType = ((SetupPane<?>) selectable).getAttributeType();
+                var attributeManager = selectedControlWrapper.getAttributeManager();
+                if(attributeManager.hasStateType(attributeType))
+                {
+                    stateAttributesTitledPane.setExpanded(true);
+                }else if(attributeManager.hasGlobalType(attributeType))
+                {
+                    globalAttributesTitledPane.setExpanded(true);
+                }
+
             }
         }
 
         this.activeSelectable = selectable;
     }
 
-    /*public void updatePreviewImage()
-    {
-        this.updatePreviewImage(stateSelectionChoiceBox.getValue());
-    }*/
-
-    /*
-    private void updatePreviewImage(WrapperState wrapperState)
-    {
-        if(selectedControlWrapper != null)
-        {
-            var children = previewStackPane.getChildren();
-            children.clear();
-
-            var preview = selectedControlWrapper.createPreviewFor(wrapperState);
-            //This is required otherwise the scaling won't work when using adapt
-            preview.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-            StackPane.setAlignment(preview, Pos.CENTER);
-
-            preview.widthProperty().addListener((observableValue, oldValue, newValue) ->
-            {
-                var scaleWidth = previewStackPane.getWidth() / newValue.doubleValue();
-                if(scaleWidth < 1)
-                {
-                    preview.setScaleX(scaleWidth);
-                }
-            });
-
-            preview.heightProperty().addListener((observableValue, oldValue, newValue) ->
-            {
-                var scaleHeight = previewStackPane.getHeight() / newValue.doubleValue();
-                if(scaleHeight < 1)
-                {
-                    preview.setScaleY(scaleHeight);
-                }
-            });
-
-            children.add(preview);
-        }
-    }
-*/
     public void updateStateSelectionBox()
     {
         if(selectedControlWrapper != null)
@@ -373,6 +341,55 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
         }
     }
 
+    private void populateButtonPanes()
+    {
+        Objects.requireNonNull(selectedControlWrapper, "Cannot populate button panes with a selected control wrapper");
+
+        //This also removed both the titled pane (That will be added in case the controlwrapper is not stateless)
+        var attributesVBoxChildren = attributesVBox.getChildren();
+        attributesVBoxChildren.clear();
+
+        //Since a control wrapper can be stateless, i want to avoid titled pane and go all buttons just there ;)
+        if(selectedControlWrapper.isStateless())
+        {
+            setupPaneList.forEach(setupPane ->
+            { //Doing this way is should respect the order given inside the list
+                var attributeType = setupPane.getAttributeType();
+                var attributeManager = selectedControlWrapper.getAttributeManager();
+                if(attributeManager.hasGlobalType(attributeType))
+                {
+                    attributesVBoxChildren.add(setupPane.getSelectButton());
+                }
+            });
+        }
+        else
+        {
+            //In case it has states, i just add back both the titles pane and the create state button!
+            attributesVBoxChildren.addAll(createStateButton,
+                    globalAttributesTitledPane, stateAttributesTitledPane);
+
+            //Since all the attributes are the same for each state, just compile it for the default state when a new wrapper is being edited
+            var stateAttributeButtonsChildren = stateAttributesVBox.getChildren();
+            stateAttributeButtonsChildren.clear();
+
+            var globalAttributeButtonsChildren = globalAttributesVBox.getChildren();
+            globalAttributeButtonsChildren.clear();
+            setupPaneList.forEach(setupPane ->
+            { //Doing this way is should respect the order given inside the list
+                var attributeType = setupPane.getAttributeType();
+                var attributeManager = selectedControlWrapper.getAttributeManager();
+
+                if(attributeManager.hasStateType(attributeType))
+                {
+                    stateAttributeButtonsChildren.add(setupPane.getSelectButton());
+                }else if(attributeManager.hasGlobalType(attributeType))
+                {
+                    globalAttributeButtonsChildren.add(setupPane.getSelectButton());
+                }
+            });
+        }
+    }
+
     private void populateStateSetupPanes()
     {
         Objects.requireNonNull(selectedControlWrapper, "Cannot populate StateSetupPanes without a SelectedControlWrapper");
@@ -380,7 +397,11 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
         var wrapperState = stateSelectionChoiceBox.getValue();
         if(wrapperState != null)
         {
-            stateSetupPaneList.populateAll(wrapperState.getAttributeMap());
+            selectedControlWrapper.getAttributeManager().forEachStateType(attributeType ->
+            {
+                var setupPane = setupPaneList.getFromAttributeType(attributeType);
+                setupPaneList.populate(setupPane, wrapperState.getAttributeMap());
+            });
             //And update the preview at the bottom of the page when a new state is selected!
             //this.updatePreviewImage(wrapperState);
         }
@@ -389,17 +410,20 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
     private void populateGlobalSetupPanes()
     {
         Objects.requireNonNull(selectedControlWrapper, "Cannot populate GlobalSetupPanes without a SelectedControlWrapper");
-
-        var globalAttributeMap = selectedControlWrapper.getGlobalAttributeMap();
-        globalSetupPaneList.populateAll(globalAttributeMap);
+        selectedControlWrapper.getAttributeManager().forEachGlobalType(attributeType ->
+        {
+            var setupPane = setupPaneList.getFromAttributeType(attributeType);
+            setupPaneList.populate(setupPane, selectedControlWrapper.getGlobalAttributeMap());
+        });
     }
 
     private void writeEntireCurrentStateToAll()
     {
-        for(var setupPane : stateSetupPaneList)
-        {
-            setupPane.writeToAllStates();
-        }
+        Objects.requireNonNull(selectedControlWrapper, "Cannot write current state without a SelectedControlWrapper");
+
+        selectedControlWrapper.getAttributeManager().forEachStateType(attributeType ->
+                setupPaneList.getFromAttributeType(attributeType).writeToAllStates()
+        );
     }
 
     private class SetupPaneList implements Iterable<SetupPane<?>>
@@ -441,7 +465,9 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
 
         public SetupPane<?> getFromAttributeType(AttributeType<?> attributeType)
         {
-            return attributeTypeSetupPaneMap.get(attributeType);
+            return Objects.requireNonNull(attributeTypeSetupPaneMap.get(attributeType),
+                    "A SetupPane for attribute " + attributeType.toString() + " does not exists"
+            );
         }
 
         public boolean contains(Object object)
@@ -449,26 +475,19 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
             return setupPaneList.contains(object);
         }
 
-        public void forEachValidButton(AttributeMap attributeMap, Consumer<Button> consumer)
+        public void populateOf(ControlWrapper<?> controlWrapper, WrapperState wrapperState,
+                AttributeType<?> attributeType)
         {
-            setupPaneList.stream()
-                    .filter(setupPane -> setupPane.hasAttribute(attributeMap))
-                    .map(SetupPane::getSelectButton)
-                    .forEach(consumer);
-        }
+            var setupPane = this.getFromAttributeType(attributeType);
 
-        public void populateOf(AttributeMap attributeMap, AttributeType<?> attributeType)
-        {
-            var setupPane = attributeTypeSetupPaneMap.get(attributeType);
-            if(setupPane != null)
+            var attributeManager = controlWrapper.getAttributeManager();
+            if(attributeManager.hasStateType(attributeType))
             {
-                this.populate(setupPane, attributeMap);
+                this.populate(setupPane, wrapperState.getAttributeMap());
+            }else if(attributeManager.hasGlobalType(attributeType))
+            {
+                this.populate(setupPane, controlWrapper.getGlobalAttributeMap());
             }
-        }
-
-        public void populateAll(AttributeMap attributeMap)
-        {
-            setupPaneList.forEach(setupPane -> this.populate(setupPane, attributeMap));
         }
 
         private void populate(SetupPane<?> setupPane, AttributeMap attributeMap)
@@ -487,3 +506,47 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
         }
     }
 }
+
+
+
+    /*
+    public void updatePreviewImage()
+    {
+        this.updatePreviewImage(stateSelectionChoiceBox.getValue());
+    }
+
+
+    private void updatePreviewImage(WrapperState wrapperState)
+    {
+        if(selectedControlWrapper != null)
+        {
+            var children = previewStackPane.getChildren();
+            children.clear();
+
+            var preview = selectedControlWrapper.createPreviewFor(wrapperState);
+            //This is required otherwise the scaling won't work when using adapt
+            preview.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+            StackPane.setAlignment(preview, Pos.CENTER);
+
+            preview.widthProperty().addListener((observableValue, oldValue, newValue) ->
+            {
+                var scaleWidth = previewStackPane.getWidth() / newValue.doubleValue();
+                if(scaleWidth < 1)
+                {
+                    preview.setScaleX(scaleWidth);
+                }
+            });
+
+            preview.heightProperty().addListener((observableValue, oldValue, newValue) ->
+            {
+                var scaleHeight = previewStackPane.getHeight() / newValue.doubleValue();
+                if(scaleHeight < 1)
+                {
+                    preview.setScaleY(scaleHeight);
+                }
+            });
+
+            children.add(preview);
+        }
+    }
+*/

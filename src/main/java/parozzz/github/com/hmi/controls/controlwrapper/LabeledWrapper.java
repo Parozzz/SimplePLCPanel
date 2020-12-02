@@ -17,9 +17,9 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
 {
     public LabeledWrapper(ControlContainerPane controlContainerPane,
             ControlWrapperType<C, ?> wrapperType,
-            BiFunction<ControlWrapper<C>, C, ControlWrapperValue<C>> valueSupplierCreator)
+            BiFunction<ControlWrapper<C>, C, ControlWrapperValue<C>> valueSupplierCreator, boolean stateless)
     {
-        super(controlContainerPane, wrapperType, valueSupplierCreator);
+        super(controlContainerPane, wrapperType, valueSupplierCreator, stateless);
     }
 
     @Override
@@ -27,8 +27,16 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
     {
         super.registerAttributeInitializers(attributeInitializer);
 
-        attributeInitializer.addStates(AttributeType.FONT)
-                .addAttributeUpdateConsumer(updateData ->
+        if(super.isStateless())
+        {
+            attributeInitializer.addStates(AttributeType.FONT);
+        }
+        else
+        {
+            attributeInitializer.addGlobals(AttributeType.FONT);
+        }
+
+        attributeInitializer.addAttributeUpdateConsumer(updateData ->
                 {
                     var control = updateData.getControl();
 

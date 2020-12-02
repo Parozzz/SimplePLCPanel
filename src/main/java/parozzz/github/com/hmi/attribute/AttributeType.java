@@ -60,6 +60,12 @@ public final class AttributeType<A extends Attribute>
         return attributeSupplier.supply(attributeMap);
     }
 
+    @Override
+    public String toString()
+    {
+        return attributeClass.getSimpleName();
+    }
+
     @FunctionalInterface
     public interface AttributeSupplier<A extends Attribute>
     {
