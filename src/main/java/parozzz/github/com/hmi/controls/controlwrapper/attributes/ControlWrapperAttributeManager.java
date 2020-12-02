@@ -3,10 +3,8 @@ package parozzz.github.com.hmi.controls.controlwrapper.attributes;
 import javafx.scene.control.Control;
 import javafx.scene.layout.Pane;
 import parozzz.github.com.hmi.FXObject;
-import parozzz.github.com.hmi.attribute.AttributeMap;
 import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
-import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperStateMap;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -19,8 +17,8 @@ public final class ControlWrapperAttributeManager<C extends Control> extends FXO
     private final ControlWrapper<C> controlWrapper;
     private final C control;
 
-    private final List<AttributeType<?>> stateAttributeTypeList;
-    private final List<AttributeType<?>> globalAttributeTypeList;
+    private final Set<AttributeType<?>> stateAttributeTypeSet;
+    private final Set<AttributeType<?>> globalAttributeTypeSet;
     private final Set<ControlWrapperAttributeUpdateConsumer<C>> attributeUpdateConsumerSet;
     private final Set<ControlWrapperGenericAttributeUpdateConsumer> genericAttributeUpdateConsumerSet;
 
@@ -31,33 +29,33 @@ public final class ControlWrapperAttributeManager<C extends Control> extends FXO
         this.controlWrapper = controlWrapper;
         this.control = control;
 
-        this.stateAttributeTypeList = new ArrayList<>();
-        this.globalAttributeTypeList = new ArrayList<>();
+        this.stateAttributeTypeSet = new HashSet<>();
+        this.globalAttributeTypeSet = new HashSet<>();
         this.attributeUpdateConsumerSet = new HashSet<>();
         this.genericAttributeUpdateConsumerSet = new HashSet<>();
     }
 
     public void forEachStateType(Consumer<AttributeType<?>> consumer)
     {
-        stateAttributeTypeList.forEach(consumer);
+        stateAttributeTypeSet.forEach(consumer);
     }
 
     public void forEachGlobalType(Consumer<AttributeType<?>> consumer)
     {
-        globalAttributeTypeList.forEach(consumer);
+        globalAttributeTypeSet.forEach(consumer);
     }
 
     public void initialize(ControlWrapperAttributeInitializer<C> attributeInitializer)
     {
-        stateAttributeTypeList.addAll(attributeInitializer.stateAttributeTypeList);
-        globalAttributeTypeList.addAll(attributeInitializer.globalAttributeTypeList);
+        stateAttributeTypeSet.addAll(attributeInitializer.stateAttributeTypeList);
+        globalAttributeTypeSet.addAll(attributeInitializer.globalAttributeTypeList);
         attributeUpdateConsumerSet.addAll(attributeInitializer.attributeUpdateConsumerSet);
     }
 
     public void setAllAttributesTo(C control, Pane containerPane)
     {
-        var allAttributeList = new ArrayList<>(stateAttributeTypeList);
-        allAttributeList.addAll(globalAttributeTypeList);
+        var allAttributeList = new ArrayList<>(stateAttributeTypeSet);
+        allAttributeList.addAll(globalAttributeTypeSet);
         var updateData = new ControlWrapperAttributeUpdateConsumer.UpdateData<>(
                 control, containerPane, allAttributeList
         );
@@ -84,18 +82,18 @@ public final class ControlWrapperAttributeManager<C extends Control> extends FXO
 
     public boolean hasStateType(AttributeType<?> attributeType)
     {
-        return stateAttributeTypeList.contains(attributeType);
+        return stateAttributeTypeSet.contains(attributeType);
     }
 
     public boolean hasGlobalType(AttributeType<?> attributeType)
     {
-        return globalAttributeTypeList.contains(attributeType);
+        return globalAttributeTypeSet.contains(attributeType);
     }
 
     public boolean hasType(AttributeType<?> attributeType)
     {
-        return stateAttributeTypeList.contains(attributeType) ||
-                globalAttributeTypeList.contains(attributeType);
+        return stateAttributeTypeSet.contains(attributeType) ||
+                globalAttributeTypeSet.contains(attributeType);
     }
 
     public void addUpdateConsumer(ControlWrapperAttributeUpdateConsumer<C> updateConsumer)

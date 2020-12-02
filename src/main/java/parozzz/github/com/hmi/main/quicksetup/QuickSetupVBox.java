@@ -8,18 +8,19 @@ import javafx.scene.paint.Color;
 import parozzz.github.com.hmi.FXController;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapperSpecific;
-import parozzz.github.com.hmi.controls.controlwrapper.attributes.ControlWrapperAttributeUpdateConsumer;
 import parozzz.github.com.hmi.controls.controlwrapper.attributes.ControlWrapperGenericAttributeUpdateConsumer;
+import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
 import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperStateChangedConsumer;
 import parozzz.github.com.hmi.main.quicksetup.impl.*;
 import parozzz.github.com.hmi.util.FXUtil;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class QuickSetupVBox extends FXController implements ControlWrapperSpecific
 {
+    private final VBox vBox;
     private final ScrollPane mainScrollPane;
 
     private final StateSelectionQuickSetupPane stateSelectionQuickSetupPane;
@@ -30,7 +31,7 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
     private final TextQuickSetupPane textQuickSetupPane;
 
     private final QuickSetupStateBinder stateBinder;
-    private final Set<QuickSetupPane> quickSetupPaneSet;
+    private final List<QuickSetupPane> quickSetupPaneList;
 
     private final ChangeListener<Boolean> validControlWrapperListener;
     private final ControlWrapperGenericAttributeUpdateConsumer attributeUpdatedConsumer;
@@ -43,16 +44,16 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
         super("QuickProperties");
 
         this.stateBinder = new QuickSetupStateBinder(this);
-        this.mainScrollPane = new ScrollPane();
+        this.mainScrollPane = new ScrollPane(this.vBox = new VBox());
 
-        this.addFXChild(this.stateSelectionQuickSetupPane = new StateSelectionQuickSetupPane())
+        this.addFXChild(this.stateSelectionQuickSetupPane = new StateSelectionQuickSetupPane(this))
                 .addFXChild(this.genericQuickSetupPane = new GenericQuickSetupPane())
                 .addFXChild(this.sizeQuickSetupPane = new SizeQuickSetupPane())
                 .addFXChild(this.fontQuickSetupPane = new FontQuickSetupPane())
                 .addFXChild(this.backgroundQuickSetupPane = new BackgroundQuickSetupPane())
                 .addFXChild(this.textQuickSetupPane = new TextQuickSetupPane());
 
-        this.quickSetupPaneSet = new HashSet<>();
+        this.quickSetupPaneList = new ArrayList<>();
 
         this.validControlWrapperListener = (observableValue, oldValue, newValue) ->
         {
@@ -65,7 +66,7 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
         {
             for(var attributeType : updateData.getAttributeTypeList())
             {
-                stateBinder.updateValueOf(attributeType);
+                stateBinder.loadValueFromControlWrapperOf(attributeType);
             }
         };
         //Since this is trigged also when a state is added/removed it should be gucci here
@@ -75,7 +76,7 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
             {
                 case ADD:
                 case REMOVE:
-                    stateSelectionQuickSetupPane.onNewControlWrapper(selectedControlWrapper);
+                    stateSelectionQuickSetupPane.loadStatesOf(selectedControlWrapper);
                     break;
             }
 
@@ -89,31 +90,15 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
     {
         super.setup();
 
+        vBox.setMinSize(0, 0);
+        vBox.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
         mainScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         mainScrollPane.setBackground(FXUtil.createBackground(Color.TRANSPARENT));
 
-        var scrollVBox = new VBox();
-        this.computeQuickSetupPane(scrollVBox,
-                stateSelectionQuickSetupPane, genericQuickSetupPane,
+        this.computeQuickSetupPane(stateSelectionQuickSetupPane, genericQuickSetupPane,
                 sizeQuickSetupPane, fontQuickSetupPane, backgroundQuickSetupPane, textQuickSetupPane
         );
-
-        scrollVBox.setMinSize(0, 0);
-        scrollVBox.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-
-        mainScrollPane.setContent(scrollVBox);
-
-        stateSelectionQuickSetupPane.setStateChangeConsumer(wrapperState ->
-        {
-            if(selectedControlWrapper == null || wrapperState == null)
-            {
-                stateBinder.setBoundWrapperState(null);
-                return;
-            }
-
-            selectedControlWrapper.getStateMap().changeCurrentState(wrapperState);
-            stateBinder.setBoundWrapperState(wrapperState);
-        });
     }
 
     @Override
@@ -129,14 +114,18 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
         return mainScrollPane;
     }
 
+    public WrapperState getSelectedWrapperState()
+    {
+        return stateSelectionQuickSetupPane.getSelectedWrapperState();
+    }
+
     public void refreshValuesIfSelected(ControlWrapper<?> controlWrapper)
     {
         if(selectedControlWrapper != null && selectedControlWrapper == controlWrapper)
         {
-            stateBinder.updateAll();
+            stateBinder.loadAllValuesFromControlWrapper();
         }
     }
-
 
     @Override
     public void setSelectedControlWrapper(ControlWrapper<?> controlWrapper)
@@ -151,19 +140,31 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
         this.selectedControlWrapper = controlWrapper;
         if(controlWrapper == null)
         {
-            stateBinder.setBoundWrapperState(null); //Without this, values on the control state are cleared on selection change
-            quickSetupPaneSet.forEach(QuickSetupPane::clear);
+            quickSetupPaneList.forEach(QuickSetupPane::clearControlWrapper);
             return;
         }
 
         controlWrapper.validProperty().addListener(validControlWrapperListener);
         controlWrapper.getAttributeManager().addGenericUpdateConsumer(attributeUpdatedConsumer);
         controlWrapper.getStateMap().addStateValueChangedConsumer(stateChangeConsumer);
-        quickSetupPaneSet.forEach(quickSetupPane ->
+
+        var children = vBox.getChildren();
+        children.clear();
+        for(var quickSetupPane : quickSetupPaneList)
+        {
+            if(quickSetupPane.parseControlWrapper(controlWrapper))
+            {
+                children.add(quickSetupPane.getParent());
+            }
+        }
+        /*
+        quickSetupPaneList.forEach(quickSetupPane ->
         {
             quickSetupPane.getParent().setVisible(true); //Uphere is better. Below it could hide it again.
             quickSetupPane.onNewControlWrapper(controlWrapper);
-        });
+        });*/
+
+        this.loadAllValuesFromControlWrapper();
     }
 
     @Override
@@ -172,14 +173,17 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
         return selectedControlWrapper;
     }
 
-    private void computeQuickSetupPane(VBox vBox, QuickSetupPane... quickSetupPanes)
+    public void loadAllValuesFromControlWrapper()
+    {
+        stateBinder.loadAllValuesFromControlWrapper();
+    }
+
+    private void computeQuickSetupPane(QuickSetupPane... quickSetupPanes)
     {
         for(var quickSetupPane : quickSetupPanes)
         {
             quickSetupPane.addBinders(stateBinder);
-
-            quickSetupPaneSet.add(quickSetupPane);
-            vBox.getChildren().add(quickSetupPane.getParent());
+            quickSetupPaneList.add(quickSetupPane);
         }
     }
 

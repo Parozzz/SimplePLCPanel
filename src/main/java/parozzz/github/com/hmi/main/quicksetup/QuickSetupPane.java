@@ -8,12 +8,11 @@ public interface QuickSetupPane
 {
     Parent getParent();
 
-    void onNewControlWrapper(ControlWrapper<?> controlWrapper);
+    boolean parseControlWrapper(ControlWrapper<?> controlWrapper);
+
+    //void onNewControlWrapper(ControlWrapper<?> controlWrapper);
+
+    void clearControlWrapper();
 
     void addBinders(QuickSetupStateBinder stateBinder);
-
-    default void clear()
-    {
-        this.getParent().setVisible(false);
-    }
 }

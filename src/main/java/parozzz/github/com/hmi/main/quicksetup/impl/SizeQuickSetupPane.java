@@ -6,11 +6,9 @@ import javafx.scene.Parent;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import parozzz.github.com.hmi.FXObject;
-import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.impl.SizeAttribute;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
-import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
 import parozzz.github.com.hmi.main.quicksetup.QuickSetupPane;
 import parozzz.github.com.hmi.main.quicksetup.QuickSetupStateBinder;
 import parozzz.github.com.hmi.util.FXUtil;
@@ -47,9 +45,9 @@ public final class SizeQuickSetupPane extends FXObject implements QuickSetupPane
     }
 
     @Override
-    public void onNewControlWrapper(ControlWrapper<?> controlWrapper)
+    public boolean parseControlWrapper(ControlWrapper<?> controlWrapper)
     {
-        vBox.setVisible(controlWrapper.getAttributeManager().hasType(AttributeType.SIZE));
+        return controlWrapper.getAttributeManager().hasType(AttributeType.SIZE);
     }
 
     @Override
@@ -61,10 +59,8 @@ public final class SizeQuickSetupPane extends FXObject implements QuickSetupPane
     }
 
     @Override
-    public void clear()
+    public void clearControlWrapper()
     {
-        QuickSetupPane.super.clear();
-
         widthTextField.setText("");
         heightTextField.setText("");
     }

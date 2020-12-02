@@ -7,11 +7,9 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import parozzz.github.com.hmi.FXObject;
-import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.impl.BackgroundAttribute;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
-import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
 import parozzz.github.com.hmi.main.quicksetup.QuickSetupPane;
 import parozzz.github.com.hmi.main.quicksetup.QuickSetupStateBinder;
 import parozzz.github.com.hmi.util.FXUtil;
@@ -45,9 +43,9 @@ public final class BackgroundQuickSetupPane extends FXObject implements QuickSet
     }
 
     @Override
-    public void onNewControlWrapper(ControlWrapper<?> controlWrapper)
+    public boolean parseControlWrapper(ControlWrapper<?> controlWrapper)
     {
-        vBox.setVisible(controlWrapper.getAttributeManager().hasType(AttributeType.BACKGROUND));
+        return controlWrapper.getAttributeManager().hasType(AttributeType.BACKGROUND);
     }
 
     @Override
@@ -58,10 +56,8 @@ public final class BackgroundQuickSetupPane extends FXObject implements QuickSet
     }
 
     @Override
-    public void clear()
+    public void clearControlWrapper()
     {
-        QuickSetupPane.super.clear();
-
         backgroundColorPicker.setValue(Color.WHITE);
     }
 }
