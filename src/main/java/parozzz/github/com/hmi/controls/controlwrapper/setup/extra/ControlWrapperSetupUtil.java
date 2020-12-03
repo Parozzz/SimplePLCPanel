@@ -11,14 +11,12 @@ public final class ControlWrapperSetupUtil
     public static <A extends Attribute> void writeAttributeChangerListToAllStates(ControlWrapper<?> controlWrapper,
             AttributeType<A> attributeType, SetupPaneAttributeChangerList<A> attributeChangerList)
     {
-
-
         //Set the changed data to ALL the states of the wrapper
         controlWrapper.getStateMap().forEach(wrapperState ->
         {
             var attribute = wrapperState.getAttributeMap().get(attributeType);
             if (attribute != null)
-            {
+            {//This is ok. A single attribute changer just modify one single data inside an attribute (I know naming is shite!)
                 for(var attributeChanger : attributeChangerList)
                 {
                     attributeChanger.setDataToAttribute(attribute);

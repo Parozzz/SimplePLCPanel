@@ -27,7 +27,7 @@ public class InputWrapper extends ControlWrapper<TextField>
 
     public InputWrapper(ControlContainerPane controlContainerPane)
     {
-        super(controlContainerPane, ControlWrapperType.NUMERIC_INPUT, InputWrapperValue::new);
+        super(controlContainerPane, ControlWrapperType.NUMERIC_INPUT, InputWrapperValue::new, true);
     }
 
     @Override
@@ -42,8 +42,7 @@ public class InputWrapper extends ControlWrapper<TextField>
     {
         super.registerAttributeInitializers(attributeInitializer);
 
-        attributeInitializer.addGlobals(AttributeType.INPUT_DATA)
-                .addStates(AttributeType.WRITE_ADDRESS, AttributeType.FONT)
+        attributeInitializer.addGlobals(AttributeType.INPUT_DATA, AttributeType.WRITE_ADDRESS, AttributeType.FONT)
                 .addAttributeUpdateConsumer(updateData ->
                 {
                     var control = updateData.getControl();

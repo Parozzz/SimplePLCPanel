@@ -10,23 +10,24 @@ import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
 import parozzz.github.com.hmi.main.quicksetup.QuickSetupPane;
 import parozzz.github.com.hmi.main.quicksetup.QuickSetupStateBinder;
+import parozzz.github.com.hmi.main.quicksetup.QuickSetupVBox;
 import parozzz.github.com.hmi.util.FXUtil;
-import parozzz.github.com.util.functionalinterface.FunctionalInterfaceUtil;
 
 import java.io.IOException;
-import java.util.function.Consumer;
 
 public final class StateSelectionQuickSetupPane extends FXObject implements QuickSetupPane
 {
     @FXML private ChoiceBox<WrapperState> stateChoiceBox;
 
-    private final VBox mainVBox;
-    private Consumer<WrapperState> stateChangeConsumer = FunctionalInterfaceUtil.emptyConsumer();
-    public StateSelectionQuickSetupPane() throws IOException
+    private final QuickSetupVBox quickSetupVBox;
+    private final VBox vBox;
+
+    public StateSelectionQuickSetupPane(QuickSetupVBox quickSetupVBox) throws IOException
     {
         super("StateSelectionQuickPropertiesPane");
 
-        this.mainVBox = (VBox) FXUtil.loadFXML("quickproperties/statesQuickSetupPane.fxml", this);
+        this.quickSetupVBox = quickSetupVBox;
+        this.vBox = (VBox) FXUtil.loadFXML("quickproperties/statesQuickSetupPane.fxml", this);
     }
 
     @Override
@@ -34,20 +35,28 @@ public final class StateSelectionQuickSetupPane extends FXObject implements Quic
     {
         super.setup();
 
-        VBox.setMargin(mainVBox, new Insets(2, 0, 0,  0));
+        VBox.setMargin(vBox, new Insets(2, 0, 0, 0));
 
         stateChoiceBox.setConverter(FXUtil.toStringOnlyConverter(WrapperState::getStringVersion));
-        stateChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> stateChangeConsumer.accept(newValue));
+        stateChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == null)
+            {
+                return;
+            }
+
+            var selectedControlWrapper = quickSetupVBox.getSelectedControlWrapper();
+            if (selectedControlWrapper != null)
+            {
+                selectedControlWrapper.getStateMap().forceCurrentState(newValue);
+
+                quickSetupVBox.loadAllValuesFromControlWrapper();
+            }
+        });
     }
 
-    public void changeState(WrapperState wrapperState)
+    public WrapperState getSelectedWrapperState()
     {
-        stateChoiceBox.setValue(wrapperState);
-    }
-
-    public void setStateChangeConsumer(Consumer<WrapperState> consumer)
-    {
-        this.stateChangeConsumer = consumer;
+        return stateChoiceBox.getValue();
     }
 
     @Override
@@ -58,25 +67,40 @@ public final class StateSelectionQuickSetupPane extends FXObject implements Quic
 
     public Parent getParent()
     {
-        return mainVBox;
+        return vBox;
     }
 
     @Override
-    public void onNewControlWrapper(ControlWrapper<?> controlWrapper)
+    public boolean parseControlWrapper(ControlWrapper<?> controlWrapper)
     {
-        var items = stateChoiceBox.getItems();
-        items.clear();
+        if(controlWrapper.isStateless())
+        {
+            return false;
+        }
 
+        this.loadStatesOf(controlWrapper);
+        return true;
+    }
+
+    public void changeState(WrapperState wrapperState)
+    {
+        stateChoiceBox.setValue(wrapperState);
+    }
+
+    public void loadStatesOf(ControlWrapper<?> controlWrapper)
+    {
         var stateMap = controlWrapper.getStateMap();
-        stateMap.forEach(items::add);
-        stateChoiceBox.getSelectionModel().select(stateMap.getCurrentState());
+        stateChoiceBox.setValue(stateMap.getCurrentState());
+
+        var stateChoiceBoxItems = stateChoiceBox.getItems();
+        stateChoiceBoxItems.clear();
+        stateMap.forEach(stateChoiceBoxItems::add);
     }
 
     @Override
-    public void clear()
+    public void clearControlWrapper()
     {
-        QuickSetupPane.super.clear();
-
+        stateChoiceBox.setValue(null);
         stateChoiceBox.getItems().clear();
     }
 }

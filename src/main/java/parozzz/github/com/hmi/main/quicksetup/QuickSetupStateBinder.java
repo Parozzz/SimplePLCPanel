@@ -2,9 +2,9 @@ package parozzz.github.com.hmi.main.quicksetup;
 
 import javafx.beans.property.Property;
 import parozzz.github.com.hmi.attribute.Attribute;
+import parozzz.github.com.hmi.attribute.AttributeMap;
 import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.property.AttributeProperty;
-import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,7 +18,6 @@ public final class QuickSetupStateBinder
     private final Set<BoundProperty<?, ?>> boundPropertySet;
     private final Map<AttributeType<?>, BoundAttributePropertySet<?>> attributeBoundPropertySetMap;
 
-    private WrapperState boundWrapperState;
     private boolean ignoreAttributeUpdate;
 
     QuickSetupStateBinder(QuickSetupVBox quickSetupVBox)
@@ -33,33 +32,48 @@ public final class QuickSetupStateBinder
         this.ignoreAttributeUpdate = ignoreAttributeUpdate;
     }
 
-    public void setBoundWrapperState(WrapperState wrapperState)
+    public void loadValueFromControlWrapperOf(AttributeType<?> attributeType)
     {
-        this.boundWrapperState = wrapperState;
-        this.updateAll();
-    }
+        AttributeMap attributeMap = this.getAttributeMapOf(attributeType);
+        if(attributeMap != null)
+        {
+            var boundAttributeProperty = attributeBoundPropertySetMap.get(attributeType);
+            if(boundAttributeProperty != null)
+            {
+                boundAttributeProperty.copyFromAttributeMap(attributeMap);
+            }
+        }
 
-    public void updateValueOf(AttributeType<?> attributeType)
-    {
+        /*
+        var wrapperState = quickSetupVBox.getSelectedWrapperState();
+
         if(boundWrapperState != null)
         {
             var boundAttributeProperty = attributeBoundPropertySetMap.get(attributeType);
             if(boundAttributeProperty != null)
             {
-                boundAttributeProperty.copyFromWrapperState(boundWrapperState);
+                boundAttributeProperty.copyFromAttributeMap(boundWrapperState);
             }
-        }
-
+        }*/
     }
 
-    public void updateAll()
+    public void loadAllValuesFromControlWrapper()
     {
+        attributeBoundPropertySetMap.values().forEach(boundAttributePropertySet ->
+        {
+            var attributeMap = this.getAttributeMapOf(boundAttributePropertySet.attributeType);
+            if(attributeMap != null)
+            {
+                boundAttributePropertySet.copyFromAttributeMap(attributeMap);
+            }
+        });
+        /*
         if(boundWrapperState != null)
         {
             attributeBoundPropertySetMap.values().forEach(boundAttributePropertySet ->
-                    boundAttributePropertySet.copyFromWrapperState(boundWrapperState)
+                    boundAttributePropertySet.copyFromAttributeMap(boundWrapperState)
             );
-        }
+        }*/
     }
 
     public <A extends Attribute> Builder<A> builder(AttributeType<A> attributeType)
@@ -86,12 +100,18 @@ public final class QuickSetupStateBinder
 
         property.addListener((observable, oldValue, newValue) ->
         {
-            if(boundWrapperState == null || ignoreAttributeUpdate)
+            if(ignoreAttributeUpdate)
             {
                 return;
             }
 
-            var attribute = boundWrapperState.getAttributeMap().get(attributeType);
+            var attributeMap = this.getAttributeMapOf(attributeType);
+            if(attributeMap == null)
+            {
+                return;
+            }
+
+            var attribute = attributeMap.get(attributeType);
             if(attribute != null)
             {
                 var attributeNewValue = quickToAttribute.apply(newValue);
@@ -99,6 +119,33 @@ public final class QuickSetupStateBinder
             }
         });
 
+    }
+
+    private AttributeMap getAttributeMapOf(AttributeType<?> attributeType)
+    {
+        var selectedControlWrapper = quickSetupVBox.getSelectedControlWrapper();
+        if(selectedControlWrapper == null)
+        {
+            return null;
+        }
+
+        AttributeMap attributeMap = null;
+
+        var attributeManager = selectedControlWrapper.getAttributeTypeManager();
+        if(attributeManager.isState(attributeType))
+        {
+            var wrapperState = quickSetupVBox.getSelectedWrapperState();
+            if(wrapperState != null)
+            {
+                attributeMap = wrapperState.getAttributeMap();
+            }
+        }
+        else if(attributeManager.isGlobal(attributeType))
+        {
+            attributeMap = selectedControlWrapper.getGlobalAttributeMap();
+        }
+
+        return attributeMap;
     }
 
     private static class BoundAttributePropertySet<A extends Attribute>
@@ -117,9 +164,9 @@ public final class QuickSetupStateBinder
             boundPropertySet.add(boundProperty);
         }
 
-        public void copyFromWrapperState(WrapperState wrapperState)
+        public void copyFromAttributeMap(AttributeMap attributeMap)
         {
-            var attribute = wrapperState.getAttributeMap().get(attributeType);
+            var attribute = attributeMap.get(attributeType);
             if(attribute != null)
             {
                 boundPropertySet.forEach(boundProperty -> boundProperty.copyFromAttribute(attribute));

@@ -2,12 +2,9 @@ package parozzz.github.com.hmi.attribute;
 
 import parozzz.github.com.hmi.FXController;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
-import parozzz.github.com.hmi.controls.controlwrapper.attributes.ControlWrapperAttributeManager;
+import parozzz.github.com.hmi.controls.controlwrapper.attributes.ControlWrapperAttributeTypeManager;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 public final class AttributeMap extends FXController
@@ -16,7 +13,7 @@ public final class AttributeMap extends FXController
     private final Map<AttributeType<?>, Attribute> typeToAttributeMap;
     private final Set<Attribute> attributeSet;
 
-    public AttributeMap (ControlWrapper<?> controlWrapper)
+    public AttributeMap(ControlWrapper<?> controlWrapper)
     {
         this(controlWrapper, "AttributeMap");
     }
@@ -30,14 +27,22 @@ public final class AttributeMap extends FXController
         this.attributeSet = new HashSet<>();
     }
 
-    public void parseAttributes(ControlWrapperAttributeManager<?> attributeManager, boolean state)
+    public void parseAttributes(ControlWrapperAttributeTypeManager attributeTypeManager, boolean state)
     {
         typeToAttributeMap.clear();
         attributeSet.clear();
 
-        if(state)
+        (state ? attributeTypeManager.getStateTypeCollection() : attributeTypeManager.getGlobalTypeCollection()).forEach(attributeType ->
         {
-            attributeManager.forEachStateType(attributeType ->
+            var attribute = attributeType.create(this);
+            super.addFXChild(attribute);
+            typeToAttributeMap.put(attributeType, attribute);
+            attributeSet.add(attribute);
+        });
+        /*
+        if (state)
+        {
+            attributeTypeManager.forEachState(attributeType ->
             {
                 var attribute = attributeType.create(this);
                 typeToAttributeMap.put(attributeType, attribute);
@@ -45,10 +50,9 @@ public final class AttributeMap extends FXController
 
                 super.addFXChild(attribute);
             });
-        }
-        else
+        } else
         {
-            attributeManager.forEachGlobalType(attributeType ->
+            attributeTypeManager.forEachGlobal(attributeType ->
             {
                 var attribute = attributeType.create(this);
                 typeToAttributeMap.put(attributeType, attribute);
@@ -56,7 +60,7 @@ public final class AttributeMap extends FXController
 
                 super.addFXChild(attribute);
             });
-        }
+        }*/
     }
 
     public ControlWrapper<?> getControlWrapper()
@@ -91,7 +95,7 @@ public final class AttributeMap extends FXController
             var attributeType = attribute.getType();
 
             var pasteAttribute = pasteAttributeMap.get(attributeType);
-            if(pasteAttribute != null)
+            if (pasteAttribute != null)
             {
                 attribute.copyInto(pasteAttribute);
             }

@@ -64,7 +64,7 @@ public class ControlWrapperQuickTextEditorStage extends HMIStage<VBox> implement
         if(selectedControlWrapper != null)
         {
             selectedControlWrapper.validProperty().removeListener(controlWrapperValidListener);
-            selectedControlWrapper.getAttributeManager().removeGenericUpdateConsumer(attributeUpdatedConsumer);
+            selectedControlWrapper.getAttributeUpdater().removeGenericUpdateConsumer(attributeUpdatedConsumer);
         }
 
         this.selectedControlWrapper = controlWrapper;
@@ -75,7 +75,7 @@ public class ControlWrapperQuickTextEditorStage extends HMIStage<VBox> implement
         }
 
         controlWrapper.validProperty().addListener(controlWrapperValidListener);
-        controlWrapper.getAttributeManager().addGenericUpdateConsumer(attributeUpdatedConsumer);
+        controlWrapper.getAttributeUpdater().addGenericUpdateConsumer(attributeUpdatedConsumer);
         controlWrapper.getStateMap().forEach(wrapperState ->
         {
             try

@@ -18,7 +18,7 @@ public final class ButtonWrapper
 {
     public ButtonWrapper(ControlContainerPane controlContainerPane)
     {
-        super(controlContainerPane, ControlWrapperType.BUTTON, ButtonWrapperValue::new);
+        super(controlContainerPane, ControlWrapperType.BUTTON, ButtonWrapperValue::new, false);
     }
 
     @Override
