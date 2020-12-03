@@ -29,11 +29,11 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
 
         if(super.isStateless())
         {
-            attributeInitializer.addStates(AttributeType.FONT);
+            attributeInitializer.addGlobals(AttributeType.FONT);
         }
         else
         {
-            attributeInitializer.addGlobals(AttributeType.FONT);
+            attributeInitializer.addStates(AttributeType.FONT);
         }
 
         attributeInitializer.addAttributeUpdateConsumer(updateData ->

@@ -2,11 +2,9 @@ package parozzz.github.com.hmi.main.quicksetup;
 
 import javafx.beans.property.Property;
 import parozzz.github.com.hmi.attribute.Attribute;
-import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.AttributeMap;
 import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.property.AttributeProperty;
-import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -133,8 +131,8 @@ public final class QuickSetupStateBinder
 
         AttributeMap attributeMap = null;
 
-        var attributeManager = selectedControlWrapper.getAttributeManager();
-        if(attributeManager.hasStateType(attributeType))
+        var attributeManager = selectedControlWrapper.getAttributeTypeManager();
+        if(attributeManager.isState(attributeType))
         {
             var wrapperState = quickSetupVBox.getSelectedWrapperState();
             if(wrapperState != null)
@@ -142,7 +140,7 @@ public final class QuickSetupStateBinder
                 attributeMap = wrapperState.getAttributeMap();
             }
         }
-        else if(attributeManager.hasGlobalType(attributeType))
+        else if(attributeManager.isGlobal(attributeType))
         {
             attributeMap = selectedControlWrapper.getGlobalAttributeMap();
         }

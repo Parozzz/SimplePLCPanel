@@ -96,7 +96,7 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
         mainScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         mainScrollPane.setBackground(FXUtil.createBackground(Color.TRANSPARENT));
 
-        this.computeQuickSetupPane(stateSelectionQuickSetupPane, genericQuickSetupPane,
+        this.computeQuickSetupPane(genericQuickSetupPane, stateSelectionQuickSetupPane,
                 sizeQuickSetupPane, fontQuickSetupPane, backgroundQuickSetupPane, textQuickSetupPane
         );
     }
@@ -133,7 +133,7 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
         if(selectedControlWrapper != null)
         {
             selectedControlWrapper.validProperty().removeListener(validControlWrapperListener);
-            selectedControlWrapper.getAttributeManager().removeGenericUpdateConsumer(attributeUpdatedConsumer);
+            selectedControlWrapper.getAttributeUpdater().removeGenericUpdateConsumer(attributeUpdatedConsumer);
             selectedControlWrapper.getStateMap().removeStateValueChangedConsumer(stateChangeConsumer);
         }
 
@@ -145,7 +145,7 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
         }
 
         controlWrapper.validProperty().addListener(validControlWrapperListener);
-        controlWrapper.getAttributeManager().addGenericUpdateConsumer(attributeUpdatedConsumer);
+        controlWrapper.getAttributeUpdater().addGenericUpdateConsumer(attributeUpdatedConsumer);
         controlWrapper.getStateMap().addStateValueChangedConsumer(stateChangeConsumer);
 
         var children = vBox.getChildren();

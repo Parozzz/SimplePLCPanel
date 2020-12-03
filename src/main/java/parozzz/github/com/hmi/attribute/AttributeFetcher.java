@@ -1,20 +1,19 @@
 package parozzz.github.com.hmi.attribute;
 
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
-import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperState;
 
 public final class AttributeFetcher
 {
     public static <A extends Attribute> A fetch(ControlWrapper<?> controlWrapper, AttributeType<A> attributeType)
     {
-        var attributeManager = controlWrapper.getAttributeManager();
+        var attributeManager = controlWrapper.getAttributeTypeManager();
 
         AttributeMap attributeMap;
-        if(attributeManager.hasStateType(attributeType))
+        if(attributeManager.isState(attributeType))
         {
             attributeMap = controlWrapper.getStateMap().getCurrentState().getAttributeMap();
         }
-        else if(attributeManager.hasGlobalType(attributeType))
+        else if(attributeManager.isGlobal(attributeType))
         {
             attributeMap = controlWrapper.getGlobalAttributeMap();
         }
@@ -28,7 +27,7 @@ public final class AttributeFetcher
 
     public static boolean hasAttribute(ControlWrapper<?> controlWrapper, AttributeType<?> attributeType)
     {
-        var attributeManager = controlWrapper.getAttributeManager();
+        var attributeManager = controlWrapper.getAttributeTypeManager();
         return attributeManager.hasType(attributeType);
     }
 

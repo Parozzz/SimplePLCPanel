@@ -53,7 +53,7 @@ public class FontQuickSetupPane  extends FXObject implements QuickSetupPane
     @Override
     public boolean parseControlWrapper(ControlWrapper<?> controlWrapper)
     {
-        return controlWrapper.getAttributeManager().hasType(AttributeType.FONT);
+        return controlWrapper.getAttributeTypeManager().hasType(AttributeType.FONT);
     }
 
     @Override
