@@ -10,6 +10,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
@@ -24,6 +25,11 @@ import java.util.function.Function;
 
 public class FXUtil
 {
+
+    public static final KeyCombination CONTROL_COPY = KeyCombination.keyCombination("CTRL+C");
+    public static final KeyCombination CONTROL_PASTE = KeyCombination.keyCombination("CTRL+V");
+    public static final KeyCombination CONTROL_CUT = KeyCombination.keyCombination("CTRL+X");
+
     private final static NumberStringConverter numberStringConverter = new NumberStringConverter(Locale.ITALY);
     public static final FileChooser.ExtensionFilter IMAGE_EXTENSION_FILTER = new FileChooser.ExtensionFilter("Images (*.jpeg, *.jpg, *.png)", "*.jpeg", "*.jpg", "*.png");
 

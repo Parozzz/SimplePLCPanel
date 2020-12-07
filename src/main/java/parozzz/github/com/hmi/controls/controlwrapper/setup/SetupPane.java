@@ -23,16 +23,16 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
     private final SetupPaneAttributeChangerList<A> attributeChangerList;
 
     private final Button selectButton;
-    private final boolean stateBased;
+    private boolean stateBased = false;
 
     public SetupPane(ControlWrapperSetupStage setupStage, String name, String buttonText,
-            AttributeType<A> attributeType, boolean stateBased)
+            AttributeType<A> attributeType)
     {
-        this(setupStage, name, new Button(buttonText), attributeType, stateBased);
+        this(setupStage, name, new Button(buttonText), attributeType);
     }
 
     public SetupPane(ControlWrapperSetupStage setupStage, String name, Button selectButton,
-            AttributeType<A> attributeType, boolean stateBased)
+            AttributeType<A> attributeType)
     {
         super(name);
 
@@ -40,7 +40,6 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
         this.attributeType = attributeType;
         this.attributeChangerList = new SetupPaneAttributeChangerList<>(this, attributeType);
         this.selectButton = selectButton;
-        this.stateBased = stateBased;
     }
 
     @Override
@@ -54,13 +53,6 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
 
         selectButton.setUserData(this);
         selectButton.setOnAction(actionEvent -> setupStage.setShownSelectable(this));
-
-        if(stateBased)
-        {
-            ContextMenuBuilder.builder()
-                    .simple("Write to All", this::writeToAllStates)
-                    .setTo(selectButton);
-        }
     }
 
     public ControlWrapperSetupStage getSetupStage()
@@ -92,16 +84,62 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
         return attributeChangerList;
     }
 
+    public void setAsState()
+    {
+        stateBased = true;
+        ContextMenuBuilder.builder()
+                .simple("Write to All", this::writeToAllStates)
+                .setTo(selectButton);
+
+        var propertySet = attributeChangerList.getPropertySet();
+        propertySet.forEach(property ->
+        {
+            var bean = property.getBean();
+            if (bean instanceof Control)
+            {
+                ContextMenuBuilder.builder()
+                        .simple("Write to All", () ->
+                        {
+                            var selectedControlWrapper = setupStage.getSelectedControlWrapper();
+                            if (selectedControlWrapper != null)
+                            {
+                                ControlWrapperSetupUtil.writeSingleAttributeChangerToAllStates(
+                                        selectedControlWrapper, attributeType,
+                                        attributeChangerList, property
+                                );
+                            }
+                        })
+                        .setTo((Control) bean);
+            }
+        });
+    }
+
+    public void setAsGlobal()
+    {
+        stateBased = false;
+        selectButton.setContextMenu(null);
+
+        var propertySet = attributeChangerList.getPropertySet();
+        propertySet.forEach(property ->
+        {
+            var bean = property.getBean();
+            if (bean instanceof Control)
+            {
+                ((Control) bean).setContextMenu(null);
+            }
+        });
+    }
+
     public void revertToDefaultValues()
     {
         var selectedControlWrapper = setupStage.getSelectedControlWrapper();
-        if(selectedControlWrapper != null)
+        if (selectedControlWrapper != null)
         {
             //Set the changed data to ALL the states of the wrapper
             selectedControlWrapper.getStateMap().forEach(wrapperState ->
             {
                 var attribute = wrapperState.getAttributeMap().get(attributeType);
-                if(attribute != null)
+                if (attribute != null)
                 {
                     attributeChangerList.forEach(attributeChanger ->
                             attributeChanger.getPropertyBis().revertToDefaultValues(attribute)
@@ -114,7 +152,7 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
     public void writeToAllStates()
     {
         var selectedControlWrapper = this.setupStage.getSelectedControlWrapper();
-        if(selectedControlWrapper != null)
+        if (selectedControlWrapper != null)
         {
             ControlWrapperSetupUtil.writeAttributeChangerListToAllStates(
                     selectedControlWrapper, attributeType, attributeChangerList
@@ -122,52 +160,9 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
         }
     }
 
-    protected void computeGlobalProperties()
-    {
-        this.computeProperties(false, true);
-    }
-
     protected void computeProperties()
     {
-        this.computeProperties(true, true);
-    }
-
-    protected void computeProperties(boolean addContextMenu, boolean addUndoRedo)
-    {
         var propertySet = attributeChangerList.getPropertySet();
-
-        if(addUndoRedo)
-        {
-            setupStage.getUndoRedoManager().addProperties(propertySet, this);
-        }
-
-        propertySet.forEach(property ->
-        {
-            var bean = property.getBean();
-            if(bean instanceof Control)
-            {
-                var control = (Control) bean;
-
-                if(addContextMenu)
-                {
-                    var setDataToAllStateMenuItem = new MenuItem("Write to All");
-                    setDataToAllStateMenuItem.setOnAction(actionEvent ->
-                    {
-                        var selectedControlWrapper = setupStage.getSelectedControlWrapper();
-                        if(selectedControlWrapper != null)
-                        {
-                            ControlWrapperSetupUtil.writeSingleAttributeChangerToAllStates(
-                                    selectedControlWrapper, attributeType,
-                                    attributeChangerList, property
-                            );
-                        }
-                    });
-
-                    var contextMenu = new ContextMenu();
-                    contextMenu.getItems().addAll(setDataToAllStateMenuItem);
-                    control.setContextMenu(contextMenu);
-                }
-            }
-        });
+        setupStage.getUndoRedoManager().addProperties(propertySet, this);
     }
 }

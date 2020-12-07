@@ -23,7 +23,7 @@ import java.util.List;
 
 public final class FontSetupPane extends SetupPane<FontAttribute>
 {
-    public final static List<Integer> SIZE_DEFAULT_CHOICE = List.of(1, 2, 4, 6, 8, 10, 12, 16, 20, 24, 28, 32, 36, 42, 48, 54, 60, 70, 80);
+    public final static List<Integer> TEXT_SIZE_DEFAULT_CHOICE = List.of(1, 2, 4, 6, 8, 10, 12, 16, 20, 24, 28, 32, 36, 42, 48, 54, 60, 70, 80);
 
     @FXML private Label frontLabel;
 
@@ -42,7 +42,7 @@ public final class FontSetupPane extends SetupPane<FontAttribute>
 
     public FontSetupPane(ControlWrapperSetupStage setupPage) throws IOException
     {
-        super(setupPage, "FontSetupPane", "Font", AttributeType.FONT, true);
+        super(setupPage, "FontSetupPane", "Font", AttributeType.FONT);
 
         this.vBox = (VBox) FXUtil.loadFXML("setup/fontSetupPane.fxml", this);
     }
@@ -52,12 +52,10 @@ public final class FontSetupPane extends SetupPane<FontAttribute>
     {
         super.setup();
 
-        textSizeComboBox.getStylesheets().add("stylesheets/combo_box_setup_style.css");
         textSizeComboBox.setConverter(new IntegerStringConverter());
-        textSizeComboBox.getItems().addAll(FontSetupPane.SIZE_DEFAULT_CHOICE);
+        textSizeComboBox.getItems().addAll(FontSetupPane.TEXT_SIZE_DEFAULT_CHOICE);
         textSizeComboBox.getEditor().setTextFormatter(FXTextFormatterUtil.simpleInteger(2));
 
-        fontComboBox.getStylesheets().add("stylesheets/combo_box_setup_style.css");
         fontComboBox.getItems().addAll(Font.getFontNames());
         fontComboBox.addEventFilter(KeyEvent.KEY_TYPED, keyEvent ->
         {

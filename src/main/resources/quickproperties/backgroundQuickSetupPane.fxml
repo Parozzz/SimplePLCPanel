@@ -5,12 +5,17 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="150.0" style="-fx-border-color: lightgray;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<?import javafx.scene.text.Font?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="150.0" spacing="3.0" style="-fx-border-color: lightgray;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Background">
          <padding>
             <Insets top="3.0" />
          </padding>
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
       </Label>
       <HBox>
          <children>
@@ -22,7 +27,7 @@
                   <Insets bottom="5.0" left="5.0" top="5.0" />
                </HBox.margin>
             </Label>
-            <ColorPicker fx:id="backgroundColorPicker" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+            <ColorPicker fx:id="backgroundColorPicker" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: transparent; -fx-border-color: lightgray;">
                <HBox.margin>
                   <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
                </HBox.margin>

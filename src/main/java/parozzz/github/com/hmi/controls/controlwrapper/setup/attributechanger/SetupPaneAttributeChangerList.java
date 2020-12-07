@@ -13,18 +13,12 @@ import java.util.function.Function;
 
 public final class SetupPaneAttributeChangerList<A extends Attribute> implements Iterable<SetupPaneAttributeChanger<A>>
 {
-    public enum Priority
-    {
-        HIGH,
-        MEDIUM,
-        LOW;
-    }
-
     private final SetupPane<A> setupPane;
     private final AttributeType<A> attributeType;
     private final List<SetupPaneAttributeChanger<A>> attributeChangerList;
     private final Map<Property<?>, SetupPaneAttributeChanger<A>> propertyToAttributeChangerMap;
 
+    private boolean ignoreCopy;
     private boolean complete = false;
 
     public SetupPaneAttributeChangerList(SetupPane<A> setupPane, AttributeType<A> attributeType)
@@ -87,13 +81,20 @@ public final class SetupPaneAttributeChangerList<A extends Attribute> implements
         {
             if(attributeChanger.isDataChanged() || forceSet)
             {
+                ignoreCopy = true;
                 attributeChanger.setDataToAttribute(attribute);
+                ignoreCopy = false;
             }
         }
     }
 
     public void copyDataFromAttribute(AttributeMap attributeMap)
     {
+        if(ignoreCopy)
+        {
+            return;
+        }
+
         var attribute = attributeMap.get(attributeType);
         if(attribute == null)
         {

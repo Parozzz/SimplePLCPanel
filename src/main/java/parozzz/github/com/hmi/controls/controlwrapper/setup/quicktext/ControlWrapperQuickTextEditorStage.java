@@ -33,7 +33,7 @@ public class ControlWrapperQuickTextEditorStage extends HMIStage<VBox> implement
         this.statePaneList = new ArrayList<>();
         controlWrapperValidListener = (observableValue, oldValue, newValue) ->
         {
-            if(!newValue)
+            if (!newValue)
             {
                 this.setSelectedControlWrapper(null);
             }
@@ -51,7 +51,9 @@ public class ControlWrapperQuickTextEditorStage extends HMIStage<VBox> implement
     {
         super.setup();
 
-        this.getStageSetter().setOnWindowCloseRequest(windowEvent -> this.setSelectedControlWrapper(null));
+        this.getStageSetter()
+                .setAlwaysOnTop(true)
+                .setOnWindowCloseRequest(windowEvent -> this.setSelectedControlWrapper(null));
     }
 
     @Override
@@ -61,14 +63,14 @@ public class ControlWrapperQuickTextEditorStage extends HMIStage<VBox> implement
         secondRowVBox.getChildren().clear();
         statePaneList.clear();
 
-        if(selectedControlWrapper != null)
+        if (selectedControlWrapper != null)
         {
             selectedControlWrapper.validProperty().removeListener(controlWrapperValidListener);
             selectedControlWrapper.getAttributeUpdater().removeGenericUpdateConsumer(attributeUpdatedConsumer);
         }
 
         this.selectedControlWrapper = controlWrapper;
-        if(controlWrapper == null)
+        if (controlWrapper == null)
         {
             this.getStageSetter().close();
             return;
@@ -83,14 +85,13 @@ public class ControlWrapperQuickTextEditorStage extends HMIStage<VBox> implement
                 var statePane = new QuickTextEditorStatePane(this, wrapperState);
                 statePane.setup();
                 statePaneList.add(statePane);
-            }
-            catch(IOException e)
+            } catch (IOException e)
             {
                 e.printStackTrace();
             }
         });
 
-        for(int x = 0; x < statePaneList.size(); x++)
+        for (int x = 0; x < statePaneList.size(); x++)
         {
             var statePane = statePaneList.get(x);
             (x % 2 == 0 ? firstRowVBox : secondRowVBox).getChildren().add(statePane.getParent());

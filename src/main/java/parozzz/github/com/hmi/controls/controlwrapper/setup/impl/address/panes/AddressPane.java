@@ -26,8 +26,11 @@ public abstract class AddressPane extends FXObject
 
     public abstract Parent getMainParent();
 
-    public abstract void parseAttributeChangerList(
-            SetupPaneAttributeChangerList<? extends AddressAttribute> attributeChangerList);
+    public abstract void parseAttributeChangerList(SetupPaneAttributeChangerList<? extends AddressAttribute> attributeChangerList);
+
+    public abstract void setAsState();
+
+    public abstract void setAsGlobal();
 
     //public abstract void parseUndoRedoManager(UndoRedoManager undoRedoManager);
 }

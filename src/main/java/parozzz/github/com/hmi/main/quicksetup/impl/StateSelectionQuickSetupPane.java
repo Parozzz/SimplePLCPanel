@@ -71,7 +71,7 @@ public final class StateSelectionQuickSetupPane extends FXObject implements Quic
     }
 
     @Override
-    public boolean parseControlWrapper(ControlWrapper<?> controlWrapper)
+    public boolean validateControlWrapper(ControlWrapper<?> controlWrapper)
     {
         if(controlWrapper.isStateless())
         {

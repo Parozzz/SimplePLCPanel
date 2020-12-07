@@ -43,7 +43,7 @@ public class InputDataSetupPane extends SetupPane<InputDataAttribute>
 
     public InputDataSetupPane(ControlWrapperSetupStage setupStage) throws IOException
     {
-        super(setupStage, "InputDataSetupPane", "Input Data", AttributeType.INPUT_DATA, false);
+        super(setupStage, "InputDataSetupPane", "Input Data", AttributeType.INPUT_DATA);
 
         vBox = (VBox) FXUtil.loadFXML("setup/inputData/inputDataMainPane.fxml", this);
 
@@ -86,7 +86,7 @@ public class InputDataSetupPane extends SetupPane<InputDataAttribute>
 
         super.getAttributeChangerList().create(inputTypeChoiceBox.valueProperty(), InputDataAttribute.TYPE);
 
-        super.computeGlobalProperties();
+        super.computeProperties();
     }
 
     @Override

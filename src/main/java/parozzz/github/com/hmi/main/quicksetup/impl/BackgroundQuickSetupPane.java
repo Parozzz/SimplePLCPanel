@@ -43,7 +43,7 @@ public final class BackgroundQuickSetupPane extends FXObject implements QuickSet
     }
 
     @Override
-    public boolean parseControlWrapper(ControlWrapper<?> controlWrapper)
+    public boolean validateControlWrapper(ControlWrapper<?> controlWrapper)
     {
         return controlWrapper.getAttributeTypeManager().hasType(AttributeType.BACKGROUND);
     }

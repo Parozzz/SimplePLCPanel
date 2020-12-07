@@ -4,12 +4,17 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.VBox?>
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="150.0" style="-fx-border-color: lightgray;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<?import javafx.scene.text.Font?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="150.0" spacing="3.0" style="-fx-border-color: lightgray;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Text">
          <padding>
             <Insets bottom="5.0" top="5.0" />
          </padding>
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
       </Label>
       <TextArea fx:id="textTextArea" maxWidth="1.7976931348623157E308" prefHeight="50.0">
          <VBox.margin>

@@ -28,7 +28,6 @@ public class AddressSetupPane<A extends AddressAttribute> extends SetupPane<A>
     @FXML private StackPane centerStackPane;
     @FXML private TextField textAddressTextField;
 
-    private final boolean global;
     private final VBox mainVBox;
 
     private final SiemensAddressPane siemensAddressPane;
@@ -36,15 +35,16 @@ public class AddressSetupPane<A extends AddressAttribute> extends SetupPane<A>
     private AddressPane selectedAddressPane;
 
     public AddressSetupPane(ControlWrapperSetupStage setupPage, String buttonText,
-                            AttributeType<A> attributeType, boolean global) throws IOException
+                            AttributeType<A> attributeType) throws IOException
     {
-        super(setupPage, buttonText + "SetupPage", buttonText, attributeType, !global);
+        super(setupPage, buttonText + "SetupPage", buttonText, attributeType);
 
-        this.global = global;
         this.mainVBox = (VBox) FXUtil.loadFXML("setup/addressSetupPane.fxml", this);
 
+        var readAddress = attributeType == AttributeType.READ_ADDRESS;
+
         this.siemensAddressPane = new SiemensAddressPane(this);
-        this.modbusTCPAddressPane = new ModbusTCPAddressPane(global); //The global one will always be read address
+        this.modbusTCPAddressPane = new ModbusTCPAddressPane(this, readAddress); //The global one will always be read address
     }
 
     @Override
@@ -109,21 +109,23 @@ public class AddressSetupPane<A extends AddressAttribute> extends SetupPane<A>
             }
         });
 
+        //This allow updating the string parser when a value here changes!
+        /*textAddressTextField.setOnAction(event -> this.parseAddressStringParser());
+        textAddressTextField.setOnMouseExited(mouseEvent -> this.parseAddressStringParser());
+        textAddressTextField.setOnKeyReleased(keyEvent ->
+        {
+            if(FXUtil.CONTROL_PASTE.match(keyEvent))
+            {
+                this.parseAddressStringParser();
+            }
+        });*/
+
+
         super.getAttributeChangerList().create(addressTypeChoiceBox.valueProperty(), AddressAttribute.DATA_TYPE);
+        siemensAddressPane.parseAttributeChangerList(super.getAttributeChangerList());
+        modbusTCPAddressPane.parseAttributeChangerList(super.getAttributeChangerList());
 
-        this.parseAddressPane(siemensAddressPane);
-        this.parseAddressPane(modbusTCPAddressPane);
-
-        if(!global) //Do this after i parse the address pane so all the values inside the attribute changer list are there.
-        {
-            super.computeProperties();
-            //super.getSetupStage().getSelectAndMultipleWrite()
-            //        .onSelectingMultiplesChangeListener(selectMultiples -> textAddressTextField.setVisible(!selectMultiples));
-        }
-        else
-        {
-            super.computeGlobalProperties();
-        }
+        super.computeProperties(); //Do this after i parse the address pane so all the values inside the attribute changer list are there.
     }
 
     @Override
@@ -143,24 +145,33 @@ public class AddressSetupPane<A extends AddressAttribute> extends SetupPane<A>
         return mainVBox;
     }
 
-    private void parseAddressPane(AddressPane addressPane)
+    public void setAsState()
     {
-        addressPane.parseAttributeChangerList(super.getAttributeChangerList());
+        super.setAsState();
+        siemensAddressPane.setAsState();
+        modbusTCPAddressPane.setAsState();
+    }
 
-        var stringParser = addressPane.getAddressStringParser();
-        stringParser.getProperty().addListener((observableValue, oldValue, newValue) ->
+    public void setAsGlobal()
+    {
+        super.setAsGlobal();
+        siemensAddressPane.setAsGlobal();
+        modbusTCPAddressPane.setAsGlobal();
+    }
+
+    public TextField getTextAddressTextField()
+    {
+        return textAddressTextField;
+    }
+
+    private void parseAddressStringParser()
+    {
+        if(selectedAddressPane == null || selectedAddressPane.getAddressDataType() == AddressDataType.NONE)
         {
-            if (addressTypeChoiceBox.getValue() == addressPane.getAddressDataType())
-            {
-                textAddressTextField.setText(newValue);
-            }
-        });
-        textAddressTextField.textProperty().addListener((observableValue, oldValue, newValue) ->
-        {
-            if (addressTypeChoiceBox.getValue() == addressPane.getAddressDataType())
-            {
-                stringParser.parse(newValue);
-            }
-        });
+            textAddressTextField.setText("");
+            return;
+        }
+
+        selectedAddressPane.getAddressStringParser().parse(textAddressTextField.getText());
     }
 }

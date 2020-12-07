@@ -6,7 +6,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.util.converter.IntegerStringConverter;
 import parozzz.github.com.hmi.FXObject;
-import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.impl.FontAttribute;
 import parozzz.github.com.hmi.attribute.impl.TextAttribute;
@@ -59,7 +58,7 @@ class QuickTextEditorStatePane extends FXObject
         );
 
         textSizeComboBox.setConverter(new IntegerStringConverter());
-        textSizeComboBox.getItems().addAll(FontSetupPane.SIZE_DEFAULT_CHOICE);
+        textSizeComboBox.getItems().addAll(FontSetupPane.TEXT_SIZE_DEFAULT_CHOICE);
         textSizeComboBox.valueProperty().addListener((observable, oldValue, newValue) ->
                 this.setToFontAttribute(FontAttribute.FONT_TEXT_SIZE, newValue)
         );

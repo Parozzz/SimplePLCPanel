@@ -4,26 +4,27 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
-import javafx.scene.control.TextField;
+import javafx.scene.control.ComboBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.util.converter.IntegerStringConverter;
 import parozzz.github.com.hmi.FXObject;
 import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.impl.FontAttribute;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
+import parozzz.github.com.hmi.controls.controlwrapper.setup.impl.FontSetupPane;
 import parozzz.github.com.hmi.main.quicksetup.QuickSetupPane;
 import parozzz.github.com.hmi.main.quicksetup.QuickSetupStateBinder;
 import parozzz.github.com.hmi.util.FXUtil;
-import parozzz.github.com.util.Util;
 
 import java.io.IOException;
-import java.util.Objects;
 
 public class FontQuickSetupPane  extends FXObject implements QuickSetupPane
 {
     @FXML private ColorPicker textColorPicker;
-    @FXML private TextField textSizeTextField;
+    @FXML private ComboBox<Integer> textSizeComboBox;
     @FXML private CheckBox boldCheckBox;
     @FXML private CheckBox italicCheckBox;
     @FXML private CheckBox underlineCheckBox;
@@ -43,6 +44,11 @@ public class FontQuickSetupPane  extends FXObject implements QuickSetupPane
         super.setup();
 
         VBox.setMargin(vBox, new Insets(2, 0, 0, 0));
+
+        textSizeComboBox.setConverter(new IntegerStringConverter());
+        textSizeComboBox.getItems().addAll(FontSetupPane.TEXT_SIZE_DEFAULT_CHOICE);
+
+        
     }
 
     public Parent getParent()
@@ -51,7 +57,7 @@ public class FontQuickSetupPane  extends FXObject implements QuickSetupPane
     }
 
     @Override
-    public boolean parseControlWrapper(ControlWrapper<?> controlWrapper)
+    public boolean validateControlWrapper(ControlWrapper<?> controlWrapper)
     {
         return controlWrapper.getAttributeTypeManager().hasType(AttributeType.FONT);
     }
@@ -61,7 +67,7 @@ public class FontQuickSetupPane  extends FXObject implements QuickSetupPane
     {
         stateBinder.builder(AttributeType.FONT)
                 .direct(textColorPicker.valueProperty(), FontAttribute.TEXT_COLOR)
-                .indirect(textSizeTextField.textProperty(), Util::parseIntOrZero, Objects::toString, FontAttribute.FONT_TEXT_SIZE)
+                .direct(textSizeComboBox.valueProperty(), FontAttribute.FONT_TEXT_SIZE)
                 .direct(boldCheckBox.selectedProperty(), FontAttribute.BOLD_WEIGHT)
                 .direct(italicCheckBox.selectedProperty(), FontAttribute.ITALIC_POSTURE)
                 .direct(underlineCheckBox.selectedProperty(), FontAttribute.UNDERLINE);
@@ -71,7 +77,7 @@ public class FontQuickSetupPane  extends FXObject implements QuickSetupPane
     public void clearControlWrapper()
     {
         textColorPicker.setValue(Color.WHITE);
-        textSizeTextField.setText("");
+        textSizeComboBox.setValue(12);
         boldCheckBox.setSelected(false);
         italicCheckBox.setSelected(false);
         underlineCheckBox.setSelected(false);

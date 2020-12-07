@@ -24,7 +24,7 @@ public class ButtonDataSetupPane extends SetupPane<ButtonDataAttribute>
 
     public ButtonDataSetupPane(ControlWrapperSetupStage setupPage) throws IOException
     {
-        super(setupPage, "ButtonDataSetupPane", "Button Data", AttributeType.BUTTON_DATA, false);
+        super(setupPage, "ButtonDataSetupPane", "Button Data", AttributeType.BUTTON_DATA);
 
         this.mainVBox = (VBox) FXUtil.loadFXML("setup/buttonDataSetupPane.fxml", this);
     }
@@ -44,7 +44,7 @@ public class ButtonDataSetupPane extends SetupPane<ButtonDataAttribute>
         );
         super.getAttributeChangerList().create(buttonTypeChoiceBox.valueProperty(), ButtonDataAttribute.TYPE);
 
-        super.computeGlobalProperties();
+        super.computeProperties();
     }
 
     @Override

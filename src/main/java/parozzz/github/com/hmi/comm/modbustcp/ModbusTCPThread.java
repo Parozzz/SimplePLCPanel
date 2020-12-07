@@ -374,12 +374,10 @@ public final class ModbusTCPThread extends CommThread implements Loggable
 
             var response = (ReadCoilsResponse) transaction.getResponse();
 
-            var coils = response.getCoils();
-
             var x = 0;
             for (var intermediateList : intermediateListMap.values())
             {
-                var coilBit = coils.getBit(x++);
+                var coilBit = response.getCoils().getBit(x++);
                 for (var intermediate : intermediateList)
                 {
                     intermediate.setValue(coilBit);
@@ -406,11 +404,10 @@ public final class ModbusTCPThread extends CommThread implements Loggable
 
             var response = (ReadInputDiscretesResponse) transaction.getResponse();
 
-            var discretes = response.getDiscretes();
             var x = 0;
             for (var intermediateList : intermediateListMap.values())
             {
-                var discreteBit = discretes.getBit(x++);
+                var discreteBit = response.getDiscretes().getBit(x++);
                 for (var intermediate : intermediateList)
                 {
                     intermediate.setValue(discreteBit);

@@ -333,6 +333,22 @@ public class ControlContainerPane extends FXController
         controlWrapperSet.forEach(ControlWrapper::convertToReadWrite);
     }
 
+    public boolean hasControlWrapperNear(double layoutX, double layoutY, double offsetX, double offsetY)
+    {
+        for (var controlWrapper : controlWrapperSet)
+        {
+            var xDiff = Math.abs(controlWrapper.getLayoutX() - layoutX);
+            var yDiff = Math.abs(controlWrapper.getLayoutY() - layoutY);
+
+            if (xDiff <= offsetX && yDiff <= offsetY)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     @Override
     public JSONDataMap serialize()
     {

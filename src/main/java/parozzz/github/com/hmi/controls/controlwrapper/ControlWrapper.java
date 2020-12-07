@@ -40,10 +40,11 @@ import parozzz.github.com.hmi.util.Resizable;
 import parozzz.github.com.hmi.util.specialfunction.FXSpecialFunctionManager;
 import parozzz.github.com.util.TrigBoolean;
 
-import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
-public abstract class ControlWrapper<C extends Control> extends FXController implements Resizable, Draggable, DoubleClickable
+public abstract class ControlWrapper<C extends Control>
+        extends FXController
+        implements Resizable, Draggable, DoubleClickable, java.io.Serializable
 {
     public static final String VALUE_PLACEHOLDER = "{value}";
 
@@ -76,8 +77,7 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
     private boolean isDragged;
     private boolean resizing;
 
-    public ControlWrapper(ControlContainerPane controlContainerPane, ControlWrapperType<C, ?> wrapperType,
-            BiFunction<ControlWrapper<C>, C, ControlWrapperValue<C>> valueSupplierCreator, boolean stateless)
+    public ControlWrapper(ControlContainerPane controlContainerPane, ControlWrapperType<C, ?> wrapperType, boolean stateless)
     {
         super("ControlWrapper_" + controlContainerPane.getNextControlWrapperIdentifier());
 
@@ -87,7 +87,7 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
         this.control = wrapperType.supplyControl();
         this.containerStackPane = new StackPane(control);
 
-        this.addFXChild(this.value = valueSupplierCreator.apply(this, control))
+        this.addFXChild(this.value = wrapperType.createWrapperValue(this, control))
                 .addFXChild(this.stateMap = new WrapperStateMap(this))
                 .addFXChild(this.globalAttributeMap = new AttributeMap(this, "GenericAttributeMap"))
                 .addFXChild(this.contextMenuController = new ControlWrapperContextMenuController(this, control, controlContainerPane))
@@ -224,6 +224,16 @@ public abstract class ControlWrapper<C extends Control> extends FXController imp
 
         attributeUpdater.updateAllAttributes();
         ControlWrapperBorderCreator.applyDashedBorder(this);
+    }
+
+    public double getLayoutX()
+    {
+        return containerStackPane.getLayoutX();
+    }
+
+    public double getLayoutY()
+    {
+        return containerStackPane.getLayoutY();
     }
 
     public ControlWrapperType<C, ?> getType()

@@ -23,7 +23,7 @@ import parozzz.github.com.hmi.controls.controlwrapper.setup.ControlWrapperSetupS
 import parozzz.github.com.hmi.controls.controlwrapper.setup.quicktext.ControlWrapperQuickTextEditorStage;
 import parozzz.github.com.hmi.database.ControlContainerDatabase;
 import parozzz.github.com.hmi.main.dragdrop.DragAndDropPane;
-import parozzz.github.com.hmi.main.others.ControlWrapperCopyPasteHandler;
+import parozzz.github.com.hmi.main.others.copypaste.ControlWrapperCopyPasteHandler;
 import parozzz.github.com.hmi.main.others.MessagesListStage;
 import parozzz.github.com.hmi.main.picturebank.PictureBankStage;
 import parozzz.github.com.hmi.main.quicksetup.QuickSetupVBox;

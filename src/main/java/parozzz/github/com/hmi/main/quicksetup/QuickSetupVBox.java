@@ -152,17 +152,11 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
         children.clear();
         for(var quickSetupPane : quickSetupPaneList)
         {
-            if(quickSetupPane.parseControlWrapper(controlWrapper))
+            if(quickSetupPane.validateControlWrapper(controlWrapper))
             {
                 children.add(quickSetupPane.getParent());
             }
         }
-        /*
-        quickSetupPaneList.forEach(quickSetupPane ->
-        {
-            quickSetupPane.getParent().setVisible(true); //Uphere is better. Below it could hide it again.
-            quickSetupPane.onNewControlWrapper(controlWrapper);
-        });*/
 
         this.loadAllValuesFromControlWrapper();
     }

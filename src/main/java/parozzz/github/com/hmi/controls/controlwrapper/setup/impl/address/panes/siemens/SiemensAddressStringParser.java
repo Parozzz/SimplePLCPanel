@@ -6,6 +6,7 @@ import parozzz.github.com.PLC.siemens.data.SiemensS7ReadableData;
 import parozzz.github.com.PLC.siemens.data.primitives.SiemensS7BitData;
 import parozzz.github.com.PLC.siemens.data.primitives.SiemensS7StringData;
 import parozzz.github.com.PLC.siemens.util.SiemensS7AreaType;
+import parozzz.github.com.hmi.controls.controlwrapper.setup.impl.address.AddressSetupPane;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.impl.address.AddressStringParser;
 
 import java.util.stream.Stream;
@@ -14,15 +15,14 @@ public final class SiemensAddressStringParser extends AddressStringParser<Siemen
 {
     private boolean isUpdating;
 
-    public SiemensAddressStringParser(SiemensAddressPane addressPane)
+    public SiemensAddressStringParser(AddressSetupPane<?> addressSetupPane, SiemensAddressPane addressPane)
     {
-        super(addressPane);
+        super(addressSetupPane, addressPane);
     }
 
     @SuppressWarnings("unchecked")
     void init()
     {
-        var addressPane = super.getAddressPane();
         Stream.of(addressPane.memoryAreaChoiceBox.valueProperty(), addressPane.dataTypeChoiceBox.valueProperty(),
                 addressPane.dbTextField.textProperty(), addressPane.offsetTextField.textProperty(),
                 addressPane.bitOffsetTextField.textProperty(), addressPane.stringLengthTextField.textProperty())
@@ -40,17 +40,16 @@ public final class SiemensAddressStringParser extends AddressStringParser<Siemen
 
     private void updateAddress()
     {
-        var stringAddress = create();
+        var stringAddress = this.createString();
         if (stringAddress != null)
         {
-            super.getProperty().setValue(stringAddress);
+            super.setText(stringAddress);
         }
     }
 
-    private String create()
+    @Override
+    public String createString()
     {
-        var addressPane = super.getAddressPane();
-
         var readableData = addressPane.dataTypeChoiceBox.getValue();
         var areaType = addressPane.memoryAreaChoiceBox.getValue();
         int dbNumber;
@@ -75,7 +74,6 @@ public final class SiemensAddressStringParser extends AddressStringParser<Siemen
         }
 
         String string = areaType.getAcronym();
-
         if (areaType == SiemensS7AreaType.DB)
         {
             string += dbNumber + ".DB" + readableData.getAcronym();
@@ -92,23 +90,24 @@ public final class SiemensAddressStringParser extends AddressStringParser<Siemen
             string += byteOffset;
         }
 
+        var extraDataParser = new ExtraDataParser();
+        extraDataParser.setDataType(readableData.getName());
         if (readableData instanceof SiemensS7StringData)
         {
-            string += " [" + stringLength + "]"; //Extra values should be inside square parenthesis and split by a comma
+            extraDataParser.addData(stringLength);
         }
 
-        string += " (" + readableData.getName() + ")"; //The type should be inside a round parenthesis
+        string += extraDataParser.parseIntoString();
         return string;
     }
 
     @Override
     public boolean parse(String string)
     {
-        if (!super.parse(string))
+        if (string.isEmpty()) //|| string.length() < 4 || !string.contains("(") || !string.endsWith(")"))
         {
             return false;
         }
-
         string = string.toUpperCase();
 
         SiemensS7ReadableData<?> readableData;
@@ -118,7 +117,10 @@ public final class SiemensAddressStringParser extends AddressStringParser<Siemen
         int bitOffset = 0;
         int stringLength = 0;
 
-        if ((readableData = SiemensS7DataStorage.getFromName(super.lastDataType)) == null)
+        var extraDataParser = new ExtraDataParser(string);
+
+        var dataType = extraDataParser.getDataType();
+        if ((readableData = SiemensS7DataStorage.getFromName(dataType)) == null)
         {
             return false;
         }
@@ -247,9 +249,12 @@ public final class SiemensAddressStringParser extends AddressStringParser<Siemen
                 return false;
             }
 
-            if (readableData instanceof SiemensS7StringData && !super.lastExtraArgumentList.isEmpty())
+            if (readableData instanceof SiemensS7StringData)
             {
-                stringLength = Integer.parseInt(lastExtraArgumentList.get(0));
+                if(extraDataParser.size() == 1)
+                {
+                    stringLength = extraDataParser.getIntAt(0);
+                }
             }
         } catch (NumberFormatException exception)
         {
@@ -257,15 +262,13 @@ public final class SiemensAddressStringParser extends AddressStringParser<Siemen
         }
 
         isUpdating = true;
-        var addressPane = super.getAddressPane();
         addressPane.dataTypeChoiceBox.setValue(readableData);
         addressPane.memoryAreaChoiceBox.setValue(areaType);
         addressPane.dbTextField.setText("" + dbNumber);
         addressPane.offsetTextField.setText("" + byteOffset);
         addressPane.bitOffsetTextField.setText("" + bitOffset);
         addressPane.stringLengthTextField.setText("" + stringLength);
-        //Since i stop updating causing multiple iteration, i need to set it manually
-        super.getProperty().setValue(string);
+        super.setText(string); //Since i stop updating causing multiple iteration, i need to set it manually
         isUpdating = false;
 
         return true;

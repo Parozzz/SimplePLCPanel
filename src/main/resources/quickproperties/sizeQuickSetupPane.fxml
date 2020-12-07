@@ -1,18 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
 <VBox maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="150.0" style="-fx-border-color: lightgray;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Size">
          <VBox.margin>
             <Insets bottom="2.0" top="2.0" />
          </VBox.margin>
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
       </Label>
-      <HBox maxHeight="-Infinity" maxWidth="-Infinity">
+      <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
          <children>
-            <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" text="Width">
+            <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefWidth="45.0" text="Width">
                <padding>
                   <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                </padding>
@@ -20,19 +28,23 @@
                   <Insets left="5.0" />
                </HBox.margin>
             </Label>
-            <TextField fx:id="widthTextField" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+            <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
+               <children>
+                  <TextField fx:id="widthTextField" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="60.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;" StackPane.alignment="CENTER">
+                     <padding>
+                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                     </padding>
+                  </TextField>
+               </children>
                <HBox.margin>
-                  <Insets left="8.0" right="5.0" top="3.0" />
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="3.0" />
                </HBox.margin>
-               <padding>
-                  <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
-               </padding>
-            </TextField>
+            </StackPane>
          </children>
       </HBox>
       <HBox>
          <children>
-            <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" text="Height">
+            <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefWidth="45.0" text="Height">
                <padding>
                   <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                </padding>
@@ -40,14 +52,15 @@
                   <Insets bottom="5.0" left="5.0" top="3.0" />
                </HBox.margin>
             </Label>
-            <TextField fx:id="heightTextField" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
-               <HBox.margin>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="3.0" />
-               </HBox.margin>
-               <padding>
-                  <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
-               </padding>
-            </TextField>
+            <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
+               <children>
+                  <TextField fx:id="heightTextField" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="60.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;">
+                     <padding>
+                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                     </padding>
+                  </TextField>
+               </children>
+            </StackPane>
          </children>
       </HBox>
    </children>

@@ -15,7 +15,7 @@ public class DisplayWrapper extends LabeledWrapper<Label>
 {
     public DisplayWrapper(ControlContainerPane controlContainerPane)
     {
-        super(controlContainerPane, ControlWrapperType.DISPLAY, DisplayWrapperValue::new, false);
+        super(controlContainerPane, ControlWrapperType.DISPLAY, false);
     }
 
     @Override

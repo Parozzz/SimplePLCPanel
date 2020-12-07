@@ -4,8 +4,9 @@ public enum ModbusTCPFunctionCode
 {
     COIL(false), //These are output bits
     DISCRETE_INPUT(true), //These are input bits
-    HOLDING_REGISTER(false),
-    INPUT_REGISTER(true); //There are input signal values
+    INPUT_REGISTER(true), //There are input signal values
+    HOLDING_REGISTER(false);
+
 
     private final boolean readOnly;
     ModbusTCPFunctionCode(boolean readOnly)

@@ -37,7 +37,7 @@ public final class BackgroundSetupPane extends SetupPane<BackgroundAttribute>
 
     public BackgroundSetupPane(ControlWrapperSetupStage setupStage) throws IOException
     {
-        super(setupStage, "BackgroundSetupPane", "Background", AttributeType.BACKGROUND, true);
+        super(setupStage, "BackgroundSetupPane", "Background", AttributeType.BACKGROUND);
 
         this.mainVBox = (VBox) FXUtil.loadFXML("setup/backgroundSetupPane.fxml", this);
     }

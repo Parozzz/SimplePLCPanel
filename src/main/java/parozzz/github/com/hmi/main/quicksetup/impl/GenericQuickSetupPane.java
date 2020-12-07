@@ -42,7 +42,7 @@ public final class GenericQuickSetupPane extends FXObject implements QuickSetupP
     }
 
     @Override
-    public boolean parseControlWrapper(ControlWrapper<?> controlWrapper)
+    public boolean validateControlWrapper(ControlWrapper<?> controlWrapper)
     {
         typeTextField.setText(controlWrapper.getType().getUserFriendlyName());
         return true;

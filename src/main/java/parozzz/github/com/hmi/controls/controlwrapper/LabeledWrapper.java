@@ -16,10 +16,9 @@ import java.util.function.BiFunction;
 public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C>
 {
     public LabeledWrapper(ControlContainerPane controlContainerPane,
-            ControlWrapperType<C, ?> wrapperType,
-            BiFunction<ControlWrapper<C>, C, ControlWrapperValue<C>> valueSupplierCreator, boolean stateless)
+            ControlWrapperType<C, ?> wrapperType, boolean stateless)
     {
-        super(controlContainerPane, wrapperType, valueSupplierCreator, stateless);
+        super(controlContainerPane, wrapperType, stateless);
     }
 
     @Override

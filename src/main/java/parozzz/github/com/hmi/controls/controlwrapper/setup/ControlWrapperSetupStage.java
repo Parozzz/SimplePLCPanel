@@ -33,33 +33,22 @@ import java.util.stream.Stream;
 
 public final class ControlWrapperSetupStage extends BorderPaneHMIStage implements ControlWrapperSpecific
 {
-    @FXML
-    private Button createStateButton;
+    @FXML private Button createStateButton;
 
-    @FXML
-    private VBox attributesVBox;
+    @FXML private VBox attributesVBox;
 
-    @FXML
-    private VBox globalAttributesVBox;
-    @FXML
-    private TitledPane globalAttributesTitledPane;
+    @FXML private VBox globalAttributesVBox;
+    @FXML private TitledPane globalAttributesTitledPane;
 
-    @FXML
-    private VBox stateAttributesVBox;
-    @FXML
-    private TitledPane stateAttributesTitledPane;
+    @FXML private VBox stateAttributesVBox;
+    @FXML private TitledPane stateAttributesTitledPane;
 
-    @FXML
-    private Label selectedPageLabel;
-    @FXML
-    private StackPane centerStackPane;
+    @FXML private Label selectedPageLabel;
+    @FXML private StackPane centerStackPane;
 
-    @FXML
-    private Label stateLabel;
-    @FXML
-    private ChoiceBox<WrapperState> stateSelectionChoiceBox;
-    @FXML
-    private Button deleteStateButton;
+    @FXML private Label stateLabel;
+    @FXML private ChoiceBox<WrapperState> stateSelectionChoiceBox;
+    @FXML private Button deleteStateButton;
 
     private final MainEditStage mainEditStage;
 
@@ -127,8 +116,8 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
                     add(new BorderSetupPane(this)).
                     add(new BackgroundSetupPane(this)).
                     add(new ValueSetupPane(this)).
-                    add(new AddressSetupPane<>(this, "Write Address", AttributeType.WRITE_ADDRESS, false)).
-                    add(new AddressSetupPane<>(this, "Read Address", AttributeType.READ_ADDRESS, true)); //I want this last! >:(
+                    add(new AddressSetupPane<>(this, "Write Address", AttributeType.WRITE_ADDRESS)).
+                    add(new AddressSetupPane<>(this, "Read Address", AttributeType.READ_ADDRESS)); //I want this last! >:(
         } catch (IOException exception)
         {
             MainLogger.getInstance().error("Error while loading Setup Panes", exception, this);
@@ -393,6 +382,8 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
             {
                 var setupPane = setupPaneList.getFromAttributeType(attributeType);
                 setupPaneList.populate(setupPane, wrapperState.getAttributeMap());
+
+                setupPane.setAsState();
             });
             //this.updatePreviewImage(wrapperState); //And update the preview at the bottom of the page when a new state is selected!
         }
@@ -405,6 +396,8 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
         {
             var setupPane = setupPaneList.getFromAttributeType(attributeType);
             setupPaneList.populate(setupPane, selectedControlWrapper.getGlobalAttributeMap());
+
+            setupPane.setAsGlobal();
         });
     }
 

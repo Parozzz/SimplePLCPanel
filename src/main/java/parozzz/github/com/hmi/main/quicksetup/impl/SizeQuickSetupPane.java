@@ -45,7 +45,7 @@ public final class SizeQuickSetupPane extends FXObject implements QuickSetupPane
     }
 
     @Override
-    public boolean parseControlWrapper(ControlWrapper<?> controlWrapper)
+    public boolean validateControlWrapper(ControlWrapper<?> controlWrapper)
     {
         return controlWrapper.getAttributeTypeManager().hasType(AttributeType.SIZE);
     }

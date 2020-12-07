@@ -8,9 +8,7 @@ public interface QuickSetupPane
 {
     Parent getParent();
 
-    boolean parseControlWrapper(ControlWrapper<?> controlWrapper);
-
-    //void onNewControlWrapper(ControlWrapper<?> controlWrapper);
+    boolean validateControlWrapper(ControlWrapper<?> controlWrapper);
 
     void clearControlWrapper();
 

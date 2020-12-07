@@ -35,7 +35,7 @@ public final class TextSetupPane extends SetupPane<TextAttribute>
 
     public TextSetupPane(ControlWrapperSetupStage setupPage) throws IOException
     {
-        super(setupPage, "TextSetupPane", "Custom Text", AttributeType.TEXT, true);
+        super(setupPage, "TextSetupPane", "Custom Text", AttributeType.TEXT);
 
         mainVBox = (VBox) FXUtil.loadFXML("setup/textSetupPane.fxml", this);
     }
@@ -50,7 +50,6 @@ public final class TextSetupPane extends SetupPane<TextAttribute>
         newLineAlignmentChoiceBox.setConverter(new EnumStringConverter<>(TextAlignment.class).setCapitalize());
         newLineAlignmentChoiceBox.getItems().addAll(TextAlignment.values());
 
-        newLineSpacingComboBox.getStylesheets().add("stylesheets/combo_box_setup_style.css");
         newLineSpacingComboBox.setConverter(new IntegerStringConverter());
         newLineSpacingComboBox.getItems().addAll(DEFAULT_LINE_SPACING);
         newLineSpacingComboBox.setValue(0);

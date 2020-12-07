@@ -24,7 +24,7 @@ public final class ChangePageSetupPane extends SetupPane<ChangePageAttribute>
 
     public ChangePageSetupPane(ControlWrapperSetupStage setupPage) throws IOException
     {
-        super(setupPage, "ChangePageSetupPane", "Change Page", AttributeType.CHANGE_PAGE, false);
+        super(setupPage, "ChangePageSetupPane", "Change Page", AttributeType.CHANGE_PAGE);
 
         this.setupStage = setupPage;
         this.vBox = (VBox) FXUtil.loadFXML("setup/changePagePane.fxml", this);
@@ -35,7 +35,6 @@ public final class ChangePageSetupPane extends SetupPane<ChangePageAttribute>
     {
         super.setup();
 
-        selectPageComboBox.getStylesheets().add("stylesheets/combo_box_setup_style.css");
         selectPageComboBox.setOnShowing(event ->
         {
             var items = selectPageComboBox.getItems();
@@ -49,7 +48,7 @@ public final class ChangePageSetupPane extends SetupPane<ChangePageAttribute>
         super.getAttributeChangerList().create(enabledCheckBox.selectedProperty(), ChangePageAttribute.ENABLED)
                 .create(selectPageComboBox.valueProperty(), ChangePageAttribute.PAGE_NAME);
 
-        super.computeGlobalProperties();
+        super.computeProperties();
     }
 
     @Override

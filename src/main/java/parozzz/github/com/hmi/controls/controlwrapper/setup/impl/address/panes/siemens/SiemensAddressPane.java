@@ -38,25 +38,23 @@ public final class SiemensAddressPane extends AddressPane
     @FXML TextField bitOffsetTextField;
     @FXML TextField stringLengthTextField;
 
-    private final AddressSetupPane<? extends AddressAttribute> addressSetupPane;
     private final VBox vBox;
-
     private final SiemensAddressStringParser addressStringParser;
 
     public SiemensAddressPane(AddressSetupPane<? extends AddressAttribute> addressSetupPane) throws IOException
     {
         super("SiemensAddressPane", AddressDataType.SIEMENS);
 
-        this.addressSetupPane = addressSetupPane;
         this.vBox = (VBox) FXUtil.loadFXML("setup/address/siemensAddressDataPane.fxml", this);
-
-        this.addressStringParser = new SiemensAddressStringParser(this);
+        this.addressStringParser = new SiemensAddressStringParser(addressSetupPane, this);
     }
 
     @Override
     public void setup()
     {
         super.setup();
+
+        addressStringParser.init();
 
         memoryAreaChoiceBox.setConverter(new EnumStringConverter<>(SiemensS7AreaType.class));
         memoryAreaChoiceBox.getItems().addAll(SiemensS7AreaType.values());
@@ -93,8 +91,6 @@ public final class SiemensAddressPane extends AddressPane
                         .max(250)
                         .getTextFormatter()
         );
-
-        addressStringParser.init();
     }
 
     @Override
@@ -134,5 +130,17 @@ public final class SiemensAddressPane extends AddressPane
                 .createStringToNumber(offsetTextField.textProperty(), SiemensDataPropertyHolder.BYTE_OFFSET, Util::parseIntOrZero)
                 .createStringToNumber(bitOffsetTextField.textProperty(), SiemensDataPropertyHolder.BIT_OFFSET, Util::parseIntOrZero)
                 .createStringToNumber(stringLengthTextField.textProperty(), SiemensDataPropertyHolder.STRING_LENGTH, Util::parseIntOrZero);
+    }
+
+    @Override
+    public void setAsState()
+    {
+
+    }
+
+    @Override
+    public void setAsGlobal()
+    {
+
     }
 }

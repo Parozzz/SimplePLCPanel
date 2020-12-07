@@ -13,6 +13,7 @@ import parozzz.github.com.hmi.attribute.impl.address.data.ModbusTCPDataPropertyH
 import parozzz.github.com.hmi.comm.modbustcp.ModbusTCPDataLength;
 import parozzz.github.com.hmi.comm.modbustcp.ModbusTCPFunctionCode;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.attributechanger.SetupPaneAttributeChangerList;
+import parozzz.github.com.hmi.controls.controlwrapper.setup.impl.address.AddressSetupPane;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.impl.address.AddressStringParser;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.impl.address.panes.AddressPane;
 import parozzz.github.com.hmi.util.EnumStringConverter;
@@ -25,35 +26,35 @@ import java.util.stream.Stream;
 
 public class ModbusTCPAddressPane extends AddressPane
 {
-    @FXML private ChoiceBox<ModbusTCPFunctionCode> typeChoiceBox;
+    @FXML ChoiceBox<ModbusTCPFunctionCode> typeChoiceBox;
     @FXML private Label lengthLabel;
-    @FXML private ChoiceBox<ModbusTCPDataLength> lengthChoiceBox;
-    @FXML private TextField addressTextField;
+    @FXML ChoiceBox<ModbusTCPDataLength> lengthChoiceBox;
+    @FXML TextField addressTextField;
     @FXML private Label bitNumberLabel;
-    @FXML private TextField bitNumberTextField;
+    @FXML TextField bitNumberTextField;
 
     @FXML private Label signedLabel;
-    @FXML private CheckBox signedCheckBox;
+    @FXML CheckBox signedCheckBox;
 
-    private final boolean readOnly;
-
+    private final boolean isReadAddress;
     private final VBox vBox;
     private final ModbusTCPAddressStringParser stringParser;
 
-    public ModbusTCPAddressPane(boolean readOnly) throws IOException
+    public ModbusTCPAddressPane(AddressSetupPane<?> addressSetupPane, boolean isReadAddress) throws IOException
     {
         super("ModbusTCPAddressPane", AddressDataType.MODBUS_TCP);
 
-        this.readOnly = readOnly;
-
+        this.isReadAddress = isReadAddress;
         this.vBox = (VBox) FXUtil.loadFXML("setup/address/modbusTCPAddressDataPane.fxml", this);
-        this.stringParser = new ModbusTCPAddressStringParser(this);
+        this.stringParser = new ModbusTCPAddressStringParser(addressSetupPane, this);
     }
 
     @Override
     public void setup()
     {
         super.setup();
+
+        stringParser.init();
 
         lengthChoiceBox.setConverter(new EnumStringConverter<>(ModbusTCPDataLength.class).setCapitalize());
         lengthChoiceBox.getItems().addAll(ModbusTCPDataLength.values());
@@ -62,11 +63,20 @@ public class ModbusTCPAddressPane extends AddressPane
             var isBit = newValue == ModbusTCPDataLength.BIT;
             bitNumberLabel.setVisible(isBit);
             bitNumberTextField.setVisible(isBit);
+
+            switch (typeChoiceBox.getValue())
+            {
+                case HOLDING_REGISTER:
+                case INPUT_REGISTER:
+                    signedLabel.setVisible(!isBit);
+                    signedCheckBox.setVisible(!isBit); //Signed booleans. A man can dream sometime.
+                    break;
+            }
         });
 
         typeChoiceBox.setConverter(new EnumStringConverter<>(ModbusTCPFunctionCode.class).setCapitalize());
         Stream.of(ModbusTCPFunctionCode.values())
-                .filter(functionCode -> readOnly || !functionCode.isReadOnly())
+                .filter(functionCode -> isReadAddress || !functionCode.isReadOnly())
                 .forEach(typeChoiceBox.getItems()::add);
         typeChoiceBox.valueProperty().addListener((observableValue, oldValue, newValue) ->
         {
@@ -83,7 +93,7 @@ public class ModbusTCPAddressPane extends AddressPane
             }
         });
 
-        addressTextField.setTextFormatter(FXTextFormatterUtil.positiveInteger(5));
+        addressTextField.setTextFormatter(FXTextFormatterUtil.positiveInteger(4));
         bitNumberTextField.setTextFormatter(
                 FXTextFormatterUtil.integerBuilder()
                         .max(15)
@@ -91,7 +101,7 @@ public class ModbusTCPAddressPane extends AddressPane
                         .getTextFormatter()
         );
 
-        signedLabel.setVisible(readOnly);  //When i write values, the system does not care about signed / unsigned
+        signedLabel.setVisible(isReadAddress);  //When i write values, the system does not care about signed / unsigned
     }
 
     @Override
@@ -126,20 +136,42 @@ public class ModbusTCPAddressPane extends AddressPane
                 .create(signedCheckBox.selectedProperty(), ModbusTCPDataPropertyHolder.SIGNED);
     }
 
+    @Override
+    public void setAsState()
+    {
+
+    }
+
+    @Override
+    public void setAsGlobal()
+    {
+
+    }
+
+    public boolean isReadAddress()
+    {
+        return isReadAddress;
+    }
+
     private void setBitType() //Bits like coils only use the offset and are boolean only
     {
+        lengthChoiceBox.setValue(ModbusTCPDataLength.BIT);
+
         lengthLabel.setVisible(false);
         lengthChoiceBox.setVisible(false);
 
         bitNumberLabel.setVisible(false);
         bitNumberTextField.setVisible(false);
+
+        signedLabel.setVisible(false);
+        signedCheckBox.setVisible(false); //Signed booleans. A man can dream sometime.
     }
 
     private void setWordType()
     {
+        lengthChoiceBox.setValue(ModbusTCPDataLength.WORD);
+
         lengthLabel.setVisible(true);
         lengthChoiceBox.setVisible(true);
-
-        lengthChoiceBox.setValue(ModbusTCPDataLength.WORD);
     }
 }
