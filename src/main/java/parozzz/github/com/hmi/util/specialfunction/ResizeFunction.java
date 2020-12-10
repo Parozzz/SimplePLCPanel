@@ -26,9 +26,6 @@ final class ResizeFunction
 
     private boolean onEdge;
 
-    DoubleConsumer newWidthConsumer = t -> { };
-    DoubleConsumer newHeightConsumer = t -> { };
-
     ResizeFunction(FXSpecialFunctionManager specialFunctionManager, Resizable resizable)
     {
         this.specialFunctionManager = specialFunctionManager;
@@ -49,6 +46,7 @@ final class ResizeFunction
             return;
         }
 
+        resizable.setLastPressedWasResize(true);
         resizable.setResizing(true);
         //resizing = true;
 
@@ -114,9 +112,7 @@ final class ResizeFunction
             }
 
             newWidth = Math.min(newWidth, containerWidth - resizable.getLayoutX());
-
             resizable.setPrefWidth(newWidth);
-            newWidthConsumer.accept(newWidth);
         }
     }
 
@@ -149,9 +145,7 @@ final class ResizeFunction
             }
 
             newHeight = Math.min(newHeight, containerHeight - resizable.getLayoutY());
-
             resizable.setPrefHeight(newHeight);
-            newHeightConsumer.accept(newHeight);
         }
     }
 

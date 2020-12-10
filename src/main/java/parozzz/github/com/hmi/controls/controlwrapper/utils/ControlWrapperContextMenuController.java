@@ -19,8 +19,6 @@ public final class ControlWrapperContextMenuController extends FXObject
     public ControlWrapperContextMenuController(ControlWrapper<?> controlWrapper, Control control,
             ControlContainerPane controlContainerPane)
     {
-        super("ControlWrapperContextMenu");
-
         this.controlWrapper = controlWrapper;
         this.control = control;
         this.controlContainerPane = controlContainerPane;

@@ -34,8 +34,6 @@ class QuickTextEditorStatePane extends FXObject
     public QuickTextEditorStatePane(ControlWrapperQuickTextEditorStage editorStage,
             WrapperState wrapperState) throws IOException
     {
-        super("QuickTextEditorStatePane");
-
         this.editorStage = editorStage;
         this.wrapperState = wrapperState;
 

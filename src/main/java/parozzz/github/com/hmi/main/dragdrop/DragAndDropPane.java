@@ -21,8 +21,6 @@ public final class DragAndDropPane extends FXController
 
     public DragAndDropPane(MainEditStage mainMenuPage) throws IOException
     {
-        super("DragAndDropPane");
-
         this.mainVBox = (VBox) FXUtil.loadFXML("dragAndDropMenu.fxml", this);
         this.mainMenuPage = mainMenuPage;
 

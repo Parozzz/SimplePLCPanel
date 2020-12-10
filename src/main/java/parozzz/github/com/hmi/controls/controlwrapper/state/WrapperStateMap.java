@@ -2,6 +2,8 @@ package parozzz.github.com.hmi.controls.controlwrapper.state;
 
 import org.json.simple.JSONObject;
 import parozzz.github.com.hmi.FXObject;
+import parozzz.github.com.hmi.attribute.Attribute;
+import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.controls.controlwrapper.attributes.ControlWrapperAttributeTypeManager;
 import parozzz.github.com.hmi.serialize.data.JSONDataArray;
@@ -12,6 +14,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public final class WrapperStateMap extends FXObject
 {
@@ -29,8 +32,6 @@ public final class WrapperStateMap extends FXObject
 
     public WrapperStateMap(ControlWrapper<?> controlWrapper)
     {
-        super("WrapperStateMap");
-
         this.controlWrapper = controlWrapper;
 
         this.wrapperStateList = new LinkedList<>();
@@ -180,6 +181,14 @@ public final class WrapperStateMap extends FXObject
     public void forEachNoDefault(Consumer<WrapperState> consumer)
     {
         wrapperStateList.forEach(consumer);
+    }
+
+    public List<Attribute> getAllAttributesOfType(AttributeType<?> attributeType)
+    {
+        return wrapperStateList.stream()
+                .map(wrapperState -> wrapperState.getAttributeMap().get(attributeType))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     public void forEach(Consumer<WrapperState> consumer)

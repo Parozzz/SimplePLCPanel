@@ -28,7 +28,7 @@ public class ControlWrapperQuickTextEditorStage extends HMIStage<VBox> implement
 
     public ControlWrapperQuickTextEditorStage() throws IOException
     {
-        super("QuickTextEditor", "setup/quicktext/quickTextEditorMainPane.fxml", VBox.class);
+        super("setup/quicktext/quickTextEditorMainPane.fxml", VBox.class);
 
         this.statePaneList = new ArrayList<>();
         controlWrapperValidListener = (observableValue, oldValue, newValue) ->

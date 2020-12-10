@@ -14,8 +14,6 @@ public final class HMIManager extends FXController
 
     public HMIManager(SiemensPLCThread plcThread, ModbusTCPThread modbusTCPThread, Runnable saveDataRunnable) throws IOException
     {
-        super("HMIManager");
-
         this.plcThread = plcThread;
 
         super.addFXChild(this.mainEditStage = new MainEditStage(plcThread, modbusTCPThread, saveDataRunnable));

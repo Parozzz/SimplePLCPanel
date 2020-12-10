@@ -13,6 +13,20 @@ public final class Util
     {
     }
 
+    public static BooleanChangeType checkChangeType(boolean newValue, boolean oldValue)
+    {
+        if(newValue && !oldValue)
+        {
+            return BooleanChangeType.RISING;
+        }
+        else if(!newValue && oldValue)
+        {
+            return BooleanChangeType.FALLING;
+        }
+
+        return BooleanChangeType.NONE;
+    }
+
     public static String capitalizeWithUnderscore(String string)
     {
         return Stream.of(string.split("_"))

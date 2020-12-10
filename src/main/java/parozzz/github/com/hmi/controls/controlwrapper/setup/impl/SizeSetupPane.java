@@ -18,9 +18,14 @@ import java.io.IOException;
 @SuppressWarnings("unused")
 public final class SizeSetupPane extends SetupPane<SizeAttribute>
 {
-    @FXML private CheckBox adaptCheckbox;
-    @FXML private TextField widthTextField;
-    @FXML private TextField heightTextField;
+    @FXML
+    private CheckBox adaptCheckbox;
+    @FXML
+    private TextField widthTextField;
+    @FXML
+    private TextField heightTextField;
+    @FXML
+    private TextField paddingTextField;
 
     private final VBox mainVBox;
 
@@ -38,28 +43,19 @@ public final class SizeSetupPane extends SetupPane<SizeAttribute>
 
         widthTextField.setTextFormatter(FXTextFormatterUtil.simpleInteger(3));
         heightTextField.setTextFormatter(FXTextFormatterUtil.simpleInteger(3));
+        paddingTextField.setTextFormatter(FXTextFormatterUtil.simpleInteger(3));
 
         super.getAttributeChangerList().create(adaptCheckbox.selectedProperty(), SizeAttribute.ADAPT)
                 .createStringToNumber(widthTextField.textProperty(), SizeAttribute.WIDTH, Util::parseIntOrZero)
-                .createStringToNumber(heightTextField.textProperty(), SizeAttribute.HEIGHT, Util::parseIntOrZero);
+                .createStringToNumber(heightTextField.textProperty(), SizeAttribute.HEIGHT, Util::parseIntOrZero)
+                .createStringToNumber(paddingTextField.textProperty(), SizeAttribute.PADDING, Util::parseIntOrZero);
 
         super.computeProperties();
     }
-
-    @Override
-    public void setDefault()
-    {
-        super.setDefault();
-
-        widthTextField.setText("120");
-        heightTextField.setText("80");
-    }
-
 
     @Override
     public Parent getParent()
     {
         return mainVBox;
     }
-
 }

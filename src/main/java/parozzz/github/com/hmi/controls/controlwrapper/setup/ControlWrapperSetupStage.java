@@ -107,10 +107,10 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
 
         try
         {
-            setupPaneList.add(new ButtonDataSetupPane(this)). //I want this first! >:(
+            setupPaneList.add(new SizeSetupPane(this))//This first >:)
+                    .add(new ButtonDataSetupPane(this)). //And this second! >:(
                     add(new InputDataSetupPane(this)).
                     add(new ChangePageSetupPane(this)).
-                    add(new SizeSetupPane(this)).
                     add(new FontSetupPane(this)).
                     add(new TextSetupPane(this)).
                     add(new BorderSetupPane(this)).

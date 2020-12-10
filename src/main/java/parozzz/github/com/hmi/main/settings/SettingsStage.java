@@ -31,7 +31,7 @@ public class SettingsStage extends HMIStage<StackPane>
 
     public SettingsStage() throws IOException
     {
-        super("SettingsMainPage", "settings/mainSettingsPage.fxml", StackPane.class);
+        super("settings/mainSettingsPage.fxml", StackPane.class);
 
         this.pageButtonSet = new HashSet<>();
         this.addFXChild(languageSettingsPane = new LanguageSettingsPane());

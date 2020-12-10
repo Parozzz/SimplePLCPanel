@@ -18,7 +18,7 @@ public class MessagesListStage extends HMIStage<VBox>
 
     public MessagesListStage() throws IOException
     {
-        super("MessagesListStage", "messagesVBox.fxml", VBox.class);
+        super("messagesVBox.fxml", VBox.class);
     }
 
     @Override

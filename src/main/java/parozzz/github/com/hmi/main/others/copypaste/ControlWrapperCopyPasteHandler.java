@@ -25,8 +25,6 @@ public class ControlWrapperCopyPasteHandler extends FXObject
 
     public ControlWrapperCopyPasteHandler(MainEditStage mainEditStage)
     {
-        super("SelectionCopyCutHandler");
-
         this.mainEditStage = mainEditStage;
     }
 

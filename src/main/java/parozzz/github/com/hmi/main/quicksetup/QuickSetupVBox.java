@@ -41,8 +41,6 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
 
     public QuickSetupVBox() throws IOException
     {
-        super("QuickProperties");
-
         this.stateBinder = new QuickSetupStateBinder(this);
         this.mainScrollPane = new ScrollPane(this.vBox = new VBox());
 

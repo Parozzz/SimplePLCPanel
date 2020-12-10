@@ -53,7 +53,7 @@ public final class FXSpecialFunctionManager
 
         mousePressedEventHandler = mouseEvent ->
         {
-            if (resizeFunction != null && resizeFunction.isOnEdge())
+            if (resizeFunction != null)
             {
                 resizeFunction.onMousePressed(mouseEvent);
                 //In case i am resizing, i ignore everything else
@@ -173,16 +173,10 @@ public final class FXSpecialFunctionManager
             specialFunctionManager = new FXSpecialFunctionManager(targetRegion, containerPane);
         }
 
-        public Builder enableResizing(Resizable resizable,
-                DoubleConsumer newWidthConsumer, DoubleConsumer newHeightConsumer)
+        public Builder enableResizing(Resizable resizable)
         {
             Objects.requireNonNull(specialFunctionManager.containerPane, "ContainerPane is required for Resizing");
-
             specialFunctionManager.resizeFunction = new ResizeFunction(specialFunctionManager, resizable);
-
-            var resizeFunction = specialFunctionManager.resizeFunction;
-            resizeFunction.newWidthConsumer = newWidthConsumer;
-            resizeFunction.newHeightConsumer = newHeightConsumer;
             return this;
         }
 

@@ -24,8 +24,6 @@ public final class ControlWrappersSelectionManager extends FXObject
 
     public ControlWrappersSelectionManager(ControlContainerPane controlContainerPane, Region regionContainer)
     {
-        super("SelectedControlWrappersManager");
-
         this.controlContainerPane = controlContainerPane;
 
         this.dragManager = new MultipleObjectDragManager(regionContainer);

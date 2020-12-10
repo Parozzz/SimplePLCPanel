@@ -98,6 +98,8 @@ public class InputWrapper extends ControlWrapper<TextField>
                             control.setFont(((FontAttribute) attribute).getFont());
                             control.setAlignment(attribute.getValue(FontAttribute.TEXT_POSITION));
 
+                            var lookupText = control.lookup(".text");
+
                             var text = FXNodeUtil.getTextFieldText(control);
                             if (text != null)
                             {
@@ -105,6 +107,8 @@ public class InputWrapper extends ControlWrapper<TextField>
                                 text.setUnderline(attribute.getValue(FontAttribute.UNDERLINE));
                                 text.fillProperty().bind(attribute.getProperty(FontAttribute.TEXT_COLOR));
                             }
+
+                            var lookupCaret = control.lookup(".caretPath");
 
                             var caretPath = FXNodeUtil.getCaret(control); //Set this after to have it revert after changing the text fill
                             if (caretPath != null)

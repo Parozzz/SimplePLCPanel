@@ -33,8 +33,6 @@ class WrapperStateCreationPane extends FXObject implements SetupSelectable
 
     public WrapperStateCreationPane(ControlWrapperSetupStage setupStage, Button selectButton) throws IOException
     {
-        super("StateCreationPane");
-
         this.setupStage = setupStage;
         this.selectButton = selectButton;
 

@@ -26,7 +26,7 @@ public final class CommunicationStage extends HMIStage<VBox>
 
     public CommunicationStage(SiemensPLCThread plcThread, ModbusTCPThread modbusTCPThread) throws IOException
     {
-        super("CommunicationPage", "communicationPage.fxml", VBox.class);
+        super("communicationPage.fxml", VBox.class);
 
         super.addFXChild(siemensPLCCommunicationManager = new SiemensPLCCommunicationManager(plcThread))
                 .addFXChild(modbusTCPCommunicationManager = new ModbusTCPCommunicationManager(modbusTCPThread));

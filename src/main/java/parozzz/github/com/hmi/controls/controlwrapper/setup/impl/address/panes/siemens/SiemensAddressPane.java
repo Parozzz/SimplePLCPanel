@@ -43,7 +43,7 @@ public final class SiemensAddressPane extends AddressPane
 
     public SiemensAddressPane(AddressSetupPane<? extends AddressAttribute> addressSetupPane) throws IOException
     {
-        super("SiemensAddressPane", AddressDataType.SIEMENS);
+        super(AddressDataType.SIEMENS);
 
         this.vBox = (VBox) FXUtil.loadFXML("setup/address/siemensAddressDataPane.fxml", this);
         this.addressStringParser = new SiemensAddressStringParser(addressSetupPane, this);

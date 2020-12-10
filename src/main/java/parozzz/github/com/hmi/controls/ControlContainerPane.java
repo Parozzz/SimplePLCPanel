@@ -45,8 +45,6 @@ import java.util.logging.Logger;
 
 public class ControlContainerPane extends FXController
 {
-    private final AtomicInteger controlWrapperIdentifier = new AtomicInteger();
-
     private final MainEditStage mainEditStage;
     private final ControlContainerDatabase controlContainerDatabase;
     private final String name;
@@ -246,11 +244,6 @@ public class ControlContainerPane extends FXController
         return Set.copyOf(controlWrapperSet);
     }
 
-    public int getNextControlWrapperIdentifier()
-    {
-        return controlWrapperIdentifier.getAndAdd(1);
-    }
-
     public String getName()
     {
         return name;
@@ -292,7 +285,7 @@ public class ControlContainerPane extends FXController
         mainAnchorPane.getChildren().add(controlWrapper.getContainerPane());
         super.addFXChild(controlWrapper, false);
 
-        controlWrapper.validProperty().setValue(true);
+        controlWrapper.setValid(true);
 
         newControlWrapperConsumer.accept(controlWrapper);
     }
@@ -305,7 +298,7 @@ public class ControlContainerPane extends FXController
 
         deleteControlWrapperConsumer.accept(controlWrapper);
 
-        controlWrapper.validProperty().setValue(false);
+        controlWrapper.setValid(false);
 
         var undoRedoManager = this.controlContainerDatabase.getMainEditStage().getUndoRedoManager();
         undoRedoManager.addAction(() -> this.addControlWrapper(controlWrapper),

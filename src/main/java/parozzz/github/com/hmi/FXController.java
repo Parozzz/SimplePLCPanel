@@ -13,6 +13,11 @@ import java.util.logging.Logger;
 public abstract class FXController extends FXObject
 {
     private final Set<FXObjectWrapper> childSet;
+    public FXController()
+    {
+        this.childSet = new HashSet<>();
+    }
+
     public FXController(String name)
     {
         super(name);

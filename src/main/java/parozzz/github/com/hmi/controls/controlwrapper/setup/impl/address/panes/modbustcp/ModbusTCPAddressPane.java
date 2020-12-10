@@ -42,7 +42,7 @@ public class ModbusTCPAddressPane extends AddressPane
 
     public ModbusTCPAddressPane(AddressSetupPane<?> addressSetupPane, boolean isReadAddress) throws IOException
     {
-        super("ModbusTCPAddressPane", AddressDataType.MODBUS_TCP);
+        super(AddressDataType.MODBUS_TCP);
 
         this.isReadAddress = isReadAddress;
         this.vBox = (VBox) FXUtil.loadFXML("setup/address/modbusTCPAddressDataPane.fxml", this);

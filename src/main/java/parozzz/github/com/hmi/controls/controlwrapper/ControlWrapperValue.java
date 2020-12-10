@@ -9,8 +9,6 @@ public abstract class ControlWrapperValue<C extends Control> extends FXObject
     protected final C control;
     public ControlWrapperValue(C control)
     {
-        super("ValueSupplier");
-
         this.control = control;
     }
 

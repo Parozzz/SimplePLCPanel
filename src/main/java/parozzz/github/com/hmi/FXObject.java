@@ -7,18 +7,24 @@ import parozzz.github.com.util.Validate;
 
 public abstract class FXObject implements JSONSerializable
 {
-    private final String name;
+    private String name;
     private boolean setupDone = false;
     protected final SerializableDataSet serializableDataSet;
     private boolean disabled;
 
     FXController controller;
 
+    public FXObject()
+    {
+        this.serializableDataSet = new SerializableDataSet();
+        this.name = this.getClass().getSimpleName();
+    }
+
     public FXObject(String name)
     {
-        this.name = name;
+        this();
 
-        this.serializableDataSet = new SerializableDataSet();
+        this.name = name;
     }
 
     public String getFXObjectName()

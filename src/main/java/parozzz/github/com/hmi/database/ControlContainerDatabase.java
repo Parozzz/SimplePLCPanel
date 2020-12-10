@@ -38,8 +38,6 @@ public final class ControlContainerDatabase extends FXController implements Iter
     public ControlContainerDatabase(MainEditStage mainEditStage, SiemensPLCThread plcThread,
                                     ModbusTCPThread modbusTCPThread)
     {
-        super("ControlPageDatabase");
-
         this.mainEditStage = mainEditStage;
 
         this.siemensPLCDataUpdater = new SiemensPLCDataUpdater(this, plcThread);

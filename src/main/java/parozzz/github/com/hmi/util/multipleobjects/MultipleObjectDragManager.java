@@ -84,6 +84,12 @@ public final class MultipleObjectDragManager
 
             mousePressedEventHandler = mouseEvent ->
             {
+                if(controller instanceof Draggable)
+                {
+                    var tDraggable = (Draggable) controller;
+                    tDraggable.setLastPressedWasDrag(false);
+                }
+
                 if(mouseEvent.getButton() != MouseButton.PRIMARY
                         || this.isControllerResizing())
                 {
@@ -106,7 +112,9 @@ public final class MultipleObjectDragManager
 
                 if(controller instanceof Draggable)
                 {
-                    ((Draggable) controller).setIsDragged(true);
+                    var tDraggable = (Draggable) controller;
+                    tDraggable.setIsDragged(true);
+                    tDraggable.setLastPressedWasDrag(true);
                 }
 
                 var xDiff = mouseEvent.getX() - startX;

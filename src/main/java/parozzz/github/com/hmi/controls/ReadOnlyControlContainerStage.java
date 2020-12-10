@@ -23,7 +23,7 @@ public final class ReadOnlyControlContainerStage extends HMIStage<StackPane>
 
     public ReadOnlyControlContainerStage(MainEditStage mainEditStage)
     {
-        super("ReadOnlyControlMainPage", new StackPane());
+        super(new StackPane());
 
         this.mainEditStage = mainEditStage;
         super.parent.getChildren().addAll(

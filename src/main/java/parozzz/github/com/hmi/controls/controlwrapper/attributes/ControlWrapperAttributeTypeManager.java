@@ -17,7 +17,6 @@ public final class ControlWrapperAttributeTypeManager extends FXObject
 
     public ControlWrapperAttributeTypeManager()
     {
-        super("ControlWrapperAttributeTypeManager");
     }
 
     public void forEachState(Consumer<AttributeType<?>> consumer)

@@ -10,10 +10,8 @@ import parozzz.github.com.hmi.controls.controlwrapper.setup.impl.address.Address
 public abstract class AddressPane extends FXObject
 {
     private final AddressDataType addressDataType;
-    public AddressPane(String name, AddressDataType addressDataType)
+    public AddressPane(AddressDataType addressDataType)
     {
-        super(name);
-
         this.addressDataType = addressDataType;
     }
 

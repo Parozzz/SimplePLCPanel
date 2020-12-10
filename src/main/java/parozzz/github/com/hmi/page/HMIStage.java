@@ -23,11 +23,26 @@ public abstract class HMIStage<P extends Parent> extends FXController implements
     private final HMIStageSetter stageSetter;
     private final UndoRedoManager undoRedoManager;
 
+    public HMIStage(String resource, Class<P> parentClass) throws IOException
+    {
+        this.parent = parentClass.cast(FXUtil.loadFXML(resource, this));
+        this.stageSetter = new HMIStageSetter(parent);
+        this.undoRedoManager = new UndoRedoManager();
+    }
+
+
     public HMIStage(String name, String resource, Class<P> parentClass) throws IOException
     {
         super(name);
 
         this.parent = parentClass.cast(FXUtil.loadFXML(resource, this));
+        this.stageSetter = new HMIStageSetter(parent);
+        this.undoRedoManager = new UndoRedoManager();
+    }
+
+    public HMIStage(P parent)
+    {
+        this.parent = parent;
         this.stageSetter = new HMIStageSetter(parent);
         this.undoRedoManager = new UndoRedoManager();
     }

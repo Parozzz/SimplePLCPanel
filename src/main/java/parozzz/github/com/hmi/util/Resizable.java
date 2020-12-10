@@ -6,5 +6,7 @@ public interface Resizable
 
     void setResizing(boolean resizing);
 
+    void setLastPressedWasResize(boolean lastPressedWasResize);
+
     boolean isResizing();
 }

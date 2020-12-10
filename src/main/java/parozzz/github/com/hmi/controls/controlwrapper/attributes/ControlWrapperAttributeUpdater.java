@@ -19,8 +19,6 @@ public final class ControlWrapperAttributeUpdater<C extends Control> extends FXO
 
     public ControlWrapperAttributeUpdater(ControlWrapper<C> controlWrapper, C control)
     {
-        super("ControlWrapperAttributeUpdater");
-
         this.controlWrapper = controlWrapper;
         this.control = control;
 

@@ -59,7 +59,7 @@ public class PictureBankStage extends HMIStage<BorderPane>
 
     public PictureBankStage() throws IOException
     {
-        super("Picture Bank", "pictureBankPane.fxml", BorderPane.class);
+        super("pictureBankPane.fxml", BorderPane.class);
 
         directoryPath = System.getProperty("user.dir") + "\\picture_bank";
     }
