@@ -81,6 +81,11 @@ public final class MainLogger extends Thread
         this.log(Level.WARNING, message, exception, involvedObject);
     }
 
+    public void error(String message,Object involvedObject)
+    {
+        this.log(Level.SEVERE, message, null, involvedObject);
+    }
+
     public void error(String message, Exception exception, Object involvedObject)
     {
         this.log(Level.SEVERE, message, exception, involvedObject);

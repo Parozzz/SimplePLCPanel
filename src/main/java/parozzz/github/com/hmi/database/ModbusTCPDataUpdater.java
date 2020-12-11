@@ -20,6 +20,7 @@ import parozzz.github.com.hmi.comm.modbustcp.intermediate.word.ModbusTCPReadWord
 import parozzz.github.com.hmi.comm.modbustcp.intermediate.word.ModbusTCPWriteWordIntermediate;
 import parozzz.github.com.hmi.util.valueintermediate.ValueIntermediate;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -33,15 +34,15 @@ public final class ModbusTCPDataUpdater extends ControlDataUpdater<ModbusTCPThre
     @Override
     public void parseReadData()
     {
-        Stream.of(commThread.getReadCoilSet(),
-                commThread.getReadDiscreteInputsSet(),
-                commThread.getReadHoldingRegisterSet(),
-                commThread.getReadInputRegistersSet()).forEach(this::parseReadOnlySet);
+        this.parseReadOnlySet(commThread.getReadCoilSet());
+        this.parseReadOnlySet(commThread.getReadDiscreteInputsSet());
+        this.parseReadOnlySet(commThread.getReadHoldingRegisterSet());
+        this.parseReadOnlySet(commThread.getReadInputRegistersSet());
     }
 
     private void parseReadOnlySet(Set<? extends ReadOnlyIntermediate> intermediateSet)
     {
-        if (intermediateSet != null)
+        if(intermediateSet != null && !intermediateSet.isEmpty())
         {
             intermediateSet.forEach(ReadOnlyIntermediate::parse);
         }
@@ -50,7 +51,7 @@ public final class ModbusTCPDataUpdater extends ControlDataUpdater<ModbusTCPThre
     @Override
     public void update()
     {
-        if (commThread.isUpdating())
+        if(commThread.isUpdating())
         {
             return;
         }
@@ -73,19 +74,19 @@ public final class ModbusTCPDataUpdater extends ControlDataUpdater<ModbusTCPThre
         var readInputRegistersSet = commThread.getReadInputRegistersSet();
         readInputRegistersSet.clear();
 
-        for (var controlWrapper : controlContainerDatabase.getControlWrapperSet())
+        for(var controlWrapper : controlContainerDatabase.getControlWrapperSet())
         {
-            if (newValueControlWrapperSet.remove(controlWrapper))
+            if(newValueControlWrapperSet.remove(controlWrapper))
             {
                 var writeCachedData = this.getCachedData(AttributeFetcher.fetch(controlWrapper, AttributeType.WRITE_ADDRESS));
-                if (writeCachedData != null)
+                if(writeCachedData != null)
                 {
                     var offset = writeCachedData.getOffset();
                     var internalValue = controlWrapper.getValue().getInternalValue();
-                    switch (writeCachedData.getFunctionCode())
+                    switch(writeCachedData.getFunctionCode())
                     {
                         case HOLDING_REGISTER:
-                            switch (writeCachedData.getDataLength())
+                            switch(writeCachedData.getDataLength())
                             {
                                 case WORD:
                                     writeHoldingRegisterSet.add(new ModbusTCPWriteWordIntermediate(offset, internalValue.asInteger()));
@@ -108,11 +109,11 @@ public final class ModbusTCPDataUpdater extends ControlDataUpdater<ModbusTCPThre
             }
 
             var readCachedData = this.getCachedData(AttributeFetcher.fetch(controlWrapper, AttributeType.READ_ADDRESS));
-            if (readCachedData != null)
+            if(readCachedData != null)
             {
                 var offset = readCachedData.getOffset();
                 var outsideValue = controlWrapper.getValue().getOutsideValue();
-                switch (readCachedData.getFunctionCode())
+                switch(readCachedData.getFunctionCode())
                 {
                     case HOLDING_REGISTER:
                         readHoldingRegisterSet.add(this.parseReadNumberIntermediate(readCachedData, offset, outsideValue));
@@ -131,7 +132,7 @@ public final class ModbusTCPDataUpdater extends ControlDataUpdater<ModbusTCPThre
             //Parse read values here
         }
 
-        if (!(readHoldingRegisterSet.isEmpty() && writeHoldingRegisterSet.isEmpty()
+        if(!(readHoldingRegisterSet.isEmpty() && writeHoldingRegisterSet.isEmpty()
                 && writeCoilsSet.isEmpty() && readCoilsSet.isEmpty()
                 && readDiscreteInputsSet.isEmpty()
                 && readInputRegistersSet.isEmpty()))
@@ -143,7 +144,7 @@ public final class ModbusTCPDataUpdater extends ControlDataUpdater<ModbusTCPThre
     private ModbusTCPReadNumberIntermediate parseReadNumberIntermediate(ModbusTCPDataPropertyHolder.CachedData data, int offset, ValueIntermediate intermediate)
     {
         ModbusTCPReadNumberIntermediate readNumberIntermediate;
-        switch (data.getDataLength())
+        switch(data.getDataLength())
         {
             case BIT:
                 var bitOffset = data.getBitOffset();
@@ -177,14 +178,14 @@ public final class ModbusTCPDataUpdater extends ControlDataUpdater<ModbusTCPThre
 
     private ModbusTCPDataPropertyHolder.CachedData getCachedData(AddressAttribute attribute)
     {
-        if (attribute == null ||
+        if(attribute == null ||
                 attribute.getValue(AddressAttribute.DATA_TYPE) != AddressDataType.MODBUS_TCP)
         {
             return null;
         }
 
         var cachedData = ModbusTCPDataPropertyHolder.getCachedDataOf(attribute);
-        if (cachedData.getOffset() < 0)
+        if(cachedData.getOffset() < 0)
         {
             return null;
         }

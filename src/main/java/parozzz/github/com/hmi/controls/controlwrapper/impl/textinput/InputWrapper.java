@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.TextField;
 import javafx.scene.control.skin.TextFieldSkin;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.impl.FontAttribute;
@@ -98,17 +99,13 @@ public class InputWrapper extends ControlWrapper<TextField>
                             control.setFont(((FontAttribute) attribute).getFont());
                             control.setAlignment(attribute.getValue(FontAttribute.TEXT_POSITION));
 
-                            var lookupText = control.lookup(".text");
-
-                            var text = FXNodeUtil.getTextFieldText(control);
+                            var text = (Text) control.lookup(".text");
                             if (text != null)
                             {
                                 //Seems like unbinding stuff that is not meant to cause graphical glitches :(
                                 text.setUnderline(attribute.getValue(FontAttribute.UNDERLINE));
                                 text.fillProperty().bind(attribute.getProperty(FontAttribute.TEXT_COLOR));
                             }
-
-                            var lookupCaret = control.lookup(".caretPath");
 
                             var caretPath = FXNodeUtil.getCaret(control); //Set this after to have it revert after changing the text fill
                             if (caretPath != null)

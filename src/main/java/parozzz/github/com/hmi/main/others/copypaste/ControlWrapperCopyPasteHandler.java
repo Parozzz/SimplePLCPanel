@@ -5,17 +5,10 @@ import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyEvent;
 import parozzz.github.com.hmi.FXObject;
 import parozzz.github.com.hmi.controls.ControlContainerPane;
-import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.hmi.main.MainEditStage;
 import parozzz.github.com.hmi.util.FXUtil;
 
-import java.text.DateFormat;
-import java.text.FieldPosition;
-import java.text.ParsePosition;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 
 public class ControlWrapperCopyPasteHandler extends FXObject
 {
@@ -83,10 +76,8 @@ public class ControlWrapperCopyPasteHandler extends FXObject
         }
 
         var selectionList = (CopyPasteSelectionList) clipboardContent;
-        for (var controlWrapper : selectionList.getControlWrapperList(controlContainerPane))
+        for (var controlWrapper : selectionList.getDeserializedControlWrapperList(controlContainerPane))
         {
-            var wrapperType = controlWrapper.getType();
-
             var layoutX = controlWrapper.getLayoutX();
             var layoutY = controlWrapper.getLayoutY();
 
@@ -96,10 +87,9 @@ public class ControlWrapperCopyPasteHandler extends FXObject
                 layoutY += 10;
             }
 
-            var newControlWrapper = controlContainerPane.createControlWrapper(wrapperType);
-            newControlWrapper.getContainerPane().relocate(layoutX, layoutY);
-            controlWrapper.copyInto(newControlWrapper);
-            newControlWrapper.getAttributeUpdater().updateAllAttributes();
+            controlContainerPane.addControlWrapper(controlWrapper);
+            controlWrapper.getContainerPane().relocate(layoutX, layoutY);
+            controlWrapper.getAttributeUpdater().updateAllAttributes();
         }
     }
 }

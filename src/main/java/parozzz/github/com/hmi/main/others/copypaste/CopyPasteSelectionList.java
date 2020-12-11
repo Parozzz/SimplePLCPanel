@@ -29,7 +29,7 @@ class CopyPasteSelectionList implements java.io.Serializable
         serializedControlWrapperList.add(json);
     }
 
-    public List<ControlWrapper<?>> getControlWrapperList(ControlContainerPane controlContainerPane)
+    public List<ControlWrapper<?>> getDeserializedControlWrapperList(ControlContainerPane controlContainerPane)
     {
         if(serializedControlWrapperList.isEmpty())
         {

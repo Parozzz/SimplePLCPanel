@@ -48,6 +48,11 @@ public abstract class FXObject implements JSONSerializable
         setupDone = true;
     }
 
+    public boolean isSetupDone()
+    {
+        return setupDone;
+    }
+
     public void setDefault()
     {
 

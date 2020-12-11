@@ -77,36 +77,6 @@ public final class FXNodeUtil
         }
     }
 
-    public static Text getTextFieldText(TextField textField)
-    {
-        if (TEXT_NODE_FIELD == null)
-        {
-            try
-            {
-                TEXT_NODE_FIELD = TextFieldSkin.class.getDeclaredField("textNode");
-                TEXT_NODE_FIELD.trySetAccessible();
-            } catch (NoSuchFieldException exception)
-            {
-                MainLogger.getInstance().error("Error while getting Text object from TextField", exception, null);
-                return null;
-            }
-        }
-
-        var skin = textField.getSkin();
-        if (skin instanceof TextFieldSkin)
-        {
-            try
-            {
-                return (Text) TEXT_NODE_FIELD.get(skin);
-            } catch (IllegalAccessException exception)
-            {
-                MainLogger.getInstance().error("Error while getting Text object from TextField", exception, null);
-            }
-        }
-
-        return null;
-    }
-
     private FXNodeUtil()
     {
 

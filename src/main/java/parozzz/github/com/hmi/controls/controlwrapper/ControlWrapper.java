@@ -197,18 +197,6 @@ public abstract class ControlWrapper<C extends Control>
                         () -> controlContainerPane.getMainEditStage().getControlWrapperSetupStage().setSelectedControlWrapper(this)) //On double click open
                 .enableResizing(this)
                 .bind();
-                        /*width ->
-                        {
-                            stateMap.getAllAttributesOfType(AttributeType.SIZE).forEach(attribute ->
-                                    attribute.setValue(SizeAttribute.WIDTH, (int) Math.floor(width))
-                            );
-                        }, height ->
-                        {
-                            stateMap.getAllAttributesOfType(AttributeType.SIZE).forEach(attribute ->
-                                    attribute.setValue(SizeAttribute.HEIGHT, (int) Math.floor(height))
-                            );
-                        }).bind();*/
-
 
         selectedProperty.addListener((observable, oldValue, newValue) ->
         {

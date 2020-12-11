@@ -32,6 +32,9 @@ import parozzz.github.com.hmi.serialize.data.JSONDataArray;
 import parozzz.github.com.hmi.serialize.data.JSONDataMap;
 import parozzz.github.com.hmi.util.ContextMenuBuilder;
 import parozzz.github.com.hmi.util.specialfunction.FXSpecialFunctionManager;
+import parozzz.github.com.logger.Loggable;
+import parozzz.github.com.logger.MainLogger;
+import parozzz.github.com.util.Validate;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -43,7 +46,7 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ControlContainerPane extends FXController
+public class ControlContainerPane extends FXController implements Loggable
 {
     private final MainEditStage mainEditStage;
     private final ControlContainerDatabase controlContainerDatabase;
@@ -179,14 +182,6 @@ public class ControlContainerPane extends FXController
     }
 
     @Override
-    public void setDefault()
-    {
-        super.setDefault();
-
-        backgroundColorProperty.setValue(Color.WHITE);
-    }
-
-    @Override
     public void setupComplete()
     {
         super.setupComplete();
@@ -270,31 +265,51 @@ public class ControlContainerPane extends FXController
         }
 
         this.addControlWrapper(controlWrapper);
+        return controlWrapper;
+    }
+
+    public void addControlWrapper(ControlWrapper<?> controlWrapper)
+    {
+        if(!controlWrapper.isSetupDone())
+        {
+            MainLogger.getInstance().error("Cannot add a not initialized ControlWrapper", this);
+            return;
+        }
+
+        if(controlWrapper.getControlMainPage() != this)
+        {
+            MainLogger.getInstance().error("Cannot add a ControlWrapper inside the wrong ControlContainerPane", this);
+            return;
+        }
+
+        if(!controlWrapperSet.add(controlWrapper))
+        {
+            MainLogger.getInstance().error("Cannot add a ControlWrapper twice inside the same ControlContainerPane", this);
+            return;
+        }
+
+        super.addFXChild(controlWrapper, false);
+        mainAnchorPane.getChildren().add(controlWrapper.getContainerPane());
+
+        controlWrapper.setValid(true);
+
+        newControlWrapperConsumer.accept(controlWrapper);
 
         var undoRedoManager = this.controlContainerDatabase.getMainEditStage().getUndoRedoManager();
         undoRedoManager.addAction(() -> this.deleteControlWrapper(controlWrapper),
                 () -> this.addControlWrapper(controlWrapper),
                 this);
-
-        return controlWrapper;
-    }
-
-    private void addControlWrapper(ControlWrapper<?> controlWrapper)
-    {
-        controlWrapperSet.add(controlWrapper);
-        mainAnchorPane.getChildren().add(controlWrapper.getContainerPane());
-        super.addFXChild(controlWrapper, false);
-
-        controlWrapper.setValid(true);
-
-        newControlWrapperConsumer.accept(controlWrapper);
     }
 
     public void deleteControlWrapper(ControlWrapper<?> controlWrapper)
     {
+        if(!controlWrapperSet.remove(controlWrapper))
+        {
+            return;
+        }
+
         super.removeFXChild(controlWrapper);
         mainAnchorPane.getChildren().remove(controlWrapper.getContainerPane());
-        controlWrapperSet.remove(controlWrapper);
 
         deleteControlWrapperConsumer.accept(controlWrapper);
 
@@ -383,8 +398,8 @@ public class ControlContainerPane extends FXController
             undoRedoManager.setIgnoreNew(false);
         } else
         {
-            Logger.getLogger(ControlContainerPane.class.getSimpleName())
-                    .log(Level.WARNING, "Controls JSONArray has not been found while de-serializing");
+            MainLogger.getInstance()
+                    .warning("Controls JSONArray has not been found while de-serializing", this);
         }
     }
 
@@ -413,5 +428,14 @@ public class ControlContainerPane extends FXController
         }
 
         mainAnchorPane.setBackground(new Background(backgroundFillList, backgroundImageList));
+    }
+
+    @Override
+    public String log()
+    {
+        return "Name: " + name +
+                "BackgroundColor: " + backgroundColorProperty.getValue() +
+                "BackgroundPictureName: " + backgroundPictureNameProperty.getValue() +
+                "ControlWrapperAmount: " + controlWrapperSet.size();
     }
 }
