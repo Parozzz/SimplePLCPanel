@@ -10,6 +10,7 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.Modality;
 import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.AttributeMap;
 import parozzz.github.com.hmi.attribute.AttributeType;

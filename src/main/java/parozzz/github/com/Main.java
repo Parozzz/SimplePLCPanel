@@ -30,7 +30,6 @@ public class Main
 
         MainLogger.getInstance().start();
 
-
         try
         {
             if(args.length != 0)

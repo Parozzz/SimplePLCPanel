@@ -29,7 +29,7 @@ public class ControlContainerCreationStage extends PaneHMIStage<VBox>
 
     public ControlContainerCreationStage(ControlContainerDatabase controlContainerDatabase) throws IOException
     {
-        super("PageCreation", "controlContainerCreatePane.fxml", VBox.class);
+        super("controlContainerCreatePane.fxml", VBox.class);
 
         this.controlContainerDatabase = controlContainerDatabase;
     }

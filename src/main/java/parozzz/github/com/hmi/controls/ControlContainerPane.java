@@ -57,11 +57,11 @@ public class ControlContainerPane extends FXController implements Loggable
     private final AnchorPane mainAnchorPane;
     private final MainEditBottomScrollingPane.ImagePane mainEditBottomImagePane;
 
-    private final Property<Color> backgroundColorProperty;
-    private final Property<String> backgroundPictureNameProperty;
-
     private final Set<ControlWrapper<?>> controlWrapperSet;
     private final ControlWrappersSelectionManager controlWrappersSelectionManager;
+
+    private final Property<Color> backgroundColorProperty;
+    private final Property<String> backgroundPictureNameProperty;
 
     public ControlContainerPane(MainEditStage mainEditStage, ControlContainerDatabase controlContainerDatabase,
             String name,
@@ -78,14 +78,13 @@ public class ControlContainerPane extends FXController implements Loggable
 
         this.mainAnchorPane = new AnchorPane();
 
-        super.addFXChild(controlWrappersSelectionManager = new ControlWrappersSelectionManager(this, mainAnchorPane));
-
         this.mainEditBottomImagePane = new MainEditBottomScrollingPane.ImagePane(this);
+
+        super.addFXChild(controlWrappersSelectionManager = new ControlWrappersSelectionManager(this, mainAnchorPane));
+        this.controlWrapperSet = new HashSet<>();
 
         this.backgroundColorProperty = new SimpleObjectProperty<>(Color.WHITE);
         this.backgroundPictureNameProperty = new SimpleObjectProperty<>("");
-
-        this.controlWrapperSet = new HashSet<>();
     }
 
     @Override
@@ -138,21 +137,15 @@ public class ControlContainerPane extends FXController implements Loggable
             }
         });
 
-        var deletePageMenuItem = new MenuItem("Delete");
-        deletePageMenuItem.setOnAction(actionEvent ->
-        {
-            var optional = new Alert(Alert.AlertType.CONFIRMATION).showAndWait();
-            if (optional.isPresent() && optional.get() == ButtonType.OK)
-            {
-                controlContainerDatabase.deletePage(this);
-            }
-        });
-
         var menuBottomContextMenu = ContextMenuBuilder.builder()
                 .simple("Delete", () ->
-                        new Alert(Alert.AlertType.CONFIRMATION).showAndWait()
-                                .filter(ButtonType.OK::equals)
-                                .ifPresent(buttonType -> controlContainerDatabase.deletePage(this)))
+                {
+                    var alert = new Alert(Alert.AlertType.CONFIRMATION, "This operation cannot be undone", ButtonType.OK, ButtonType.CLOSE);
+                    alert.setHeaderText("Delete page: " + name + "?");
+                    alert.showAndWait()
+                            .filter(ButtonType.OK::equals)
+                            .ifPresent(buttonType -> controlContainerDatabase.deletePage(this));
+                })
                 .spacer()
                 .custom(new Label("Background Color"), false)
                 .colorPicker(false, colorPicker -> backgroundColorProperty.bindBidirectional(colorPicker.valueProperty()))
@@ -270,19 +263,19 @@ public class ControlContainerPane extends FXController implements Loggable
 
     public void addControlWrapper(ControlWrapper<?> controlWrapper)
     {
-        if(!controlWrapper.isSetupDone())
+        if (!controlWrapper.isSetupDone())
         {
             MainLogger.getInstance().error("Cannot add a not initialized ControlWrapper", this);
             return;
         }
 
-        if(controlWrapper.getControlMainPage() != this)
+        if (controlWrapper.getControlMainPage() != this)
         {
             MainLogger.getInstance().error("Cannot add a ControlWrapper inside the wrong ControlContainerPane", this);
             return;
         }
 
-        if(!controlWrapperSet.add(controlWrapper))
+        if (!controlWrapperSet.add(controlWrapper))
         {
             MainLogger.getInstance().error("Cannot add a ControlWrapper twice inside the same ControlContainerPane", this);
             return;
@@ -303,7 +296,7 @@ public class ControlContainerPane extends FXController implements Loggable
 
     public void deleteControlWrapper(ControlWrapper<?> controlWrapper)
     {
-        if(!controlWrapperSet.remove(controlWrapper))
+        if (!controlWrapperSet.remove(controlWrapper))
         {
             return;
         }

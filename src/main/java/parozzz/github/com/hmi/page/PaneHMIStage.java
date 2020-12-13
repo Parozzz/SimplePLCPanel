@@ -8,9 +8,19 @@ import java.io.IOException;
 
 public abstract class PaneHMIStage<P extends Pane> extends HMIStage<P>
 {
+    public PaneHMIStage(String resource, Class<P> paneClass) throws IOException
+    {
+        super(resource, paneClass);
+    }
+
     public PaneHMIStage(String name, String resource, Class<P> paneClass) throws IOException
     {
         super(name, resource, paneClass);
+    }
+
+    public PaneHMIStage(P pane)
+    {
+        super(pane);
     }
 
     public PaneHMIStage(String name, P pane)

@@ -26,36 +26,35 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
     {
         super.registerAttributeInitializers(attributeInitializer);
 
-        if(super.isStateless())
+        if (super.isStateless())
         {
             attributeInitializer.addGlobals(AttributeType.FONT);
-        }
-        else
+        } else
         {
             attributeInitializer.addStates(AttributeType.FONT);
         }
 
         attributeInitializer.addAttributeUpdateConsumer(updateData ->
+        {
+            var control = updateData.getControl();
+
+            for (var attributeType : updateData.getAttributeTypeList())
+            {
+                var attribute = AttributeFetcher.fetch(this, attributeType);
+                if (attribute == null)
                 {
-                    var control = updateData.getControl();
+                    continue;
+                }
 
-                    for(var attributeType : updateData.getAttributeTypeList())
-                    {
-                        var attribute = AttributeFetcher.fetch(this, attributeType);
-                        if(attribute == null)
-                        {
-                            continue;
-                        }
-
-                        if(attribute instanceof FontAttribute)
-                        {
-                            control.setFont(((FontAttribute) attribute).getFont());
-                            control.setUnderline(attribute.getValue(FontAttribute.UNDERLINE));
-                            control.setAlignment(attribute.getValue(FontAttribute.TEXT_POSITION));
-                            control.setTextFill(attribute.getValue(FontAttribute.TEXT_COLOR));
-                        }
-                    }
-                });
+                if (attribute instanceof FontAttribute)
+                {
+                    control.setFont(((FontAttribute) attribute).getFont());
+                    control.setUnderline(attribute.getValue(FontAttribute.UNDERLINE));
+                    control.setAlignment(attribute.getValue(FontAttribute.TEXT_POSITION));
+                    control.setTextFill(attribute.getValue(FontAttribute.TEXT_COLOR));
+                }
+            }
+        });
     }
 
     @Override
@@ -65,7 +64,7 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
 
         super.getStateMap().addStateValueChangedConsumer((stateMap, oldState, changeType) ->
         {
-            if(changeType != WrapperStateChangedConsumer.ChangeType.STATE_CHANGED)
+            if (changeType != WrapperStateChangedConsumer.ChangeType.STATE_CHANGED)
             {
                 return;
             }
@@ -76,7 +75,7 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
 
             var textAttribute = attributeMap.get(AttributeType.TEXT);
             var valueAttribute = attributeMap.get(AttributeType.VALUE);
-            if(textAttribute != null && valueAttribute != null)
+            if (textAttribute != null && valueAttribute != null)
             {
                 var text = textAttribute.getValue(TextAttribute.TEXT);
                 this.setParsedTextPlaceholders(super.control, text, valueAttribute);
@@ -92,14 +91,14 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
 
         //Use external value here ... WTF i was thinking?
         String stringPlaceholder;
-        if(parseAs == ValueIntermediateType.BOOLEAN)
+        if (parseAs == ValueIntermediateType.BOOLEAN)
         {
             var languageSettings = super.getControlMainPage().getMainEditStage()
                     .getSettingsStage().getLanguage();
             stringPlaceholder = super.getValue().getOutsideValue().asBoolean()
-                                ? languageSettings.getONBooleanPlaceholder()
-                                : languageSettings.getOFFBooleanPlaceholder();
-        }else
+                    ? languageSettings.getONBooleanPlaceholder()
+                    : languageSettings.getOFFBooleanPlaceholder();
+        } else
         {
             var doubleValue = (super.getValue().getOutsideValue().asDouble() + offset) * multiplyBy;
             stringPlaceholder = parseAs.convertNumber(doubleValue).toString();

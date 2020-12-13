@@ -183,13 +183,6 @@ public final class MainEditStage extends BorderPaneHMIStage
                 anchorPane.setPrefWidth(newWidth);
                 anchorPane.setMaxWidth(newWidth);
             }
-            /*
-            controlContainerDatabase.getPageList().forEach(controlMainPage -> controlMainPage.getMainAnchorPane().setPrefWidth(newWidth));
-            if (shownControlContainerPane != null)
-            {
-                shownControlContainerPane.getMainAnchorPane().setPrefWidth(newWidth);
-                //this.getStageSetter().get().sizeToScene();
-            }*/
         });
 
         pageHeightTextField.setTextFormatter(FXTextFormatterUtil.simpleInteger(4));
@@ -202,14 +195,6 @@ public final class MainEditStage extends BorderPaneHMIStage
                 anchorPane.setPrefHeight(newHeight);
                 anchorPane.setMaxHeight(newHeight);
             }
-
-            /*
-            controlContainerDatabase.getPageList().forEach(controlMainPage -> controlMainPage.getMainAnchorPane().setPrefHeight(newHeight));
-            if (shownControlContainerPane != null)
-            {
-                shownControlContainerPane.getMainAnchorPane().setPrefHeight(newHeight);
-                //this.getStageSetter().get().sizeToScene();
-            }*/
         });
 
         leftStackPane.getChildren().add(dragAndDropPane.getMainVBox());
@@ -390,16 +375,17 @@ public final class MainEditStage extends BorderPaneHMIStage
             centerTopLabel.setText("Not Selected");
 
             anchorPane = new AnchorPane();
-            anchorPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
             anchorPane.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-            anchorPane.setPrefSize(this.getPageWidth(), this.getPageHeight());
         } else
         {
             centerTopLabel.setText(controlContainerPane.getName());
             anchorPane = shownControlContainerPane.getMainAnchorPane();
         }
 
-        anchorPane.setPrefSize(this.getPageWidth(), this.getPageHeight());
+        var pageWidth = this.getPageWidth();
+        var pageHeight = this.getPageHeight();
+        anchorPane.setPrefSize(pageWidth, pageHeight);
+        anchorPane.setMaxSize(pageWidth, pageHeight);
 
         var children = centerScrollStackPane.getChildren();
         children.clear();
