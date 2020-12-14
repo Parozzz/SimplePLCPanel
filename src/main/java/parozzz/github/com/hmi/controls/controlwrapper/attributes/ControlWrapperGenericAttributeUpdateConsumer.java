@@ -2,11 +2,16 @@ package parozzz.github.com.hmi.controls.controlwrapper.attributes;
 
 import javafx.scene.control.Control;
 import javafx.scene.layout.Pane;
+import parozzz.github.com.hmi.attribute.Attribute;
+import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.AttributeType;
+import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapper;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public interface ControlWrapperGenericAttributeUpdateConsumer
 {
@@ -14,25 +19,38 @@ public interface ControlWrapperGenericAttributeUpdateConsumer
 
     class GenericUpdateData
     {
+        private final ControlWrapper<?> controlWrapper;
         private final Control control;
         private final Pane containerPane;
-        private final List<AttributeType<?>> attributeTypeList;
+        private final List<Attribute> attributeList;
 
-        public GenericUpdateData(Control control, Pane containerPane, AttributeType<?>... attributeTypes)
+        public GenericUpdateData(ControlWrapper<?> controlWrapper, Control control, Pane containerPane,
+                AttributeType<?>... attributeTypes)
         {
-            this(control, containerPane, Arrays.asList(attributeTypes));
+            this(controlWrapper, control, containerPane, Arrays.asList(attributeTypes));
         }
 
-        public GenericUpdateData(Control control, Pane containerPane, Collection<AttributeType<?>> attributeTypeCollection)
+        public GenericUpdateData(ControlWrapper<?> controlWrapper, Control control, Pane containerPane,
+                Collection<AttributeType<?>> attributeTypeCollection)
         {
+            this.controlWrapper = controlWrapper;
             this.control = control;
             this.containerPane = containerPane;
-            this.attributeTypeList = List.copyOf(attributeTypeCollection);
+
+            attributeList = attributeTypeCollection.stream()
+                    .map(attributeType -> AttributeFetcher.fetch(controlWrapper, attributeType))
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toUnmodifiableList());
         }
 
-        public List<AttributeType<?>> getAttributeTypeList()
+        public ControlWrapper<?> getControlWrapper()
         {
-            return attributeTypeList;
+            return controlWrapper;
+        }
+
+        public List<Attribute> getAttributeList()
+        {
+            return attributeList;
         }
 
         public Control getControl()

@@ -62,8 +62,9 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
         };
         this.attributeUpdatedConsumer = updateData ->
         {
-            for(var attributeType : updateData.getAttributeTypeList())
+            for(var attribute : updateData.getAttributeList())
             {
+                var attributeType = attribute.getType();
                 stateBinder.loadValueFromControlWrapperOf(attributeType);
             }
         };

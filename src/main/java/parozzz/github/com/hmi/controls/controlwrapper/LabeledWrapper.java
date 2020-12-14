@@ -11,8 +11,6 @@ import parozzz.github.com.hmi.controls.controlwrapper.attributes.ControlWrapperA
 import parozzz.github.com.hmi.controls.controlwrapper.state.WrapperStateChangedConsumer;
 import parozzz.github.com.hmi.util.valueintermediate.ValueIntermediateType;
 
-import java.util.function.BiFunction;
-
 public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C>
 {
     public LabeledWrapper(ControlContainerPane controlContainerPane,
@@ -25,7 +23,6 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
     protected void registerAttributeInitializers(ControlWrapperAttributeInitializer<C> attributeInitializer)
     {
         super.registerAttributeInitializers(attributeInitializer);
-
         if (super.isStateless())
         {
             attributeInitializer.addGlobals(AttributeType.FONT);
@@ -38,14 +35,8 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
         {
             var control = updateData.getControl();
 
-            for (var attributeType : updateData.getAttributeTypeList())
+            for (var attribute : updateData.getAttributeList())
             {
-                var attribute = AttributeFetcher.fetch(this, attributeType);
-                if (attribute == null)
-                {
-                    continue;
-                }
-
                 if (attribute instanceof FontAttribute)
                 {
                     control.setFont(((FontAttribute) attribute).getFont());

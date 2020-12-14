@@ -5,16 +5,15 @@ import javafx.beans.value.ObservableValue;
 import parozzz.github.com.hmi.attribute.Attribute;
 import parozzz.github.com.hmi.attribute.property.AttributeProperty;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.SetupPane;
+import parozzz.github.com.logger.Loggable;
 import parozzz.github.com.logger.MainLogger;
 
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public final class SetupPaneAttributeChanger<A extends Attribute>
+public final class SetupPaneAttributeChanger<A extends Attribute> implements Loggable
 {
-    private final static Logger logger = Logger.getLogger(SetupPaneAttributeChanger.class.getSimpleName());
-
     private final SetupPane<A> setupPane;
     private final PropertyBis<?, ?> propertyBis;
     private boolean dataChanged = false;
@@ -85,7 +84,13 @@ public final class SetupPaneAttributeChanger<A extends Attribute>
         propertyBis.setDataToAttribute(attribute);
     }
 
-    public final class PropertyBis<V, H>
+    @Override
+    public String log()
+    {
+        return "SetupPane: " + setupPane.getFXObjectName();
+    }
+
+    public final class PropertyBis<V, H> implements Loggable
     {
         private final AttributeProperty<V> attributeProperty;
         private final Property<H> property;
@@ -110,7 +115,6 @@ public final class SetupPaneAttributeChanger<A extends Attribute>
             try
             {
                 var defaultValue = attributeProperty.getDefaultValue();
-
                 attribute.setValue(attributeProperty, defaultValue);
                 property.setValue(attributeToPropertyConvert.apply(defaultValue));
             }
@@ -118,8 +122,7 @@ public final class SetupPaneAttributeChanger<A extends Attribute>
             {
                 MainLogger.getInstance().warning(
                         "Error while reverting to a default value. " +
-                                "AttributeName " + attribute.getFXObjectName() +
-                                ", SetupPane " + setupPane.getFXObjectName()
+                                "AttributeName " + attribute.getFXObjectName()
                         , exception
                 );
             }
@@ -150,13 +153,11 @@ public final class SetupPaneAttributeChanger<A extends Attribute>
             {
                 MainLogger.getInstance().warning(
                         "Error while setting data to an attribute. " +
-                                "AttributeName " + attribute.getFXObjectName() +
-                                ", SetupPane " + setupPane.getFXObjectName()
+                                "AttributeName " + attribute.getFXObjectName()
                         , exception
                 );
             }
-
-
+            
             undoRedoManager.setIgnoreNew(false);
         }
 
@@ -165,17 +166,24 @@ public final class SetupPaneAttributeChanger<A extends Attribute>
             try
             {
                 var propertyValue = property.getValue();
-                attribute.setValue(attributeProperty, propertyToAttributeConvert.apply(propertyValue));
+                if(propertyValue != null)
+                {
+                    var propertyConvertedValue = propertyToAttributeConvert.apply(propertyValue);
+                    attribute.setValue(attributeProperty, propertyConvertedValue);
+                }
             }
             catch(Exception exception)
             {
-                logger.log(Level.WARNING,
-                        "Error while getting data to an attribute." +
-                                " AttributeName: " + attribute.getFXObjectName() +
-                                "SetupPane: " + setupPane.getFXObjectName(),
+                MainLogger.getInstance().warning("Error while getting data to an attribute." +
+                                " AttributeName: " + attribute.getFXObjectName(),
                         exception);
             }
         }
 
+        @Override
+        public String log()
+        {
+            return "SetupPane: " + setupPane.getFXObjectName();
+        }
     }
 }

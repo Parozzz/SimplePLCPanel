@@ -5,7 +5,6 @@ import parozzz.github.com.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.impl.TextAttribute;
 import parozzz.github.com.hmi.attribute.impl.ValueAttribute;
-import parozzz.github.com.hmi.attribute.impl.address.ReadAddressAttribute;
 import parozzz.github.com.hmi.controls.ControlContainerPane;
 import parozzz.github.com.hmi.controls.controlwrapper.ControlWrapperType;
 import parozzz.github.com.hmi.controls.controlwrapper.LabeledWrapper;
@@ -32,14 +31,8 @@ public class DisplayWrapper extends LabeledWrapper<Label>
                     TextAttribute textAttribute = null;
                     ValueAttribute valueAttribute = null;
 
-                    for (var attributeType : updateData.getAttributeTypeList())
+                    for (var attribute : updateData.getAttributeList())
                     {
-                        var attribute = AttributeFetcher.fetch(this, attributeType);
-                        if (attribute == null)
-                        {
-                            continue;
-                        }
-
                         if (attribute instanceof TextAttribute)
                         {
                             textAttribute = (TextAttribute) attribute;

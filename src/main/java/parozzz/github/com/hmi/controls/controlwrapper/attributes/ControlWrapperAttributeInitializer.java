@@ -8,16 +8,12 @@ import java.util.*;
 
 public final class ControlWrapperAttributeInitializer<C extends Control>
 {
-    private final ControlWrapper<C> controlWrapper;
-
     final List<AttributeType<?>> stateAttributeTypeList;
     final List<AttributeType<?>> globalAttributeTypeList;
     final Set<ControlWrapperAttributeUpdateConsumer<C>> attributeUpdateConsumerSet;
 
-    public ControlWrapperAttributeInitializer(ControlWrapper<C> controlWrapper)
+    public ControlWrapperAttributeInitializer()
     {
-        this.controlWrapper = controlWrapper;
-
         this.stateAttributeTypeList = new ArrayList<>();
         this.globalAttributeTypeList = new ArrayList<>();
 

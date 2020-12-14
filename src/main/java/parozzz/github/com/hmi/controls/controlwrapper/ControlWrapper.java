@@ -114,7 +114,7 @@ public abstract class ControlWrapper<C extends Control>
 
         this.setControlVisualProperties(control, containerStackPane);
 
-        var attributeInitializer = new ControlWrapperAttributeInitializer<>(this);
+        var attributeInitializer = new ControlWrapperAttributeInitializer<C>();
         this.registerAttributeInitializers(attributeInitializer);
         attributeTypeManager.initialize(attributeInitializer);
         attributeUpdater.initialize(attributeInitializer);
@@ -479,14 +479,8 @@ public abstract class ControlWrapper<C extends Control>
             var control = updateData.getControl();
             var containerPane = updateData.getContainerPane();
 
-            for(var attributeType : updateData.getAttributeTypeList())
+            for(var attribute : updateData.getAttributeList())
             {
-                var attribute = AttributeFetcher.fetch(this, attributeType);
-                if(attribute == null)
-                {
-                    continue;
-                }
-
                 if(attribute instanceof ChangePageAttribute)
                 {
                     if(control == this.control) //This needs to be set only if is the same control as the one inside the controlwrapper

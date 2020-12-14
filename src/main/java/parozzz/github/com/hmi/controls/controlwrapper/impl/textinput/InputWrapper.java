@@ -48,14 +48,8 @@ public class InputWrapper extends ControlWrapper<TextField>
                 {
                     var control = updateData.getControl();
 
-                    for (var attributeType : updateData.getAttributeTypeList())
+                    for (var attribute : updateData.getAttributeList())
                     {
-                        var attribute = AttributeFetcher.fetch(this, attributeType);
-                        if (attribute == null)
-                        {
-                            continue;
-                        }
-
                         if (attribute instanceof InputDataAttribute)
                         {
                             switch (attribute.getValue(InputDataAttribute.TYPE))

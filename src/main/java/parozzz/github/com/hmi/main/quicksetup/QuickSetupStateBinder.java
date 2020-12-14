@@ -43,18 +43,6 @@ public final class QuickSetupStateBinder
                 boundAttributeProperty.copyFromAttributeMap(attributeMap);
             }
         }
-
-        /*
-        var wrapperState = quickSetupVBox.getSelectedWrapperState();
-
-        if(boundWrapperState != null)
-        {
-            var boundAttributeProperty = attributeBoundPropertySetMap.get(attributeType);
-            if(boundAttributeProperty != null)
-            {
-                boundAttributeProperty.copyFromAttributeMap(boundWrapperState);
-            }
-        }*/
     }
 
     public void loadAllValuesFromControlWrapper()
@@ -67,13 +55,6 @@ public final class QuickSetupStateBinder
                 boundAttributePropertySet.copyFromAttributeMap(attributeMap);
             }
         });
-        /*
-        if(boundWrapperState != null)
-        {
-            attributeBoundPropertySetMap.values().forEach(boundAttributePropertySet ->
-                    boundAttributePropertySet.copyFromAttributeMap(boundWrapperState)
-            );
-        }*/
     }
 
     public <A extends Attribute> Builder<A> builder(AttributeType<A> attributeType)

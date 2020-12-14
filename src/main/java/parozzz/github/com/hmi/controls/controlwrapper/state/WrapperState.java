@@ -15,8 +15,6 @@ public class WrapperState implements Comparable<WrapperState>
         HIGHER_EQUAL((t1, t2) -> t1 >= t2),
         LOWER((t1, t2) -> t1 < t2),
         LOWER_EQUAL((t1, t2) -> t1 <= t2);
-        //BETWEEN("{first}<X<{second}", false, (value, low, high) -> value < high && value > low),
-        //BETWEEN_EQUAL("{first}<=X<={second}", false, (value, low, high) -> value <= high && value >= low);
 
         private final IntBiPredicate predicate;
 
@@ -51,7 +49,6 @@ public class WrapperState implements Comparable<WrapperState>
     private static String createStringVersion(int firstCompare, CompareType firstCompareType,
             int secondCompare, CompareType secondCompareType)
     {
-
         var stringBuilder = new StringBuilder();
         if(firstCompareType != CompareType.ALWAYS_TRUE)
         {
@@ -180,7 +177,6 @@ public class WrapperState implements Comparable<WrapperState>
         {
             return true;
         }
-
 
         if(!(object instanceof WrapperState))
         {

@@ -54,7 +54,7 @@ public final class ControlWrapperAttributeUpdater<C extends Control> extends FXO
     private void update(C control, Pane containerPane, Collection<AttributeType<?>> attributeTypeCollection)
     {
         var updateData = new ControlWrapperAttributeUpdateConsumer.UpdateData<>(
-                control, containerPane, attributeTypeCollection
+                controlWrapper, control, containerPane, attributeTypeCollection
         );
         attributeUpdateConsumerSet.forEach(updateConsumer -> updateConsumer.update(updateData));
         genericAttributeUpdateConsumerSet.forEach(updateConsumer -> updateConsumer.update(updateData));
