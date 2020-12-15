@@ -58,15 +58,4 @@ public class BorderSetupPane extends SetupPane<BorderAttribute>
 
         super.computeProperties();
     }
-
-    @Override
-    public void setDefault()
-    {
-        super.setDefault();
-
-        borderColorPicker.setValue(Color.BLACK);
-        borderWidthTextField.setText("1");
-        borderStyleChoiceBox.setValue(BorderAttribute.StrokeStyle.SOLID);
-        cornerRadiiTextField.setText("1");
-    }
 }

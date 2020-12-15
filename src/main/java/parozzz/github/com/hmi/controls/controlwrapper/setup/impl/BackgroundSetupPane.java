@@ -103,10 +103,4 @@ public final class BackgroundSetupPane extends SetupPane<BackgroundAttribute>
 
         super.computeProperties();
     }
-
-    @Override
-    public void setDefault()
-    {
-        super.setDefault();
-    }
 }

@@ -121,8 +121,8 @@ public final class SetupPaneAttributeChanger<A extends Attribute> implements Log
             catch(Exception exception)
             {
                 MainLogger.getInstance().warning(
-                        "Error while reverting to a default value. " +
-                                "AttributeName " + attribute.getFXObjectName()
+                        "Error while reverting to a default value. AttributeName "
+                                + attribute.getFXObjectName()
                         , exception
                 );
             }
@@ -152,8 +152,8 @@ public final class SetupPaneAttributeChanger<A extends Attribute> implements Log
             catch(Exception exception)
             {
                 MainLogger.getInstance().warning(
-                        "Error while setting data to an attribute. " +
-                                "AttributeName " + attribute.getFXObjectName()
+                        "Error while setting data to an attribute. AttributeName "
+                                + attribute.getFXObjectName()
                         , exception
                 );
             }
@@ -174,8 +174,9 @@ public final class SetupPaneAttributeChanger<A extends Attribute> implements Log
             }
             catch(Exception exception)
             {
-                MainLogger.getInstance().warning("Error while getting data to an attribute." +
-                                " AttributeName: " + attribute.getFXObjectName(),
+                MainLogger.getInstance().warning(
+                        "Error while getting data to an attribute. AttributeName "
+                                + attribute.getFXObjectName(),
                         exception);
             }
         }

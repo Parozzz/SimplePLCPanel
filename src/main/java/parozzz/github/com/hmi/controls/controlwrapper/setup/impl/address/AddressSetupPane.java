@@ -129,17 +129,6 @@ public class AddressSetupPane<A extends AddressAttribute> extends SetupPane<A>
     }
 
     @Override
-    public void setDefault()
-    {
-        super.setDefault();
-
-        siemensAddressPane.setDefault();
-        modbusTCPAddressPane.setDefault();
-
-        addressTypeChoiceBox.setValue(AddressDataType.NONE);
-    }
-
-    @Override
     public Parent getParent()
     {
         return mainVBox;

@@ -8,9 +8,11 @@ import parozzz.github.com.hmi.controls.controlwrapper.setup.attributechanger.Set
 
 public final class ControlWrapperSetupUtil
 {
-    public static <A extends Attribute> void writeAttributeChangerListToAllStates(ControlWrapper<?> controlWrapper,
-            AttributeType<A> attributeType, SetupPaneAttributeChangerList<A> attributeChangerList)
+    public static <A extends Attribute> void writeAttributeChangerListToAllStates(
+            ControlWrapper<?> controlWrapper,
+             SetupPaneAttributeChangerList<A> attributeChangerList)
     {
+        var attributeType = attributeChangerList.getAttributeType();
         //Set the changed data to ALL the states of the wrapper
         controlWrapper.getStateMap().forEach(wrapperState ->
         {
@@ -26,9 +28,9 @@ public final class ControlWrapperSetupUtil
     }
 
     public static <A extends Attribute> void writeSingleAttributeChangerToAllStates(ControlWrapper<?> controlWrapper,
-            AttributeType<A> attributeType, SetupPaneAttributeChangerList<A> attributeChangerList,
-            Property<?> property)
+            SetupPaneAttributeChangerList<A> attributeChangerList, Property<?> property)
     {
+        var attributeType = attributeChangerList.getAttributeType();
         //Set the changed data to ALL the states of the wrapper
         controlWrapper.getStateMap().forEach(wrapperState ->
         {

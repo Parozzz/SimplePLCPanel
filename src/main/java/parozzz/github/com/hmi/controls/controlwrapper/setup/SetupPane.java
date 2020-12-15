@@ -104,8 +104,7 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
                             if (selectedControlWrapper != null)
                             {
                                 ControlWrapperSetupUtil.writeSingleAttributeChangerToAllStates(
-                                        selectedControlWrapper, attributeType,
-                                        attributeChangerList, property
+                                        selectedControlWrapper, attributeChangerList, property
                                 );
                             }
                         })
@@ -155,7 +154,7 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
         if (selectedControlWrapper != null)
         {
             ControlWrapperSetupUtil.writeAttributeChangerListToAllStates(
-                    selectedControlWrapper, attributeType, attributeChangerList
+                    selectedControlWrapper, attributeChangerList
             );
         }
     }

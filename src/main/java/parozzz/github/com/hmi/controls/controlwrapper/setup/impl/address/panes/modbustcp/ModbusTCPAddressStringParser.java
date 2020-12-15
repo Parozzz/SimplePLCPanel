@@ -46,7 +46,6 @@ public class ModbusTCPAddressStringParser extends AddressStringParser<ModbusTCPA
     @Override
     public String createString()
     {
-
         int address = 0; //Modbus address do start from one not zero.
         int bitNumber;
 
@@ -62,6 +61,11 @@ public class ModbusTCPAddressStringParser extends AddressStringParser<ModbusTCPA
         boolean canHaveBit = false; //One can have bit if is ITSELF not a bit, like reading bit of holding registers!
 
         var functionCode = addressPane.typeChoiceBox.getValue();
+        if(functionCode == null)
+        {
+            return null;
+        }
+
         switch (functionCode)
         {
             case COIL:
@@ -82,6 +86,11 @@ public class ModbusTCPAddressStringParser extends AddressStringParser<ModbusTCPA
         var parseString = "" + address;
 
         var addressLength = addressPane.lengthChoiceBox.getValue();
+        if(addressLength == null)
+        {
+            return null;
+        }
+
         if (canHaveBit && addressLength == ModbusTCPDataLength.BIT)
         {
             parseString += "." + bitNumber;

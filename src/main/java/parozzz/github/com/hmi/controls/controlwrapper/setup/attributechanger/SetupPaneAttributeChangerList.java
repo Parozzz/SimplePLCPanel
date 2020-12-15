@@ -6,28 +6,35 @@ import parozzz.github.com.hmi.attribute.AttributeMap;
 import parozzz.github.com.hmi.attribute.AttributeType;
 import parozzz.github.com.hmi.attribute.property.AttributeProperty;
 import parozzz.github.com.hmi.controls.controlwrapper.setup.SetupPane;
+import parozzz.github.com.logger.Loggable;
+import parozzz.github.com.logger.MainLogger;
 import parozzz.github.com.util.Validate;
 
 import java.util.*;
 import java.util.function.Function;
 
-public final class SetupPaneAttributeChangerList<A extends Attribute> implements Iterable<SetupPaneAttributeChanger<A>>
+public final class SetupPaneAttributeChangerList<A extends Attribute>
+        implements Iterable<SetupPaneAttributeChanger<A>>, Loggable
 {
     private final SetupPane<A> setupPane;
     private final AttributeType<A> attributeType;
-    private final List<SetupPaneAttributeChanger<A>> attributeChangerList;
+    private final Set<SetupPaneAttributeChanger<A>> attributeChangerSet;
     private final Map<Property<?>, SetupPaneAttributeChanger<A>> propertyToAttributeChangerMap;
 
     private boolean ignoreCopy;
-    private boolean complete = false;
 
     public SetupPaneAttributeChangerList(SetupPane<A> setupPane, AttributeType<A> attributeType)
     {
         this.setupPane = setupPane;
         this.attributeType = attributeType;
 
-        this.attributeChangerList = new LinkedList<>();
+        this.attributeChangerSet = new HashSet<>();
         this.propertyToAttributeChangerMap = new HashMap<>();
+    }
+
+    public AttributeType<A> getAttributeType()
+    {
+        return attributeType;
     }
 
     public Set<Property<?>> getPropertySet()
@@ -42,13 +49,24 @@ public final class SetupPaneAttributeChangerList<A extends Attribute> implements
 
     public void resetAllDataChanged()
     {
-        attributeChangerList.forEach(SetupPaneAttributeChanger::resetDataChanged);
+        attributeChangerSet.forEach(SetupPaneAttributeChanger::resetDataChanged);
+    }
+
+    public SetupPaneAttributeChangerList<A> add(SetupPaneAttributeChanger<A> attributeChanger)
+    {
+        if(!attributeChangerSet.add(attributeChanger))
+        {
+            MainLogger.getInstance().warning("Trying to add a SetupPaneAttributeChanger twice", this);
+        }
+
+        propertyToAttributeChangerMap.put(attributeChanger.getProperty(), attributeChanger);
+        return this;
     }
 
     //This should be a pretty hot method, better be safe with a reliable for loop than a stream
     public boolean isAnyDataChanged()
     {
-        for(var attributeChanger : attributeChangerList)
+        for(var attributeChanger : attributeChangerSet)
         {
             if(attributeChanger.isDataChanged())
             {
@@ -59,16 +77,6 @@ public final class SetupPaneAttributeChangerList<A extends Attribute> implements
         return false;
     }
 
-    public SetupPaneAttributeChangerList<A> add(SetupPaneAttributeChanger<A> attributeChanger)
-    {
-        Validate.needTrue("Trying to add an AttributeChanger twice to " + setupPane.getFXObjectName(),
-                attributeChangerList.add(attributeChanger));
-
-        propertyToAttributeChangerMap.put(attributeChanger.getProperty(), attributeChanger);
-
-        return this;
-    }
-
     public void setDataToAttribute(AttributeMap attributeMap, boolean forceSet)
     {
         var attribute = attributeMap.get(attributeType);
@@ -76,8 +84,8 @@ public final class SetupPaneAttributeChangerList<A extends Attribute> implements
         {
             return;
         }
-        //I am copying the list because attribute could change it while iterating here
-        for(var attributeChanger : attributeChangerList)
+
+        for(var attributeChanger : attributeChangerSet)
         {
             if(attributeChanger.isDataChanged() || forceSet)
             {
@@ -100,8 +108,9 @@ public final class SetupPaneAttributeChangerList<A extends Attribute> implements
         {
             return;
         }
+
         //I am copying the list because attribute could change it while iterating here
-        for(var attributeChanger : attributeChangerList)
+        for(var attributeChanger : attributeChangerSet)
         {
             attributeChanger.copyDataFromAttribute(attribute);
         }
@@ -136,6 +145,13 @@ public final class SetupPaneAttributeChangerList<A extends Attribute> implements
     @Override
     public Iterator<SetupPaneAttributeChanger<A>> iterator()
     {
-        return attributeChangerList.iterator();
+        return attributeChangerSet.iterator();
+    }
+
+    @Override
+    public String log()
+    {
+        return "SetupPane: " + setupPane.getFXObjectName() +
+                "AttributeType: " + attributeType;
     }
 }

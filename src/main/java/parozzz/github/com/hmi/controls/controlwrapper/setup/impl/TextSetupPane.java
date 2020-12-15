@@ -63,21 +63,8 @@ public final class TextSetupPane extends SetupPane<TextAttribute>
     }
 
     @Override
-    public void setDefault()
-    {
-        super.setDefault();
-
-        var undoRedoManager = super.getSetupStage().getUndoRedoManager();
-
-        undoRedoManager.setIgnoreNew(true);
-        newLineAlignmentChoiceBox.getSelectionModel().selectFirst();
-        undoRedoManager.setIgnoreNew(false);
-    }
-
-    @Override
     public Parent getParent()
     {
         return mainVBox;
     }
-
 }

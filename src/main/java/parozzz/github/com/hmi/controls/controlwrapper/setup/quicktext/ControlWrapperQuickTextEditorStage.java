@@ -24,26 +24,22 @@ public class ControlWrapperQuickTextEditorStage extends HMIStage<VBox> implement
     private final ChangeListener<Boolean> controlWrapperValidListener;
     private final ControlWrapperGenericAttributeUpdateConsumer attributeUpdatedConsumer;
     private ControlWrapper<?> selectedControlWrapper;
-    private boolean ignoreAttributeUpdate;
 
     public ControlWrapperQuickTextEditorStage() throws IOException
     {
         super("setup/quicktext/quickTextEditorMainPane.fxml", VBox.class);
 
         this.statePaneList = new ArrayList<>();
-        controlWrapperValidListener = (observableValue, oldValue, newValue) ->
+        this.controlWrapperValidListener = (observableValue, oldValue, newValue) ->
         {
-            if (!newValue)
+            if(!newValue)
             {
                 this.setSelectedControlWrapper(null);
             }
         };
-        attributeUpdatedConsumer = updateData ->
-        {
-            ignoreAttributeUpdate = true;
-            statePaneList.forEach(QuickTextEditorStatePane::refreshValues);
-            ignoreAttributeUpdate = false;
-        };
+
+        this.attributeUpdatedConsumer = updateData ->
+                statePaneList.forEach(QuickTextEditorStatePane::refreshValues);
     }
 
     @Override
@@ -63,14 +59,14 @@ public class ControlWrapperQuickTextEditorStage extends HMIStage<VBox> implement
         secondRowVBox.getChildren().clear();
         statePaneList.clear();
 
-        if (selectedControlWrapper != null)
+        if(selectedControlWrapper != null)
         {
             selectedControlWrapper.validProperty().removeListener(controlWrapperValidListener);
             selectedControlWrapper.getAttributeUpdater().removeGenericUpdateConsumer(attributeUpdatedConsumer);
         }
 
         this.selectedControlWrapper = controlWrapper;
-        if (controlWrapper == null)
+        if(controlWrapper == null)
         {
             this.getStageSetter().close();
             return;
@@ -82,16 +78,17 @@ public class ControlWrapperQuickTextEditorStage extends HMIStage<VBox> implement
         {
             try
             {
-                var statePane = new QuickTextEditorStatePane(this, wrapperState);
+                var statePane = new QuickTextEditorStatePane(wrapperState);
                 statePane.setup();
                 statePaneList.add(statePane);
-            } catch (IOException e)
+            }
+            catch(IOException e)
             {
                 e.printStackTrace();
             }
         });
 
-        for (int x = 0; x < statePaneList.size(); x++)
+        for(int x = 0; x < statePaneList.size(); x++)
         {
             var statePane = statePaneList.get(x);
             (x % 2 == 0 ? firstRowVBox : secondRowVBox).getChildren().add(statePane.getParent());

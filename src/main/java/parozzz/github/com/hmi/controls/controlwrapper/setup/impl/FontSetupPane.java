@@ -108,19 +108,6 @@ public final class FontSetupPane extends SetupPane<FontAttribute>
     }
 
     @Override
-    public void setDefault()
-    {
-        super.setDefault();
-
-        textColorPicker.setValue(Color.BLACK);
-        textSizeComboBox.setValue(12);
-
-        fontComboBox.getSelectionModel().selectFirst();
-        textPositionChoiceBox.getSelectionModel().selectFirst();
-    }
-
-
-    @Override
     public Parent getParent()
     {
         return vBox;

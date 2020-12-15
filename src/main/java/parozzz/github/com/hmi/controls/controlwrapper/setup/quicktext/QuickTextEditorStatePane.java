@@ -27,16 +27,12 @@ class QuickTextEditorStatePane extends FXObject
     @FXML private ToggleButton italicToggleButton;
     @FXML private ToggleButton underlineToggleButton;
 
-    private final ControlWrapperQuickTextEditorStage editorStage;
     private final WrapperState wrapperState;
     private final HBox hBox;
 
-    public QuickTextEditorStatePane(ControlWrapperQuickTextEditorStage editorStage,
-            WrapperState wrapperState) throws IOException
+    public QuickTextEditorStatePane(WrapperState wrapperState) throws IOException
     {
-        this.editorStage = editorStage;
         this.wrapperState = wrapperState;
-
         hBox = (HBox) FXUtil.loadFXML("setup/quicktext/quickTextStatePane.fxml", this);
     }
 
