@@ -60,11 +60,17 @@ public class ModbusTCPAddressPane extends AddressPane
         lengthChoiceBox.getItems().addAll(ModbusTCPDataLength.values());
         lengthChoiceBox.valueProperty().addListener((observableValue, oldValue, newValue) ->
         {
+            var functionCode = typeChoiceBox.getValue();
+            if(newValue == null || functionCode == null)
+            {
+                return;
+            }
+
             var isBit = newValue == ModbusTCPDataLength.BIT;
             bitNumberLabel.setVisible(isBit);
             bitNumberTextField.setVisible(isBit);
 
-            switch (typeChoiceBox.getValue())
+            switch (functionCode)
             {
                 case HOLDING_REGISTER:
                 case INPUT_REGISTER:
@@ -80,6 +86,11 @@ public class ModbusTCPAddressPane extends AddressPane
                 .forEach(typeChoiceBox.getItems()::add);
         typeChoiceBox.valueProperty().addListener((observableValue, oldValue, newValue) ->
         {
+            if(newValue == null)
+            {
+                return;
+            }
+
             switch (newValue)
             {
                 case COIL:

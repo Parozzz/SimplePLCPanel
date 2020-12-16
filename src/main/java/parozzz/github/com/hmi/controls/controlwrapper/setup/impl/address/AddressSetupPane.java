@@ -24,9 +24,12 @@ public class AddressSetupPane<A extends AddressAttribute> extends SetupPane<A>
 {
     //Labels
 
-    @FXML private ChoiceBox<AddressDataType> addressTypeChoiceBox;
-    @FXML private StackPane centerStackPane;
-    @FXML private TextField textAddressTextField;
+    @FXML
+    private ChoiceBox<AddressDataType> addressTypeChoiceBox;
+    @FXML
+    private StackPane centerStackPane;
+    @FXML
+    private TextField textAddressTextField;
 
     private final VBox mainVBox;
 
@@ -35,7 +38,7 @@ public class AddressSetupPane<A extends AddressAttribute> extends SetupPane<A>
     private AddressPane selectedAddressPane;
 
     public AddressSetupPane(ControlWrapperSetupStage setupPage, String buttonText,
-                            AttributeType<A> attributeType) throws IOException
+            AttributeType<A> attributeType) throws IOException
     {
         super(setupPage, buttonText + "SetupPage", buttonText, attributeType);
 
@@ -68,7 +71,7 @@ public class AddressSetupPane<A extends AddressAttribute> extends SetupPane<A>
             var children = centerStackPane.getChildren();
             children.clear();
 
-            if (newValue == AddressDataType.NONE)
+            if(newValue == AddressDataType.NONE)
             {
                 var emptyStackPane = new StackPane();
                 emptyStackPane.setPrefSize(200, 200);
@@ -82,7 +85,7 @@ public class AddressSetupPane<A extends AddressAttribute> extends SetupPane<A>
             //I need them both because one of the AddressAttribute is a global one
             var selectedControlWrapper = super.getSetupStage().getSelectedControlWrapper();
             var selectedWrapperState = super.getSetupStage().getSelectedWrapperState();
-            if (selectedControlWrapper == null || selectedWrapperState == null
+            if(selectedControlWrapper == null || selectedWrapperState == null
                     || (attribute = AttributeFetcher.fetch(selectedControlWrapper, super.getAttributeType())) == null)
             {
                 addressTypeChoiceBox.setValue(AddressDataType.NONE);
@@ -91,11 +94,10 @@ public class AddressSetupPane<A extends AddressAttribute> extends SetupPane<A>
 
             attribute.setValue(AddressAttribute.DATA_TYPE, newValue);
             //attribute.setDataType(newValue);
-            if (newValue == AddressDataType.SIEMENS)
+            if(newValue == AddressDataType.SIEMENS)
             {
                 selectedAddressPane = siemensAddressPane;
-            }
-            else if(newValue == AddressDataType.MODBUS_TCP)
+            }else if(newValue == AddressDataType.MODBUS_TCP)
             {
                 selectedAddressPane = modbusTCPAddressPane;
             }
@@ -110,7 +112,7 @@ public class AddressSetupPane<A extends AddressAttribute> extends SetupPane<A>
         });
 
         //This allow updating the string parser when a value here changes!
-        /*textAddressTextField.setOnAction(event -> this.parseAddressStringParser());
+        textAddressTextField.setOnAction(event -> this.parseAddressStringParser());
         textAddressTextField.setOnMouseExited(mouseEvent -> this.parseAddressStringParser());
         textAddressTextField.setOnKeyReleased(keyEvent ->
         {
@@ -118,8 +120,7 @@ public class AddressSetupPane<A extends AddressAttribute> extends SetupPane<A>
             {
                 this.parseAddressStringParser();
             }
-        });*/
-
+        });
 
         super.getAttributeChangerList().create(addressTypeChoiceBox.valueProperty(), AddressAttribute.DATA_TYPE);
         siemensAddressPane.parseAttributeChangerList(super.getAttributeChangerList());
@@ -132,6 +133,14 @@ public class AddressSetupPane<A extends AddressAttribute> extends SetupPane<A>
     public Parent getParent()
     {
         return mainVBox;
+    }
+
+    @Override
+    public void doDataCopiedFromAttribute()
+    {
+        super.doDataCopiedFromAttribute();
+
+        this.parseAddressStringParser();
     }
 
     public void setAsState()

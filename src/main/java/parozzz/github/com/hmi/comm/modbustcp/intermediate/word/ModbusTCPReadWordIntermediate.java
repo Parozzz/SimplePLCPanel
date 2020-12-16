@@ -9,7 +9,6 @@ public class ModbusTCPReadWordIntermediate extends ModbusTCPReadNumberIntermedia
 {
     private final IntConsumer consumer;
     private int value;
-    private boolean signed = true;
 
     public ModbusTCPReadWordIntermediate(int offset, IntConsumer consumer)
     {
@@ -20,10 +19,9 @@ public class ModbusTCPReadWordIntermediate extends ModbusTCPReadNumberIntermedia
     @Override
     public void setNextWord(int value)
     {
-        var intValue = (int) value;
         this.value = super.signed
-                ? ByteBuffer.allocate(4).putInt(intValue).getShort(2)
-                : intValue;
+                ? ByteBuffer.allocate(4).putInt(value).getShort(2)
+                : value;
     }
 
     @Override

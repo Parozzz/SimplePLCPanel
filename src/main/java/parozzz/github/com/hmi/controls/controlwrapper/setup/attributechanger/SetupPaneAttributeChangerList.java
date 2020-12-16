@@ -114,6 +114,8 @@ public final class SetupPaneAttributeChangerList<A extends Attribute>
         {
             attributeChanger.copyDataFromAttribute(attribute);
         }
+
+        setupPane.doDataCopiedFromAttribute();
     }
 
     public <N extends Number> SetupPaneAttributeChangerList<A> createStringToNumber(Property<String> property,

@@ -22,7 +22,7 @@ public class ModbusTCPReadDWordIntermediate extends ModbusTCPReadNumberIntermedi
     {
         //A Double Word is 4 bytes, so an integer contains it all :)
         //Every new value added, it is added to the actual value by shifting the set value by 16 * (values received)
-        this.value |= (value & 0xFFFF) << (16 * valueCounter ++);
+        this.value |= (long) (value & 0xFFFF) << (16 * valueCounter ++);
 
         if(signed && valueCounter == 2)
         {
