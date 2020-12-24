@@ -33,7 +33,7 @@
                <children>
                   <TextField fx:id="textAddressTextField" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="40.0" prefWidth="300.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;">
                      <font>
-                        <Font size="16.0" />
+                        <Font size="14.0" />
                      </font>
                   </TextField>
                   <Button maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;">
