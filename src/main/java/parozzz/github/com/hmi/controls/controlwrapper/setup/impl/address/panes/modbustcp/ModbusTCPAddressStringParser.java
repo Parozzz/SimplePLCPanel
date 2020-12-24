@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 public class ModbusTCPAddressStringParser extends AddressStringParser<ModbusTCPAddressPane>
 {
 
-    public static String createStringFromData(Data data)
+    public static String createStringFromData(Data data, boolean read)
     {
         var showAddress = data.getAddress();
         boolean canHaveBit = false; //One can have bit if is ITSELF not a bit, like reading bit of holding registers!
@@ -21,9 +21,19 @@ public class ModbusTCPAddressStringParser extends AddressStringParser<ModbusTCPA
             case COIL:
                 break;
             case DISCRETE_INPUT:
+                if(!read)
+                {
+                    return null;
+                }
+
                 showAddress += 10000;
                 break;
             case INPUT_REGISTER:
+                if(!read)
+                {
+                    return null;
+                }
+
                 showAddress += 30000;
                 canHaveBit = true;
                 canHaveSign = true;
@@ -45,7 +55,7 @@ public class ModbusTCPAddressStringParser extends AddressStringParser<ModbusTCPA
 
         var extraDataParser = new ExtraDataParser();
         extraDataParser.setDataType(dataLength.name());
-        if(canHaveSign && dataLength != ModbusTCPDataLength.BIT && data.isSigned())
+        if(read && canHaveSign && dataLength != ModbusTCPDataLength.BIT && data.isSigned())
         {
             extraDataParser.addData("S");
         }
@@ -146,7 +156,7 @@ public class ModbusTCPAddressStringParser extends AddressStringParser<ModbusTCPA
             signed = true;
         }
 
-        return new Data(functionCode, dataLength, address, bitNumber, signed);
+        return new Data(functionCode, dataLength, address, bitNumber, signed, false);
     }
 
     private boolean isUpdating;
@@ -186,7 +196,7 @@ public class ModbusTCPAddressStringParser extends AddressStringParser<ModbusTCPA
     public String createString()
     {
         var data = this.getDataFromAddressPane();
-        return data == null ? null : createStringFromData(data);
+        return data == null ? null : createStringFromData(data, addressPane.isReadAddress());
     }
 
     @Override
@@ -236,8 +246,9 @@ public class ModbusTCPAddressStringParser extends AddressStringParser<ModbusTCPA
             var bitNumber = Integer.parseInt(addressPane.bitNumberTextField.getText());
             var address = Integer.parseInt(addressPane.addressTextField.getText());
             var signed = addressPane.signedCheckBox.isSelected();
+            var read = addressPane.isReadAddress();
 
-            return new Data(functionCode, dataLength, address, bitNumber, signed);
+            return new Data(functionCode, dataLength, address, bitNumber, signed, read);
         }
         catch(NumberFormatException exception)
         {
@@ -252,15 +263,17 @@ public class ModbusTCPAddressStringParser extends AddressStringParser<ModbusTCPA
         private final int address;
         private final int bitNumber;
         private final boolean signed;
+        private final boolean read;
 
         public Data(ModbusTCPFunctionCode functionCode, ModbusTCPDataLength dataLength,
-                int address, int bitNumber, boolean signed)
+                int address, int bitNumber, boolean signed, boolean read)
         {
             this.functionCode = functionCode;
             this.dataLength = dataLength;
             this.address = address;
             this.bitNumber = bitNumber;
             this.signed = signed;
+            this.read = read;
         }
 
         public ModbusTCPFunctionCode getFunctionCode()
@@ -286,6 +299,11 @@ public class ModbusTCPAddressStringParser extends AddressStringParser<ModbusTCPA
         public boolean isSigned()
         {
             return signed;
+        }
+
+        public boolean isRead()
+        {
+            return read;
         }
     }
 }

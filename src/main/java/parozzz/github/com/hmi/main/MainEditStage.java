@@ -14,6 +14,7 @@ import javafx.scene.shape.Circle;
 import parozzz.github.com.Main;
 import parozzz.github.com.StartProperties;
 import parozzz.github.com.hmi.comm.CommunicationStage;
+import parozzz.github.com.hmi.comm.modbustcp.ModbusTCPStringAddressCreatorStage;
 import parozzz.github.com.hmi.comm.modbustcp.ModbusTCPThread;
 import parozzz.github.com.hmi.comm.siemens.SiemensPLCThread;
 import parozzz.github.com.hmi.controls.ControlContainerCreationStage;
@@ -37,41 +38,63 @@ import java.io.IOException;
 
 public final class MainEditStage extends BorderPaneHMIStage
 {
-    @FXML private CheckBox setPageFullScreenCheckBox;
-    @FXML private CheckBox setPageAtStartupCheckBox;
-    @FXML private MenuItem startReadOnlyMenuItem;
+    @FXML
+    private CheckBox setPageFullScreenCheckBox;
+    @FXML
+    private CheckBox setPageAtStartupCheckBox;
+    @FXML
+    private MenuItem startReadOnlyMenuItem;
 
     //Bottom
-    @FXML private HBox bottomScrollingHBox;
+    @FXML
+    private HBox bottomScrollingHBox;
 
     //File
-    @FXML private MenuItem saveMenuItem;
-    @FXML private MenuItem settingsMenuItem;
+    @FXML
+    private MenuItem saveMenuItem;
+    @FXML
+    private MenuItem settingsMenuItem;
 
     //ControlWrapperPage Data
-    @FXML private MenuItem createPageMenuItem;
-    @FXML private TextField zoomTextField;
-    @FXML private TextField pageWidthTextField;
-    @FXML private TextField pageHeightTextField;
+    @FXML
+    private MenuItem createPageMenuItem;
+    @FXML
+    private TextField zoomTextField;
+    @FXML
+    private TextField pageWidthTextField;
+    @FXML
+    private TextField pageHeightTextField;
 
     //Communication
-    @FXML private Circle plcConnectedCircle;
-    @FXML private MenuItem setupCommunicationMenuItem;
+    @FXML
+    private Circle plcConnectedCircle;
+    @FXML
+    private MenuItem setupCommunicationMenuItem;
 
     //Tools Menu
-    @FXML private MenuItem pictureBankMenuItem;
+    @FXML
+    private MenuItem pictureBankMenuItem;
+    @FXML
+    private MenuItem modbusTCPStringAddressMenuItem;
 
     //Messages Menu
-    @FXML private Label messagePresentLabel;
-    @FXML private MenuItem showMessageListMenuItem;
+    @FXML
+    private Label messagePresentLabel;
+    @FXML
+    private MenuItem showMessageListMenuItem;
 
-    @FXML private StackPane leftStackPane;
-    @FXML private StackPane rightStackPane;
+    @FXML
+    private StackPane leftStackPane;
+    @FXML
+    private StackPane rightStackPane;
 
     //Center = Page Showing
-    @FXML private Label centerTopLabel;
-    @FXML private VBox centerMainVBox;
-    @FXML private StackPane centerScrollStackPane;
+    @FXML
+    private Label centerTopLabel;
+    @FXML
+    private VBox centerMainVBox;
+    @FXML
+    private StackPane centerScrollStackPane;
 
     private final Runnable saveDataRunnable;
 
@@ -156,10 +179,13 @@ public final class MainEditStage extends BorderPaneHMIStage
 
         //Tools Menu
         pictureBankMenuItem.setOnAction(actionEvent -> pictureBankStage.showStage());
-        messagePresentLabel.setVisible(false);
+        modbusTCPStringAddressMenuItem.setOnAction(event ->
+                ModbusTCPStringAddressCreatorStage.getInstance().showAsStandalone()
+        );
 
         //Messages Menu
         showMessageListMenuItem.setOnAction(event -> messagesListStage.showStage());
+        messagePresentLabel.setVisible(false);
 
         zoomTextField.setTextFormatter(FXTextFormatterUtil.simpleInteger(3));
         zoomTextField.textProperty().addListener((observableValue, oldValue, newValue) ->
@@ -202,7 +228,7 @@ public final class MainEditStage extends BorderPaneHMIStage
         //Needs to be on the vbox in case the zoom is too low
         centerMainVBox.addEventFilter(ScrollEvent.SCROLL, scrollEvent ->
         {
-            if (scrollEvent.isControlDown())
+            if(scrollEvent.isControlDown())
             {
                 var delta = scrollEvent.getDeltaY();
 
@@ -230,17 +256,17 @@ public final class MainEditStage extends BorderPaneHMIStage
     {
         super.loop();
 
-        if (super.every(1000))
+        if(super.every(1000))
         {
             var selectedCommunicationManager = communicationStage.getSelectedCommunicationManager();
-            if (selectedCommunicationManager != null)
+            if(selectedCommunicationManager != null)
             {
                 var isConnected = selectedCommunicationManager.getCommThread().isConnected();
                 plcConnectedCircle.setFill(isConnected ? Color.GREEN : Color.RED);
             }
 
             messagePresentTrig.set(messagesListStage.areMessagesPresent());
-            switch (messagePresentTrig.checkTrig())
+            switch(messagePresentTrig.checkTrig())
             {
                 case RISING:
                     messagePresentLabel.setVisible(true);
@@ -328,7 +354,7 @@ public final class MainEditStage extends BorderPaneHMIStage
 
     public void changeReadOnlyPage(ControlContainerPane controlContainerPane)
     {
-        if (this.isReadOnlyShowing())
+        if(this.isReadOnlyShowing())
         {
             readOnlyControlMainPage.setControlMainPage(controlContainerPane);
         }
@@ -339,9 +365,9 @@ public final class MainEditStage extends BorderPaneHMIStage
         this.setShownControlContainerPane(null);
 
         var pageList = controlContainerDatabase.getPageList();
-        if (!pageList.isEmpty())
+        if(!pageList.isEmpty())
         {
-            if (isDebug)
+            if(isDebug)
             {
                 readOnlyControlMainPage.setExitKeyCombination();
             }
@@ -360,7 +386,7 @@ public final class MainEditStage extends BorderPaneHMIStage
 
     public void setShownControlContainerPane(ControlContainerPane controlContainerPane)
     {
-        if (shownControlContainerPane != null)
+        if(shownControlContainerPane != null)
         {
             //If i don't clear selections some bad things could happen, especially while debugging read only page
             shownControlContainerPane.getSelectionManager().clearSelections();
@@ -370,13 +396,13 @@ public final class MainEditStage extends BorderPaneHMIStage
         this.shownControlContainerPane = controlContainerPane;
 
         AnchorPane anchorPane;
-        if (shownControlContainerPane == null)
+        if(shownControlContainerPane == null)
         {
             centerTopLabel.setText("Not Selected");
 
             anchorPane = new AnchorPane();
             anchorPane.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        } else
+        }else
         {
             centerTopLabel.setText(controlContainerPane.getName());
             anchorPane = shownControlContainerPane.getMainAnchorPane();
@@ -403,10 +429,10 @@ public final class MainEditStage extends BorderPaneHMIStage
     public void start()
     {
         var startProperties = Main.START_PROPERTIES;
-        if (startProperties.getBoolean(StartProperties.PropertyEnum.SHOW_EDIT_SCREEN))
+        if(startProperties.getBoolean(StartProperties.PropertyEnum.SHOW_EDIT_SCREEN))
         {
             this.showStage();
-        } else
+        }else
         {
             //Disable all the non essentials stuff
             controlsPageCreationPage.setDisabled(true);
