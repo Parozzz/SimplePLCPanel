@@ -27,6 +27,7 @@ public final class RuntimeControlContainerStage extends HMIStage<StackPane>
         super(new StackPane());
 
         this.mainEditStage = mainEditStage;
+
         super.parent.getChildren().addAll(
                 this.group = new Group()
         );
@@ -39,10 +40,10 @@ public final class RuntimeControlContainerStage extends HMIStage<StackPane>
 
         super.getStageSetter().initModality(Modality.APPLICATION_MODAL)
                 .initStyle(StageStyle.UNDECORATED)
-                //.setFullScreen(true, "", null)
+                .setPos(0, 0) //Always place windows on top left corner
                 .setFullScreen(false, "", null)
                 .setAlwaysOnTop(true)
-                .setResizable(true)
+                //.setResizable(true)
                 .addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, windowEvent ->
                 {
                     if (!stopFullScreen)

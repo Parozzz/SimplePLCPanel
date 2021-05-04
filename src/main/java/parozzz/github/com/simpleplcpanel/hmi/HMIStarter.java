@@ -1,7 +1,6 @@
 package parozzz.github.com.simpleplcpanel.hmi;
 
 import javafx.application.Platform;
-import javafx.stage.Stage;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -89,7 +88,7 @@ public final class HMIStarter
     public void startRuntimeEngine()
     {
         init();
-        hmiManager.getMainEditStage().showReadOnlyControlMainPage(false, false);
+        hmiManager.getMainEditStage().showRuntimeScene(false, false);
     }
 
     public void stop()

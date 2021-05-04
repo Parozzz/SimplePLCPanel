@@ -20,13 +20,13 @@ public class ChangePageExtraFeature implements ControlWrapperExtraFeature
 
         eventHandler = mouseEvent -> {
             var menuPage = controlWrapper.getControlMainPage().getMainEditStage();
-            if(!menuPage.isReadOnlyShowing())
+            if(!menuPage.isRuntimeShowing())
             {
                 return;
             }
 
             var controlWrapperMainPage = controlWrapper.getControlMainPage().getControlContainerDatabase().getByName(pageName);
-            menuPage.changeReadOnlyPage(controlWrapperMainPage);
+            menuPage.changeRuntimePage(controlWrapperMainPage);
         };
     }
 

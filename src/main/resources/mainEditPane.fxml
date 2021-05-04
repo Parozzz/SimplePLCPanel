@@ -67,17 +67,17 @@
                   </CustomMenuItem>
                </items>
             </Menu>
-            <Menu mnemonicParsing="false" text="Setup">
+            <Menu mnemonicParsing="false" text="Runtime">
                <items>
-                  <MenuItem fx:id="startReadOnlyMenuItem" mnemonicParsing="false" text="Start" />
+                  <MenuItem fx:id="startRuntimeMenuItem" mnemonicParsing="false" text="Start" />
                   <CustomMenuItem hideOnClick="false" mnemonicParsing="false">
                      <content>
-                        <CheckBox fx:id="setPageFullScreenCheckBox" graphicTextGap="0.0" nodeOrientation="RIGHT_TO_LEFT" style="-fx-text-fill: black;" text="FullScreen" />
+                        <CheckBox fx:id="runtimeFullScreenCheckBox" graphicTextGap="0.0" nodeOrientation="RIGHT_TO_LEFT" style="-fx-text-fill: black;" text="FullScreen" />
                      </content>
                   </CustomMenuItem>
                   <CustomMenuItem hideOnClick="false" mnemonicParsing="false" text="Unspecified Action">
                      <content>
-                        <CheckBox fx:id="setPageAtStartupCheckBox" nodeOrientation="RIGHT_TO_LEFT" style="-fx-text-fill: black;" text="Startup" />
+                        <CheckBox fx:id="runtimeAtStartupCheckBox" nodeOrientation="RIGHT_TO_LEFT" style="-fx-text-fill: black;" text="Startup" />
                      </content>
                   </CustomMenuItem>
                </items>
@@ -157,11 +157,11 @@
             </StackPane>
             <StackPane alignment="TOP_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" style="-fx-border-color: lightgray; -fx-border-width: 2 0 0 0;" VBox.vgrow="ALWAYS">
                <children>
-                  <ScrollPane fitToHeight="true" fitToWidth="true" focusTraversable="false" hbarPolicy="ALWAYS" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0" vbarPolicy="ALWAYS" StackPane.alignment="CENTER">
+                  <ScrollPane fitToHeight="true" fitToWidth="true" focusTraversable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0" StackPane.alignment="CENTER">
                      <content>
                         <Group>
                            <children>
-                              <StackPane fx:id="centerScrollStackPane" layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="50.0" minWidth="50.0" />
+                              <StackPane fx:id="centerScrollStackPane" layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="50.0" minWidth="50.0" style="-fx-border-color: darkgray; -fx-border-width: 2;" />
                            </children>
                         </Group>
                      </content>

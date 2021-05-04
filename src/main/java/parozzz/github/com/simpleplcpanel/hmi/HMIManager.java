@@ -31,7 +31,7 @@ public final class HMIManager extends FXController
 
     public void showStage()
     {
-        mainEditStage.start();
+        mainEditStage.showStage();
     }
 
     @Override

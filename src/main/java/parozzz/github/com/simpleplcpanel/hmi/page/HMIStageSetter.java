@@ -58,6 +58,13 @@ public final class HMIStageSetter
         return stage.getHeight();
     }
 
+    public HMIStageSetter setPos(double x, double y)
+    {
+        stage.setX(x);
+        stage.setY(y);
+        return this;
+    }
+
     public HMIStageSetter resize(double width, double height)
     {
         stage.setWidth(width);

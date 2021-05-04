@@ -38,8 +38,7 @@ public final class JavaFXMain extends Application
             saveFile.createNewFile();
 
             this.hmiStarter = new HMIStarter(saveFile);
-            //this.hmiStarter.startEditingEngine();
-            this.hmiStarter.startRuntimeEngine();
+            this.hmiStarter.startEditingEngine();
         }
         catch(Exception exception)
         {

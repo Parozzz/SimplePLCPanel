@@ -11,7 +11,6 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import parozzz.github.com.simpleplcpanel.Main;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationStage;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbustcp.ModbusTCPStringAddressCreatorStage;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbustcp.ModbusTCPThread;
@@ -38,11 +37,11 @@ import java.io.IOException;
 public final class MainEditStage extends BorderPaneHMIStage
 {
     @FXML
-    private CheckBox setPageFullScreenCheckBox;
+    private CheckBox runtimeFullScreenCheckBox;
     @FXML
-    private CheckBox setPageAtStartupCheckBox;
+    private CheckBox runtimeAtStartupCheckBox;
     @FXML
-    private MenuItem startReadOnlyMenuItem;
+    private MenuItem startRuntimeMenuItem;
 
     //Bottom
     @FXML
@@ -158,8 +157,8 @@ public final class MainEditStage extends BorderPaneHMIStage
 
         super.serializableDataSet.addString("PageHeight", pageHeightTextField.textProperty())
                 .addString("PageWidth", pageWidthTextField.textProperty())
-                .addBoolean("SetPageFullScreen", setPageFullScreenCheckBox.selectedProperty())
-                .addBoolean("SetPageAtStartup", setPageAtStartupCheckBox.selectedProperty());
+                .addBoolean("RuntimeFullScreen", runtimeFullScreenCheckBox.selectedProperty())
+                .addBoolean("RuntimeAtStartup", runtimeAtStartupCheckBox.selectedProperty());
 
         settingsStage.getStageSetter().setResizable(true);
 
@@ -170,8 +169,8 @@ public final class MainEditStage extends BorderPaneHMIStage
         //Communication Menu
         setupCommunicationMenuItem.setOnAction(event -> communicationStage.showStage());
 
-        //Setup Menu
-        startReadOnlyMenuItem.setOnAction(actionEvent -> this.showReadOnlyControlMainPage(true, setPageFullScreenCheckBox.isSelected()));
+        //Runtime Menu
+        startRuntimeMenuItem.setOnAction(actionEvent -> this.showRuntimeScene(true, runtimeFullScreenCheckBox.isSelected()));
 
         //Page Menu
         createPageMenuItem.setOnAction(actionEvent -> controlsPageCreationPage.showStage());
@@ -208,6 +207,8 @@ public final class MainEditStage extends BorderPaneHMIStage
                 anchorPane.setPrefWidth(newWidth);
                 anchorPane.setMaxWidth(newWidth);
             }
+
+            runtimeControlMainPage.getStageSetter().setWidth(newWidth);
         });
 
         pageHeightTextField.setTextFormatter(FXTextFormatterUtil.simpleInteger(4));
@@ -220,6 +221,8 @@ public final class MainEditStage extends BorderPaneHMIStage
                 anchorPane.setPrefHeight(newHeight);
                 anchorPane.setMaxHeight(newHeight);
             }
+
+            runtimeControlMainPage.getStageSetter().setHeight(newHeight);
         });
 
         leftStackPane.getChildren().add(dragAndDropPane.getMainVBox());
@@ -346,33 +349,33 @@ public final class MainEditStage extends BorderPaneHMIStage
         return Integer.parseInt(pageHeightTextField.getText());
     }
 
-    public boolean isReadOnlyShowing()
+    public boolean isRuntimeShowing()
     {
         return runtimeControlMainPage.getStageSetter().isShowing();
     }
 
-    public void changeReadOnlyPage(ControlContainerPane controlContainerPane)
+    public void changeRuntimePage(ControlContainerPane controlContainerPane)
     {
-        if(this.isReadOnlyShowing())
+        if(this.isRuntimeShowing())
         {
             runtimeControlMainPage.setControlMainPage(controlContainerPane);
         }
     }
 
-    public void showReadOnlyControlMainPage(boolean isDebug, boolean fullScreen)
+    public void showRuntimeScene(boolean isDebug, boolean fullScreen)
     {
-        //Disable all the non essentials stuff
-        controlsPageCreationPage.setDisabled(true);
-        dragAndDropPane.setDisabled(true);
-        quickSetupVBox.setDisabled(true);
-        settingsStage.setDisabled(true);
-        pictureBankStage.setDisabled(true);
-
-        this.setShownControlContainerPane(null);
-
         var pageList = controlContainerDatabase.getPageList();
         if(!pageList.isEmpty())
         {
+            //Disable all the non essentials stuff
+            controlsPageCreationPage.setDisabled(true);
+            dragAndDropPane.setDisabled(true);
+            quickSetupVBox.setDisabled(true);
+            settingsStage.setDisabled(true);
+            pictureBankStage.setDisabled(true);
+
+            this.setShownControlContainerPane(null);
+
             if(isDebug)
             {
                 runtimeControlMainPage.setExitKeyCombination();
@@ -427,14 +430,32 @@ public final class MainEditStage extends BorderPaneHMIStage
         //this.getStageSetter().get().sizeToScene();
     }
 
-    public boolean showPageFullScreen()
+    public boolean runtimeFullScreen()
     {
-        return setPageFullScreenCheckBox.isSelected();
+        return runtimeFullScreenCheckBox.isSelected();
     }
 
-    public void start()
+    public boolean runtimeAtStartup()
     {
-        var startProperties = Main.START_PROPERTIES;
-        this.showStage();
+        return runtimeAtStartupCheckBox.isSelected();
+    }
+
+    @Override
+    public void showStage()
+    {
+        //Enable all the stuff
+        controlsPageCreationPage.setDisabled(false);
+        dragAndDropPane.setDisabled(false);
+        quickSetupVBox.setDisabled(false);
+        settingsStage.setDisabled(false);
+        pictureBankStage.setDisabled(false);
+
+        var pageList = this.getControlContainerDatabase().getPageList();
+        if(!pageList.isEmpty())
+        {
+            this.setShownControlContainerPane(pageList.get(0));
+        }
+
+        super.showStage();
     }
 }
