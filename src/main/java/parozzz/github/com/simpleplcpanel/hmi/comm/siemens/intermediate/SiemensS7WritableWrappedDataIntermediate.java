@@ -4,11 +4,11 @@ import parozzz.github.com.simpleplcpanel.PLC.siemens.data.SiemensS7Data;
 import parozzz.github.com.simpleplcpanel.PLC.siemens.rwdata.wrappeddata.SiemensS7WritableWrappedData;
 import parozzz.github.com.simpleplcpanel.PLC.siemens.util.SiemensS7AreaType;
 
-public final class SiemensPLCWritableWrappedDataIntermediate<T> extends SiemensPLCWrappedDataIntermediate
+public final class SiemensS7WritableWrappedDataIntermediate<T> extends SiemensS7WrappedDataIntermediate
 {
     private final SiemensS7WritableWrappedData<T, ?> writableWrappedData;
 
-    public SiemensPLCWritableWrappedDataIntermediate(SiemensS7Data<T> s7Data, SiemensS7AreaType areaType,
+    public SiemensS7WritableWrappedDataIntermediate(SiemensS7Data<T> s7Data, SiemensS7AreaType areaType,
                                                      int dbNumber, int offset, T value)
     {
         super(areaType, dbNumber, offset);

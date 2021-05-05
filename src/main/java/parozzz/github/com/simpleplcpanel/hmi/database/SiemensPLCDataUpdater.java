@@ -10,18 +10,18 @@ import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.AddressAttribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.data.AddressDataType;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.data.SiemensDataPropertyHolder;
-import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensPLCThread;
-import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.intermediate.SiemensPLCReadableWrappedDataIntermediate;
-import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.intermediate.SiemensPLCWritableBitWrappedDataIntermediate;
-import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.intermediate.SiemensPLCWritableWrappedDataIntermediate;
+import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7Thread;
+import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.intermediate.SiemensS7ReadableWrappedDataIntermediate;
+import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.intermediate.SiemensS7WritableBitWrappedDataIntermediate;
+import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.intermediate.SiemensS7WritableWrappedDataIntermediate;
 import parozzz.github.com.simpleplcpanel.hmi.util.valueintermediate.ValueIntermediate;
 
 import java.util.Set;
 import java.util.function.Consumer;
 
-final class SiemensPLCDataUpdater extends ControlDataUpdater<SiemensPLCThread>
+final class SiemensPLCDataUpdater extends ControlDataUpdater<SiemensS7Thread>
 {
-    public SiemensPLCDataUpdater(ControlContainerDatabase controlContainerDatabase, SiemensPLCThread plcThread)
+    public SiemensPLCDataUpdater(ControlContainerDatabase controlContainerDatabase, SiemensS7Thread plcThread)
     {
         super(controlContainerDatabase, plcThread);
     }
@@ -32,7 +32,7 @@ final class SiemensPLCDataUpdater extends ControlDataUpdater<SiemensPLCThread>
         var readSet = commThread.getReadDataIntermediateSet();
         if (!readSet.isEmpty())
         {
-            readSet.forEach(SiemensPLCReadableWrappedDataIntermediate::parse);
+            readSet.forEach(SiemensS7ReadableWrappedDataIntermediate::parse);
         }
     }
 
@@ -83,16 +83,16 @@ final class SiemensPLCDataUpdater extends ControlDataUpdater<SiemensPLCThread>
 
     private void parseWrite(ValueIntermediate valueIntermediate,
                             SiemensDataPropertyHolder.CachedData cachedData,
-                            Set<SiemensPLCWritableWrappedDataIntermediate<?>> writeSet,
-                            Set<SiemensPLCWritableBitWrappedDataIntermediate> writeBitSet)
+                            Set<SiemensS7WritableWrappedDataIntermediate<?>> writeSet,
+                            Set<SiemensS7WritableBitWrappedDataIntermediate> writeBitSet)
     {
 
         var s7Data = cachedData.getS7Data();
 
-        SiemensPLCWritableWrappedDataIntermediate<?> writableWrappedDataIntermediate = null;
+        SiemensS7WritableWrappedDataIntermediate<?> writableWrappedDataIntermediate = null;
         if (s7Data instanceof SiemensS7BitData)
         {
-            var writableBitDataIntermediate = new SiemensPLCWritableBitWrappedDataIntermediate(
+            var writableBitDataIntermediate = new SiemensS7WritableBitWrappedDataIntermediate(
                     cachedData.getS7AreaType(), cachedData.getDbNumber(),
                     cachedData.getByteOffset(), cachedData.getBitOffset(),
                     valueIntermediate.asBoolean());
@@ -138,21 +138,21 @@ final class SiemensPLCDataUpdater extends ControlDataUpdater<SiemensPLCThread>
         }
     }
 
-    private <T> SiemensPLCWritableWrappedDataIntermediate<T> createWriteIntermediate(
+    private <T> SiemensS7WritableWrappedDataIntermediate<T> createWriteIntermediate(
             SiemensDataPropertyHolder.CachedData cachedData,
             SiemensS7Data<T> readableData, T value)
     {
-        return new SiemensPLCWritableWrappedDataIntermediate<>(readableData,
+        return new SiemensS7WritableWrappedDataIntermediate<>(readableData,
                 cachedData.getS7AreaType(), cachedData.getDbNumber(), cachedData.getByteOffset(), value);
     }
 
     private void parseRead(ValueIntermediate valueIntermediate,
                            SiemensDataPropertyHolder.CachedData cachedData,
-                           Set<SiemensPLCReadableWrappedDataIntermediate<?>> readSet)
+                           Set<SiemensS7ReadableWrappedDataIntermediate<?>> readSet)
     {
         var s7Data = cachedData.getS7Data();
 
-        SiemensPLCReadableWrappedDataIntermediate<?> readableWrappedDataIntermediate = null;
+        SiemensS7ReadableWrappedDataIntermediate<?> readableWrappedDataIntermediate = null;
         if (s7Data instanceof SiemensS7BitData)
         {
             var bitData = SiemensS7DataStorage.getBit(cachedData.getBitOffset());
@@ -197,11 +197,11 @@ final class SiemensPLCDataUpdater extends ControlDataUpdater<SiemensPLCThread>
         }
     }
 
-    private <T> SiemensPLCReadableWrappedDataIntermediate<T> createReadIntermediate(
+    private <T> SiemensS7ReadableWrappedDataIntermediate<T> createReadIntermediate(
             SiemensDataPropertyHolder.CachedData cachedData,
             SiemensS7ReadableData<T> readableData, Consumer<T> consumer)
     {
-        return new SiemensPLCReadableWrappedDataIntermediate<>(readableData,
+        return new SiemensS7ReadableWrappedDataIntermediate<>(readableData,
                 cachedData.getS7AreaType(), cachedData.getDbNumber(), cachedData.getByteOffset(), consumer);
     }
 

@@ -14,7 +14,7 @@ import javafx.scene.shape.Circle;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationStage;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbustcp.ModbusTCPStringAddressCreatorStage;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbustcp.ModbusTCPThread;
-import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensPLCThread;
+import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7Thread;
 import parozzz.github.com.simpleplcpanel.hmi.controls.ControlContainerCreationStage;
 import parozzz.github.com.simpleplcpanel.hmi.controls.ControlContainerPane;
 import parozzz.github.com.simpleplcpanel.hmi.runtime.RuntimeControlContainerStage;
@@ -113,7 +113,7 @@ public final class MainEditStage extends BorderPaneHMIStage
     private final TrigBoolean messagePresentTrig;
     private ControlContainerPane shownControlContainerPane;
 
-    public MainEditStage(SiemensPLCThread plcThread, ModbusTCPThread modbusTCPThread,
+    public MainEditStage(SiemensS7Thread plcThread, ModbusTCPThread modbusTCPThread,
             Runnable saveDataRunnable) throws IOException
     {
         super("Menu", "mainEditPane.fxml");

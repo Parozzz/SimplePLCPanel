@@ -16,7 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
-public final class SiemensPLCCommunicationManager extends DeviceCommunicationManager<SiemensPLCThread>
+public final class SiemensS7CommunicationManager extends DeviceCommunicationManager<SiemensS7Thread>
 {
     @FXML private TextField address1TextField;
     @FXML private TextField address2TextField;
@@ -33,7 +33,7 @@ public final class SiemensPLCCommunicationManager extends DeviceCommunicationMan
     private final SettableConcurrentObject<String> modelObject;
     private boolean queryModelNumber = false;
 
-    public SiemensPLCCommunicationManager(SiemensPLCThread plcThread) throws IOException
+    public SiemensS7CommunicationManager(SiemensS7Thread plcThread) throws IOException
     {
         super("SiemensPLCCommunicationManager", plcThread);
 
@@ -63,10 +63,10 @@ public final class SiemensPLCCommunicationManager extends DeviceCommunicationMan
         super.setSkipOnNextForDot(address3TextField, address4TextField);
 
         Stream.of(rackTextField, slotTextField).forEach(textField ->
-                textField.setTextFormatter(FXTextFormatterUtil.positiveInteger(2)))
-        ;
+                textField.setTextFormatter(FXTextFormatterUtil.positiveInteger(2))
+        );
 
-        connectButton.setOnAction(event -> this.setPLCAddress());
+        connectButton.setOnAction(event -> this.parseAndSetPLCAddress());
     }
 
     @Override
@@ -111,7 +111,7 @@ public final class SiemensPLCCommunicationManager extends DeviceCommunicationMan
     {
         super.setupComplete();
 
-        this.setPLCAddress();
+        this.parseAndSetPLCAddress();
     }
 
     @Override
@@ -120,7 +120,7 @@ public final class SiemensPLCCommunicationManager extends DeviceCommunicationMan
         return mainStackPane;
     }
 
-    private void setPLCAddress()
+    private void parseAndSetPLCAddress()
     {
         try
         {
@@ -129,12 +129,12 @@ public final class SiemensPLCCommunicationManager extends DeviceCommunicationMan
             var slot = Integer.parseInt(slotTextField.getText());
             var rack = Integer.parseInt(rackTextField.getText());
 
-            commThread.setConnectionParameters(ipAddress, slot, rack);
+            commThread.setConnectionParameters(new SiemensS7ConnectionParams(ipAddress, slot, rack));
 
             queryModelNumber = true;
         } catch (NumberFormatException exception)
         {
-            Logger.getLogger(SiemensPLCCommunicationManager.class.getSimpleName())
+            Logger.getLogger(SiemensS7CommunicationManager.class.getSimpleName())
                     .log(Level.WARNING, "Something went wrong while setting the PLC Address", exception);
         }
     }

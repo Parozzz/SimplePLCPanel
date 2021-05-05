@@ -1,7 +1,7 @@
 package parozzz.github.com.simpleplcpanel.hmi;
 
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbustcp.ModbusTCPThread;
-import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensPLCThread;
+import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7Thread;
 import parozzz.github.com.simpleplcpanel.hmi.main.MainEditStage;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
 
@@ -9,17 +9,17 @@ import java.io.IOException;
 
 public final class HMIManager extends FXController
 {
-    private final SiemensPLCThread plcThread;
+    private final SiemensS7Thread plcThread;
     private final MainEditStage mainEditStage;
 
-    public HMIManager(SiemensPLCThread plcThread, ModbusTCPThread modbusTCPThread, Runnable saveDataRunnable) throws IOException
+    public HMIManager(SiemensS7Thread plcThread, ModbusTCPThread modbusTCPThread, Runnable saveDataRunnable) throws IOException
     {
         this.plcThread = plcThread;
 
         super.addFXChild(this.mainEditStage = new MainEditStage(plcThread, modbusTCPThread, saveDataRunnable));
     }
 
-    public SiemensPLCThread getPlcThread()
+    public SiemensS7Thread getPlcThread()
     {
         return plcThread;
     }

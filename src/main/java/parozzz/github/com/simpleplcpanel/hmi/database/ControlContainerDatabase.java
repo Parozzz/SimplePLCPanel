@@ -3,7 +3,7 @@ package parozzz.github.com.simpleplcpanel.hmi.database;
 import org.json.simple.JSONObject;
 import parozzz.github.com.simpleplcpanel.hmi.FXController;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbustcp.ModbusTCPThread;
-import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensPLCThread;
+import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7Thread;
 import parozzz.github.com.simpleplcpanel.hmi.controls.ControlContainerPane;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.simpleplcpanel.hmi.main.MainEditStage;
@@ -32,7 +32,7 @@ public final class ControlContainerDatabase extends FXController implements Iter
     private final Set<ControlWrapper<?>> controlWrapperSet;
     private Set<ControlWrapper<?>> immutableControlWrapperSet;
 
-    public ControlContainerDatabase(MainEditStage mainEditStage, SiemensPLCThread plcThread,
+    public ControlContainerDatabase(MainEditStage mainEditStage, SiemensS7Thread plcThread,
             ModbusTCPThread modbusTCPThread)
     {
         this.mainEditStage = mainEditStage;

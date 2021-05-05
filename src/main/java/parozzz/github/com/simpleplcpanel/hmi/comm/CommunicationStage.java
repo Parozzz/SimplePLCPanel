@@ -6,8 +6,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbustcp.ModbusTCPCommunicationManager;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbustcp.ModbusTCPThread;
-import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensPLCCommunicationManager;
-import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensPLCThread;
+import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7CommunicationManager;
+import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7Thread;
 import parozzz.github.com.simpleplcpanel.hmi.page.HMIStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.EnumStringConverter;
 
@@ -20,15 +20,15 @@ public final class CommunicationStage extends HMIStage<VBox>
 
     @FXML private StackPane commManagerStackPane;
 
-    private final SiemensPLCCommunicationManager siemensPLCCommunicationManager;
+    private final SiemensS7CommunicationManager siemensS7CommunicationManager;
     private final ModbusTCPCommunicationManager modbusTCPCommunicationManager;
     private DeviceCommunicationManager<?> selectedCommunicationManager;
 
-    public CommunicationStage(SiemensPLCThread plcThread, ModbusTCPThread modbusTCPThread) throws IOException
+    public CommunicationStage(SiemensS7Thread plcThread, ModbusTCPThread modbusTCPThread) throws IOException
     {
         super("communicationPage.fxml", VBox.class);
 
-        super.addFXChild(siemensPLCCommunicationManager = new SiemensPLCCommunicationManager(plcThread))
+        super.addFXChild(siemensS7CommunicationManager = new SiemensS7CommunicationManager(plcThread))
                 .addFXChild(modbusTCPCommunicationManager = new ModbusTCPCommunicationManager(modbusTCPThread));
     }
 
@@ -94,7 +94,7 @@ public final class CommunicationStage extends HMIStage<VBox>
         {
             default:
             case SIEMENS_S7:
-                return siemensPLCCommunicationManager;
+                return siemensS7CommunicationManager;
             case MODBUS_TCP:
                 return modbusTCPCommunicationManager;
         }

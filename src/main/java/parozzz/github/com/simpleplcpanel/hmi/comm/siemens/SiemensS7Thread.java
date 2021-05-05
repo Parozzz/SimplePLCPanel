@@ -6,10 +6,10 @@ import parozzz.github.com.simpleplcpanel.PLC.siemens.rwdata.SiemensS7WriteData;
 import parozzz.github.com.simpleplcpanel.PLC.siemens.util.SiemensS7AreaType;
 import parozzz.github.com.simpleplcpanel.PLC.siemens.util.SiemensS7Error;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommThread;
-import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.intermediate.SiemensPLCReadableWrappedDataIntermediate;
-import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.intermediate.SiemensPLCWrappedDataIntermediate;
-import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.intermediate.SiemensPLCWritableBitWrappedDataIntermediate;
-import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.intermediate.SiemensPLCWritableWrappedDataIntermediate;
+import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.intermediate.SiemensS7ReadableWrappedDataIntermediate;
+import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.intermediate.SiemensS7WrappedDataIntermediate;
+import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.intermediate.SiemensS7WritableBitWrappedDataIntermediate;
+import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.intermediate.SiemensS7WritableWrappedDataIntermediate;
 import parozzz.github.com.simpleplcpanel.logger.Loggable;
 import parozzz.github.com.simpleplcpanel.logger.MainLogger;
 import parozzz.github.com.simpleplcpanel.util.concurrent.SettableConcurrentObject;
@@ -20,23 +20,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public final class SiemensPLCThread extends CommThread implements Loggable
+public final class SiemensS7Thread extends CommThread<SiemensS7ConnectionParams> implements Loggable
 {
-    private final Set<SiemensPLCReadableWrappedDataIntermediate<?>> readDataIntermediateSet;
-    private final Set<SiemensPLCWritableWrappedDataIntermediate<?>> writeDataIntermediateSet;
+    private final Set<SiemensS7ReadableWrappedDataIntermediate<?>> readDataIntermediateSet;
+    private final Set<SiemensS7WritableWrappedDataIntermediate<?>> writeDataIntermediateSet;
 
-    private final Set<SiemensPLCWritableBitWrappedDataIntermediate> writeBitWrapperSet;
+    private final Set<SiemensS7WritableBitWrappedDataIntermediate> writeBitWrapperSet;
 
     private SiemensS7Client client;
-    private volatile String ipAddress;
-    private volatile int rack;
-    private volatile int slot;
-    private volatile boolean newConnectionParams = false;
-    private volatile boolean firstConnectionParamsReceived = false;
 
     private SettableConcurrentObject<String> queryModelNumberObject;
 
-    public SiemensPLCThread()
+    public SiemensS7Thread()
     {
         this.setName("SiemensPLCThread");
 
@@ -45,29 +40,19 @@ public final class SiemensPLCThread extends CommThread implements Loggable
         writeDataIntermediateSet = ConcurrentHashMap.newKeySet();
     }
 
-    public Set<SiemensPLCReadableWrappedDataIntermediate<?>> getReadDataIntermediateSet()
+    public Set<SiemensS7ReadableWrappedDataIntermediate<?>> getReadDataIntermediateSet()
     {
         return readDataIntermediateSet;
     }
 
-    public Set<SiemensPLCWritableBitWrappedDataIntermediate> getWriteBitWrapperSet()
+    public Set<SiemensS7WritableBitWrappedDataIntermediate> getWriteBitWrapperSet()
     {
         return writeBitWrapperSet;
     }
 
-    public Set<SiemensPLCWritableWrappedDataIntermediate<?>> getWriteDataIntermediateSet()
+    public Set<SiemensS7WritableWrappedDataIntermediate<?>> getWriteDataIntermediateSet()
     {
         return writeDataIntermediateSet;
-    }
-
-    public synchronized void setConnectionParameters(String ipAddress, int rack, int slot)
-    {
-        this.ipAddress = ipAddress;
-        this.rack = rack;
-        this.slot = slot;
-
-        newConnectionParams = true;
-        firstConnectionParamsReceived = true;
     }
 
     @Override
@@ -88,16 +73,37 @@ public final class SiemensPLCThread extends CommThread implements Loggable
     }
 
     @Override
-    public void loop() throws InterruptedException
+    public boolean connect()
     {
-        while (!firstConnectionParamsReceived)
+        if (newConnectionParams)
         {
-            Thread.sleep(250);
+            if (client != null && client.isConnected())
+            {
+                client.disconnect();
+            }
+
+            client = null;
+            client = communicationParams.createClient();
+
+            newConnectionParams = false;
+        }
+
+        if (client == null)
+        {
+            return false;
+        }
+
+        if (client.isConnected())
+        {
+            return true;
         }
 
         try
         {
-            connect();
+            client.connect();
+
+            var model = client.getModelInfo().getModel();
+            MainLogger.getInstance().info("PLC Model: " + model, this);
         } catch (SiemensS7Error.SiemensS7Exception exception)
         {
             if (exception.getError() == SiemensS7Error.TCPConnectionFailed)
@@ -107,14 +113,16 @@ public final class SiemensPLCThread extends CommThread implements Loggable
             {
                 MainLogger.getInstance().warning("Error while connecting to Siemens PLC", exception, this);
             }
+
+            return false;
         }
 
-        if(!isConnected())
-        {
-            this.sleepWithStopCheck(10);
-            return;
-        }
+        return true;
+    }
 
+    @Override
+    public void update()
+    {
         if (queryModelNumberObject != null)
         {
             try
@@ -126,12 +134,6 @@ public final class SiemensPLCThread extends CommThread implements Loggable
             {
                 MainLogger.getInstance().warning("Error while querying Siemens PLC model number", exception, this);
             }
-        }
-
-        if (!update)
-        {
-            Thread.sleep(50);
-            return;
         }
 
         //This needs to be handled locally, because of the update to reset
@@ -186,48 +188,6 @@ public final class SiemensPLCThread extends CommThread implements Loggable
         {
             MainLogger.getInstance().warning("Error while Reading/Writing data to Siemens PLC", exception, this);
         }
-
-        update = false;
-    }
-
-
-    private boolean connect() throws SiemensS7Error.SiemensS7Exception
-    {
-        if (newConnectionParams)
-        {
-            if (client != null)
-            {
-                client.disconnect();
-            }
-
-            client = new SiemensS7Client(ipAddress, rack, slot);
-            client.setConnectionTimeout(1000);
-            newConnectionParams = false;
-        }
-
-        if (client == null)
-        {
-            return false;
-        }
-
-        if (!client.isConnected())
-        {
-            client.connect();
-
-            var timestamp = System.currentTimeMillis();
-            while (!client.isConnected())
-            {
-                //If after 5 seconds is not connected, return!
-                if ((System.currentTimeMillis() - timestamp) > 5000)
-                {
-                    return false;
-                }
-            }
-
-            System.out.println("PLC Model: " + client.getModelInfo().getModel());
-        }
-
-        return true;
     }
 
     private void readDataOf(SiemensS7AreaType areaType) throws SiemensS7Error.SiemensS7Exception
@@ -250,7 +210,7 @@ public final class SiemensPLCThread extends CommThread implements Loggable
         }
     }
 
-    private <T extends SiemensPLCWrappedDataIntermediate> Map<Integer, Set<T>> splitByDBNumber(Set<T> intermediateSet)
+    private <T extends SiemensS7WrappedDataIntermediate> Map<Integer, Set<T>> splitByDBNumber(Set<T> intermediateSet)
     {
         var dbReadingMap = new HashMap<Integer, Set<T>>();
 

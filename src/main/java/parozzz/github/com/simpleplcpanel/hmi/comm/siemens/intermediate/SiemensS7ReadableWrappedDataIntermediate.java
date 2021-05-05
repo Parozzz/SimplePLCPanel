@@ -6,11 +6,11 @@ import parozzz.github.com.simpleplcpanel.PLC.siemens.util.SiemensS7AreaType;
 
 import java.util.function.Consumer;
 
-public final class SiemensPLCReadableWrappedDataIntermediate<T> extends SiemensPLCWrappedDataIntermediate
+public final class SiemensS7ReadableWrappedDataIntermediate<T> extends SiemensS7WrappedDataIntermediate
 {
     private final Consumer<T> consumer;
     private final SiemensS7ReadableWrappedData<T, ?> readableData;
-    public SiemensPLCReadableWrappedDataIntermediate(SiemensS7ReadableData<T> s7Data, SiemensS7AreaType areaType,
+    public SiemensS7ReadableWrappedDataIntermediate(SiemensS7ReadableData<T> s7Data, SiemensS7AreaType areaType,
                                                      int dbNumber, int offset, Consumer<T> consumer)
     {
         super(areaType, dbNumber, offset);

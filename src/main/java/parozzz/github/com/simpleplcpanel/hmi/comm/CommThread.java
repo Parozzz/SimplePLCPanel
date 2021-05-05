@@ -2,11 +2,18 @@ package parozzz.github.com.simpleplcpanel.hmi.comm;
 
 import parozzz.github.com.simpleplcpanel.logger.MainLogger;
 
-public abstract class CommThread extends Thread
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+
+public abstract class CommThread<T extends CommunicationConnectionParams> extends Thread
 {
     private volatile boolean oldActive;
     private volatile boolean active;
     private volatile boolean stop;
+
+    protected volatile T communicationParams;
+    protected volatile boolean newConnectionParams = false;
+    private volatile boolean firstConnectionParamsReceived = false;
 
     protected volatile boolean update;
 
@@ -28,6 +35,14 @@ public abstract class CommThread extends Thread
     public synchronized void setActive(boolean active)
     {
         this.active = active;
+    }
+
+    public synchronized void setConnectionParameters(T communicationParams)
+    {
+        this.communicationParams = communicationParams;
+
+        newConnectionParams = true;
+        firstConnectionParamsReceived = true;
     }
 
     @Override
@@ -79,7 +94,32 @@ public abstract class CommThread extends Thread
 
     public abstract boolean isConnected();
 
-    public abstract void loop() throws Exception;
+    public abstract boolean connect();
+
+    public final void loop() throws Exception
+    {
+        while (!firstConnectionParamsReceived)
+        {
+            Thread.sleep(250);
+        }
+
+        if (!connect())
+        {
+            this.sleepWithStopCheck(10);
+            return;
+        }
+
+        if (!update)
+        {
+            Thread.sleep(50);
+            return;
+        }
+
+        this.update();
+        update = false;
+    }
+
+    public abstract void update();
 
     protected void sleepWithStopCheck(int seconds)
     {

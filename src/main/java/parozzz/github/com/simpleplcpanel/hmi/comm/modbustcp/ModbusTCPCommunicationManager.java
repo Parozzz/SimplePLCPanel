@@ -89,6 +89,6 @@ public final class ModbusTCPCommunicationManager extends DeviceCommunicationMana
                 "." + address3TextField.getText() + "." + address4TextField.getText();
         var port = Integer.parseInt(portTextField.getText());
 
-        commThread.setConnectionParameters(ipAddress, port);
+        commThread.setConnectionParameters(new ModbusTCPConnectionParams(ipAddress, port));
     }
 }

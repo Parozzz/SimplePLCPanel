@@ -19,7 +19,7 @@ import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public final class ModbusTCPThread extends CommThread implements Loggable
+public final class ModbusTCPThread extends CommThread<ModbusTCPConnectionParams> implements Loggable
 {
     private final TCPMasterConnection masterConnection;
 
@@ -31,11 +31,6 @@ public final class ModbusTCPThread extends CommThread implements Loggable
 
     private final Set<ModbusTCPReadBitIntermediate> readDiscreteInputsSet;
     private final Set<ModbusTCPReadNumberIntermediate> readInputRegistersSet;
-
-    private volatile String ipAddress;
-    private volatile int port;
-    private volatile boolean newConnectionParams;
-    private boolean firstConnectionParamsReceived;
 
     public ModbusTCPThread()
     {
@@ -90,15 +85,6 @@ public final class ModbusTCPThread extends CommThread implements Loggable
         masterConnection.close();
     }
 
-    public synchronized void setConnectionParameters(String ipAddress, int port)
-    {
-        this.ipAddress = ipAddress;
-        this.port = port;
-
-        newConnectionParams = true;
-        firstConnectionParamsReceived = true;
-    }
-
     @Override
     public synchronized boolean isConnected()
     {
@@ -106,13 +92,8 @@ public final class ModbusTCPThread extends CommThread implements Loggable
     }
 
     @Override
-    public void loop() throws InterruptedException
+    public boolean connect()
     {
-        while (!firstConnectionParamsReceived)
-        {
-            Thread.sleep(250);
-        }
-
         if (newConnectionParams)
         {
             if (masterConnection.isConnected())
@@ -122,8 +103,7 @@ public final class ModbusTCPThread extends CommThread implements Loggable
 
             try
             {
-                masterConnection.setAddress(InetAddress.getByName(ipAddress));
-                masterConnection.setPort(port);
+                communicationParams.updateParams(masterConnection);
             } catch (UnknownHostException exception)
             {
                 MainLogger.getInstance().error("Error while trying to change params of Modbus Client", exception, this);
@@ -134,32 +114,28 @@ public final class ModbusTCPThread extends CommThread implements Loggable
 
         if (masterConnection.getAddress() == null)
         {
-            return;
+            return false;
         }
 
-        if (!masterConnection.isConnected())
+        if (masterConnection.isConnected())
         {
-            try
-            {
-                masterConnection.connect();
-            } catch (Exception exception)
-            {
-                MainLogger.getInstance().error("Error while trying to connect to Modbus Server", exception, this);
-            }
-
-            if (!masterConnection.isConnected())
-            {
-                this.sleepWithStopCheck(10);
-                return;
-            }
+            return true;
         }
 
-        if (!update)
+        try
         {
-            Thread.sleep(50);
-            return;
+            masterConnection.connect();
+        } catch (Exception exception)
+        {
+            MainLogger.getInstance().error("Error while trying to connect to Modbus Server", exception, this);
         }
 
+        return masterConnection.isConnected();
+    }
+
+    @Override
+    public void update()
+    {
         try
         {
             var transaction = new ModbusTCPTransaction();
@@ -184,11 +160,10 @@ public final class ModbusTCPThread extends CommThread implements Loggable
         {
             MainLogger.getInstance().error("Error while managing lists the modbus server", exception, this);
         }
-
-        update = false;
     }
 
-    @Override public String log()
+    @Override
+    public String log()
     {
         return "IPAddress " + masterConnection.getAddress().getHostAddress()
                 + ", Port " + masterConnection.getPort()

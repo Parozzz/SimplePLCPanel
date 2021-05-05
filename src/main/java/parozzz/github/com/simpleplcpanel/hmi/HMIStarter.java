@@ -5,7 +5,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbustcp.ModbusTCPThread;
-import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensPLCThread;
+import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7Thread;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
 import parozzz.github.com.simpleplcpanel.logger.MainLogger;
@@ -19,7 +19,7 @@ import java.nio.file.StandardCopyOption;
 
 public final class HMIStarter
 {
-    private final SiemensPLCThread plcThread;
+    private final SiemensS7Thread plcThread;
     private final ModbusTCPThread modbusTCPThread;
     private final HMIManager hmiManager;
 
@@ -27,7 +27,7 @@ public final class HMIStarter
 
     public HMIStarter(File saveFile) throws IOException
     {
-        this.plcThread = new SiemensPLCThread();
+        this.plcThread = new SiemensS7Thread();
         this.modbusTCPThread = new ModbusTCPThread();
         this.hmiManager = new HMIManager(plcThread, modbusTCPThread, this::saveData);
 
