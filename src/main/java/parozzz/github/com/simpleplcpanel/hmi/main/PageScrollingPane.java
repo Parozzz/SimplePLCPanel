@@ -22,7 +22,7 @@ import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
 
 import java.io.IOException;
 
-public final class MainEditBottomScrollingPane
+public final class PageScrollingPane
     extends FXController
     implements HMIPane, HidablePane
 {
@@ -32,7 +32,7 @@ public final class MainEditBottomScrollingPane
 
     private final BooleanProperty visible = new SimpleBooleanProperty(true);
 
-    public MainEditBottomScrollingPane()
+    public PageScrollingPane()
     {
         this.mainVBox = new VBox(
                 scrollPane = new ScrollPane(

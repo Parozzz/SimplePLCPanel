@@ -7,6 +7,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import parozzz.github.com.simpleplcpanel.hmi.FXController;
 import parozzz.github.com.simpleplcpanel.hmi.redoundo.UndoRedoManager;
@@ -15,7 +17,9 @@ import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
 
 import java.io.IOException;
 
-public abstract class HMIStage<P extends Parent> extends FXController implements JSONSerializable
+public abstract class HMIStage<P extends Parent>
+        extends FXController
+        implements JSONSerializable
 {
     private long everyTimestamp;
 
@@ -29,7 +33,6 @@ public abstract class HMIStage<P extends Parent> extends FXController implements
         this.stageSetter = new HMIStageSetter(parent);
         this.undoRedoManager = new UndoRedoManager();
     }
-
 
     public HMIStage(String name, String resource, Class<P> parentClass) throws IOException
     {
@@ -102,9 +105,22 @@ public abstract class HMIStage<P extends Parent> extends FXController implements
         return undoRedoManager;
     }
 
+    public HMIStage<?> setAsSubWindow(HMIStage<?> hmiStage)
+    {
+        this.getStageSetter()
+                .initOwner(hmiStage.getStage())
+                .initModality(Modality.WINDOW_MODAL);
+        return this;
+    }
+
     public WritableImage createSnapshot()
     {
         return parent.snapshot(new SnapshotParameters(), null);
+    }
+
+    public Stage getStage()
+    {
+        return stageSetter.getStage();
     }
 
     public HMIStageSetter getStageSetter()

@@ -14,15 +14,15 @@ import java.util.function.Function;
 
 public final class QuickSetupStateBinder
 {
-    private final QuickSetupVBox quickSetupVBox;
+    private final QuickSetupPane quickSetupPane;
     private final Set<BoundProperty<?, ?>> boundPropertySet;
     private final Map<AttributeType<?>, BoundAttributePropertySet<?>> attributeBoundPropertySetMap;
 
     private boolean ignoreAttributeUpdate;
 
-    QuickSetupStateBinder(QuickSetupVBox quickSetupVBox)
+    QuickSetupStateBinder(QuickSetupPane quickSetupPane)
     {
-        this.quickSetupVBox = quickSetupVBox;
+        this.quickSetupPane = quickSetupPane;
         this.boundPropertySet = new HashSet<>();
         this.attributeBoundPropertySetMap = new HashMap<>();
     }
@@ -104,7 +104,7 @@ public final class QuickSetupStateBinder
 
     private AttributeMap getAttributeMapOf(AttributeType<?> attributeType)
     {
-        var selectedControlWrapper = quickSetupVBox.getSelectedControlWrapper();
+        var selectedControlWrapper = quickSetupPane.getSelectedControlWrapper();
         if(selectedControlWrapper == null)
         {
             return null;
@@ -115,7 +115,7 @@ public final class QuickSetupStateBinder
         var attributeManager = selectedControlWrapper.getAttributeTypeManager();
         if(attributeManager.isState(attributeType))
         {
-            var wrapperState = quickSetupVBox.getSelectedWrapperState();
+            var wrapperState = quickSetupPane.getSelectedWrapperState();
             if(wrapperState != null)
             {
                 attributeMap = wrapperState.getAttributeMap();

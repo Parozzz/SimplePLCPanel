@@ -7,10 +7,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCombination;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import javafx.stage.WindowEvent;
+import javafx.stage.*;
 
 public final class HMIStageSetter
 {
@@ -28,6 +25,12 @@ public final class HMIStageSetter
     public HMIStageSetter initModality(Modality modality)
     {
         stage.initModality(modality);
+        return this;
+    }
+
+    public HMIStageSetter initOwner(Window window)
+    {
+        stage.initOwner(window);
         return this;
     }
 
@@ -191,7 +194,12 @@ public final class HMIStageSetter
         stage.show();
     }
 
-    public Stage get()
+    public Scene getScene()
+    {
+        return scene;
+    }
+
+    public Stage getStage()
     {
         return stage;
     }

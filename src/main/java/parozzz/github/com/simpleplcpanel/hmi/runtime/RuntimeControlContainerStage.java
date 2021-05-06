@@ -59,7 +59,7 @@ public final class RuntimeControlContainerStage extends HMIStage<StackPane>
                         super.getStageSetter().setFullScreen(!stopFullScreen, "", null);
                     }
                 })
-                .get().fullScreenProperty()
+                .getStage().fullScreenProperty()
                 .addListener((observableValue, oldValue, newValue) ->
                 {
                     if (!stopFullScreen && (newValue == null || !newValue))

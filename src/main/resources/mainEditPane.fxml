@@ -17,7 +17,7 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <top>
       <MenuBar maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" BorderPane.alignment="TOP_CENTER">
          <menus>
@@ -69,8 +69,8 @@
             </Menu>
             <Menu mnemonicParsing="false" text="View">
                <items>
-                  <MenuItem fx:id="viewQuickSetupMenuItem" mnemonicParsing="false" text="QuickEdit" />
                   <MenuItem fx:id="viewDragAndDropMenuItem" mnemonicParsing="false" text="DragAndDrop" />
+                  <MenuItem fx:id="viewQuickSetupMenuItem" mnemonicParsing="false" text="QuickEdit" />
                   <MenuItem fx:id="viewScrollingPagesMenuItem" mnemonicParsing="false" text="Pages" />
                </items>
             </Menu>
@@ -101,6 +101,7 @@
                <items>
                   <MenuItem fx:id="pictureBankMenuItem" mnemonicParsing="false" text="Picture Bank" />
                   <MenuItem fx:id="modbusTCPStringAddressMenuItem" mnemonicParsing="false" text="Modbus TCP Address Creator" />
+                  <MenuItem fx:id="siemensS7StringAddressMenuItem" mnemonicParsing="false" text="Siemens S7 Address Creator" />
                </items>
             </Menu>
             <Menu mnemonicParsing="false" style="-fx-content-display: right; -fx-graphic-text-gap: 5;" text="Messages">

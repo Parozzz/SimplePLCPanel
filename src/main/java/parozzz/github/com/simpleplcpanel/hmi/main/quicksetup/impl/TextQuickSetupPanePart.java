@@ -9,20 +9,20 @@ import parozzz.github.com.simpleplcpanel.hmi.FXObject;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.TextAttribute;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
-import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupPane;
+import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupPanePart;
 import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupStateBinder;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
 
 import java.io.IOException;
 
-public final class TextQuickSetupPane extends FXObject implements QuickSetupPane
+public final class TextQuickSetupPanePart extends FXObject implements QuickSetupPanePart
 {
     @FXML
     private TextArea textTextArea;
 
     private final VBox vBox;
 
-    public TextQuickSetupPane() throws IOException
+    public TextQuickSetupPanePart() throws IOException
     {
         super("TextQuickPropertiesPane");
 

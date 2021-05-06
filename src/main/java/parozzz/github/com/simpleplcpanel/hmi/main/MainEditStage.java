@@ -25,7 +25,7 @@ import parozzz.github.com.simpleplcpanel.hmi.main.dragdrop.DragAndDropPane;
 import parozzz.github.com.simpleplcpanel.hmi.main.others.MessagesListStage;
 import parozzz.github.com.simpleplcpanel.hmi.main.others.copypaste.ControlWrapperCopyPasteHandler;
 import parozzz.github.com.simpleplcpanel.hmi.main.picturebank.PictureBankStage;
-import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupVBox;
+import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupPane;
 import parozzz.github.com.simpleplcpanel.hmi.main.settings.SettingsStage;
 import parozzz.github.com.simpleplcpanel.hmi.pane.BorderPaneHMIStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXTextFormatterUtil;
@@ -78,6 +78,7 @@ public final class MainEditStage extends BorderPaneHMIStage
     private MenuItem pictureBankMenuItem;
     @FXML
     private MenuItem modbusTCPStringAddressMenuItem;
+    @FXML private MenuItem siemensS7StringAddressMenuItem;
 
     //Messages Menu
     @FXML
@@ -104,12 +105,12 @@ public final class MainEditStage extends BorderPaneHMIStage
     private final Runnable saveDataRunnable;
 
     private final ControlContainerDatabase controlContainerDatabase;
-    private final ControlContainerCreationStage controlsPageCreationPage;
+    private final ControlContainerCreationStage controlsPageCreationStage;
     private final ControlWrapperSetupStage controlWrapperSetupStage;
     private final ControlWrapperQuickTextEditorStage controlWrapperQuickTextEditorStage;
     private final DragAndDropPane dragAndDropPane;
-    private final MainEditBottomScrollingPane bottomScrollingPane;
-    private final QuickSetupVBox quickSetupVBox;
+    private final PageScrollingPane pageScrollingPane;
+    private final QuickSetupPane quickSetupPane;
     private final SettingsStage settingsStage;
     private final PictureBankStage pictureBankStage;
     private final CommunicationStage communicationStage;
@@ -127,18 +128,23 @@ public final class MainEditStage extends BorderPaneHMIStage
 
         this.saveDataRunnable = saveDataRunnable;
 
-        super.addFXChild(bottomScrollingPane = new MainEditBottomScrollingPane())
+
+        super   //HANDLERS AND VARIOUS
                 .addFXChild(controlContainerDatabase = new ControlContainerDatabase(this, plcThread, modbusTCPThread))
-                .addFXChild(controlsPageCreationPage = new ControlContainerCreationStage(controlContainerDatabase))
-                .addFXChild(controlWrapperSetupStage = new ControlWrapperSetupStage(this))
-                .addFXChild(controlWrapperQuickTextEditorStage = new ControlWrapperQuickTextEditorStage())
-                .addFXChild(dragAndDropPane = new DragAndDropPane(this))
-                .addFXChild(quickSetupVBox = new QuickSetupVBox())
-                .addFXChild(settingsStage = new SettingsStage())
-                .addFXChild(pictureBankStage = new PictureBankStage())
-                .addFXChild(communicationStage = new CommunicationStage(plcThread, modbusTCPThread))
-                .addFXChild(messagesListStage = new MessagesListStage())
                 .addFXChild(copyPasteHandler = new ControlWrapperCopyPasteHandler(this))
+                //SIDE PANES
+                .addFXChild(dragAndDropPane = new DragAndDropPane(this)) //LEFT
+                .addFXChild(quickSetupPane = new QuickSetupPane()) //RIGHT
+                .addFXChild(pageScrollingPane = new PageScrollingPane()) //BOTTOM
+                //CHILD STAGES
+                .addFXChild((controlsPageCreationStage = new ControlContainerCreationStage(controlContainerDatabase)).setAsSubWindow(this))
+                .addFXChild((controlWrapperSetupStage = new ControlWrapperSetupStage(this)).setAsSubWindow(this))
+                .addFXChild((controlWrapperQuickTextEditorStage = new ControlWrapperQuickTextEditorStage()).setAsSubWindow(this))
+                .addFXChild((settingsStage = new SettingsStage()).setAsSubWindow(this))
+                .addFXChild((pictureBankStage = new PictureBankStage()).setAsSubWindow(this))
+                .addFXChild((communicationStage = new CommunicationStage(plcThread, modbusTCPThread)).setAsSubWindow(this))
+                .addFXChild((messagesListStage = new MessagesListStage()).setAsSubWindow(this))
+                //OTHER STAGES
                 .addFXChild(runtimeControlMainPage = new RuntimeControlContainerStage(this));
 
         this.messagePresentTrig = new TrigBoolean(false);
@@ -155,7 +161,7 @@ public final class MainEditStage extends BorderPaneHMIStage
                 .setMaximized(true)
                 .addEventFilter(KeyEvent.KEY_PRESSED, keyEvent ->
                 {
-                    if(saveKeyCombination.match(keyEvent))
+                    if (saveKeyCombination.match(keyEvent))
                     {
                         saveMenuItem.fire();
                         keyEvent.consume();
@@ -180,12 +186,15 @@ public final class MainEditStage extends BorderPaneHMIStage
         startRuntimeMenuItem.setOnAction(actionEvent -> this.showRuntimeScene(true, runtimeFullScreenCheckBox.isSelected()));
 
         //Page Menu
-        createPageMenuItem.setOnAction(actionEvent -> controlsPageCreationPage.showStage());
+        createPageMenuItem.setOnAction(actionEvent -> controlsPageCreationStage.showStage());
 
         //Tools Menu
         pictureBankMenuItem.setOnAction(actionEvent -> pictureBankStage.showStage());
         modbusTCPStringAddressMenuItem.setOnAction(event ->
-                ModbusTCPStringAddressCreatorStage.getInstance().showAsStandalone()
+                controlWrapperSetupStage.getModbusTCPStringAddressCreatorStage().showAsStandalone(MainEditStage.this)
+        );
+        siemensS7StringAddressMenuItem.setOnAction(event ->
+                controlWrapperSetupStage.getSiemensS7StringAddressCreator().showAsStandalone(MainEditStage.this)
         );
 
         //Messages Menu
@@ -208,7 +217,7 @@ public final class MainEditStage extends BorderPaneHMIStage
         pageWidthTextField.textProperty().addListener((observableValue, oldValue, newValue) ->
         {
             var newWidth = Util.parseInt(newValue, 640);
-            for(var controlContainerPage : controlContainerDatabase)
+            for (var controlContainerPage : controlContainerDatabase)
             {
                 var anchorPane = controlContainerPage.getMainAnchorPane();
                 anchorPane.setPrefWidth(newWidth);
@@ -222,7 +231,7 @@ public final class MainEditStage extends BorderPaneHMIStage
         pageHeightTextField.textProperty().addListener((observableValue, oldValue, newValue) ->
         {
             var newHeight = Util.parseInt(newValue, 480);
-            for(var controlContainerPage : controlContainerDatabase)
+            for (var controlContainerPage : controlContainerDatabase)
             {
                 var anchorPane = controlContainerPage.getMainAnchorPane();
                 anchorPane.setPrefHeight(newHeight);
@@ -235,7 +244,7 @@ public final class MainEditStage extends BorderPaneHMIStage
         //Needs to be on the vbox in case the zoom is too low
         centerMainVBox.addEventFilter(ScrollEvent.SCROLL, scrollEvent ->
         {
-            if(scrollEvent.isControlDown())
+            if (scrollEvent.isControlDown())
             {
                 var delta = scrollEvent.getDeltaY();
 
@@ -249,15 +258,13 @@ public final class MainEditStage extends BorderPaneHMIStage
 
 
         //Setup for Bottom Scrolling Pane
-        bottomStackPane.getChildren().add(bottomScrollingPane.getMainParent());
-        bottomScrollingPane.bindVisibilityToMenuItem(
+        pageScrollingPane.bindVisibilityToMenuItem(
                 viewScrollingPagesMenuItem,
-                () -> bottomStackPane.getChildren().add(bottomScrollingPane.getMainParent()),
-                () -> bottomStackPane.getChildren().remove(bottomScrollingPane.getMainParent())
+                () -> bottomStackPane.getChildren().add(pageScrollingPane.getMainParent()),
+                () -> bottomStackPane.getChildren().remove(pageScrollingPane.getMainParent())
         );
 
         //Setup for DRAG AND DROP
-        leftStackPane.getChildren().add(dragAndDropPane.getMainParent());
         dragAndDropPane.bindVisibilityToMenuItem(
                 viewDragAndDropMenuItem,
                 () -> leftStackPane.getChildren().add(dragAndDropPane.getMainParent()),
@@ -265,11 +272,10 @@ public final class MainEditStage extends BorderPaneHMIStage
         );
 
         //Setup for Quick Setup
-        rightStackPane.getChildren().add(quickSetupVBox.getMainParent());
-        quickSetupVBox.bindVisibilityToMenuItem(
+        quickSetupPane.bindVisibilityToMenuItem(
                 viewQuickSetupMenuItem,
-                () -> rightStackPane.getChildren().add(quickSetupVBox.getMainParent()),
-                () -> rightStackPane.getChildren().remove(quickSetupVBox.getMainParent())
+                () -> rightStackPane.getChildren().add(quickSetupPane.getMainParent()),
+                () -> rightStackPane.getChildren().remove(quickSetupPane.getMainParent())
         );
     }
 
@@ -288,17 +294,17 @@ public final class MainEditStage extends BorderPaneHMIStage
     {
         super.loop();
 
-        if(super.every(1000))
+        if (super.every(1000))
         {
             var selectedCommunicationManager = communicationStage.getSelectedCommunicationManager();
-            if(selectedCommunicationManager != null)
+            if (selectedCommunicationManager != null)
             {
                 var isConnected = selectedCommunicationManager.getCommThread().isConnected();
                 plcConnectedCircle.setFill(isConnected ? Color.GREEN : Color.RED);
             }
 
             messagePresentTrig.set(messagesListStage.areMessagesPresent());
-            switch(messagePresentTrig.checkTrig())
+            switch (messagePresentTrig.checkTrig())
             {
                 case RISING:
                     messagePresentLabel.setVisible(true);
@@ -344,14 +350,14 @@ public final class MainEditStage extends BorderPaneHMIStage
         return communicationStage;
     }
 
-    public QuickSetupVBox getQuickPropertiesVBox()
+    public QuickSetupPane getQuickPropertiesVBox()
     {
-        return quickSetupVBox;
+        return quickSetupPane;
     }
 
-    public MainEditBottomScrollingPane getBottomScrollingPane()
+    public PageScrollingPane getPageScrollingPane()
     {
-        return bottomScrollingPane;
+        return pageScrollingPane;
     }
 
     public SettingsStage getSettingsStage()
@@ -386,7 +392,7 @@ public final class MainEditStage extends BorderPaneHMIStage
 
     public void changeRuntimePage(ControlContainerPane controlContainerPane)
     {
-        if(this.isRuntimeShowing())
+        if (this.isRuntimeShowing())
         {
             runtimeControlMainPage.setControlMainPage(controlContainerPane);
         }
@@ -395,18 +401,18 @@ public final class MainEditStage extends BorderPaneHMIStage
     public void showRuntimeScene(boolean isDebug, boolean fullScreen)
     {
         var pageList = controlContainerDatabase.getPageList();
-        if(!pageList.isEmpty())
+        if (!pageList.isEmpty())
         {
             //Disable all the non essentials stuff
-            controlsPageCreationPage.setDisabled(true);
+            controlsPageCreationStage.setDisabled(true);
             dragAndDropPane.setDisabled(true);
-            quickSetupVBox.setDisabled(true);
+            quickSetupPane.setDisabled(true);
             settingsStage.setDisabled(true);
             pictureBankStage.setDisabled(true);
 
             this.setShownControlContainerPane(null);
 
-            if(isDebug)
+            if (isDebug)
             {
                 runtimeControlMainPage.setExitKeyCombination();
             }
@@ -425,7 +431,7 @@ public final class MainEditStage extends BorderPaneHMIStage
 
     public void setShownControlContainerPane(ControlContainerPane controlContainerPane)
     {
-        if(shownControlContainerPane != null)
+        if (shownControlContainerPane != null)
         {
             //If i don't clear selections some bad things could happen, especially while debugging read only page
             shownControlContainerPane.getSelectionManager().clearSelections();
@@ -435,13 +441,13 @@ public final class MainEditStage extends BorderPaneHMIStage
         this.shownControlContainerPane = controlContainerPane;
 
         AnchorPane anchorPane;
-        if(shownControlContainerPane == null)
+        if (shownControlContainerPane == null)
         {
             centerTopLabel.setText("Not Selected");
 
             anchorPane = new AnchorPane();
             anchorPane.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        }else
+        } else
         {
             centerTopLabel.setText(controlContainerPane.getName());
             anchorPane = shownControlContainerPane.getMainAnchorPane();
@@ -474,14 +480,14 @@ public final class MainEditStage extends BorderPaneHMIStage
     public void showStage()
     {
         //Enable all the stuff
-        controlsPageCreationPage.setDisabled(false);
+        controlsPageCreationStage.setDisabled(false);
         dragAndDropPane.setDisabled(false);
-        quickSetupVBox.setDisabled(false);
+        quickSetupPane.setDisabled(false);
         settingsStage.setDisabled(false);
         pictureBankStage.setDisabled(false);
 
         var pageList = this.getControlContainerDatabase().getPageList();
-        if(!pageList.isEmpty())
+        if (!pageList.isEmpty())
         {
             this.setShownControlContainerPane(pageList.get(0));
         }

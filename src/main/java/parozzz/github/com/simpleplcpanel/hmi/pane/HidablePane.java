@@ -37,6 +37,15 @@ public interface HidablePane
                 hideRunnable.run();
             }
         });
+
+        if(visible.get())
+        {
+            showRunnable.run();
+        }
+        else
+        {
+            hideRunnable.run();
+        }
     }
 
     default void show()

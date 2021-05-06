@@ -7,18 +7,18 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import parozzz.github.com.simpleplcpanel.hmi.FXObject;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
-import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupPane;
+import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupPanePart;
 import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupStateBinder;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
 
 import java.io.IOException;
 
-public final class GenericQuickSetupPane extends FXObject implements QuickSetupPane
+public final class GenericQuickSetupPanePart extends FXObject implements QuickSetupPanePart
 {
     @FXML private TextField typeTextField;
 
     private final VBox mainVBox;
-    public GenericQuickSetupPane() throws IOException
+    public GenericQuickSetupPanePart() throws IOException
     {
         super("GenericQuickProperties");
 
@@ -56,6 +56,6 @@ public final class GenericQuickSetupPane extends FXObject implements QuickSetupP
     @Override
     public void clearControlWrapper()
     {
-        typeTextField.setText("");
+        typeTextField.setText("None");
     }
 }

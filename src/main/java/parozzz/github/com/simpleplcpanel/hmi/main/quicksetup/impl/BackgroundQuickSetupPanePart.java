@@ -10,18 +10,18 @@ import parozzz.github.com.simpleplcpanel.hmi.FXObject;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.BackgroundAttribute;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
-import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupPane;
+import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupPanePart;
 import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupStateBinder;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
 
 import java.io.IOException;
 
-public final class BackgroundQuickSetupPane extends FXObject implements QuickSetupPane
+public final class BackgroundQuickSetupPanePart extends FXObject implements QuickSetupPanePart
 {
     @FXML private ColorPicker backgroundColorPicker;
 
     private final VBox vBox;
-    public BackgroundQuickSetupPane() throws IOException
+    public BackgroundQuickSetupPanePart() throws IOException
     {
         super("BackgroundQuickSetupPane");
 

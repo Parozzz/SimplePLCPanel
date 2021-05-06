@@ -11,7 +11,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.util.converter.DefaultStringConverter;
+import parozzz.github.com.simpleplcpanel.hmi.main.MainEditStage;
 import parozzz.github.com.simpleplcpanel.hmi.pane.HMIStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.ContextMenuBuilder;
 import parozzz.github.com.simpleplcpanel.hmi.util.EnumStringConverter;
@@ -61,7 +63,7 @@ public class PictureBankStage extends HMIStage<BorderPane>
     {
         super("pictureBankPane.fxml", BorderPane.class);
 
-        directoryPath = System.getProperty("user.dir") + "\\picture_bank";
+        this.directoryPath = System.getProperty("user.dir") + "\\picture_bank";
     }
 
     @Override
@@ -131,7 +133,7 @@ public class PictureBankStage extends HMIStage<BorderPane>
             var fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().addAll(FXUtil.IMAGE_EXTENSION_FILTER);
 
-            var fileList = fileChooser.showOpenMultipleDialog(this.getStageSetter().get()); //Allow to select multiple files...
+            var fileList = fileChooser.showOpenMultipleDialog(this.getStageSetter().getStage()); //Allow to select multiple files...
             if(fileList == null)
             {
                 return;

@@ -168,14 +168,14 @@ public final class ControlContainerDatabase extends FXController implements Iter
 
         super.addFXChild(controlContainerPane, false);
         controlsPageMap.put(controlContainerPane.getName(), controlContainerPane);
-        mainEditStage.getBottomScrollingPane().addImagePane(controlContainerPane.getMenuBottomImagePane());
+        mainEditStage.getPageScrollingPane().addImagePane(controlContainerPane.getMenuBottomImagePane());
     }
 
     public void deletePage(ControlContainerPane controlContainer)
     {
         if(controlsPageMap.remove(controlContainer.getName(), controlContainer))
         {
-            mainEditStage.getBottomScrollingPane().removeImagePane(controlContainer.getMenuBottomImagePane());
+            mainEditStage.getPageScrollingPane().removeImagePane(controlContainer.getMenuBottomImagePane());
             mainEditStage.setShownControlContainerPane(null);
         }
     }

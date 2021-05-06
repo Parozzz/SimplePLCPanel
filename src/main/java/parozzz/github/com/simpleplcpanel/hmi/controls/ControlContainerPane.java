@@ -24,7 +24,7 @@ import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.Contr
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.quicktext.ControlWrapperQuickTextEditorStage;
 import parozzz.github.com.simpleplcpanel.hmi.controls.others.ControlWrappersSelectionManager;
 import parozzz.github.com.simpleplcpanel.hmi.database.ControlContainerDatabase;
-import parozzz.github.com.simpleplcpanel.hmi.main.MainEditBottomScrollingPane;
+import parozzz.github.com.simpleplcpanel.hmi.main.PageScrollingPane;
 import parozzz.github.com.simpleplcpanel.hmi.main.MainEditStage;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.JSONSerializables;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataArray;
@@ -50,7 +50,7 @@ public class ControlContainerPane extends FXController implements Loggable
     private final Consumer<ControlWrapper<?>> deleteControlWrapperConsumer;
 
     private final AnchorPane mainAnchorPane;
-    private final MainEditBottomScrollingPane.ImagePane mainEditBottomImagePane;
+    private final PageScrollingPane.ImagePane mainEditBottomImagePane;
 
     private final Set<ControlWrapper<?>> controlWrapperSet;
     private final ControlWrappersSelectionManager controlWrappersSelectionManager;
@@ -73,7 +73,7 @@ public class ControlContainerPane extends FXController implements Loggable
 
         this.mainAnchorPane = new AnchorPane();
 
-        this.mainEditBottomImagePane = new MainEditBottomScrollingPane.ImagePane(this);
+        this.mainEditBottomImagePane = new PageScrollingPane.ImagePane(this);
 
         super.addFXChild(controlWrappersSelectionManager = new ControlWrappersSelectionManager(this, mainAnchorPane));
         this.controlWrapperSet = new HashSet<>();
@@ -217,7 +217,7 @@ public class ControlContainerPane extends FXController implements Loggable
         return mainAnchorPane;
     }
 
-    public MainEditBottomScrollingPane.ImagePane getMenuBottomImagePane()
+    public PageScrollingPane.ImagePane getMenuBottomImagePane()
     {
         return mainEditBottomImagePane;
     }

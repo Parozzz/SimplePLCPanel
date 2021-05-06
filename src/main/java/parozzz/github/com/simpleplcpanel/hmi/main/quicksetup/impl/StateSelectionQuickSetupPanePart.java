@@ -8,25 +8,25 @@ import javafx.scene.layout.VBox;
 import parozzz.github.com.simpleplcpanel.hmi.FXObject;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.state.WrapperState;
-import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupPane;
+import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupPanePart;
 import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupStateBinder;
-import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupVBox;
+import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupPane;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
 
 import java.io.IOException;
 
-public final class StateSelectionQuickSetupPane extends FXObject implements QuickSetupPane
+public final class StateSelectionQuickSetupPanePart extends FXObject implements QuickSetupPanePart
 {
     @FXML private ChoiceBox<WrapperState> stateChoiceBox;
 
-    private final QuickSetupVBox quickSetupVBox;
+    private final QuickSetupPane quickSetupPane;
     private final VBox vBox;
 
-    public StateSelectionQuickSetupPane(QuickSetupVBox quickSetupVBox) throws IOException
+    public StateSelectionQuickSetupPanePart(QuickSetupPane quickSetupPane) throws IOException
     {
         super("StateSelectionQuickPropertiesPane");
 
-        this.quickSetupVBox = quickSetupVBox;
+        this.quickSetupPane = quickSetupPane;
         this.vBox = (VBox) FXUtil.loadFXML("quickproperties/statesQuickSetupPane.fxml", this);
     }
 
@@ -44,12 +44,12 @@ public final class StateSelectionQuickSetupPane extends FXObject implements Quic
                 return;
             }
 
-            var selectedControlWrapper = quickSetupVBox.getSelectedControlWrapper();
+            var selectedControlWrapper = quickSetupPane.getSelectedControlWrapper();
             if (selectedControlWrapper != null)
             {
                 selectedControlWrapper.getStateMap().forceCurrentState(newValue);
 
-                quickSetupVBox.loadAllValuesFromControlWrapper();
+                quickSetupPane.loadAllValuesFromControlWrapper();
             }
         });
     }

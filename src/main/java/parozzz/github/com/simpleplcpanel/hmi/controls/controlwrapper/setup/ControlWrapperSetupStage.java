@@ -13,6 +13,8 @@ import javafx.scene.paint.Color;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeMap;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
+import parozzz.github.com.simpleplcpanel.hmi.comm.modbustcp.ModbusTCPStringAddressCreatorStage;
+import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7StringAddressCreator;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapperSpecific;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.attributes.ControlWrapperGenericAttributeUpdateConsumer;
@@ -54,6 +56,10 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
 
     private final SetupPaneList setupPaneList;
 
+    private final WrapperStateCreationPane wrapperStateCreationPane;
+    private final ModbusTCPStringAddressCreatorStage modbusTCPStringAddressCreatorStage;
+    private final SiemensS7StringAddressCreator siemensS7StringAddressCreator;
+
     private final ChangeListener<Boolean> controlWrapperValidListener;
     private final ControlWrapperGenericAttributeUpdateConsumer attributesUpdatedConsumer;
 
@@ -69,7 +75,9 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
 
         this.setupPaneList = new SetupPaneList();
 
-        this.addFXChild(new WrapperStateCreationPane(this, createStateButton));
+        this.addFXChild(wrapperStateCreationPane = new WrapperStateCreationPane(this, createStateButton))
+                .addFXChild(modbusTCPStringAddressCreatorStage = new ModbusTCPStringAddressCreatorStage())
+                .addFXChild(siemensS7StringAddressCreator = new SiemensS7StringAddressCreator());
 
         controlWrapperValidListener = (observableValue, oldValue, newValue) ->
         {
@@ -138,7 +146,7 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
         stateSelectionChoiceBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) ->
         {
             this.populateStateSetupPanes();
-            if(selectedControlWrapper != null)
+            if (selectedControlWrapper != null)
             {
                 selectedControlWrapper.getStateMap().forceCurrentState(newValue);
             }
@@ -209,6 +217,16 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
     public MainEditStage getMainEditStage()
     {
         return mainEditStage;
+    }
+
+    public ModbusTCPStringAddressCreatorStage getModbusTCPStringAddressCreatorStage()
+    {
+        return modbusTCPStringAddressCreatorStage;
+    }
+
+    public SiemensS7StringAddressCreator getSiemensS7StringAddressCreator()
+    {
+        return siemensS7StringAddressCreator;
     }
 
     @Override

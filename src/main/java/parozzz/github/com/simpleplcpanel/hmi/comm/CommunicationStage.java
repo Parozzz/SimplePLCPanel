@@ -4,10 +4,12 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbustcp.ModbusTCPCommunicationManager;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbustcp.ModbusTCPThread;
 import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7CommunicationManager;
 import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7Thread;
+import parozzz.github.com.simpleplcpanel.hmi.main.MainEditStage;
 import parozzz.github.com.simpleplcpanel.hmi.pane.HMIStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.EnumStringConverter;
 
@@ -24,7 +26,7 @@ public final class CommunicationStage extends HMIStage<VBox>
     private final ModbusTCPCommunicationManager modbusTCPCommunicationManager;
     private NetworkCommunicationManager<?> selectedCommunicationManager;
 
-    public CommunicationStage(SiemensS7Thread plcThread, ModbusTCPThread modbusTCPThread) throws IOException
+    public CommunicationStage( SiemensS7Thread plcThread, ModbusTCPThread modbusTCPThread) throws IOException
     {
         super("communicationPage.fxml", VBox.class);
 
@@ -37,8 +39,7 @@ public final class CommunicationStage extends HMIStage<VBox>
     {
         super.setup();
 
-        super.getStageSetter()
-                .setResizable(true);
+        super.getStageSetter().setResizable(true);
 
         serializableDataSet.addEnum("CommunicationType", commTypeChoiceBox.valueProperty(), CommunicationType.class, CommunicationType.SIEMENS_S7);
 

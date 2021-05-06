@@ -14,13 +14,13 @@ import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.FontAttribute;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.impl.FontSetupPane;
-import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupPane;
+import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupPanePart;
 import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupStateBinder;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
 
 import java.io.IOException;
 
-public class FontQuickSetupPane  extends FXObject implements QuickSetupPane
+public class FontQuickSetupPanePart extends FXObject implements QuickSetupPanePart
 {
     @FXML private ColorPicker textColorPicker;
     @FXML private ComboBox<Integer> textSizeComboBox;
@@ -30,7 +30,7 @@ public class FontQuickSetupPane  extends FXObject implements QuickSetupPane
 
     private final VBox vBox;
 
-    public FontQuickSetupPane() throws IOException
+    public FontQuickSetupPanePart() throws IOException
     {
         super("FontQuickSetupPane");
 

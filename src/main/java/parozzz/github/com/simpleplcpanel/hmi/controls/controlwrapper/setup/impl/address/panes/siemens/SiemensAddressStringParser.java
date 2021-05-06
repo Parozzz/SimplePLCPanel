@@ -284,7 +284,7 @@ public final class SiemensAddressStringParser extends AddressStringParser<Siemen
         {
             return null;
         }
-     }
+    }
 
 
     @Override
