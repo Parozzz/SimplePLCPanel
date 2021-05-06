@@ -14,6 +14,7 @@ import parozzz.github.com.simpleplcpanel.hmi.comm.modbustcp.intermediate.bit.Mod
 import parozzz.github.com.simpleplcpanel.logger.Loggable;
 import parozzz.github.com.simpleplcpanel.logger.MainLogger;
 
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
@@ -125,9 +126,12 @@ public final class ModbusTCPThread extends CommThread<ModbusTCPConnectionParams>
         try
         {
             masterConnection.connect();
+        }catch(ConnectException connectException)
+        {
+            MainLogger.getInstance().info("Can not connect to ModbusTCP Server", this);
         } catch (Exception exception)
         {
-            MainLogger.getInstance().error("Error while trying to connect to Modbus Server", exception, this);
+            MainLogger.getInstance().warning("Error while trying to connect to ModbusTCP Server", exception, this);
         }
 
         return masterConnection.isConnected();

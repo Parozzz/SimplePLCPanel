@@ -6,7 +6,7 @@ import javafx.scene.layout.VBox;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapperSpecific;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.attributes.ControlWrapperGenericAttributeUpdateConsumer;
-import parozzz.github.com.simpleplcpanel.hmi.page.HMIStage;
+import parozzz.github.com.simpleplcpanel.hmi.pane.HMIStage;
 
 import java.io.IOException;
 import java.util.ArrayList;

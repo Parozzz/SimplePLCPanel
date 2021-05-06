@@ -11,7 +11,7 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import parozzz.github.com.simpleplcpanel.hmi.main.settings.impl.LanguageSettingsPane;
-import parozzz.github.com.simpleplcpanel.hmi.page.HMIStage;
+import parozzz.github.com.simpleplcpanel.hmi.pane.HMIStage;
 
 import java.io.IOException;
 import java.util.HashSet;

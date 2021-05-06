@@ -22,7 +22,7 @@ import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.impl.
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.impl.control.InputDataSetupPane;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.state.WrapperState;
 import parozzz.github.com.simpleplcpanel.hmi.main.MainEditStage;
-import parozzz.github.com.simpleplcpanel.hmi.page.BorderPaneHMIStage;
+import parozzz.github.com.simpleplcpanel.hmi.pane.BorderPaneHMIStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.ContextMenuBuilder;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
 import parozzz.github.com.simpleplcpanel.logger.MainLogger;

@@ -27,7 +27,7 @@ import parozzz.github.com.simpleplcpanel.hmi.main.others.copypaste.ControlWrappe
 import parozzz.github.com.simpleplcpanel.hmi.main.picturebank.PictureBankStage;
 import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupVBox;
 import parozzz.github.com.simpleplcpanel.hmi.main.settings.SettingsStage;
-import parozzz.github.com.simpleplcpanel.hmi.page.BorderPaneHMIStage;
+import parozzz.github.com.simpleplcpanel.hmi.pane.BorderPaneHMIStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXTextFormatterUtil;
 import parozzz.github.com.simpleplcpanel.util.TrigBoolean;
 import parozzz.github.com.simpleplcpanel.util.Util;
@@ -42,10 +42,6 @@ public final class MainEditStage extends BorderPaneHMIStage
     private CheckBox runtimeAtStartupCheckBox;
     @FXML
     private MenuItem startRuntimeMenuItem;
-
-    //Bottom
-    @FXML
-    private HBox bottomScrollingHBox;
 
     //File
     @FXML
@@ -62,6 +58,14 @@ public final class MainEditStage extends BorderPaneHMIStage
     private TextField pageWidthTextField;
     @FXML
     private TextField pageHeightTextField;
+
+    //View Menu
+    @FXML
+    private MenuItem viewQuickSetupMenuItem;
+    @FXML
+    private MenuItem viewDragAndDropMenuItem;
+    @FXML
+    private MenuItem viewScrollingPagesMenuItem;
 
     //Communication
     @FXML
@@ -81,10 +85,13 @@ public final class MainEditStage extends BorderPaneHMIStage
     @FXML
     private MenuItem showMessageListMenuItem;
 
+    //Sides Stack Panes
     @FXML
     private StackPane leftStackPane;
     @FXML
     private StackPane rightStackPane;
+    @FXML
+    private StackPane bottomStackPane;
 
     //Center = Page Showing
     @FXML
@@ -120,8 +127,8 @@ public final class MainEditStage extends BorderPaneHMIStage
 
         this.saveDataRunnable = saveDataRunnable;
 
-        bottomScrollingPane = new MainEditBottomScrollingPane(bottomScrollingHBox);
-        super.addFXChild(controlContainerDatabase = new ControlContainerDatabase(this, plcThread, modbusTCPThread))
+        super.addFXChild(bottomScrollingPane = new MainEditBottomScrollingPane())
+                .addFXChild(controlContainerDatabase = new ControlContainerDatabase(this, plcThread, modbusTCPThread))
                 .addFXChild(controlsPageCreationPage = new ControlContainerCreationStage(controlContainerDatabase))
                 .addFXChild(controlWrapperSetupStage = new ControlWrapperSetupStage(this))
                 .addFXChild(controlWrapperQuickTextEditorStage = new ControlWrapperQuickTextEditorStage())
@@ -225,8 +232,6 @@ public final class MainEditStage extends BorderPaneHMIStage
             runtimeControlMainPage.getStageSetter().setHeight(newHeight);
         });
 
-        leftStackPane.getChildren().add(dragAndDropPane.getMainVBox());
-        rightStackPane.getChildren().add(quickSetupVBox.getMainParent());
         //Needs to be on the vbox in case the zoom is too low
         centerMainVBox.addEventFilter(ScrollEvent.SCROLL, scrollEvent ->
         {
@@ -241,6 +246,31 @@ public final class MainEditStage extends BorderPaneHMIStage
                 scrollEvent.consume();
             }
         });
+
+
+        //Setup for Bottom Scrolling Pane
+        bottomStackPane.getChildren().add(bottomScrollingPane.getMainParent());
+        bottomScrollingPane.bindVisibilityToMenuItem(
+                viewScrollingPagesMenuItem,
+                () -> bottomStackPane.getChildren().add(bottomScrollingPane.getMainParent()),
+                () -> bottomStackPane.getChildren().remove(bottomScrollingPane.getMainParent())
+        );
+
+        //Setup for DRAG AND DROP
+        leftStackPane.getChildren().add(dragAndDropPane.getMainParent());
+        dragAndDropPane.bindVisibilityToMenuItem(
+                viewDragAndDropMenuItem,
+                () -> leftStackPane.getChildren().add(dragAndDropPane.getMainParent()),
+                () -> leftStackPane.getChildren().remove(dragAndDropPane.getMainParent())
+        );
+
+        //Setup for Quick Setup
+        rightStackPane.getChildren().add(quickSetupVBox.getMainParent());
+        quickSetupVBox.bindVisibilityToMenuItem(
+                viewQuickSetupMenuItem,
+                () -> rightStackPane.getChildren().add(quickSetupVBox.getMainParent()),
+                () -> rightStackPane.getChildren().remove(quickSetupVBox.getMainParent())
+        );
     }
 
     @Override

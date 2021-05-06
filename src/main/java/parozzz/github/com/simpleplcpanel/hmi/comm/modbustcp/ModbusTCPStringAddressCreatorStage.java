@@ -5,7 +5,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.impl.address.panes.modbustcp.ModbusTCPAddressStringParser;
-import parozzz.github.com.simpleplcpanel.hmi.page.HMIStage;
+import parozzz.github.com.simpleplcpanel.hmi.pane.HMIStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.EnumStringConverter;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXTextFormatterUtil;
 import parozzz.github.com.simpleplcpanel.util.Util;

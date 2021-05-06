@@ -8,7 +8,7 @@ import parozzz.github.com.simpleplcpanel.hmi.comm.modbustcp.ModbusTCPCommunicati
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbustcp.ModbusTCPThread;
 import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7CommunicationManager;
 import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7Thread;
-import parozzz.github.com.simpleplcpanel.hmi.page.HMIStage;
+import parozzz.github.com.simpleplcpanel.hmi.pane.HMIStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.EnumStringConverter;
 
 import java.io.IOException;

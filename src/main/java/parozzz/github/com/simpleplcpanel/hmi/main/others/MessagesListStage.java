@@ -5,7 +5,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.VBox;
 import javafx.stage.WindowEvent;
-import parozzz.github.com.simpleplcpanel.hmi.page.HMIStage;
+import parozzz.github.com.simpleplcpanel.hmi.pane.HMIStage;
 import parozzz.github.com.simpleplcpanel.logger.MainLogger;
 
 import java.io.IOException;

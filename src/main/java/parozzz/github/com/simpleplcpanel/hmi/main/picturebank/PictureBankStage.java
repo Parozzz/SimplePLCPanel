@@ -12,7 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.util.converter.DefaultStringConverter;
-import parozzz.github.com.simpleplcpanel.hmi.page.HMIStage;
+import parozzz.github.com.simpleplcpanel.hmi.pane.HMIStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.ContextMenuBuilder;
 import parozzz.github.com.simpleplcpanel.hmi.util.EnumStringConverter;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXImageUtil;

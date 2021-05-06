@@ -12,7 +12,7 @@ import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 import parozzz.github.com.simpleplcpanel.hmi.controls.ControlContainerPane;
 import parozzz.github.com.simpleplcpanel.hmi.main.MainEditStage;
-import parozzz.github.com.simpleplcpanel.hmi.page.HMIStage;
+import parozzz.github.com.simpleplcpanel.hmi.pane.HMIStage;
 
 public final class RuntimeControlContainerStage extends HMIStage<StackPane>
 {

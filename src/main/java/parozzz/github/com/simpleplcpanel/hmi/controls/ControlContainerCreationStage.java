@@ -9,7 +9,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import parozzz.github.com.simpleplcpanel.hmi.database.ControlContainerDatabase;
-import parozzz.github.com.simpleplcpanel.hmi.page.PaneHMIStage;
+import parozzz.github.com.simpleplcpanel.hmi.pane.PaneHMIStage;
 
 import java.io.IOException;
 

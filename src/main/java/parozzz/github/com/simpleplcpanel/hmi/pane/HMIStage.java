@@ -1,4 +1,4 @@
-package parozzz.github.com.simpleplcpanel.hmi.page;
+package parozzz.github.com.simpleplcpanel.hmi.pane;
 
 import javafx.scene.Parent;
 import javafx.scene.SnapshotParameters;

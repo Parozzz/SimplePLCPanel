@@ -67,6 +67,13 @@
                   </CustomMenuItem>
                </items>
             </Menu>
+            <Menu mnemonicParsing="false" text="View">
+               <items>
+                  <MenuItem fx:id="viewQuickSetupMenuItem" mnemonicParsing="false" text="QuickEdit" />
+                  <MenuItem fx:id="viewDragAndDropMenuItem" mnemonicParsing="false" text="DragAndDrop" />
+                  <MenuItem fx:id="viewScrollingPagesMenuItem" mnemonicParsing="false" text="Pages" />
+               </items>
+            </Menu>
             <Menu mnemonicParsing="false" text="Runtime">
                <items>
                   <MenuItem fx:id="startRuntimeMenuItem" mnemonicParsing="false" text="Start" />
@@ -114,16 +121,6 @@
          </menus>
       </MenuBar>
    </top>
-   <bottom>
-      <ScrollPane fitToHeight="true" fitToWidth="true" focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" vbarPolicy="NEVER" BorderPane.alignment="BOTTOM_CENTER">
-         <content>
-            <HBox fx:id="bottomScrollingHBox" alignment="CENTER" spacing="4.0" />
-         </content>
-         <BorderPane.margin>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-         </BorderPane.margin>
-      </ScrollPane>
-   </bottom>
    <left>
       <StackPane fx:id="leftStackPane" maxHeight="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" style="-fx-border-color: lightgray; -fx-border-width: 2;" BorderPane.alignment="CENTER">
          <BorderPane.margin>
@@ -187,4 +184,11 @@
          </BorderPane.margin>
       </StackPane>
    </right>
+   <bottom>
+      <StackPane fx:id="bottomStackPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-color: lightgray; -fx-border-width: 2;" BorderPane.alignment="CENTER">
+         <BorderPane.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </BorderPane.margin>
+      </StackPane>
+   </bottom>
 </BorderPane>

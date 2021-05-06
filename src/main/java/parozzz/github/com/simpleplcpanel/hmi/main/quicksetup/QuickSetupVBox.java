@@ -1,8 +1,13 @@
 package parozzz.github.com.simpleplcpanel.hmi.main.quicksetup;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import parozzz.github.com.simpleplcpanel.hmi.FXController;
@@ -12,16 +17,23 @@ import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.attributes.
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.state.WrapperState;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.state.WrapperStateChangedConsumer;
 import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.impl.*;
+import parozzz.github.com.simpleplcpanel.hmi.pane.HMIPane;
+import parozzz.github.com.simpleplcpanel.hmi.pane.HidablePane;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
+import parozzz.github.com.simpleplcpanel.util.functionalinterface.primitives.BooleanConsumer;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class QuickSetupVBox extends FXController implements ControlWrapperSpecific
+public final class QuickSetupVBox
+        extends FXController
+        implements HMIPane, ControlWrapperSpecific, HidablePane
 {
-    private final VBox vBox;
-    private final ScrollPane mainScrollPane;
+    private final ScrollPane scrollPane;
+    private final VBox mainVBox;
+    private final VBox paneVBox;
+
 
     private final StateSelectionQuickSetupPane stateSelectionQuickSetupPane;
     private final GenericQuickSetupPane genericQuickSetupPane;
@@ -37,12 +49,19 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
     private final ControlWrapperGenericAttributeUpdateConsumer attributeUpdatedConsumer;
     private final WrapperStateChangedConsumer stateChangeConsumer;
 
+    private final BooleanProperty visible;
+
     private ControlWrapper<?> selectedControlWrapper;
 
     public QuickSetupVBox() throws IOException
     {
         this.stateBinder = new QuickSetupStateBinder(this);
-        this.mainScrollPane = new ScrollPane(this.vBox = new VBox());
+        this.mainVBox = new VBox(
+                this.scrollPane = new ScrollPane(
+                        this.paneVBox = new VBox()
+                )
+        );
+
 
         this.addFXChild(this.stateSelectionQuickSetupPane = new StateSelectionQuickSetupPane(this))
                 .addFXChild(this.genericQuickSetupPane = new GenericQuickSetupPane())
@@ -82,6 +101,13 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
             stateSelectionQuickSetupPane.changeState(stateMap.getCurrentState());
         };
 
+        this.visible = new SimpleBooleanProperty(true);
+    }
+
+    @Override
+    public BooleanProperty visibleProperty()
+    {
+        return visible;
     }
 
     @Override
@@ -89,11 +115,16 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
     {
         super.setup();
 
-        vBox.setMinSize(0, 0);
-        vBox.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        //Hide VBox Button at the TOP
+        mainVBox.getChildren().add(0, this.createHideParent(Pos.TOP_RIGHT));
+        mainVBox.setMinSize(0, 0);
+        mainVBox.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
-        mainScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        mainScrollPane.setBackground(FXUtil.createBackground(Color.TRANSPARENT));
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setBackground(FXUtil.createBackground(Color.TRANSPARENT));
+
+        paneVBox.setMinSize(0, 0);
+        paneVBox.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
         this.computeQuickSetupPane(genericQuickSetupPane, stateSelectionQuickSetupPane,
                 sizeQuickSetupPane, fontQuickSetupPane, backgroundQuickSetupPane, textQuickSetupPane
@@ -108,9 +139,10 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
         this.setSelectedControlWrapper(null); //Start with a null value (Also set everything invisible)
     }
 
+    @Override
     public Parent getMainParent()
     {
-        return mainScrollPane;
+        return mainVBox;
     }
 
     public WrapperState getSelectedWrapperState()
@@ -139,6 +171,7 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
         this.selectedControlWrapper = controlWrapper;
         if(controlWrapper == null)
         {
+            paneVBox.getChildren().clear();
             quickSetupPaneList.forEach(QuickSetupPane::clearControlWrapper);
             return;
         }
@@ -147,7 +180,7 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
         controlWrapper.getAttributeUpdater().addGenericUpdateConsumer(attributeUpdatedConsumer);
         controlWrapper.getStateMap().addStateValueChangedConsumer(stateChangeConsumer);
 
-        var children = vBox.getChildren();
+        var children = paneVBox.getChildren();
         children.clear();
         for(var quickSetupPane : quickSetupPaneList)
         {
@@ -179,5 +212,4 @@ public final class QuickSetupVBox extends FXController implements ControlWrapper
             quickSetupPaneList.add(quickSetupPane);
         }
     }
-
 }
