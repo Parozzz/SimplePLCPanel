@@ -7,6 +7,14 @@ import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7Thread;
 import parozzz.github.com.simpleplcpanel.logger.MainLogger;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public final class JavaFXMain extends Application
 {
@@ -23,8 +31,7 @@ public final class JavaFXMain extends Application
     {
         try
         {
-            saveFile = new File(System.getProperty("user.dir"), "saves.json");
-            saveFile.createNewFile();
+            saveFile = this.getSaveFile();
 
             this.hmiStarter = new HMIStarter(saveFile);
             this.hmiStarter.startEditingEngine();
@@ -42,5 +49,26 @@ public final class JavaFXMain extends Application
         {
             hmiStarter.stop();
         }
+    }
+
+    private File getSaveFile() throws IOException
+    {
+        var userDir = System.getProperty("user.dir");
+
+        var saveFile = new File(userDir, "saves.json");
+        saveFile.createNewFile();
+
+        var saveFileBackupDir = new File(userDir, "Backups");
+        saveFileBackupDir.mkdirs();
+
+        var sdf = new SimpleDateFormat(); // creo l'oggetto
+        sdf.applyPattern("yyyy.MM.dd.hh.mm.ss");
+
+        var stringDate = sdf.format(new Date());
+        var backupSaveFile = new File(saveFileBackupDir, "bak" + stringDate + ".json");
+
+        Files.copy(saveFile.toPath(), backupSaveFile.toPath());
+
+        return saveFile;
     }
 }

@@ -20,7 +20,7 @@ import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public final class ModbusTCPThread extends CommThread<ModbusTCPConnectionParams> implements Loggable
+public final class ModbusTCPThread extends CommThread<ModbusTCPConnectionParams>
 {
     private final TCPMasterConnection masterConnection;
 
@@ -93,32 +93,35 @@ public final class ModbusTCPThread extends CommThread<ModbusTCPConnectionParams>
     }
 
     @Override
-    public boolean connect()
+    public void updateConnectionParams()
     {
-        if (newConnectionParams)
+        if(masterConnection.isConnected())
         {
-            if (masterConnection.isConnected())
-            {
-                masterConnection.close();
-            }
+            masterConnection.close();
+        }
 
+        if(communicationParams != null)
+        {
             try
             {
                 communicationParams.updateParams(masterConnection);
-            } catch (UnknownHostException exception)
+            }
+            catch(UnknownHostException exception)
             {
                 MainLogger.getInstance().error("Error while trying to change params of Modbus Client", exception, this);
             }
-
-            newConnectionParams = false;
         }
+    }
 
-        if (masterConnection.getAddress() == null)
+    @Override
+    public boolean connect()
+    {
+        if(masterConnection.getAddress() == null)
         {
             return false;
         }
 
-        if (masterConnection.isConnected())
+        if(masterConnection.isConnected())
         {
             return true;
         }
@@ -126,10 +129,12 @@ public final class ModbusTCPThread extends CommThread<ModbusTCPConnectionParams>
         try
         {
             masterConnection.connect();
-        }catch(ConnectException connectException)
+        }
+        catch(ConnectException connectException)
         {
             MainLogger.getInstance().info("Can not connect to ModbusTCP Server", this);
-        } catch (Exception exception)
+        }
+        catch(Exception exception)
         {
             MainLogger.getInstance().warning("Error while trying to connect to ModbusTCP Server", exception, this);
         }
@@ -160,32 +165,25 @@ public final class ModbusTCPThread extends CommThread<ModbusTCPConnectionParams>
                     intermediateListMap -> this.readConsecutiveDiscreteInputs(transaction, intermediateListMap));
             this.manageIntermediateSet(readInputRegistersSet, intermediateListMap -> this
                     .readMultipleConsecutiveInputRegisters(transaction, intermediateListMap));
-        } catch (Exception exception)
+        }
+        catch(Exception exception)
         {
             MainLogger.getInstance().error("Error while managing lists the modbus server", exception, this);
         }
     }
 
-    @Override
-    public String log()
-    {
-        return "IPAddress " + masterConnection.getAddress().getHostAddress()
-                + ", Port " + masterConnection.getPort()
-                + ", Timeout " + masterConnection.getTimeout();
-    }
-
     private <T extends ModbusTCPIntermediate> void manageIntermediateSet(Set<T> intermediateSet,
             ExceptionConsumer<Map<Integer, List<T>>> parseConsecutiveIntermediateConsumer) throws Exception
     {
-        if (intermediateSet.isEmpty() || !this.isConnected())
+        if(intermediateSet.isEmpty() || !this.isConnected())
         {
             return;
         }
 
         Map<Integer, List<T>> intermediateMap = new TreeMap<>();
-        for (var intermediate : intermediateSet)
+        for(var intermediate : intermediateSet)
         {
-            for (var offset : intermediate.getOffsetArray())
+            for(var offset : intermediate.getOffsetArray())
             {
                 intermediateMap.computeIfAbsent(offset, tOffset -> new ArrayList<>()).add(intermediate);
             }
@@ -194,14 +192,14 @@ public final class ModbusTCPThread extends CommThread<ModbusTCPConnectionParams>
         Map<Integer, List<T>> consecutiveIntermediateListMap = new TreeMap<>();
 
         int lastOffset = -1;
-        for (var entry : intermediateMap.entrySet())
+        for(var entry : intermediateMap.entrySet())
         {
             var offset = entry.getKey();
             var intermediateList = entry.getValue();
 
-            if (lastOffset != -1 && lastOffset + 1 != offset)
+            if(lastOffset != -1 && lastOffset + 1 != offset)
             {
-                if (!consecutiveIntermediateListMap.isEmpty())
+                if(!consecutiveIntermediateListMap.isEmpty())
                 {
                     parseConsecutiveIntermediateConsumer.accept(consecutiveIntermediateListMap);
                     consecutiveIntermediateListMap.clear();
@@ -212,7 +210,7 @@ public final class ModbusTCPThread extends CommThread<ModbusTCPConnectionParams>
             consecutiveIntermediateListMap.put(offset, intermediateList);
         }
 
-        if (!consecutiveIntermediateListMap.isEmpty())
+        if(!consecutiveIntermediateListMap.isEmpty())
         {
             parseConsecutiveIntermediateConsumer.accept(consecutiveIntermediateListMap);
         }
@@ -226,24 +224,24 @@ public final class ModbusTCPThread extends CommThread<ModbusTCPConnectionParams>
             var registerList = new ArrayList<SimpleInputRegister>();
 
             var firstOffset = -1;
-            for (var entry : intermediateListMap.entrySet())
+            for(var entry : intermediateListMap.entrySet())
             {
                 var offset = entry.getKey();
                 var intermediateList = entry.getValue();
 
-                if (intermediateList.isEmpty())
+                if(intermediateList.isEmpty())
                 {
                     throw new IllegalStateException(
                             "Found an intermediate sub list that is empty while writing holdings");
                 }
 
-                if (intermediateList.size() > 1)
+                if(intermediateList.size() > 1)
                 {
                     MainLogger.getInstance()
                             .warning("Trying to write multiple holdings to the same offset " + offset, this);
                 }
 
-                if (firstOffset == -1)
+                if(firstOffset == -1)
                 {
                     firstOffset = offset;
                 }
@@ -260,7 +258,8 @@ public final class ModbusTCPThread extends CommThread<ModbusTCPConnectionParams>
 
             //var response = (WriteMultipleRegistersResponse) transaction.getResponse();
             //Check something here ??
-        } catch (Exception exception)
+        }
+        catch(Exception exception)
         {
             MainLogger.getInstance().error("Error while reading Modbus tcp holding registers", exception, this);
             this.disconnect();
@@ -283,15 +282,16 @@ public final class ModbusTCPThread extends CommThread<ModbusTCPConnectionParams>
             var response = (ReadMultipleRegistersResponse) transaction.getResponse();
 
             var x = 0;
-            for (var intermediateList : intermediateListMap.values())
+            for(var intermediateList : intermediateListMap.values())
             {
                 var register = response.getRegisters()[x++];
-                for (var intermediate : intermediateList)
+                for(var intermediate : intermediateList)
                 {
                     intermediate.setNextWord(register.getValue());
                 }
             }
-        } catch (Exception exception)
+        }
+        catch(Exception exception)
         {
             MainLogger.getInstance().error("Error while reading Modbus tcp holding registers", exception, this);
             this.disconnect();
@@ -309,16 +309,16 @@ public final class ModbusTCPThread extends CommThread<ModbusTCPConnectionParams>
             transaction.setRequest(request);
 
             var x = 0;
-            for (var entry : intermediateListMap.entrySet())
+            for(var entry : intermediateListMap.entrySet())
             {
                 var intermediateList = entry.getValue();
-                if (intermediateList.isEmpty())
+                if(intermediateList.isEmpty())
                 {
                     throw new IllegalStateException(
                             "Found an intermediate sub list that is empty while writing multiple coils");
                 }
 
-                if (intermediateList.size() > 1)
+                if(intermediateList.size() > 1)
                 {
                     MainLogger.getInstance()
                             .warning("Trying to write multiple coils to the same offset " + entry.getKey(), this);
@@ -332,7 +332,8 @@ public final class ModbusTCPThread extends CommThread<ModbusTCPConnectionParams>
 
             //var response = (WriteMultipleCoilsResponse) transaction.getResponse();
             //???
-        } catch (Exception exception)
+        }
+        catch(Exception exception)
         {
             MainLogger.getInstance().error("Error while writing Modbus tcp multiple coils", exception, this);
             this.disconnect();
@@ -354,15 +355,16 @@ public final class ModbusTCPThread extends CommThread<ModbusTCPConnectionParams>
             var response = (ReadCoilsResponse) transaction.getResponse();
 
             var x = 0;
-            for (var intermediateList : intermediateListMap.values())
+            for(var intermediateList : intermediateListMap.values())
             {
                 var coilBit = response.getCoils().getBit(x++);
-                for (var intermediate : intermediateList)
+                for(var intermediate : intermediateList)
                 {
                     intermediate.setValue(coilBit);
                 }
             }
-        } catch (Exception exception)
+        }
+        catch(Exception exception)
         {
             MainLogger.getInstance().error("Error while reading Modbus tcp multiple coils", exception, this);
             this.disconnect();
@@ -384,15 +386,16 @@ public final class ModbusTCPThread extends CommThread<ModbusTCPConnectionParams>
             var response = (ReadInputDiscretesResponse) transaction.getResponse();
 
             var x = 0;
-            for (var intermediateList : intermediateListMap.values())
+            for(var intermediateList : intermediateListMap.values())
             {
                 var discreteBit = response.getDiscretes().getBit(x++);
-                for (var intermediate : intermediateList)
+                for(var intermediate : intermediateList)
                 {
                     intermediate.setValue(discreteBit);
                 }
             }
-        } catch (Exception exception)
+        }
+        catch(Exception exception)
         {
             MainLogger.getInstance().error("Error while reading Modbus tcp discrete inputs", exception, this);
             this.disconnect();
@@ -414,15 +417,16 @@ public final class ModbusTCPThread extends CommThread<ModbusTCPConnectionParams>
             var response = (ReadInputRegistersResponse) transaction.getResponse();
 
             int x = 0;
-            for (var intermediateList : intermediateListMap.values())
+            for(var intermediateList : intermediateListMap.values())
             {
                 var register = response.getRegisters()[x++];
-                for (var intermediate : intermediateList)
+                for(var intermediate : intermediateList)
                 {
                     intermediate.setNextWord(register.getValue());
                 }
             }
-        } catch (Exception exception)
+        }
+        catch(Exception exception)
         {
             MainLogger.getInstance().error("Error while reading Modbus tcp input registers", exception, this);
             this.disconnect();

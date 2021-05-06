@@ -34,4 +34,11 @@ public final class ModbusTCPConnectionParams extends CommunicationConnectionPara
     {
         return port;
     }
+
+    @Override
+    public String log()
+    {
+        return "IPAddress: " + ipAddress
+                + ", Port: " + port;
+    }
 }

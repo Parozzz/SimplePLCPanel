@@ -68,7 +68,7 @@ public final class HMIStarter
             hmiManager.setupComplete();
 
             FXUtil.runEveryMillis(1, hmiManager::loop);
-            FXUtil.runEverySecond(60, this::saveData);
+            //FXUtil.runEverySecond(60, this::saveData);
 
             //Stop the JavaFX platform is no windows are open
             Platform.setImplicitExit(true);

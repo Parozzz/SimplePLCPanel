@@ -40,4 +40,12 @@ public class SiemensS7ConnectionParams extends CommunicationConnectionParams
     {
         return slot;
     }
+
+    @Override
+    public String log()
+    {
+        return "IPAddress: " + ipAddress +
+                ", Rack: " + rack +
+                ", Slot: " + slot;
+    }
 }

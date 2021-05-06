@@ -85,7 +85,8 @@ public final class JSONDataMap extends JSONData<JSONObject>
 
     public String getString(String key)
     {
-        return get(key, String.class);
+        var stringValue = get(key, String.class);
+        return stringValue == null || stringValue.isEmpty() ? null : stringValue;
     }
 
     public <T extends Enum<T>> T getEnum(String key, Class<T> enumClass)

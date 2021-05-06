@@ -2,6 +2,7 @@ package parozzz.github.com.simpleplcpanel.hmi.database;
 
 import org.json.simple.JSONObject;
 import parozzz.github.com.simpleplcpanel.hmi.FXController;
+import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbustcp.ModbusTCPThread;
 import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7Thread;
 import parozzz.github.com.simpleplcpanel.hmi.controls.ControlContainerPane;
@@ -51,18 +52,7 @@ public final class ControlContainerDatabase extends FXController implements Iter
     {
         super.setup();
 
-        mainEditStage.getCommunicationStage().addCommunicationTypeListener(communicationType ->
-        {
-            switch(communicationType)
-            {
-                case SIEMENS_S7:
-                    nextControlDataUpdater = siemensPLCDataUpdater;
-                    break;
-                case MODBUS_TCP:
-                    nextControlDataUpdater = modbusTCPDataUpdater;
-                    break;
-            }
-        });
+        mainEditStage.getCommunicationStage().addCommunicationTypeListener(this::updateCommunicationManager);
     }
 
     @Override
@@ -79,17 +69,7 @@ public final class ControlContainerDatabase extends FXController implements Iter
     {
         super.setupComplete();
 
-        //Just to be sure, on setup complete i will set the next data updater since it does not set
-        //the first time from the listener created in the setup
-        switch(mainEditStage.getCommunicationStage().getCommunicationType())
-        {
-            case SIEMENS_S7:
-                nextControlDataUpdater = siemensPLCDataUpdater;
-                break;
-            case MODBUS_TCP:
-                nextControlDataUpdater = modbusTCPDataUpdater;
-                break;
-        }
+        this.updateCommunicationManager(mainEditStage.getCommunicationStage().getCommunicationType());
     }
 
     public MainEditStage getMainEditStage()
@@ -200,6 +180,25 @@ public final class ControlContainerDatabase extends FXController implements Iter
         }
     }
 
+    private void updateCommunicationManager(CommunicationType communicationType)
+    {
+        if(communicationType == null)
+        {
+            return;
+        }
+
+        //Just to be sure, on setup complete i will set the next data updater since it does not set
+        //the first time from the listener created in the setup
+        switch(mainEditStage.getCommunicationStage().getCommunicationType())
+        {
+            case SIEMENS_S7:
+                nextControlDataUpdater = siemensPLCDataUpdater;
+                break;
+            case MODBUS_TCP:
+                nextControlDataUpdater = modbusTCPDataUpdater;
+                break;
+        }
+    }
 
     private void changeSelectedDataUpdater()
     {

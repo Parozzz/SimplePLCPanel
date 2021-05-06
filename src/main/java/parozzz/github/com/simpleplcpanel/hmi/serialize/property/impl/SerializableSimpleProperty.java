@@ -11,9 +11,11 @@ public class SerializableSimpleProperty<T> extends SerializableProperty<T>
 {
     private final Property<T> property;
     private final BiFunction<JSONDataMap, String, T> getterFunction;
+    private final T loadDefaultValue;
 
     public <M> SerializableSimpleProperty(String key, Property<T> property,
-                                          BiFunction<JSONDataMap, String, M> middleGetterFunction, Function<M, T> middleFunction)
+            BiFunction<JSONDataMap, String, M> middleGetterFunction,
+            Function<M, T> middleFunction, T loadDefaultValue)
     {
         super(key);
 
@@ -28,14 +30,17 @@ public class SerializableSimpleProperty<T> extends SerializableProperty<T>
 
             return middleFunction.apply(middleValue);
         };
+        this.loadDefaultValue = loadDefaultValue;
     }
 
-    public SerializableSimpleProperty(String key, Property<T> property, BiFunction<JSONDataMap, String, T> getterFunction)
+    public SerializableSimpleProperty(String key, Property<T> property,
+            BiFunction<JSONDataMap, String, T> getterFunction, T loadDefaultValue)
     {
         super(key);
 
         this.property = property;
         this.getterFunction = getterFunction;
+        this.loadDefaultValue = loadDefaultValue;
     }
 
     @Override
@@ -65,6 +70,9 @@ public class SerializableSimpleProperty<T> extends SerializableProperty<T>
         if(value != null)
         {
             property.setValue(value);
+        } else if(loadDefaultValue != null)
+        {
+            property.setValue(loadDefaultValue);
         }
     }
 }

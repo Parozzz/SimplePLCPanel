@@ -48,22 +48,42 @@ public final class SerializableDataSet implements JSONSerializable
 
     public SerializableDataSet addBoolean(String key, Property<Boolean> property)
     {
-        return add(new SerializableSimpleProperty<>(key, property, JSONDataMap::getBoolean));
+        return add(new SerializableSimpleProperty<>(key, property, JSONDataMap::getBoolean, null));
+    }
+
+    public SerializableDataSet addBoolean(String key, Property<Boolean> property, boolean loadDefaultValue)
+    {
+        return add(new SerializableSimpleProperty<>(key, property, JSONDataMap::getBoolean, loadDefaultValue));
     }
 
     public SerializableDataSet addInt(String key, Property<Number> property)
     {
-        return add(new SerializableSimpleProperty<>(key, property, JSONDataMap::getNumber, Number::intValue));
+        return add(new SerializableSimpleProperty<>(key, property, JSONDataMap::getNumber, Number::intValue, null));
+    }
+
+    public SerializableDataSet addInt(String key, Property<Number> property, int loadDefaultValue)
+    {
+        return add(new SerializableSimpleProperty<>(key, property, JSONDataMap::getNumber, Number::intValue, loadDefaultValue));
     }
 
     public SerializableDataSet addDouble(String key, Property<Number> property)
     {
-        return add(new SerializableSimpleProperty<>(key, property, JSONDataMap::getNumber, Number::doubleValue));
+        return add(new SerializableSimpleProperty<>(key, property, JSONDataMap::getNumber, Number::doubleValue, null));
+    }
+
+    public SerializableDataSet addDouble(String key, Property<Number> property, double loadDefaultValue)
+    {
+        return add(new SerializableSimpleProperty<>(key, property, JSONDataMap::getNumber, Number::doubleValue, loadDefaultValue));
     }
 
     public SerializableDataSet addString(String key, Property<String> property)
     {
-        return add(new SerializableSimpleProperty<>(key, property, JSONDataMap::getString));
+        return add(new SerializableSimpleProperty<>(key, property, JSONDataMap::getString, null));
+    }
+
+    public SerializableDataSet addString(String key, Property<String> property, String loadDefaultValue)
+    {
+        return add(new SerializableSimpleProperty<>(key, property, JSONDataMap::getString, loadDefaultValue));
     }
 
     public <V> SerializableDataSet addParsable(String key, Property<V> property, SuppliedJSONObjectParser<V> objectParser)
@@ -71,9 +91,14 @@ public final class SerializableDataSet implements JSONSerializable
         return add(new SerializableParsedProperty<>(key, property, objectParser));
     }
 
+    public <V extends Enum<V>> SerializableDataSet addEnum(String key, Property<V> property, Class<V> enumClass, V loadDefaultValue)
+    {
+        return add(new SerializableSimpleProperty<>(key, property, (jsonDataMap, tKey) -> jsonDataMap.getEnum(tKey, enumClass), loadDefaultValue));
+    }
+
     public <V extends Enum<V>> SerializableDataSet addEnum(String key, Property<V> property, Class<V> enumClass)
     {
-        return add(new SerializableSimpleProperty<>(key, property, (jsonDataMap, tKey) -> jsonDataMap.getEnum(tKey, enumClass)));
+        return add(new SerializableSimpleProperty<>(key, property, (jsonDataMap, tKey) -> jsonDataMap.getEnum(tKey, enumClass), null));
     }
 
     public SerializableDataSet add(SerializableProperty<?> serializableProperty)

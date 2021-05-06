@@ -1,21 +1,30 @@
 package parozzz.github.com.simpleplcpanel.hmi.comm;
 
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.control.CheckBox;
+import parozzz.github.com.simpleplcpanel.logger.Loggable;
 import parozzz.github.com.simpleplcpanel.logger.MainLogger;
 
+import java.awt.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-public abstract class CommThread<T extends CommunicationConnectionParams> extends Thread
+public abstract class CommThread<T extends CommunicationConnectionParams>
+        extends Thread
+        implements Loggable
 {
     private volatile boolean oldActive;
     private volatile boolean active;
     private volatile boolean stop;
 
     protected volatile T communicationParams;
-    protected volatile boolean newConnectionParams = false;
-    private volatile boolean firstConnectionParamsReceived = false;
+    private volatile boolean newConnectionParams = false;
 
     protected volatile boolean update;
+    private volatile boolean alwaysRetryConnection;
+    private boolean connectedTried;
+    private volatile int timeBetweenRetries;
 
     public CommThread()
     {
@@ -37,14 +46,21 @@ public abstract class CommThread<T extends CommunicationConnectionParams> extend
         this.active = active;
     }
 
+    public synchronized void setAlwaysRetryConnection(boolean alwaysRetryConnection)
+    {
+        this.alwaysRetryConnection = alwaysRetryConnection;
+    }
+
     public synchronized void setConnectionParameters(T communicationParams)
     {
         this.communicationParams = communicationParams;
-
         newConnectionParams = true;
-        firstConnectionParamsReceived = true;
     }
 
+    public synchronized void setTimeBetweenRetries(int timeBetweenRetries)
+    {
+        this.timeBetweenRetries = timeBetweenRetries;
+    }
     @Override
     public final void run()
     {
@@ -74,7 +90,9 @@ public abstract class CommThread<T extends CommunicationConnectionParams> extend
             try
             {
                 this.loop();
-            } catch (Exception exception) {
+            }
+            catch(Exception exception)
+            {
                 MainLogger.getInstance().error("Error while running CommThread", exception, this);
             }
         }
@@ -96,27 +114,38 @@ public abstract class CommThread<T extends CommunicationConnectionParams> extend
 
     public abstract boolean connect();
 
+    public abstract void updateConnectionParams();
+
     public final void loop() throws Exception
     {
-        while (!firstConnectionParamsReceived)
+        if(newConnectionParams)
         {
-            Thread.sleep(250);
+            updateConnectionParams();
+            newConnectionParams = false;
+            connectedTried = false;
         }
 
-        if (!connect())
+        if(!alwaysRetryConnection && connectedTried)
         {
-            this.sleepWithStopCheck(10);
+            Thread.sleep(1000);
+            //this.sleepWithStopCheck(5);
             return;
         }
 
-        if (!update)
+        connectedTried = true;
+        if(!connect())
         {
-            Thread.sleep(50);
+            this.sleepWithStopCheck(timeBetweenRetries);
             return;
         }
 
-        this.update();
-        update = false;
+        if(update)
+        {
+            this.update();
+            update = false;
+        }
+
+        Thread.sleep(50);
     }
 
     public abstract void update();
@@ -141,11 +170,18 @@ public abstract class CommThread<T extends CommunicationConnectionParams> extend
                     return;
                 }
             }
-        } catch (InterruptedException interruptedException)
+        }
+        catch(InterruptedException interruptedException)
         {
             interruptedException.printStackTrace();
         }
 
+    }
+
+    @Override
+    public String log()
+    {
+        return "CommunicationParams {" + communicationParams.log() + "}";
     }
 
 }

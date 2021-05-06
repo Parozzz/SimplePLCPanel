@@ -28,8 +28,8 @@ public class LanguageSettingsPane extends SettingsPane
     {
         super.setup();
 
-        super.serializableDataSet.addString("ONBooleanPlaceholder", onBooleanPlaceholderTextField.textProperty())
-                .addString("OFFBooleanPlaceholder", offBooleanPlaceholderTextField.textProperty());
+        super.serializableDataSet.addString("ONBooleanPlaceholder", onBooleanPlaceholderTextField.textProperty(), "On")
+                .addString("OFFBooleanPlaceholder", offBooleanPlaceholderTextField.textProperty(), "Off");
     }
 
     @Override

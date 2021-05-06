@@ -22,7 +22,7 @@ public final class CommunicationStage extends HMIStage<VBox>
 
     private final SiemensS7CommunicationManager siemensS7CommunicationManager;
     private final ModbusTCPCommunicationManager modbusTCPCommunicationManager;
-    private DeviceCommunicationManager<?> selectedCommunicationManager;
+    private NetworkCommunicationManager<?> selectedCommunicationManager;
 
     public CommunicationStage(SiemensS7Thread plcThread, ModbusTCPThread modbusTCPThread) throws IOException
     {
@@ -40,7 +40,7 @@ public final class CommunicationStage extends HMIStage<VBox>
         super.getStageSetter()
                 .setResizable(true);
 
-        serializableDataSet.addEnum("CommunicationType", commTypeChoiceBox.valueProperty(), CommunicationType.class);
+        serializableDataSet.addEnum("CommunicationType", commTypeChoiceBox.valueProperty(), CommunicationType.class, CommunicationType.SIEMENS_S7);
 
         commTypeChoiceBox.setConverter(new EnumStringConverter<>(CommunicationType.class).setCapitalize());
         commTypeChoiceBox.getItems().addAll(CommunicationType.values());
@@ -73,7 +73,7 @@ public final class CommunicationStage extends HMIStage<VBox>
         commTypeChoiceBox.setValue(CommunicationType.SIEMENS_S7);
     }
 
-    public DeviceCommunicationManager<?> getSelectedCommunicationManager()
+    public NetworkCommunicationManager<?> getSelectedCommunicationManager()
     {
         return selectedCommunicationManager;
     }
@@ -88,7 +88,7 @@ public final class CommunicationStage extends HMIStage<VBox>
         return commTypeChoiceBox.getValue();
     }
 
-    private DeviceCommunicationManager<?> getCommunicationManager(CommunicationType communicationType)
+    private NetworkCommunicationManager<?> getCommunicationManager(CommunicationType communicationType)
     {
         switch (communicationType)
         {

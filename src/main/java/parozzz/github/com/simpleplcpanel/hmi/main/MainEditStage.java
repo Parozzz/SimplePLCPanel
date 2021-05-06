@@ -162,10 +162,10 @@ public final class MainEditStage extends BorderPaneHMIStage
                     }
                 });
 
-        super.serializableDataSet.addString("PageHeight", pageHeightTextField.textProperty())
-                .addString("PageWidth", pageWidthTextField.textProperty())
-                .addBoolean("RuntimeFullScreen", runtimeFullScreenCheckBox.selectedProperty())
-                .addBoolean("RuntimeAtStartup", runtimeAtStartupCheckBox.selectedProperty());
+        super.serializableDataSet.addString("PageHeight", pageHeightTextField.textProperty(), "640")
+                .addString("PageWidth", pageWidthTextField.textProperty(), "480")
+                .addBoolean("RuntimeFullScreen", runtimeFullScreenCheckBox.selectedProperty(), false)
+                .addBoolean("RuntimeAtStartup", runtimeAtStartupCheckBox.selectedProperty(), false);
 
         settingsStage.getStageSetter().setResizable(true);
 

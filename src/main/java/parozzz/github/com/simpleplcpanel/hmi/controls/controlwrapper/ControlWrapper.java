@@ -109,8 +109,8 @@ public abstract class ControlWrapper<C extends Control>
     {
         super.setup();
 
-        serializableDataSet.addInt("LayoutX", containerStackPane.layoutXProperty())
-                .addInt("LayoutY", containerStackPane.layoutYProperty());
+        serializableDataSet.addInt("LayoutX", containerStackPane.layoutXProperty(), 0)
+                .addInt("LayoutY", containerStackPane.layoutYProperty(), 0);
 
         this.setControlVisualProperties(control, containerStackPane);
 

@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public final class SiemensS7Thread extends CommThread<SiemensS7ConnectionParams> implements Loggable
+public final class SiemensS7Thread extends CommThread<SiemensS7ConnectionParams>
 {
     private final Set<SiemensS7ReadableWrappedDataIntermediate<?>> readDataIntermediateSet;
     private final Set<SiemensS7WritableWrappedDataIntermediate<?>> writeDataIntermediateSet;
@@ -73,27 +73,29 @@ public final class SiemensS7Thread extends CommThread<SiemensS7ConnectionParams>
     }
 
     @Override
-    public boolean connect()
+    public void updateConnectionParams()
     {
-        if (newConnectionParams)
+        if(client != null && client.isConnected())
         {
-            if (client != null && client.isConnected())
-            {
-                client.disconnect();
-            }
-
-            client = null;
-            client = communicationParams.createClient();
-
-            newConnectionParams = false;
+            client.disconnect();
         }
 
-        if (client == null)
+        client = null;
+        if(communicationParams != null)
+        {
+            client = communicationParams.createClient();
+        }
+    }
+
+    @Override
+    public boolean connect()
+    {
+        if(client == null)
         {
             return false;
         }
 
-        if (client.isConnected())
+        if(client.isConnected())
         {
             return true;
         }
@@ -104,33 +106,35 @@ public final class SiemensS7Thread extends CommThread<SiemensS7ConnectionParams>
 
             var model = client.getModelInfo().getModel();
             MainLogger.getInstance().info("PLC Model: " + model, this);
-        } catch (SiemensS7Error.SiemensS7Exception exception)
+
+            return true;
+        }
+        catch(SiemensS7Error.SiemensS7Exception exception)
         {
-            if (exception.getError() == SiemensS7Error.TCPConnectionFailed)
+            if(exception.getError() == SiemensS7Error.TCPConnectionFailed)
             {
                 MainLogger.getInstance().info("Cannot connect to Siemens PLC", this);
-            } else
+            }else
             {
                 MainLogger.getInstance().warning("Error while connecting to Siemens PLC", exception, this);
             }
 
             return false;
         }
-
-        return true;
     }
 
     @Override
     public void update()
     {
-        if (queryModelNumberObject != null)
+        if(queryModelNumberObject != null)
         {
             try
             {
                 var modelString = client.getModelInfo().getModel();
                 queryModelNumberObject.setObject(modelString);
                 queryModelNumberObject = null;
-            } catch (SiemensS7Error.SiemensS7Exception exception)
+            }
+            catch(SiemensS7Error.SiemensS7Exception exception)
             {
                 MainLogger.getInstance().warning("Error while querying Siemens PLC model number", exception, this);
             }
@@ -139,17 +143,17 @@ public final class SiemensS7Thread extends CommThread<SiemensS7ConnectionParams>
         //This needs to be handled locally, because of the update to reset
         try
         {
-            if (!(readDataIntermediateSet.isEmpty() && writeBitWrapperSet.isEmpty() && writeDataIntermediateSet.isEmpty()))
+            if(!(readDataIntermediateSet.isEmpty() && writeBitWrapperSet.isEmpty() && writeDataIntermediateSet.isEmpty()))
             {
                 //Firstly write the value and then read it in case it has not changed and avoid delay between click and display
                 var dbWritingMap = this.splitByDBNumber(writeDataIntermediateSet);
-                for (var entry : dbWritingMap.entrySet())
+                for(var entry : dbWritingMap.entrySet())
                 {
                     var dbNumber = entry.getKey();
                     var writeData = new SiemensS7WriteData(client, SiemensS7AreaType.DB, dbNumber);
 
                     var intermediateSet = entry.getValue();
-                    for (var intermediate : intermediateSet)
+                    for(var intermediate : intermediateSet)
                     {
                         writeData.append(intermediate.getS7WritableWrappedData());
                     }
@@ -157,7 +161,7 @@ public final class SiemensS7Thread extends CommThread<SiemensS7ConnectionParams>
                     writeData.write();
                 }
 
-                for (var bitIntermediate : writeBitWrapperSet)
+                for(var bitIntermediate : writeBitWrapperSet)
                 {
                     var state = bitIntermediate.getValue();
                     client.writeBit(bitIntermediate.getAreaType(), bitIntermediate.getDbNumber(),
@@ -166,13 +170,13 @@ public final class SiemensS7Thread extends CommThread<SiemensS7ConnectionParams>
                 }
 
                 var dbReadingMap = this.splitByDBNumber(readDataIntermediateSet);
-                for (var entry : dbReadingMap.entrySet())
+                for(var entry : dbReadingMap.entrySet())
                 {
                     var dbNumber = entry.getKey();
                     var readData = new SiemensS7ReadData(client, SiemensS7AreaType.DB, dbNumber);
 
                     var intermediateSet = entry.getValue();
-                    for (var intermediate : intermediateSet)
+                    for(var intermediate : intermediateSet)
                     {
                         readData.append(intermediate.getS7ReadableWrappedData());
                     }
@@ -184,7 +188,8 @@ public final class SiemensS7Thread extends CommThread<SiemensS7ConnectionParams>
                 this.readDataOf(SiemensS7AreaType.OUTPUT);
                 this.readDataOf(SiemensS7AreaType.MERKER);
             }
-        } catch (SiemensS7Error.SiemensS7Exception exception)
+        }
+        catch(SiemensS7Error.SiemensS7Exception exception)
         {
             MainLogger.getInstance().warning("Error while Reading/Writing data to Siemens PLC", exception, this);
         }
@@ -195,16 +200,16 @@ public final class SiemensS7Thread extends CommThread<SiemensS7ConnectionParams>
         boolean valid = false;
 
         var readData = new SiemensS7ReadData(client, areaType);
-        for (var intermediate : readDataIntermediateSet)
+        for(var intermediate : readDataIntermediateSet)
         {
-            if (intermediate.getAreaType() == areaType)
+            if(intermediate.getAreaType() == areaType)
             {
                 valid = true;
                 readData.append(intermediate.getS7ReadableWrappedData());
             }
         }
 
-        if (valid)
+        if(valid)
         {
             readData.read();
         }
@@ -214,23 +219,15 @@ public final class SiemensS7Thread extends CommThread<SiemensS7ConnectionParams>
     {
         var dbReadingMap = new HashMap<Integer, Set<T>>();
 
-        for (var intermediate : intermediateSet)
+        for(var intermediate : intermediateSet)
         {
             var dbNumber = intermediate.getDbNumber();
-            if (intermediate.getAreaType() == SiemensS7AreaType.DB && dbNumber >= 1)
+            if(intermediate.getAreaType() == SiemensS7AreaType.DB && dbNumber >= 1)
             {
                 dbReadingMap.computeIfAbsent(dbNumber, t -> new HashSet<>()).add(intermediate);
             }
         }
 
         return dbReadingMap;
-    }
-
-    @Override
-    public String log()
-    {
-        return "IPAddress: " + client.getIpAddress() +
-                ", Rack: " + client.getRack() +
-                ", Slot: " + client.getSlot();
     }
 }

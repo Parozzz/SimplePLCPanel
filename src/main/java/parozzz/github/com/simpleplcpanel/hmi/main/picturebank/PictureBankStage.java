@@ -69,7 +69,7 @@ public class PictureBankStage extends HMIStage<BorderPane>
     {
         super.setup();
 
-        super.serializableDataSet.addEnum("WhiteTolerance", whiteToleranceChoiceBox.valueProperty(), WhiteToleranceEnum.class);
+        super.serializableDataSet.addEnum("WhiteTolerance", whiteToleranceChoiceBox.valueProperty(), WhiteToleranceEnum.class, WhiteToleranceEnum.NONE);
 
         super.getStageSetter().setAlwaysOnTop(true)
                 .setResizable(true)
