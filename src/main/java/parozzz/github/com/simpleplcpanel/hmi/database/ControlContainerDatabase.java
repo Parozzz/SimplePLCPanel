@@ -1,12 +1,17 @@
 package parozzz.github.com.simpleplcpanel.hmi.database;
 
+import net.wimpi.modbus.Modbus;
 import org.json.simple.JSONObject;
 import parozzz.github.com.simpleplcpanel.hmi.FXController;
+import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
-import parozzz.github.com.simpleplcpanel.hmi.comm.modbustcp.ModbusTCPThread;
+import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.tcp.ModbusTCPThread;
 import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7Thread;
 import parozzz.github.com.simpleplcpanel.hmi.controls.ControlContainerPane;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
+import parozzz.github.com.simpleplcpanel.hmi.database.dataupdater.ControlDataUpdater;
+import parozzz.github.com.simpleplcpanel.hmi.database.dataupdater.ModbusTCPDataUpdater;
+import parozzz.github.com.simpleplcpanel.hmi.database.dataupdater.SiemensPLCDataUpdater;
 import parozzz.github.com.simpleplcpanel.hmi.main.MainEditStage;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataArray;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
@@ -20,11 +25,11 @@ import java.util.*;
 public final class ControlContainerDatabase extends FXController implements Iterable<ControlContainerPane>, Loggable
 {
     private final MainEditStage mainEditStage;
+    private final CommunicationDataHolder communicationDataHolder;
 
-    private final ControlDataUpdater<?> siemensPLCDataUpdater;
-    private final ControlDataUpdater<?> modbusTCPDataUpdater;
+    private final Map<CommunicationType, ControlDataUpdater<?>> controlDataUpdaterMap;
     private ControlDataUpdater<?> selectedControlDataUpdater;
-    private ControlDataUpdater<?> nextControlDataUpdater;
+    private CommunicationType nextControlDataCommunicationType;
 
     private final Cooldown nextDataUpdateCooldown;
     private boolean parseUpdatedData;
@@ -33,13 +38,21 @@ public final class ControlContainerDatabase extends FXController implements Iter
     private final Set<ControlWrapper<?>> controlWrapperSet;
     private Set<ControlWrapper<?>> immutableControlWrapperSet;
 
-    public ControlContainerDatabase(MainEditStage mainEditStage, SiemensS7Thread plcThread,
-            ModbusTCPThread modbusTCPThread)
+    public ControlContainerDatabase(MainEditStage mainEditStage, CommunicationDataHolder communicationDataHolder)
     {
         this.mainEditStage = mainEditStage;
+        this.communicationDataHolder = communicationDataHolder;
 
-        this.siemensPLCDataUpdater = new SiemensPLCDataUpdater(this, plcThread);
-        this.modbusTCPDataUpdater = new ModbusTCPDataUpdater(this, modbusTCPThread);
+        this.controlDataUpdaterMap = new HashMap<>();
+        controlDataUpdaterMap.put(
+                CommunicationType.SIEMENS_S7,
+                SiemensPLCDataUpdater.createInstance(this, communicationDataHolder)
+        );
+        controlDataUpdaterMap.put(
+                CommunicationType.MODBUS_TCP,
+                ModbusTCPDataUpdater.createInstance(this, communicationDataHolder)
+        );
+
         this.nextDataUpdateCooldown = new Cooldown(200);
 
         this.controlsPageMap = new HashMap<>();
@@ -52,7 +65,9 @@ public final class ControlContainerDatabase extends FXController implements Iter
     {
         super.setup();
 
-        mainEditStage.getCommunicationStage().addCommunicationTypeListener(this::updateCommunicationManager);
+        communicationDataHolder.getCommunicationStage().addCommunicationTypeListener(communicationType ->
+                this.nextControlDataCommunicationType = communicationType
+        );
     }
 
     @Override
@@ -69,7 +84,7 @@ public final class ControlContainerDatabase extends FXController implements Iter
     {
         super.setupComplete();
 
-        this.updateCommunicationManager(mainEditStage.getCommunicationStage().getCommunicationType());
+        this.nextControlDataCommunicationType = communicationDataHolder.getCommunicationStage().getCommunicationType();
     }
 
     public MainEditStage getMainEditStage()
@@ -77,7 +92,7 @@ public final class ControlContainerDatabase extends FXController implements Iter
         return mainEditStage;
     }
 
-    protected Set<ControlWrapper<?>> getControlWrapperSet()
+    public Set<ControlWrapper<?>> getControlWrapperSet()
     {
         return immutableControlWrapperSet;
     }
@@ -107,7 +122,7 @@ public final class ControlContainerDatabase extends FXController implements Iter
     private ControlContainerPane create(String name, boolean setDefault)
     {
         name = name.toLowerCase();
-        if(doNameExists(name))
+        if (doNameExists(name))
         {
             return null;
         }
@@ -121,7 +136,7 @@ public final class ControlContainerDatabase extends FXController implements Iter
                         controlWrapperSet.add(controlWrapper);
                         immutableControlWrapperSet = Collections.unmodifiableSet(controlWrapperSet);
 
-                        if(selectedControlDataUpdater != null)
+                        if (selectedControlDataUpdater != null)
                         {
                             selectedControlDataUpdater.bindControlWrapper(controlWrapper);
                         }
@@ -131,21 +146,20 @@ public final class ControlContainerDatabase extends FXController implements Iter
                         controlWrapperSet.remove(controlWrapper);
                         immutableControlWrapperSet = Collections.unmodifiableSet(controlWrapperSet);
 
-                        if(selectedControlDataUpdater != null)
+                        if (selectedControlDataUpdater != null)
                         {
                             selectedControlDataUpdater.unbindControlWrapper(controlWrapper);
                         }
                     });
             controlContainerPanelMainPage.setup();
-            if(setDefault)
+            if (setDefault)
             {
                 controlContainerPanelMainPage.setDefault();
             }
 
             this.addPage(controlContainerPanelMainPage);
             return controlContainerPanelMainPage;
-        }
-        catch(IOException exception)
+        } catch (IOException exception)
         {
             MainLogger.getInstance().warning("Something went wrong while create a new Page", exception, this);
             return null;
@@ -154,13 +168,13 @@ public final class ControlContainerDatabase extends FXController implements Iter
 
     public void addPage(ControlContainerPane controlContainerPane)
     {
-        if(!controlContainerPane.isSetupDone())
+        if (!controlContainerPane.isSetupDone())
         {
             MainLogger.getInstance().warning("Cannot add a non initialized ControlContainerPane", this);
             return;
         }
 
-        if(controlsPageMap.containsKey(controlContainerPane.getName()))
+        if (controlsPageMap.containsKey(controlContainerPane.getName()))
         {
             MainLogger.getInstance().warning("Trying to add a ControlContainerPane twice", this);
             return;
@@ -173,50 +187,35 @@ public final class ControlContainerDatabase extends FXController implements Iter
 
     public void deletePage(ControlContainerPane controlContainer)
     {
-        if(controlsPageMap.remove(controlContainer.getName(), controlContainer))
+        if (controlsPageMap.remove(controlContainer.getName(), controlContainer))
         {
             mainEditStage.getPageScrollingPane().removeImagePane(controlContainer.getMenuBottomImagePane());
             mainEditStage.setShownControlContainerPane(null);
         }
     }
 
-    private void updateCommunicationManager(CommunicationType communicationType)
-    {
-        if(communicationType == null)
-        {
-            return;
-        }
-
-        //Just to be sure, on setup complete i will set the next data updater since it does not set
-        //the first time from the listener created in the setup
-        switch(mainEditStage.getCommunicationStage().getCommunicationType())
-        {
-            case SIEMENS_S7:
-                nextControlDataUpdater = siemensPLCDataUpdater;
-                break;
-            case MODBUS_TCP:
-                nextControlDataUpdater = modbusTCPDataUpdater;
-                break;
-        }
-    }
-
     private void changeSelectedDataUpdater()
     {
-        //If i have to change data updater, i need to do it only when the selected data updater has finished (aka is ready)
-        if(nextControlDataUpdater == null || (selectedControlDataUpdater != null && !selectedControlDataUpdater.isReady()))
+        if (nextControlDataCommunicationType == null)
         {
             return;
         }
 
-        if(selectedControlDataUpdater != null)
+        //If i have to change data updater, i need to do it only when the selected data updater has finished (aka is ready)
+        if (selectedControlDataUpdater != null && !selectedControlDataUpdater.isReady())
+        {
+            return;
+        }
+
+        if (selectedControlDataUpdater != null)
         {
             controlWrapperSet.forEach(selectedControlDataUpdater::unbindControlWrapper);
         }
 
-        selectedControlDataUpdater = nextControlDataUpdater;
-        nextControlDataUpdater = null;
+        selectedControlDataUpdater = controlDataUpdaterMap.get(nextControlDataCommunicationType);
+        nextControlDataCommunicationType = null;
 
-        if(selectedControlDataUpdater != null)
+        if (selectedControlDataUpdater != null)
         {
             controlWrapperSet.forEach(selectedControlDataUpdater::bindControlWrapper);
         }
@@ -224,7 +223,12 @@ public final class ControlContainerDatabase extends FXController implements Iter
 
     private void updateSelectedDataUpdater()
     {
-        if(selectedControlDataUpdater == null || !selectedControlDataUpdater.isReady())
+        if (selectedControlDataUpdater == null)
+        {
+            return;
+        }
+
+        if (!selectedControlDataUpdater.isReady())
         {
             //Keep the cooldown refreshed so when the updater is ready, will wait the full time
             nextDataUpdateCooldown.createStamp();
@@ -232,13 +236,13 @@ public final class ControlContainerDatabase extends FXController implements Iter
         }
 
         //If the data updater is ready it means the plc thread has finished, so i update the read data
-        if(parseUpdatedData)
+        if (parseUpdatedData)
         {
             selectedControlDataUpdater.parseReadData();
             parseUpdatedData = false;
         }
         //And then wait some time for the next update
-        if(nextDataUpdateCooldown.passed())
+        if (nextDataUpdateCooldown.passed())
         {
             selectedControlDataUpdater.update();
             parseUpdatedData = true;
@@ -259,7 +263,7 @@ public final class ControlContainerDatabase extends FXController implements Iter
         super.deserialize(jsonDataMap);
 
         var pagesJSONArray = jsonDataMap.getArray("Pages");
-        if(pagesJSONArray == null)
+        if (pagesJSONArray == null)
         {
             MainLogger.getInstance().warning("Pages JSONArray has not been found while de-serializing", this);
             return;
@@ -271,14 +275,14 @@ public final class ControlContainerDatabase extends FXController implements Iter
                 .forEach(pageJSONDataMap ->
                 {
                     var pageName = pageJSONDataMap.getString("ControlWrapperPageName");
-                    if(pageName != null)
+                    if (pageName != null)
                     {
                         var controlWrapperPage = this.create(pageName, false);
-                        if(controlWrapperPage != null)
+                        if (controlWrapperPage != null)
                         {
                             controlWrapperPage.deserialize(pageJSONDataMap);
                             //No setupComplete here, is called automagically inside the FXController
-                        }else
+                        } else
                         {
                             MainLogger.getInstance().warning("Creating while deserializing a ControlMainPage has returned null.", this);
                         }
@@ -303,7 +307,7 @@ public final class ControlContainerDatabase extends FXController implements Iter
     private String getSelectedControlDataUpdaterName()
     {
         return selectedControlDataUpdater == null
-               ? "none"
-               : selectedControlDataUpdater.getClass().getSimpleName();
+                ? "none"
+                : selectedControlDataUpdater.getClass().getSimpleName();
     }
 }

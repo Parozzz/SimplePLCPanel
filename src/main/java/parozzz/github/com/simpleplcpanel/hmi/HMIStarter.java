@@ -4,7 +4,9 @@ import javafx.application.Platform;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import parozzz.github.com.simpleplcpanel.hmi.comm.modbustcp.ModbusTCPThread;
+import parozzz.github.com.simpleplcpanel.hmi.comm.CommThread;
+import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
+import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.tcp.ModbusTCPThread;
 import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7Thread;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
@@ -19,17 +21,15 @@ import java.nio.file.StandardCopyOption;
 
 public final class HMIStarter
 {
-    private final SiemensS7Thread plcThread;
-    private final ModbusTCPThread modbusTCPThread;
+    private final CommunicationDataHolder communicationDataHolder;
     private final HMIManager hmiManager;
 
     private final File saveFile;
 
     public HMIStarter(File saveFile) throws IOException
     {
-        this.plcThread = new SiemensS7Thread();
-        this.modbusTCPThread = new ModbusTCPThread();
-        this.hmiManager = new HMIManager(plcThread, modbusTCPThread, this::saveData);
+        this.communicationDataHolder = new CommunicationDataHolder();
+        this.hmiManager = new HMIManager(communicationDataHolder, this::saveData);
 
         this.saveFile = saveFile;
     }
@@ -38,8 +38,10 @@ public final class HMIStarter
     {
         try
         {
-            plcThread.start();
-            modbusTCPThread.start();
+            for(var commThread : communicationDataHolder.getCommThreadCollection())
+            {
+                commThread.start();
+            }
 
             hmiManager.setup();
             if(saveFile.exists())
@@ -97,12 +99,17 @@ public final class HMIStarter
         {
             this.saveData();
 
-            plcThread.setStop();
-            modbusTCPThread.setStop();
+            for(var commThread : communicationDataHolder.getCommThreadCollection())
+            {
+                commThread.setStop();
+            }
             MainLogger.getInstance().setStop();
 
-            plcThread.join(); //Waits for the thread to stop
-            modbusTCPThread.join();
+            //Waits for all the threads to stop
+            for(var commThread : communicationDataHolder.getCommThreadCollection())
+            {
+                commThread.join();
+            }
             MainLogger.getInstance().join();
         }
         catch(Exception exception)

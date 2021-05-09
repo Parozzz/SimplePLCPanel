@@ -13,13 +13,17 @@ import javafx.scene.paint.Color;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeMap;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
-import parozzz.github.com.simpleplcpanel.hmi.comm.modbustcp.ModbusTCPStringAddressCreatorStage;
-import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7StringAddressCreator;
+import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
+import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationStage;
+import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationStringAddressCreatorStage;
+import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
+import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.stringaddress.ModbusStringAddressCreatorStage;
+import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.stringaddress.SiemensS7StringAddressCreator;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapperSpecific;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.attributes.ControlWrapperGenericAttributeUpdateConsumer;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.impl.*;
-import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.impl.address.AddressSetupPane;
+import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.impl.AddressSetupPane;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.impl.control.ButtonDataSetupPane;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.impl.control.InputDataSetupPane;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.state.WrapperState;
@@ -53,12 +57,11 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
     @FXML private Button deleteStateButton;
 
     private final MainEditStage mainEditStage;
+    private final CommunicationDataHolder communicationDataHolder;
 
     private final SetupPaneList setupPaneList;
 
     private final WrapperStateCreationPane wrapperStateCreationPane;
-    private final ModbusTCPStringAddressCreatorStage modbusTCPStringAddressCreatorStage;
-    private final SiemensS7StringAddressCreator siemensS7StringAddressCreator;
 
     private final ChangeListener<Boolean> controlWrapperValidListener;
     private final ControlWrapperGenericAttributeUpdateConsumer attributesUpdatedConsumer;
@@ -67,17 +70,16 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
     private SetupSelectable activeSelectable;
     private boolean ignoreAttributeChanges;
 
-    public ControlWrapperSetupStage(MainEditStage mainEditStage) throws IOException
+    public ControlWrapperSetupStage(MainEditStage mainEditStage, CommunicationDataHolder communicationDataHolder) throws IOException
     {
         super("ControlWrapperSetupPage", "setup/mainSetupPane.fxml");
 
         this.mainEditStage = mainEditStage;
+        this.communicationDataHolder = communicationDataHolder;
 
         this.setupPaneList = new SetupPaneList();
 
-        this.addFXChild(wrapperStateCreationPane = new WrapperStateCreationPane(this, createStateButton))
-                .addFXChild(modbusTCPStringAddressCreatorStage = new ModbusTCPStringAddressCreatorStage())
-                .addFXChild(siemensS7StringAddressCreator = new SiemensS7StringAddressCreator());
+        this.addFXChild(wrapperStateCreationPane = new WrapperStateCreationPane(this, createStateButton));
 
         controlWrapperValidListener = (observableValue, oldValue, newValue) ->
         {
@@ -125,8 +127,8 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
                     add(new BorderSetupPane(this)).
                     add(new BackgroundSetupPane(this)).
                     add(new ValueSetupPane(this)).
-                    add(new AddressSetupPane<>(this, "Write Address", AttributeType.WRITE_ADDRESS)).
-                    add(new AddressSetupPane<>(this, "Read Address", AttributeType.READ_ADDRESS)); //I want this last! >:(
+                    add(new AddressSetupPane<>(this, communicationDataHolder, "Write Address", AttributeType.WRITE_ADDRESS)).
+                    add(new AddressSetupPane<>(this, communicationDataHolder,"Read Address", AttributeType.READ_ADDRESS)); //I want this last! >:(
         } catch (IOException exception)
         {
             MainLogger.getInstance().error("Error while loading Setup Panes", exception, this);
@@ -201,12 +203,12 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
             if (attributeManager.isState(attributeType))
             {
                 var selectedState = stateSelectionChoiceBox.getValue();
-                attributeChangerSet.setDataToAttribute(selectedState.getAttributeMap(), false);
+                attributeChangerSet.saveDataToAttribute(selectedState.getAttributeMap(), false);
 
             } else if (attributeManager.isGlobal(attributeType))
             {
                 var globalAttributeMap = selectedControlWrapper.getGlobalAttributeMap();
-                attributeChangerSet.setDataToAttribute(globalAttributeMap, false);
+                attributeChangerSet.saveDataToAttribute(globalAttributeMap, false);
             }
 
             //this.updatePreviewImage(); //If any data is changed, update the preview image to be real time ;)
@@ -217,16 +219,6 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
     public MainEditStage getMainEditStage()
     {
         return mainEditStage;
-    }
-
-    public ModbusTCPStringAddressCreatorStage getModbusTCPStringAddressCreatorStage()
-    {
-        return modbusTCPStringAddressCreatorStage;
-    }
-
-    public SiemensS7StringAddressCreator getSiemensS7StringAddressCreator()
-    {
-        return siemensS7StringAddressCreator;
     }
 
     @Override
@@ -495,7 +487,7 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
         private void populate(SetupPane<?> setupPane, AttributeMap attributeMap)
         {
             var attributeChangerList = setupPane.getAttributeChangerList();
-            attributeChangerList.copyDataFromAttribute(attributeMap);
+            attributeChangerList.readDataFromAttribute(attributeMap);
             //I need to reset all data changes since a lot of stuff might be loaded and change inside the SetupPane
             //and if the "EditAll" button is selected all states are messed up
             attributeChangerList.resetAllDataChanged();

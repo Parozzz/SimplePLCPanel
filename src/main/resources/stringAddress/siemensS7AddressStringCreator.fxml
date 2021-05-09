@@ -31,7 +31,7 @@
                               <Font size="17.0" />
                            </font>
                         </Label>
-                        <ChoiceBox fx:id="memoryAreaChoiceBox" prefWidth="135.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;" />
+                        <ChoiceBox fx:id="memoryAreaChoiceBox" prefWidth="100.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;" />
                      </children>
                   </HBox>
                   <HBox maxHeight="-Infinity" maxWidth="-Infinity" spacing="10.0">
@@ -58,7 +58,7 @@
                               <Font size="17.0" />
                            </font>
                         </Label>
-                        <ChoiceBox fx:id="dataTypeChoiceBox" prefWidth="135.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;" />
+                        <ChoiceBox fx:id="dataTypeChoiceBox" prefWidth="100.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;" />
                      </children>
                   </HBox>
                   <HBox maxHeight="-Infinity" maxWidth="-Infinity" spacing="10.0">

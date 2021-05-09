@@ -20,6 +20,9 @@ public final class SetupPaneAttributeChangerList<A extends Attribute>
     private final Set<SetupPaneAttributeChanger<A>> attributeChangerSet;
     private final Map<Property<?>, SetupPaneAttributeChanger<A>> propertyToAttributeChangerMap;
 
+    private Runnable postReadRunnable;
+    private Runnable postSaveRunnable;
+
     private boolean ignoreCopy;
 
     public SetupPaneAttributeChangerList(SetupPane<A> setupPane, AttributeType<A> attributeType)
@@ -29,6 +32,18 @@ public final class SetupPaneAttributeChangerList<A extends Attribute>
 
         this.attributeChangerSet = new HashSet<>();
         this.propertyToAttributeChangerMap = new HashMap<>();
+    }
+
+    public SetupPaneAttributeChangerList<A> setPostReadRunnable(Runnable runnable)
+    {
+        this.postReadRunnable = runnable;
+        return this;
+    }
+
+    public SetupPaneAttributeChangerList<A> setPostSaveRunnable(Runnable runnable)
+    {
+        this.postSaveRunnable = runnable;
+        return this;
     }
 
     public AttributeType<A> getAttributeType()
@@ -76,7 +91,7 @@ public final class SetupPaneAttributeChangerList<A extends Attribute>
         return false;
     }
 
-    public void setDataToAttribute(AttributeMap attributeMap, boolean forceSet)
+    public void saveDataToAttribute(AttributeMap attributeMap, boolean forceSet)
     {
         var attribute = attributeMap.get(attributeType);
         if(attribute == null)
@@ -93,9 +108,14 @@ public final class SetupPaneAttributeChangerList<A extends Attribute>
                 ignoreCopy = false;
             }
         }
+
+        if(postSaveRunnable != null)
+        {
+            postSaveRunnable.run();
+        }
     }
 
-    public void copyDataFromAttribute(AttributeMap attributeMap)
+    public void readDataFromAttribute(AttributeMap attributeMap)
     {
         if(ignoreCopy)
         {
@@ -114,7 +134,10 @@ public final class SetupPaneAttributeChangerList<A extends Attribute>
             attributeChanger.copyDataFromAttribute(attribute);
         }
 
-        setupPane.doDataCopiedFromAttribute();
+        if(postReadRunnable != null)
+        {
+            postReadRunnable.run();
+        }
     }
 
     public <N extends Number> SetupPaneAttributeChangerList<A> createStringToNumber(Property<String> property,

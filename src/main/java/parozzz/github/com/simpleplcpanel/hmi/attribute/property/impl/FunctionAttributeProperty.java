@@ -38,6 +38,7 @@ public class FunctionAttributeProperty<T> extends AttributeProperty<T>
     @Override
     public void deserializeFrom(Property<T> property, JSONDataMap jsonDataMap)
     {
-        super.setValue(property, deserializeFunction.apply(jsonDataMap, super.key));
+        var deserializedValue = deserializeFunction.apply(jsonDataMap, super.key);
+        super.setValue(property, deserializedValue);
     }
 }

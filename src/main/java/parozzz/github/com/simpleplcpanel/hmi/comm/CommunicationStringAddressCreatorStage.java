@@ -5,13 +5,16 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.WindowEvent;
+import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.AddressAttribute;
+import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.stringaddress.ModbusStringAddressCreatorStage;
 import parozzz.github.com.simpleplcpanel.hmi.pane.HMIStage;
 
 import java.io.IOException;
 import java.util.function.Consumer;
 
-public abstract class CommunicationStringAddressCreatorStage<T>
+public abstract class CommunicationStringAddressCreatorStage<T extends CommunicationStringAddressData>
         extends HMIStage<VBox>
 {
 
@@ -20,11 +23,13 @@ public abstract class CommunicationStringAddressCreatorStage<T>
 
     @FXML protected TextField convertedAddressTextField;
 
-    private Consumer<String> inputTextAddressConsumer;
-
-    public CommunicationStringAddressCreatorStage(String resource) throws IOException
+    private final CommunicationType<T> communicationType;
+    private AddressAttribute addressAttribute;
+    public CommunicationStringAddressCreatorStage(CommunicationType<T> communicationType, String resource) throws IOException
     {
         super(resource, VBox.class);
+
+        this.communicationType = communicationType;
     }
 
     @Override
@@ -33,23 +38,23 @@ public abstract class CommunicationStringAddressCreatorStage<T>
         super.setup();
 
         this.getStageSetter()
+                .setAlwaysOnTop(true)
+                .initModality(Modality.APPLICATION_MODAL)
                 //Clear the consumer on page close
                 .addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, event ->
-                        inputTextAddressConsumer = null
+                        addressAttribute = null
                 );
 
         confirmButton.setOnAction(event ->
         {
-            var textAddress = convertedAddressTextField.getText();
-            if (textAddress == null || textAddress.isEmpty())
+            if (addressAttribute != null)
             {
-                return;
-            }
-
-            if (inputTextAddressConsumer != null)
-            {
-                inputTextAddressConsumer.accept(textAddress);
-                inputTextAddressConsumer = null;
+                var data = this.createDataFromActualValues();
+                if(data != null && data.validate())
+                {
+                    addressAttribute.setValue(communicationType.getAttributeProperty(), data);
+                    addressAttribute = null;
+                }
             }
 
             this.getStageSetter().close();
@@ -63,7 +68,7 @@ public abstract class CommunicationStringAddressCreatorStage<T>
         this.updateTextConvertedAddress();
 
         var children = super.parent.getChildren();
-        if (inputTextAddressConsumer == null)
+        if (addressAttribute == null)
         {
             children.remove(confirmButtonStackPane);
         } else
@@ -77,17 +82,33 @@ public abstract class CommunicationStringAddressCreatorStage<T>
         super.showStage();
     }
 
-    public void showAsStandalone(HMIStage<?> owner)
+    public void showAsStandalone()
     {
-        this.showAsInputTextAddress(owner, null);
+        this.showAsInputTextAddress(null);
     }
 
-    public void showAsInputTextAddress(HMIStage<?> owner, Consumer<String> inputTextAddressConsumer)
+    public void showAsInputTextAddress(AddressAttribute addressAttribute)
     {
-        this.setAsSubWindow(owner);
-
-        this.inputTextAddressConsumer = inputTextAddressConsumer;
+        this.addressAttribute = addressAttribute;
         this.showStage();
+    }
+
+    public abstract void setReadOnly(boolean readOnly);
+
+    public boolean loadAddressAttributeToActualValues(AddressAttribute addressAttribute)
+    {
+        if(addressAttribute == null)
+        {
+            return false;
+        }
+
+        var addressStringData = addressAttribute.getValue(this.communicationType.getAttributeProperty());
+        if(addressStringData == null)
+        {
+            return false;
+        }
+
+        return this.loadStringDataToActualValues(addressStringData.getStringData());
     }
 
     public abstract boolean loadStringDataToActualValues(String stringData);

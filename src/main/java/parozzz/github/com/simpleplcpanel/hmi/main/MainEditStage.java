@@ -11,9 +11,10 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationStage;
-import parozzz.github.com.simpleplcpanel.hmi.comm.modbustcp.ModbusTCPStringAddressCreatorStage;
-import parozzz.github.com.simpleplcpanel.hmi.comm.modbustcp.ModbusTCPThread;
+import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
+import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.tcp.ModbusTCPThread;
 import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7Thread;
 import parozzz.github.com.simpleplcpanel.hmi.controls.ControlContainerCreationStage;
 import parozzz.github.com.simpleplcpanel.hmi.controls.ControlContainerPane;
@@ -102,6 +103,7 @@ public final class MainEditStage extends BorderPaneHMIStage
     @FXML
     private StackPane centerScrollStackPane;
 
+    private final CommunicationDataHolder communicationDataHolder;
     private final Runnable saveDataRunnable;
 
     private final ControlContainerDatabase controlContainerDatabase;
@@ -113,7 +115,6 @@ public final class MainEditStage extends BorderPaneHMIStage
     private final QuickSetupPane quickSetupPane;
     private final SettingsStage settingsStage;
     private final PictureBankStage pictureBankStage;
-    private final CommunicationStage communicationStage;
     private final MessagesListStage messagesListStage;
     private final ControlWrapperCopyPasteHandler copyPasteHandler;
     private final RuntimeControlContainerStage runtimeControlMainPage;
@@ -121,28 +122,29 @@ public final class MainEditStage extends BorderPaneHMIStage
     private final TrigBoolean messagePresentTrig;
     private ControlContainerPane shownControlContainerPane;
 
-    public MainEditStage(SiemensS7Thread plcThread, ModbusTCPThread modbusTCPThread,
-            Runnable saveDataRunnable) throws IOException
+    public MainEditStage(CommunicationDataHolder communicationDataHolder, Runnable saveDataRunnable) throws IOException
     {
         super("Menu", "mainEditPane.fxml");
 
+        this.communicationDataHolder = communicationDataHolder;
+        communicationDataHolder.getCommunicationStage().setAsSubWindow(this);
         this.saveDataRunnable = saveDataRunnable;
 
 
         super   //HANDLERS AND VARIOUS
-                .addFXChild(controlContainerDatabase = new ControlContainerDatabase(this, plcThread, modbusTCPThread))
+                .addFXChild(controlContainerDatabase = new ControlContainerDatabase(this, communicationDataHolder))
                 .addFXChild(copyPasteHandler = new ControlWrapperCopyPasteHandler(this))
                 //SIDE PANES
                 .addFXChild(dragAndDropPane = new DragAndDropPane(this)) //LEFT
-                .addFXChild(quickSetupPane = new QuickSetupPane()) //RIGHT
+                .addFXChild(quickSetupPane = new QuickSetupPane(communicationDataHolder)) //RIGHT
                 .addFXChild(pageScrollingPane = new PageScrollingPane()) //BOTTOM
                 //CHILD STAGES
                 .addFXChild((controlsPageCreationStage = new ControlContainerCreationStage(controlContainerDatabase)).setAsSubWindow(this))
-                .addFXChild((controlWrapperSetupStage = new ControlWrapperSetupStage(this)).setAsSubWindow(this))
+                .addFXChild((controlWrapperSetupStage = new ControlWrapperSetupStage(this, communicationDataHolder)).setAsSubWindow(this))
                 .addFXChild((controlWrapperQuickTextEditorStage = new ControlWrapperQuickTextEditorStage()).setAsSubWindow(this))
                 .addFXChild((settingsStage = new SettingsStage()).setAsSubWindow(this))
                 .addFXChild((pictureBankStage = new PictureBankStage()).setAsSubWindow(this))
-                .addFXChild((communicationStage = new CommunicationStage(plcThread, modbusTCPThread)).setAsSubWindow(this))
+
                 .addFXChild((messagesListStage = new MessagesListStage()).setAsSubWindow(this))
                 //OTHER STAGES
                 .addFXChild(runtimeControlMainPage = new RuntimeControlContainerStage(this));
@@ -180,7 +182,7 @@ public final class MainEditStage extends BorderPaneHMIStage
         saveMenuItem.setOnAction(event -> saveDataRunnable.run());
 
         //Communication Menu
-        setupCommunicationMenuItem.setOnAction(event -> communicationStage.showStage());
+        setupCommunicationMenuItem.setOnAction(event -> communicationDataHolder.getCommunicationStage().showStage());
 
         //Runtime Menu
         startRuntimeMenuItem.setOnAction(actionEvent -> this.showRuntimeScene(true, runtimeFullScreenCheckBox.isSelected()));
@@ -190,12 +192,22 @@ public final class MainEditStage extends BorderPaneHMIStage
 
         //Tools Menu
         pictureBankMenuItem.setOnAction(actionEvent -> pictureBankStage.showStage());
-        modbusTCPStringAddressMenuItem.setOnAction(event ->
-                controlWrapperSetupStage.getModbusTCPStringAddressCreatorStage().showAsStandalone(MainEditStage.this)
-        );
-        siemensS7StringAddressMenuItem.setOnAction(event ->
-                controlWrapperSetupStage.getSiemensS7StringAddressCreator().showAsStandalone(MainEditStage.this)
-        );
+        modbusTCPStringAddressMenuItem.setOnAction(event -> {
+            var stringAddressCreator = CommunicationType.MODBUS_TCP.supplyStringAddressCreatorStage();
+            if (stringAddressCreator != null)
+            {
+                stringAddressCreator.setAsSubWindow(MainEditStage.this);
+                stringAddressCreator.showAsStandalone();
+            }
+        });
+        siemensS7StringAddressMenuItem.setOnAction(event -> {
+            var stringAddressCreator = CommunicationType.SIEMENS_S7.supplyStringAddressCreatorStage();
+            if (stringAddressCreator != null)
+            {
+                stringAddressCreator.setAsSubWindow(MainEditStage.this);
+                stringAddressCreator.showAsStandalone();
+            }
+        });
 
         //Messages Menu
         showMessageListMenuItem.setOnAction(event -> messagesListStage.showStage());
@@ -296,7 +308,7 @@ public final class MainEditStage extends BorderPaneHMIStage
 
         if (super.every(1000))
         {
-            var selectedCommunicationManager = communicationStage.getSelectedCommunicationManager();
+            var selectedCommunicationManager = communicationDataHolder.getCommunicationStage().getSelectedCommunicationManager();
             if (selectedCommunicationManager != null)
             {
                 var isConnected = selectedCommunicationManager.getCommThread().isConnected();
@@ -345,9 +357,9 @@ public final class MainEditStage extends BorderPaneHMIStage
         return controlWrapperQuickTextEditorStage;
     }
 
-    public CommunicationStage getCommunicationStage()
+    public CommunicationDataHolder getCommunicationDataHolder()
     {
-        return communicationStage;
+        return communicationDataHolder;
     }
 
     public QuickSetupPane getQuickPropertiesVBox()

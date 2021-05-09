@@ -2,19 +2,16 @@ package parozzz.github.com.simpleplcpanel.hmi;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import parozzz.github.com.simpleplcpanel.hmi.comm.modbustcp.ModbusTCPThread;
+import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.tcp.ModbusTCPThread;
 import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7Thread;
+import parozzz.github.com.simpleplcpanel.hmi.tags.TagSplitPaneTest;
 import parozzz.github.com.simpleplcpanel.logger.MainLogger;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 public final class JavaFXMain extends Application
 {
@@ -35,6 +32,14 @@ public final class JavaFXMain extends Application
 
             this.hmiStarter = new HMIStarter(saveFile);
             this.hmiStarter.startEditingEngine();
+/*
+            var tabTableViewTest = new TagTableViewTest();
+            tabTableViewTest.setup();
+            tabTableViewTest.showStage();
+*/
+            var tagSplitPaneTest = new TagSplitPaneTest();
+            tagSplitPaneTest.setup();
+            tagSplitPaneTest.showStage();
         }
         catch(Exception exception)
         {

@@ -4,16 +4,23 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import parozzz.github.com.simpleplcpanel.hmi.comm.modbustcp.ModbusTCPCommunicationManager;
-import parozzz.github.com.simpleplcpanel.hmi.comm.modbustcp.ModbusTCPThread;
+import javafx.util.StringConverter;
+import parozzz.github.com.simpleplcpanel.Nullable;
+import parozzz.github.com.simpleplcpanel.hmi.attribute.property.AttributeProperty;
+import parozzz.github.com.simpleplcpanel.hmi.attribute.property.impl.FunctionAttributeProperty;
+import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.tcp.ModbusTCPCommunicationManager;
+import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.tcp.ModbusTCPThread;
 import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7CommunicationManager;
 import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7Thread;
-import parozzz.github.com.simpleplcpanel.hmi.main.MainEditStage;
 import parozzz.github.com.simpleplcpanel.hmi.pane.HMIStage;
+import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
+import parozzz.github.com.simpleplcpanel.hmi.serialize.property.SerializableProperty;
 import parozzz.github.com.simpleplcpanel.hmi.util.EnumStringConverter;
+import parozzz.github.com.simpleplcpanel.util.Util;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public final class CommunicationStage extends HMIStage<VBox>
@@ -22,16 +29,14 @@ public final class CommunicationStage extends HMIStage<VBox>
 
     @FXML private StackPane commManagerStackPane;
 
-    private final SiemensS7CommunicationManager siemensS7CommunicationManager;
-    private final ModbusTCPCommunicationManager modbusTCPCommunicationManager;
+    private final CommunicationDataHolder communicationDataHolder;
     private NetworkCommunicationManager<?> selectedCommunicationManager;
 
-    public CommunicationStage( SiemensS7Thread plcThread, ModbusTCPThread modbusTCPThread) throws IOException
+    public CommunicationStage(CommunicationDataHolder communicationDataHolder) throws IOException
     {
         super("communicationPage.fxml", VBox.class);
 
-        super.addFXChild(siemensS7CommunicationManager = new SiemensS7CommunicationManager(plcThread))
-                .addFXChild(modbusTCPCommunicationManager = new ModbusTCPCommunicationManager(modbusTCPThread));
+        this.communicationDataHolder = communicationDataHolder;
     }
 
     @Override
@@ -41,9 +46,23 @@ public final class CommunicationStage extends HMIStage<VBox>
 
         super.getStageSetter().setResizable(true);
 
-        serializableDataSet.addEnum("CommunicationType", commTypeChoiceBox.valueProperty(), CommunicationType.class, CommunicationType.SIEMENS_S7);
+        serializableDataSet.addFunction("CommunicationType", commTypeChoiceBox.valueProperty(),
+                CommunicationType::getByName, CommunicationType::getName);
 
-        commTypeChoiceBox.setConverter(new EnumStringConverter<>(CommunicationType.class).setCapitalize());
+        commTypeChoiceBox.setConverter(new StringConverter<>()
+        {
+            @Override
+            public String toString(CommunicationType communicationType)
+            {
+                return Util.capitalizeWithUnderscore(communicationType.getName());
+            }
+
+            @Override
+            public CommunicationType fromString(String s)
+            {
+                return CommunicationType.getByName(s);
+            }
+        });
         commTypeChoiceBox.getItems().addAll(CommunicationType.values());
         commTypeChoiceBox.valueProperty().addListener((observableValue, oldValue, newValue) ->
         {
@@ -58,10 +77,12 @@ public final class CommunicationStage extends HMIStage<VBox>
 
             if (newValue != null)
             {
-                selectedCommunicationManager = this.getCommunicationManager(newValue);
-                selectedCommunicationManager.setActive(true);
-
-                children.add(selectedCommunicationManager.getParent());
+                selectedCommunicationManager = communicationDataHolder.getCommunicationManager(newValue);
+                if(selectedCommunicationManager != null)
+                {
+                    selectedCommunicationManager.setActive(true);
+                    children.add(selectedCommunicationManager.getParent());
+                }
             }
         });
     }
@@ -87,17 +108,5 @@ public final class CommunicationStage extends HMIStage<VBox>
     public CommunicationType getCommunicationType()
     {
         return commTypeChoiceBox.getValue();
-    }
-
-    private NetworkCommunicationManager<?> getCommunicationManager(CommunicationType communicationType)
-    {
-        switch (communicationType)
-        {
-            default:
-            case SIEMENS_S7:
-                return siemensS7CommunicationManager;
-            case MODBUS_TCP:
-                return modbusTCPCommunicationManager;
-        }
     }
 }

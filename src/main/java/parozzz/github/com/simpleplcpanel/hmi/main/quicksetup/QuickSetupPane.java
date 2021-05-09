@@ -9,6 +9,8 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import parozzz.github.com.simpleplcpanel.hmi.FXController;
+import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
+import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapperSpecific;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.attributes.ControlWrapperGenericAttributeUpdateConsumer;
@@ -31,13 +33,14 @@ public final class QuickSetupPane
     private final VBox mainVBox;
     private final VBox paneVBox;
 
-
     private final GenericQuickSetupPanePart genericQuickSetupPanePart;
     private final StateSelectionQuickSetupPanePart stateSelectionQuickSetupPanePart;
     private final SizeQuickSetupPanePart sizeQuickSetupPanePart;
     private final FontQuickSetupPanePart fontQuickSetupPanePart;
     private final BackgroundQuickSetupPanePart backgroundQuickSetupPanePart;
     private final TextQuickSetupPanePart textQuickSetupPanePart;
+    private final AddressQuickSetupPanePart readAddressQuickSetupPanePart;
+    private final AddressQuickSetupPanePart writeAddressQuickSetupPanePart;
 
     private final QuickSetupStateBinder stateBinder;
     private final List<QuickSetupPanePart> quickSetupPanePartList;
@@ -50,7 +53,7 @@ public final class QuickSetupPane
 
     private ControlWrapper<?> selectedControlWrapper;
 
-    public QuickSetupPane() throws IOException
+    public QuickSetupPane(CommunicationDataHolder communicationDataHolder) throws IOException
     {
         this.stateBinder = new QuickSetupStateBinder(this);
         this.mainVBox = new VBox(
@@ -64,7 +67,9 @@ public final class QuickSetupPane
                 .addFXChild(this.sizeQuickSetupPanePart = new SizeQuickSetupPanePart())
                 .addFXChild(this.fontQuickSetupPanePart = new FontQuickSetupPanePart())
                 .addFXChild(this.backgroundQuickSetupPanePart = new BackgroundQuickSetupPanePart())
-                .addFXChild(this.textQuickSetupPanePart = new TextQuickSetupPanePart());
+                .addFXChild(this.textQuickSetupPanePart = new TextQuickSetupPanePart())
+                .addFXChild(this.readAddressQuickSetupPanePart = new AddressQuickSetupPanePart(this, communicationDataHolder ,true))
+                .addFXChild(this.writeAddressQuickSetupPanePart = new AddressQuickSetupPanePart(this, communicationDataHolder ,false));
 
         this.quickSetupPanePartList = new ArrayList<>();
 
@@ -123,6 +128,7 @@ public final class QuickSetupPane
         paneVBox.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
         this.computeQuickSetupPane(genericQuickSetupPanePart, stateSelectionQuickSetupPanePart,
+                readAddressQuickSetupPanePart, writeAddressQuickSetupPanePart,
                 sizeQuickSetupPanePart, fontQuickSetupPanePart, backgroundQuickSetupPanePart, textQuickSetupPanePart
         );
     }
@@ -196,6 +202,11 @@ public final class QuickSetupPane
     public ControlWrapper<?> getSelectedControlWrapper()
     {
         return selectedControlWrapper;
+    }
+
+    public void loadAllValuesFromControlWrapperOf(AttributeType<?> attributeType)
+    {
+        stateBinder.loadValueFromControlWrapperOf(attributeType);
     }
 
     public void loadAllValuesFromControlWrapper()

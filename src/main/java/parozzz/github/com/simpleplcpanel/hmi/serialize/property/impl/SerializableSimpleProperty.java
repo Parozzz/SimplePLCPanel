@@ -9,37 +9,26 @@ import java.util.function.Function;
 
 public class SerializableSimpleProperty<T> extends SerializableProperty<T>
 {
-    private final Property<T> property;
-    private final BiFunction<JSONDataMap, String, T> getterFunction;
-    private final T loadDefaultValue;
-
-    public <M> SerializableSimpleProperty(String key, Property<T> property,
-            BiFunction<JSONDataMap, String, M> middleGetterFunction,
-            Function<M, T> middleFunction, T loadDefaultValue)
+    public static <T> Builder<T> builder(String key, Property<T> property)
     {
-        super(key);
-
-        this.property = property;
-        getterFunction = (tJSONDataMap, tKey) ->
-        {
-            var middleValue = middleGetterFunction.apply(tJSONDataMap, tKey);
-            if(middleValue == null)
-            {
-                return null;
-            }
-
-            return middleFunction.apply(middleValue);
-        };
-        this.loadDefaultValue = loadDefaultValue;
+        return new Builder<>(key, property);
     }
 
-    public SerializableSimpleProperty(String key, Property<T> property,
-            BiFunction<JSONDataMap, String, T> getterFunction, T loadDefaultValue)
+    private final Property<T> property;
+    private final BiFunction<JSONDataMap, String, T> getterFunction;
+    private final Function<T, Object> setterFunction;
+
+    private final T loadDefaultValue;
+
+    public  SerializableSimpleProperty(String key, Property<T> property,
+            BiFunction<JSONDataMap, String, T> getterFunction, Function<T, Object> setterFunction,
+            T loadDefaultValue)
     {
         super(key);
 
         this.property = property;
         this.getterFunction = getterFunction;
+        this.setterFunction = setterFunction;
         this.loadDefaultValue = loadDefaultValue;
     }
 
@@ -51,10 +40,15 @@ public class SerializableSimpleProperty<T> extends SerializableProperty<T>
             return;
         }
 
+        //Setter function is never null. At worst it return the same value!
         var value = property.getValue();
         if(value != null)
         {
-            jsonDataMap.set(key, value);
+            var setObject = setterFunction.apply(value);
+            if(setObject != null)
+            {
+                jsonDataMap.set(key, setObject);
+            }
         }
     }
 
@@ -73,6 +67,61 @@ public class SerializableSimpleProperty<T> extends SerializableProperty<T>
         } else if(loadDefaultValue != null)
         {
             property.setValue(loadDefaultValue);
+        }
+    }
+
+    public static class Builder<T>
+    {
+        private final String key;
+        private final Property<T> property;
+        private T loadDefaultValue;
+        private BiFunction<JSONDataMap, String, T> getterFunction = (jsonDataMap, s) -> null;
+        private Function<T, Object> setterFunction = t -> t; //If not set, return the same object!
+
+        public Builder(String key, Property<T> property)
+        {
+            this.key = key;
+            this.property = property;
+        }
+
+        public Builder<T> getterFunction(BiFunction<JSONDataMap, String, T> getterFunction)
+        {
+            this.getterFunction = getterFunction;
+            return this;
+        }
+
+        public <M> Builder<T> getterFunction(BiFunction<JSONDataMap, String, M> middleGetterFunction,
+                Function<M, T> middleFunction)
+        {
+            this.getterFunction = (tJSONDataMap, tKey) ->
+            {
+                var middleValue = middleGetterFunction.apply(tJSONDataMap, tKey);
+                if(middleValue == null)
+                {
+                    return null;
+                }
+
+                return middleFunction.apply(middleValue);
+            };
+
+            return this;
+        }
+
+        public Builder<T> setterFunction(Function<T, Object> setterFunction)
+        {
+            this.setterFunction = setterFunction;
+            return this;
+        }
+
+        public Builder<T> loadDefaultValue(T loadDefaultValue)
+        {
+            this.loadDefaultValue = loadDefaultValue;
+            return this;
+        }
+
+        public SerializableSimpleProperty<T> build()
+        {
+            return new SerializableSimpleProperty<>(key, property, getterFunction, setterFunction, loadDefaultValue);
         }
     }
 }

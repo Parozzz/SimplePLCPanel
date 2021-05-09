@@ -25,6 +25,15 @@ public abstract class FXController extends FXObject
         this.childSet = new HashSet<>();
     }
 
+    public FXController addMultipleFXChild(FXObject... children)
+    {
+        for(var child : children)
+        {
+            this.addFXChild(child);
+        }
+        return this;
+    }
+
     public FXController addFXChild(FXObject child)
     {
         return addFXChild(child, true);

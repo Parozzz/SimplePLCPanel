@@ -162,9 +162,4 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
         var propertySet = attributeChangerList.getPropertySet();
         setupStage.getUndoRedoManager().addProperties(propertySet, this);
     }
-
-    public void doDataCopiedFromAttribute()
-    {
-
-    }
 }

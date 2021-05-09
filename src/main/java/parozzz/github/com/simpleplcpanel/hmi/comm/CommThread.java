@@ -125,18 +125,21 @@ public abstract class CommThread<T extends CommunicationConnectionParams>
             connectedTried = false;
         }
 
-        if(!alwaysRetryConnection && connectedTried)
+        if(!this.isConnected())
         {
-            Thread.sleep(1000);
-            //this.sleepWithStopCheck(5);
-            return;
-        }
+            if(!alwaysRetryConnection && connectedTried)
+            {
+                Thread.sleep(1000);
+                //this.sleepWithStopCheck(5);
+                return;
+            }
 
-        connectedTried = true;
-        if(!connect())
-        {
-            this.sleepWithStopCheck(timeBetweenRetries);
-            return;
+            connectedTried = true;
+            if(!connect())
+            {
+                this.sleepWithStopCheck(timeBetweenRetries);
+                return;
+            }
         }
 
         if(update)
@@ -152,7 +155,6 @@ public abstract class CommThread<T extends CommunicationConnectionParams>
 
     protected void sleepWithStopCheck(int seconds)
     {
-        var wasActive = this.active;
         try
         {
             //This should stop the annoying wait for the sleep to finish stuff
@@ -160,14 +162,9 @@ public abstract class CommThread<T extends CommunicationConnectionParams>
             {
                 Thread.sleep(1000);
                 //In case the thread come active from inactivity, break from here!
-                if(!wasActive && active)
+                if(!active || stop)
                 {
                     break;
-                }
-
-                if(stop)
-                {
-                    return;
                 }
             }
         }

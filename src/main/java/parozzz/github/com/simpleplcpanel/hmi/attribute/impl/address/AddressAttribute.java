@@ -3,70 +3,72 @@ package parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.Attribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeMap;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
-import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.data.AddressDataType;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.property.AttributeProperty;
+import parozzz.github.com.simpleplcpanel.hmi.attribute.property.impl.EnumAttributeProperty;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.property.impl.FunctionAttributeProperty;
+import parozzz.github.com.simpleplcpanel.hmi.attribute.property.impl.primitives.StringAttributeProperty;
+import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
+import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
+import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.stringaddress.ModbusStringAddressData;
+import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.stringaddress.SiemensS7StringAddressData;
+import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.impl.AddressSetupPane;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
+
+import java.util.function.Function;
 
 public abstract class AddressAttribute extends Attribute
 {
-    public static final AttributeProperty<AddressDataType> DATA_TYPE = new FunctionAttributeProperty<>("DataType", AddressDataType.NONE,
-            AddressDataType::getName,
-            (jsonDataMap, key) -> AddressDataType.getByName(jsonDataMap.getString(key))
-    );
+    public static final AttributeProperty<AddressSetupPane.AddressType> ADDRESS_TYPE =
+            new EnumAttributeProperty<>("CommunicationType", AddressSetupPane.AddressType.NONE);
 
-    private boolean deserializing;
+    public static final AttributeProperty<SiemensS7StringAddressData> SIEMENS_STRING_DATA =
+            new FunctionAttributeProperty<>("Siemens.StringData", new SiemensS7StringAddressData(),
+                    SiemensS7StringAddressData::getStringData,
+                    (jsonDataMap, key) ->
+                    {
+                        var stringData = jsonDataMap.getString(key);
+                        if(stringData != null)
+                        {
+                            var stringAddressData = SiemensS7StringAddressData.parseStringData(stringData);
+                            return stringAddressData == null
+                                    ? new SiemensS7StringAddressData()
+                                    : stringAddressData;
+                        }
+
+                        return null;
+                    }
+            );
+
+    public static final AttributeProperty<ModbusStringAddressData> MODBUS_TCP_STRING_DATA =
+            new FunctionAttributeProperty<>("ModbusTCP.StringData", new ModbusStringAddressData(),
+                    ModbusStringAddressData::getStringData,
+                    (jsonDataMap, key) ->
+                    {
+                        var stringData = jsonDataMap.getString(key);
+                        if(stringData != null)
+                        {
+                            var stringAddressData = ModbusStringAddressData.parseStringData(stringData);
+                            return stringAddressData == null
+                                    ? new ModbusStringAddressData()
+                                    : stringAddressData;
+                        }
+
+                        return null;
+                    }
+            );
+
     public AddressAttribute(AttributeMap attributeMap, AttributeType<? extends AddressAttribute> attributeType,
             String name)
     {
         super(attributeMap, attributeType, name);
 
-        var attributePropertyManager = super.getAttributePropertyManager();
-        attributePropertyManager.addAll(DATA_TYPE);
-
-        var dataTypeProperty = super.getAttributePropertyManager().getByAttributeProperty(DATA_TYPE);
-        dataTypeProperty.addListener((observableValue, oldValue, newValue) ->
-        {
-            if(deserializing) //This is because it would throw a ConcurrentModificationException while deserializing.
-            {
-                return;
-            }
-
-            if(oldValue != newValue)
-            {
-                if(oldValue != null)
-                {
-                    oldValue.removeAttributesFrom(attributePropertyManager);
-                }
-
-                if(newValue != null)
-                {
-                    newValue.addAttributesTo(attributePropertyManager);
-                }
-            }
-        });
-        dataTypeProperty.setValue(AddressDataType.NONE);
+        super.getAttributePropertyManager().addAll(ADDRESS_TYPE, SIEMENS_STRING_DATA, MODBUS_TCP_STRING_DATA);
     }
+
 
     @Override
     public void update()
     {
 
-    }
-
-    @Override
-    public void deserialize(JSONDataMap jsonDataMap)
-    {
-        //First deserialize the data type and then all the other stuff
-        var dataTypeProperty = super.getProperty(DATA_TYPE);
-        DATA_TYPE.deserializeFrom(dataTypeProperty, jsonDataMap);
-
-        deserializing = true;
-
-        //Here it will deserialize the same value again but it shouldn't be
-        //much of a hassle since is just a one time thing
-        super.deserialize(jsonDataMap);
-
-        deserializing = false;
     }
 }
