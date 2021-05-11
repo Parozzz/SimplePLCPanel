@@ -85,11 +85,11 @@ public final class TagStage extends HMIStage<VBox>
             return cell;
         });
 
-        TreeTableColumn<Tag, Boolean> typeColumn = new TreeTableColumn<>();
-        typeColumn.setText("Local");
-        typeColumn.setPrefWidth(50);
-        typeColumn.setSortable(false);
-        typeColumn.setCellFactory(tColumn ->
+        TreeTableColumn<Tag, Boolean> localColumn = new TreeTableColumn<>();
+        localColumn.setText("Local");
+        localColumn.setPrefWidth(35);
+        localColumn.setSortable(false);
+        localColumn.setCellFactory(tColumn ->
         {
             var cellFactoryHandler = new LocalCellFactoryHandler(communicationDataHolder);
             cellFactoryHandler.init();
@@ -106,45 +106,64 @@ public final class TagStage extends HMIStage<VBox>
             cellFactoryHandler.init();
             return cellFactoryHandler.getCell();
         });
-/*
+
+
+        treeTableView.setOnKeyPressed(event ->
+        {
+            var selectedIndex = treeTableView.getSelectionModel().getSelectedIndex();
+            if(selectedIndex < 0 || !event.isAltDown())
+            {
+                return;
+            }
+
+            var treeItem = treeTableView.getTreeItem(selectedIndex);
+            if(treeItem == null || treeItem.getParent() == null)
+            {
+                return;
+            }
+
+            var index = treeItem.getParent().getChildren().indexOf(treeItem);
+            if(index < 0)
+            {
+                return;
+            }
+
+            var children = treeItem.getParent().getChildren();
+            switch(event.getCode())
+            {
+                case UP:
+                    if(index != 0)
+                    {
+                        children.remove(treeItem);
+                        children.add(index - 1, treeItem);
+                    }
+                    break;
+                case DOWN:
+                    if(index != children.size() - 1)
+                    {
+                        children.remove(treeItem);
+                        children.add(index + 1, treeItem);
+                    }
+                    break;
+            }
+
+            var selectionModel = treeTableView.getSelectionModel();
+            selectionModel.select(treeItem);
+            selectionModel.focus(selectionModel.getSelectedIndex());
+        });
         treeTableView.setRowFactory(tTableView ->
         {
             var tableRow = new TreeTableRow<Tag>();
-
-            tableRow.setOnKeyPressed(event ->
-            {
-                var treeItem = tableRow.getTreeItem();
-                if(treeItem == null || !event.isAltDown())
-                {
-                    return;
-                }
-
-                var parent = treeItem.getParent();
-                switch(event.getCode())
-                {
-                    case UP:
-                        var index = parent.getChildren().indexOf(treeItem);
-                        if(index != 0)
-                        {
-                            parent.getChildren().remove(treeItem);
-                            parent.getChildren().add(index, treeItem);
-                        }
-                        break;
-                    case DOWN:
-
-                        break;
-                }
-            });
-
+            tableRow.setPrefHeight(40);
             return tableRow;
-        }); */
+        });
 
         treeTableView.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         treeTableView.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         treeTableView.setColumnResizePolicy(resizeFeatures -> true);
         treeTableView.setShowRoot(true);
         treeTableView.setRoot(rootFolderTag.createTreeItem());
-        treeTableView.getColumns().addAll(nameColumn, typeColumn, addressColumn);
+        treeTableView.getColumns().addAll(nameColumn, localColumn, addressColumn);
         super.parent.getChildren().add(treeTableView);
 
         this.addTag(new CommunicationTag(communicationDataHolder, "Tag1"));
