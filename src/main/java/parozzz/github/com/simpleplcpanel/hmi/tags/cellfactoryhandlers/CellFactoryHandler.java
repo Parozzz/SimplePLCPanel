@@ -5,16 +5,20 @@ import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
+import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
 import parozzz.github.com.simpleplcpanel.hmi.tags.CommunicationTag;
 import parozzz.github.com.simpleplcpanel.hmi.tags.Tag;
 
 public abstract class CellFactoryHandler<T>
 {
+    protected final CommunicationDataHolder communicationDataHolder;
     protected final TreeTableCell<Tag, T> cell;
     protected final ChangeListener<TreeItem<Tag>> changeTreeItemListener;
 
-    public CellFactoryHandler()
+    public CellFactoryHandler(CommunicationDataHolder communicationDataHolder)
     {
+        this.communicationDataHolder = communicationDataHolder;
+
         this.cell = new TreeTableCell<>();
         this.changeTreeItemListener = this::updateTreeItem;
     }

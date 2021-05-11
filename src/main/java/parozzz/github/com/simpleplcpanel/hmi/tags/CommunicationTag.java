@@ -1,8 +1,7 @@
 package parozzz.github.com.simpleplcpanel.hmi.tags;
 
-import javafx.beans.property.Property;
-import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
+import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationStringAddressData;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
 import parozzz.github.com.simpleplcpanel.hmi.util.ContextMenuBuilder;
@@ -11,36 +10,54 @@ import java.util.HashSet;
 
 public final class CommunicationTag extends Tag
 {
-    private final Property<CommunicationType<?>> communicationTypeProperty;
+    private final CommunicationDataHolder communicationDataHolder;
+    private final BooleanProperty localProperty;
     private final Property<CommunicationStringAddressData> stringAddressDataProperty;
 
-    public CommunicationTag(String key, CommunicationType<?> communicationType)
+    public CommunicationTag(CommunicationDataHolder communicationDataHolder, String key)
     {
         super(key);
 
-        this.communicationTypeProperty = new SimpleObjectProperty<>(communicationType);
-        this.stringAddressDataProperty = new SimpleObjectProperty<>(communicationType.supplyDefaultStringAddressData());
+        this.communicationDataHolder = communicationDataHolder;
+        this.localProperty = new SimpleBooleanProperty(false);
+        this.stringAddressDataProperty = new SimpleObjectProperty<>();
 
-        this.communicationTypeProperty.addListener((observable, oldValue, newValue) ->
+        //THIS NEED TO BE REMOVE! THE LISTENER IS NEVER REMOVED AND THUS WILL KEEP THIS CLASS ALIVE FOREVER!
+        //JUST FOR TESTING.
+        communicationDataHolder.getCommunicationStage().addCommunicationTypeListener(communicationType ->
+                stringAddressDataProperty.setValue(communicationType.supplyDefaultStringAddressData())
+        );
+
+        var communicationType = communicationDataHolder.getCurrentCommunicationType();
+        if(communicationType != null)
         {
-            if(newValue == null || newValue == CommunicationType.NONE)
+            stringAddressDataProperty.setValue(communicationType.supplyDefaultStringAddressData());
+        }
+
+        localProperty.addListener((observable, oldValue, newValue) ->
+        {
+            if(newValue == null || newValue)
             {
                 stringAddressDataProperty.setValue(null);
                 return;
             }
 
-            stringAddressDataProperty.setValue(newValue.supplyDefaultStringAddressData());
+            var lCommunicationType = communicationDataHolder.getCurrentCommunicationType();
+            if(lCommunicationType != null)
+            {
+                stringAddressDataProperty.setValue(lCommunicationType.supplyDefaultStringAddressData());
+            }
         });
     }
 
-    public CommunicationType<?> getCommunicationType()
+    public boolean isLocal()
     {
-        return communicationTypeProperty.getValue();
+        return localProperty.get();
     }
 
-    public Property<CommunicationType<?>> communicationTypeProperty()
+    public BooleanProperty localProperty()
     {
-        return communicationTypeProperty;
+        return localProperty;
     }
 
     public CommunicationStringAddressData getStringAddressData()

@@ -3,10 +3,12 @@ package parozzz.github.com.simpleplcpanel.hmi.tags.cellfactoryhandlers;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import parozzz.github.com.simpleplcpanel.Nullable;
+import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationStringAddressData;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
 import parozzz.github.com.simpleplcpanel.hmi.tags.CommunicationTag;
@@ -17,8 +19,10 @@ public final class StringAddressDataCellFactoryHandler extends CellFactoryHandle
     private final TextField textField;
     private final Property<CommunicationStringAddressData> property;
 
-    public StringAddressDataCellFactoryHandler()
+    public StringAddressDataCellFactoryHandler(CommunicationDataHolder communicationDataHolder)
     {
+        super(communicationDataHolder);
+
         this.textField = new TextField();
         this.property = new SimpleObjectProperty<>();
     }
@@ -34,6 +38,7 @@ public final class StringAddressDataCellFactoryHandler extends CellFactoryHandle
         textField.setBackground(FXUtil.createBackground(Color.TRANSPARENT));
         textField.setBorder(null);
         textField.setEditable(false);
+        textField.setCursor(Cursor.HAND);
 
         textField.setOnMouseClicked(event ->
         {
@@ -42,13 +47,17 @@ public final class StringAddressDataCellFactoryHandler extends CellFactoryHandle
                 return;
             }
 
-            var communicationType = this.getCommunicationType();
-            if(communicationType != null)
+            var tag = this.getTag();
+            if(tag != null && !tag.isLocal())
             {
-                var creatorStage = communicationType.supplyStringAddressCreatorStage();
-                if(creatorStage != null)
+                var communicationType = communicationDataHolder.getCurrentCommunicationType();
+                if(communicationType != null)
                 {
-                    creatorStage.showAsStandalone();
+                    var creatorStage = communicationType.supplyStringAddressCreatorStage();
+                    if(creatorStage != null)
+                    {
+                        creatorStage.showAsStandalone();
+                    }
                 }
             }
         });
@@ -60,13 +69,17 @@ public final class StringAddressDataCellFactoryHandler extends CellFactoryHandle
                 return;
             }
 
-            var communicationType = this.getCommunicationType();
-            if(communicationType != null)
+            var tag = this.getTag();
+            if(tag != null && !tag.isLocal())
             {
-                var stringAddressData = communicationType.parseStringAddressData(newValue);
-                if(stringAddressData != null && stringAddressData.validate())
+                var communicationType = communicationDataHolder.getCurrentCommunicationType();
+                if(communicationType != null)
                 {
-                    property.setValue(stringAddressData);
+                    var stringAddressData = communicationType.parseStringAddressData(newValue);
+                    if(stringAddressData != null && stringAddressData.validate())
+                    {
+                        property.setValue(stringAddressData);
+                    }
                 }
             }
         });
@@ -108,7 +121,7 @@ public final class StringAddressDataCellFactoryHandler extends CellFactoryHandle
     }
 
     @Nullable
-    private CommunicationType<?> getCommunicationType()
+    private CommunicationTag getTag()
     {
         var row = cell.getTreeTableRow();
         if(row == null)
@@ -123,11 +136,8 @@ public final class StringAddressDataCellFactoryHandler extends CellFactoryHandle
         }
 
         var tag = treeItem.getValue();
-        if(tag instanceof CommunicationTag)
-        {
-            return ((CommunicationTag) tag).getCommunicationType();
-        }
-
-        return null;
+        return tag instanceof CommunicationTag
+                ? (CommunicationTag) tag
+               : null;
     }
 }

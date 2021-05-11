@@ -37,7 +37,7 @@ public final class JavaFXMain extends Application
             tabTableViewTest.setup();
             tabTableViewTest.showStage();
 */
-            var tagStage = new TagStage();
+            var tagStage = new TagStage(hmiStarter.getHmiManager().getCommunicationDataHolder());
             tagStage.setup();
             tagStage.showStage();
         }

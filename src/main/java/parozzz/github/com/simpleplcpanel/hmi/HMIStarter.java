@@ -34,6 +34,11 @@ public final class HMIStarter
         this.saveFile = saveFile;
     }
 
+    public HMIManager getHmiManager()
+    {
+        return hmiManager;
+    }
+
     private void init()
     {
         try

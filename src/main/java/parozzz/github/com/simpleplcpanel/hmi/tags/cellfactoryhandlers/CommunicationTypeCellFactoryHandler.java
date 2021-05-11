@@ -3,6 +3,7 @@ package parozzz.github.com.simpleplcpanel.hmi.tags.cellfactoryhandlers;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.paint.Color;
 import javafx.util.StringConverter;
+import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
 import parozzz.github.com.simpleplcpanel.hmi.tags.CommunicationTag;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
@@ -10,10 +11,35 @@ import parozzz.github.com.simpleplcpanel.util.Util;
 
 public final class CommunicationTypeCellFactoryHandler extends CellFactoryHandler<CommunicationType<?>>
 {
+    public CommunicationTypeCellFactoryHandler(CommunicationDataHolder communicationDataHolder)
+    {
+        super(communicationDataHolder);
+    }
+
+    @Override
+    protected void registerTag(CommunicationTag tag)
+    {
+
+    }
+
+    @Override
+    protected void unregisterTag(CommunicationTag tag)
+    {
+
+    }
+
+    @Override
+    protected void setGraphic()
+    {
+
+    }
+    /*
     private final ChoiceBox<CommunicationType<?>> choiceBox;
 
-    public CommunicationTypeCellFactoryHandler()
+    public CommunicationTypeCellFactoryHandler(CommunicationDataHolder communicationDataHolder)
     {
+        super(communicationDataHolder);
+
         this.choiceBox = new ChoiceBox<>();
     }
 
@@ -65,5 +91,5 @@ public final class CommunicationTypeCellFactoryHandler extends CellFactoryHandle
     protected void setGraphic()
     {
         cell.setGraphic(choiceBox);
-    }
+    }*/
 }

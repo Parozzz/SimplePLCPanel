@@ -11,10 +11,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
+import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationStringAddressData;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
 import parozzz.github.com.simpleplcpanel.hmi.pane.HMIStage;
 import parozzz.github.com.simpleplcpanel.hmi.tags.cellfactoryhandlers.CommunicationTypeCellFactoryHandler;
+import parozzz.github.com.simpleplcpanel.hmi.tags.cellfactoryhandlers.LocalCellFactoryHandler;
 import parozzz.github.com.simpleplcpanel.hmi.tags.cellfactoryhandlers.StringAddressDataCellFactoryHandler;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
 
@@ -23,14 +25,18 @@ import java.util.Set;
 
 public final class TagStage extends HMIStage<VBox>
 {
+    private final CommunicationDataHolder communicationDataHolder;
+
     private final TreeTableView<Tag> treeTableView;
     private final Tag rootFolderTag;
 
     private final Set<Tag> tagSet;
 
-    public TagStage()
+    public TagStage(CommunicationDataHolder communicationDataHolder)
     {
         super(new VBox());
+
+        this.communicationDataHolder = communicationDataHolder;
 
         this.treeTableView = new TreeTableView<>();
         this.rootFolderTag = new FolderTag("root");
@@ -79,13 +85,13 @@ public final class TagStage extends HMIStage<VBox>
             return cell;
         });
 
-        TreeTableColumn<Tag, CommunicationType<?>> typeColumn = new TreeTableColumn<>();
-        typeColumn.setText("Type");
-        typeColumn.setPrefWidth(125);
+        TreeTableColumn<Tag, Boolean> typeColumn = new TreeTableColumn<>();
+        typeColumn.setText("Local");
+        typeColumn.setPrefWidth(50);
         typeColumn.setSortable(false);
         typeColumn.setCellFactory(tColumn ->
         {
-            var cellFactoryHandler = new CommunicationTypeCellFactoryHandler();
+            var cellFactoryHandler = new LocalCellFactoryHandler(communicationDataHolder);
             cellFactoryHandler.init();
             return cellFactoryHandler.getCell();
         });
@@ -96,7 +102,7 @@ public final class TagStage extends HMIStage<VBox>
         addressColumn.setSortable(false);
         addressColumn.setCellFactory(tColumn ->
         {
-            var cellFactoryHandler = new StringAddressDataCellFactoryHandler();
+            var cellFactoryHandler = new StringAddressDataCellFactoryHandler(communicationDataHolder);
             cellFactoryHandler.init();
             return cellFactoryHandler.getCell();
         });
@@ -141,26 +147,26 @@ public final class TagStage extends HMIStage<VBox>
         treeTableView.getColumns().addAll(nameColumn, typeColumn, addressColumn);
         super.parent.getChildren().add(treeTableView);
 
-        this.addTag(new CommunicationTag("Tag1", CommunicationType.MODBUS_TCP));
-        this.addTag(new CommunicationTag("Tag2", CommunicationType.SIEMENS_S7));
-        this.addTag(new CommunicationTag("Tag3", CommunicationType.NONE));
-        this.addTag(new CommunicationTag("Tag4", CommunicationType.SIEMENS_S7));
+        this.addTag(new CommunicationTag(communicationDataHolder, "Tag1"));
+        this.addTag(new CommunicationTag(communicationDataHolder, "Tag2"));
+        this.addTag(new CommunicationTag(communicationDataHolder, "Tag3"));
+        this.addTag(new CommunicationTag(communicationDataHolder,"Tag4"));
 
         var aFolder = new FolderTag("Folder1!");
         this.addTag(aFolder);
 
-        this.addTag(aFolder, new CommunicationTag("Tag5", CommunicationType.MODBUS_TCP));
-        this.addTag(aFolder, new CommunicationTag("Tag6", CommunicationType.SIEMENS_S7));
-        this.addTag(aFolder, new CommunicationTag("Tag7", CommunicationType.NONE));
-        this.addTag(aFolder, new CommunicationTag("Tag8", CommunicationType.SIEMENS_S7));
+        this.addTag(aFolder, new CommunicationTag(communicationDataHolder,"Tag5"));
+        this.addTag(aFolder, new CommunicationTag(communicationDataHolder,"Tag6"));
+        this.addTag(aFolder, new CommunicationTag(communicationDataHolder,"Tag7"));
+        this.addTag(aFolder, new CommunicationTag(communicationDataHolder,"Tag8"));
 
         var aSecondFolder = new FolderTag("Folder2!");
         this.addTag(aSecondFolder);
 
-        this.addTag(aSecondFolder, new CommunicationTag("Tag9", CommunicationType.MODBUS_TCP));
-        this.addTag(aSecondFolder, new CommunicationTag("Tag10", CommunicationType.SIEMENS_S7));
-        this.addTag(aSecondFolder, new CommunicationTag("Tag11", CommunicationType.NONE));
-        this.addTag(aSecondFolder, new CommunicationTag("Tag12", CommunicationType.SIEMENS_S7));
+        this.addTag(aSecondFolder, new CommunicationTag(communicationDataHolder,"Tag9"));
+        this.addTag(aSecondFolder, new CommunicationTag(communicationDataHolder,"Tag10"));
+        this.addTag(aSecondFolder, new CommunicationTag(communicationDataHolder,"Tag11"));
+        this.addTag(aSecondFolder, new CommunicationTag(communicationDataHolder,"Tag12"));
 
     }
 

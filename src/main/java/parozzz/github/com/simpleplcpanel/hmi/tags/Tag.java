@@ -35,9 +35,8 @@ public abstract class Tag
 
     public TreeItem<Tag> createTreeItem()
     {
-        Validate.needTrue("Trying to set a TreeItem to a tag twice", this.treeItem == null);
-        return this.treeItem = new TreeItem<>();
-        //return treeItem;
+        this.setTreeItem(new TreeItem<>(this));
+        return treeItem;
     }
 
     public void setTreeItem(TreeItem<Tag> treeItem)
