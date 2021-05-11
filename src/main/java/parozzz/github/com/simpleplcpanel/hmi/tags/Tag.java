@@ -1,5 +1,6 @@
 package parozzz.github.com.simpleplcpanel.hmi.tags;
 
+import com.sun.source.tree.Tree;
 import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
@@ -15,39 +16,40 @@ import parozzz.github.com.simpleplcpanel.util.Validate;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Tag
+public abstract class Tag
 {
     private final ObservableValue<String> keyValue;
     private final Set<Runnable> deleteRunnableSet;
     private final ContextMenu contextMenu;
 
-    private final Property<CommunicationType<?>> communicationTypeProperty;
-    private final Property<CommunicationStringAddressData> stringAddressDataProperty;
+    private TreeItem<Tag> treeItem;
 
-    private TagSplitPane splitPane;
-
-    public Tag(String key, CommunicationType<?> communicationType)
+    public Tag(String key)
     {
         this.keyValue = new ReadOnlyObjectWrapper<>(key);
         this.deleteRunnableSet = new HashSet<>();
-
-        this.communicationTypeProperty = new SimpleObjectProperty<>(communicationType);
-        this.stringAddressDataProperty = new SimpleObjectProperty<>();
 
         this.contextMenu = ContextMenuBuilder.builder().simple("Delete", this::delete)
                 .getContextMenu();
     }
 
-    public void setSplitPane(TagSplitPane splitPane)
+    public TreeItem<Tag> createTreeItem()
     {
-        Validate.needTrue("Trying to set the TreeItem for a tag twice", this.splitPane == null);
-        this.splitPane = splitPane;
+        Validate.needTrue("Trying to set a TreeItem to a tag twice", this.treeItem == null);
+        return this.treeItem = new TreeItem<>();
+        //return treeItem;
+    }
+
+    public void setTreeItem(TreeItem<Tag> treeItem)
+    {
+        Validate.needTrue("Trying to set a TreeItem to a tag twice", this.treeItem == null);
+        this.treeItem = treeItem;
     }
 
     @Nullable
-    public TagSplitPane getSplitPane()
+    public TreeItem<Tag> getTreeItem()
     {
-        return splitPane;
+        return treeItem;
     }
 
     public String getKey()
@@ -60,32 +62,12 @@ public class Tag
         return keyValue;
     }
 
-    public CommunicationType<?> getCommunicationType()
-    {
-        return communicationTypeProperty.getValue();
-    }
-
-    public Property<CommunicationType<?>> communicationTypeProperty()
-    {
-        return communicationTypeProperty;
-    }
-
-    public CommunicationStringAddressData getStringAddressData()
-    {
-        return stringAddressDataProperty.getValue();
-    }
-
-    public Property<CommunicationStringAddressData> communicationStringAddressDataProperty()
-    {
-        return stringAddressDataProperty;
-    }
-
     public ContextMenu getContextMenu()
     {
         return contextMenu;
     }
 
-    private void delete()
+    public void delete()
     {
         deleteRunnableSet.forEach(Runnable::run);
     }

@@ -10,7 +10,18 @@ import java.util.List;
 
 public abstract class CommunicationStringAddressData
 {
+    private final CommunicationType<?> communicationType;
     protected String stringData = "";
+
+    public CommunicationStringAddressData(CommunicationType<?> communicationType)
+    {
+        this.communicationType = communicationType;
+    }
+
+    public CommunicationType<?> getCommunicationType()
+    {
+        return communicationType;
+    }
 
     public String getStringData()
     {
@@ -30,12 +41,12 @@ public abstract class CommunicationStringAddressData
 
         public NoneStringAddressData()
         {
-
+            super(CommunicationType.NONE);
         }
 
         public NoneStringAddressData(String stringData)
         {
-
+            this();
         }
 
         @Override
@@ -49,6 +60,7 @@ public abstract class CommunicationStringAddressData
     {
         private final List<String> extraDataList;
         private String dataType = "";
+
         public ExtraDataParser(String parseString)
         {
             this();
@@ -123,7 +135,7 @@ public abstract class CommunicationStringAddressData
                 dataType = parseString.substring(parseString.indexOf("(") + 1, parseString.indexOf(")"));
             }
 
-            if (parseString.contains("[") && parseString.contains("]"))
+            if(parseString.contains("[") && parseString.contains("]"))
             {
                 var extraArgumentString = parseString.substring(parseString.indexOf("[") + 1, parseString.indexOf("]"));
 

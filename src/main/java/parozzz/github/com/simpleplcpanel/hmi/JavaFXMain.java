@@ -4,7 +4,7 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.tcp.ModbusTCPThread;
 import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7Thread;
-import parozzz.github.com.simpleplcpanel.hmi.tags.TagSplitPaneTest;
+import parozzz.github.com.simpleplcpanel.hmi.tags.TagStage;
 import parozzz.github.com.simpleplcpanel.logger.MainLogger;
 
 import java.io.File;
@@ -37,9 +37,9 @@ public final class JavaFXMain extends Application
             tabTableViewTest.setup();
             tabTableViewTest.showStage();
 */
-            var tagSplitPaneTest = new TagSplitPaneTest();
-            tagSplitPaneTest.setup();
-            tagSplitPaneTest.showStage();
+            var tagStage = new TagStage();
+            tagStage.setup();
+            tagStage.showStage();
         }
         catch(Exception exception)
         {

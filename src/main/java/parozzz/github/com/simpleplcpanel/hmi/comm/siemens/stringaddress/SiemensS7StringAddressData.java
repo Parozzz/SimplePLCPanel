@@ -9,6 +9,7 @@ import parozzz.github.com.simpleplcpanel.PLC.siemens.util.SiemensS7AreaType;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.AddressAttribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.propertyholders.SiemensS7AttributePropertyHolder;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationStringAddressData;
+import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
 
 public final class SiemensS7StringAddressData
         extends CommunicationStringAddressData
@@ -208,6 +209,8 @@ public final class SiemensS7StringAddressData
     public SiemensS7StringAddressData(SiemensS7ReadableData<?> readableData, SiemensS7AreaType areaType,
             int dbNumber, int byteOffset, int bitOffset, int stringLength)
     {
+        super(CommunicationType.SIEMENS_S7);
+        
         this.readableData = readableData;
         this.areaType = areaType;
         this.dbNumber = dbNumber;

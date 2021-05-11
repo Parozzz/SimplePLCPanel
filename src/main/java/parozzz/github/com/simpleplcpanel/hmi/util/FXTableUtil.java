@@ -7,7 +7,6 @@ import java.util.function.Consumer;
 
 public final class FXTableUtil
 {
-
     public static <S, T> TreeTableCell<S, T> createTreeTableCell(TableCellConsumer<S, T> tableCellConsumer)
     {
         return new TreeTableCell<>()
