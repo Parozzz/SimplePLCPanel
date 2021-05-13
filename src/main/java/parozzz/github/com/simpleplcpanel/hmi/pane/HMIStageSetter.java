@@ -167,6 +167,20 @@ public final class HMIStageSetter
         return this;
     }
 
+    public HMIStageSetter stopWidthResize()
+    {
+        stage.maxWidthProperty().bind(stage.widthProperty());
+        stage.minWidthProperty().bind(stage.widthProperty());
+        return this;
+    }
+
+    public HMIStageSetter stopHeightResize()
+    {
+        stage.maxWidthProperty().bind(stage.heightProperty());
+        stage.minWidthProperty().bind(stage.heightProperty());
+        return this;
+    }
+
     public void hide()
     {
         this.close();

@@ -8,11 +8,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.WindowEvent;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.AddressAttribute;
-import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.stringaddress.ModbusStringAddressCreatorStage;
 import parozzz.github.com.simpleplcpanel.hmi.pane.HMIStage;
+import parozzz.github.com.simpleplcpanel.hmi.tags.CommunicationTag;
 
 import java.io.IOException;
-import java.util.function.Consumer;
 
 public abstract class CommunicationStringAddressCreatorStage<T extends CommunicationStringAddressData>
         extends HMIStage<VBox>
@@ -25,6 +24,7 @@ public abstract class CommunicationStringAddressCreatorStage<T extends Communica
 
     private final CommunicationType<T> communicationType;
     private AddressAttribute addressAttribute;
+    private CommunicationTag communicationTag;
     public CommunicationStringAddressCreatorStage(CommunicationType<T> communicationType, String resource) throws IOException
     {
         super(resource, VBox.class);
@@ -47,6 +47,16 @@ public abstract class CommunicationStringAddressCreatorStage<T extends Communica
 
         confirmButton.setOnAction(event ->
         {
+            if(communicationTag != null)
+            {
+                var data = this.createDataFromActualValues();
+                if(data != null && data.validate())
+                {
+                    communicationTag.setStringAddressData(data);
+                    communicationTag = null;
+                }
+            }
+
             if (addressAttribute != null)
             {
                 var data = this.createDataFromActualValues();
@@ -68,7 +78,7 @@ public abstract class CommunicationStringAddressCreatorStage<T extends Communica
         this.updateTextConvertedAddress();
 
         var children = super.parent.getChildren();
-        if (addressAttribute == null)
+        if (addressAttribute == null && communicationTag == null)
         {
             children.remove(confirmButtonStackPane);
         } else
@@ -84,12 +94,18 @@ public abstract class CommunicationStringAddressCreatorStage<T extends Communica
 
     public void showAsStandalone()
     {
-        this.showAsInputTextAddress(null);
+        this.showAsInputTextAddress((AddressAttribute) null);
     }
 
     public void showAsInputTextAddress(AddressAttribute addressAttribute)
     {
         this.addressAttribute = addressAttribute;
+        this.showStage();
+    }
+
+    public void showAsInputTextAddress(CommunicationTag communicationTag)
+    {
+        this.communicationTag = this.communicationTag;
         this.showStage();
     }
 

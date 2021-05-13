@@ -1,11 +1,15 @@
 package parozzz.github.com.simpleplcpanel.hmi.tags;
 
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTreeTableCell;
+import javafx.scene.control.skin.TreeTableViewSkin;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -50,10 +54,11 @@ public final class TagStage extends HMIStage<VBox>
         super.setup();
 
         super.getStageSetter()
-                .setResizable(true);
+                .setAlwaysOnTop(true)
+                .setResizable(true).stopWidthResize();
 
         var topLabel = new Label();
-        topLabel.setMinSize(0, 0);
+        topLabel.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         topLabel.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         topLabel.setText("Tags");
         topLabel.setAlignment(Pos.CENTER);
@@ -82,12 +87,13 @@ public final class TagStage extends HMIStage<VBox>
             TreeTableCell<Tag, String> cell = new TextFieldTreeTableCell<>();
             cell.setEditable(true);
             cell.setAlignment(Pos.CENTER_LEFT);
+            cell.setPadding(Insets.EMPTY);
             return cell;
         });
 
         TreeTableColumn<Tag, Boolean> localColumn = new TreeTableColumn<>();
         localColumn.setText("Local");
-        localColumn.setPrefWidth(35);
+        localColumn.setPrefWidth(50);
         localColumn.setSortable(false);
         localColumn.setCellFactory(tColumn ->
         {
@@ -100,6 +106,7 @@ public final class TagStage extends HMIStage<VBox>
         addressColumn.setText("Address");
         addressColumn.setPrefWidth(170);
         addressColumn.setSortable(false);
+
         addressColumn.setCellFactory(tColumn ->
         {
             var cellFactoryHandler = new StringAddressDataCellFactoryHandler(communicationDataHolder);
@@ -154,38 +161,53 @@ public final class TagStage extends HMIStage<VBox>
         treeTableView.setRowFactory(tTableView ->
         {
             var tableRow = new TreeTableRow<Tag>();
-            tableRow.setPrefHeight(40);
+            tableRow.setPrefHeight(20);
+            tableRow.setPadding(new Insets(0));
             return tableRow;
         });
 
-        treeTableView.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        treeTableView.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        treeTableView.setColumnResizePolicy(resizeFeatures -> true);
+        treeTableView.setMinSize(Region.USE_PREF_SIZE, 0);
+        treeTableView.setMaxSize(Region.USE_PREF_SIZE, Double.MAX_VALUE);
+        treeTableView.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY);
         treeTableView.setShowRoot(true);
         treeTableView.setRoot(rootFolderTag.createTreeItem());
         treeTableView.getColumns().addAll(nameColumn, localColumn, addressColumn);
-        super.parent.getChildren().add(treeTableView);
 
-        this.addTag(new CommunicationTag(communicationDataHolder, "Tag1"));
-        this.addTag(new CommunicationTag(communicationDataHolder, "Tag2"));
-        this.addTag(new CommunicationTag(communicationDataHolder, "Tag3"));
-        this.addTag(new CommunicationTag(communicationDataHolder,"Tag4"));
+        var stackPane = new StackPane(treeTableView);
+        stackPane.setMinSize(0, 0);
+        stackPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        StackPane.setAlignment(treeTableView, Pos.CENTER);
+        VBox.setVgrow(stackPane, Priority.ALWAYS);
+        super.parent.getChildren().add(stackPane);
+
+        communicationDataHolder.getCommunicationStage().addCommunicationTypeListener(communicationType ->
+        {
+            tagSet.stream()
+                    .filter(CommunicationTag.class::isInstance)
+                    .map(CommunicationTag.class::cast)
+                    .forEach(communicationTag -> communicationTag.updateCommunicationType(communicationType));
+        });
+
+        this.addTag(new CommunicationTag("Tag1"));
+        this.addTag(new CommunicationTag("Tag2"));
+        this.addTag(new CommunicationTag("Tag3"));
+        this.addTag(new CommunicationTag("Tag4"));
 
         var aFolder = new FolderTag("Folder1!");
         this.addTag(aFolder);
 
-        this.addTag(aFolder, new CommunicationTag(communicationDataHolder,"Tag5"));
-        this.addTag(aFolder, new CommunicationTag(communicationDataHolder,"Tag6"));
-        this.addTag(aFolder, new CommunicationTag(communicationDataHolder,"Tag7"));
-        this.addTag(aFolder, new CommunicationTag(communicationDataHolder,"Tag8"));
+        this.addTag(aFolder, new CommunicationTag("Tag5"));
+        this.addTag(aFolder, new CommunicationTag("Tag6"));
+        this.addTag(aFolder, new CommunicationTag("Tag7"));
+        this.addTag(aFolder, new CommunicationTag("Tag8"));
 
         var aSecondFolder = new FolderTag("Folder2!");
         this.addTag(aSecondFolder);
 
-        this.addTag(aSecondFolder, new CommunicationTag(communicationDataHolder,"Tag9"));
-        this.addTag(aSecondFolder, new CommunicationTag(communicationDataHolder,"Tag10"));
-        this.addTag(aSecondFolder, new CommunicationTag(communicationDataHolder,"Tag11"));
-        this.addTag(aSecondFolder, new CommunicationTag(communicationDataHolder,"Tag12"));
+        this.addTag(aSecondFolder, new CommunicationTag("Tag9"));
+        this.addTag(aSecondFolder, new CommunicationTag("Tag10"));
+        this.addTag(aSecondFolder, new CommunicationTag("Tag11"));
+        this.addTag(aSecondFolder, new CommunicationTag("Tag12"));
 
     }
 
@@ -204,6 +226,11 @@ public final class TagStage extends HMIStage<VBox>
             if(folderTreeItem != null)
             {
                 folderTreeItem.getChildren().add(tag.createTreeItem());
+            }
+
+            if(tag instanceof CommunicationTag)
+            {
+                ((CommunicationTag) tag).updateCommunicationType(communicationDataHolder.getCurrentCommunicationType());
             }
         }
     }

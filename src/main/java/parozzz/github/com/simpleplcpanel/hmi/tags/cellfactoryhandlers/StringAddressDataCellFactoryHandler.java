@@ -2,6 +2,7 @@ package parozzz.github.com.simpleplcpanel.hmi.tags.cellfactoryhandlers;
 
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.TextField;
@@ -32,6 +33,9 @@ public final class StringAddressDataCellFactoryHandler extends CellFactoryHandle
     {
         super.init();
 
+        cell.setPadding(Insets.EMPTY);
+
+        textField.setPadding(Insets.EMPTY);
         textField.setMinSize(0, 0);
         textField.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         textField.setAlignment(Pos.CENTER);
@@ -56,7 +60,7 @@ public final class StringAddressDataCellFactoryHandler extends CellFactoryHandle
                     var creatorStage = communicationType.supplyStringAddressCreatorStage();
                     if(creatorStage != null)
                     {
-                        creatorStage.showAsStandalone();
+                        creatorStage.showAsInputTextAddress(tag);
                     }
                 }
             }
