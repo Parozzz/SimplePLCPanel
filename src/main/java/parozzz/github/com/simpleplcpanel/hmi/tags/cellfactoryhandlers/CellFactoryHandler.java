@@ -30,11 +30,13 @@ public abstract class CellFactoryHandler<T>
         {
             if(oldRow != null)
             {
+                this.updateTreeItem(oldRow.treeItemProperty(), oldRow.getTreeItem(), null);
                 oldRow.treeItemProperty().removeListener(changeTreeItemListener);
             }
 
             if(newRow != null)
             {
+                this.updateTreeItem(newRow.treeItemProperty(), null, newRow.getTreeItem());
                 newRow.treeItemProperty().addListener(changeTreeItemListener);
             }
         });

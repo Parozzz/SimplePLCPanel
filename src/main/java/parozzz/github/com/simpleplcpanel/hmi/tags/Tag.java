@@ -29,7 +29,8 @@ public abstract class Tag
         this.keyValue = new ReadOnlyObjectWrapper<>(key);
         this.deleteRunnableSet = new HashSet<>();
 
-        this.contextMenu = ContextMenuBuilder.builder().simple("Delete", this::delete)
+        this.contextMenu = ContextMenuBuilder.builder()
+                .simple("Delete", this::delete)
                 .getContextMenu();
     }
 

@@ -16,7 +16,6 @@ import java.io.IOException;
 public abstract class CommunicationStringAddressCreatorStage<T extends CommunicationStringAddressData>
         extends HMIStage<VBox>
 {
-
     @FXML private StackPane confirmButtonStackPane;
     @FXML private Button confirmButton;
 
@@ -105,7 +104,7 @@ public abstract class CommunicationStringAddressCreatorStage<T extends Communica
 
     public void showAsInputTextAddress(CommunicationTag communicationTag)
     {
-        this.communicationTag = this.communicationTag;
+        this.communicationTag = communicationTag;
         this.showStage();
     }
 

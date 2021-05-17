@@ -5,8 +5,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTreeTableCell;
-import javafx.scene.control.skin.TreeTableViewSkin;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -15,11 +13,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
+import javafx.util.converter.DefaultStringConverter;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationStringAddressData;
-import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
 import parozzz.github.com.simpleplcpanel.hmi.pane.HMIStage;
-import parozzz.github.com.simpleplcpanel.hmi.tags.cellfactoryhandlers.CommunicationTypeCellFactoryHandler;
 import parozzz.github.com.simpleplcpanel.hmi.tags.cellfactoryhandlers.LocalCellFactoryHandler;
 import parozzz.github.com.simpleplcpanel.hmi.tags.cellfactoryhandlers.StringAddressDataCellFactoryHandler;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
@@ -55,7 +52,7 @@ public final class TagStage extends HMIStage<VBox>
 
         super.getStageSetter()
                 .setAlwaysOnTop(true)
-                .setResizable(true).stopWidthResize();
+                .setResizable(true);//.stopWidthResize();
 
         var topLabel = new Label();
         topLabel.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
@@ -70,7 +67,9 @@ public final class TagStage extends HMIStage<VBox>
         TreeTableColumn<Tag, String> nameColumn = new TreeTableColumn<>();
         nameColumn.setText("Name");
         nameColumn.setPrefWidth(250);
+        nameColumn.setMinWidth(250);
         nameColumn.setSortable(false);
+        nameColumn.setEditable(true);
         nameColumn.setCellValueFactory(features ->
         {
             var treeItem = features.getValue();
@@ -84,16 +83,50 @@ public final class TagStage extends HMIStage<VBox>
         });
         nameColumn.setCellFactory(tColumn ->
         {
-            TreeTableCell<Tag, String> cell = new TextFieldTreeTableCell<>();
+            var cell = new TextFieldTreeTableCell<Tag, String>()
+            {
+                private boolean firstEdit = true;
+
+                @Override
+                public void startEdit() {
+                    super.startEdit();
+
+                    if(firstEdit)
+                    {
+                        firstEdit = false;
+
+                        try
+                        {
+                            var field = TextFieldTreeTableCell.class.getDeclaredField("textField");
+                            field.trySetAccessible();
+
+                            var textField = (TextField) field.get(this);
+                            textField.setPadding(Insets.EMPTY);
+                            textField.setBorder(null);
+                            textField.setBackground(FXUtil.createBackground(Color.TRANSPARENT));
+                        } catch (Exception exception)
+                        {
+                            exception.printStackTrace();
+                        }
+                    }
+                }
+            };
+
+            cell.tableRowProperty().addListener((observable, oldValue, newValue) ->
+                    cell.setEditable(newValue.getItem() instanceof CommunicationTag)
+            );
+
             cell.setEditable(true);
             cell.setAlignment(Pos.CENTER_LEFT);
             cell.setPadding(Insets.EMPTY);
+            cell.setConverter(new DefaultStringConverter());
             return cell;
         });
 
         TreeTableColumn<Tag, Boolean> localColumn = new TreeTableColumn<>();
         localColumn.setText("Local");
-        localColumn.setPrefWidth(50);
+        localColumn.setPrefWidth(40);
+        localColumn.setMinWidth(40);
         localColumn.setSortable(false);
         localColumn.setCellFactory(tColumn ->
         {
@@ -105,8 +138,8 @@ public final class TagStage extends HMIStage<VBox>
         TreeTableColumn<Tag, CommunicationStringAddressData> addressColumn = new TreeTableColumn<>();
         addressColumn.setText("Address");
         addressColumn.setPrefWidth(170);
+        addressColumn.setMinWidth(170);
         addressColumn.setSortable(false);
-
         addressColumn.setCellFactory(tColumn ->
         {
             var cellFactoryHandler = new StringAddressDataCellFactoryHandler(communicationDataHolder);
@@ -161,15 +194,27 @@ public final class TagStage extends HMIStage<VBox>
         treeTableView.setRowFactory(tTableView ->
         {
             var tableRow = new TreeTableRow<Tag>();
-            tableRow.setPrefHeight(20);
+            tableRow.setPrefHeight(30);
             tableRow.setPadding(new Insets(0));
+            tableRow.treeItemProperty().addListener((observable, oldValue, newValue) ->
+            {
+                Tag tag;
+                if(newValue == null || (tag = newValue.getValue()) == null)
+                {
+                    tableRow.setContextMenu(null);
+                    return;
+                }
+
+                tableRow.setContextMenu(tag.getContextMenu());
+            });
             return tableRow;
         });
 
+        treeTableView.setEditable(true);
         treeTableView.setMinSize(Region.USE_PREF_SIZE, 0);
-        treeTableView.setMaxSize(Region.USE_PREF_SIZE, Double.MAX_VALUE);
+        treeTableView.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         treeTableView.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY);
-        treeTableView.setShowRoot(true);
+        treeTableView.setShowRoot(false);
         treeTableView.setRoot(rootFolderTag.createTreeItem());
         treeTableView.getColumns().addAll(nameColumn, localColumn, addressColumn);
 
