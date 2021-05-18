@@ -21,28 +21,7 @@ public class FunctionAttributeProperty<T> extends AttributeProperty<T>
         this.serializeParseFunction = serializeParseFunction;
         this.deserializeFunction = deserializeFunction;
     }
-/*
-    @Override
-    public void serializeInto(Property<T> property, JSONDataMap jsonDataMap)
-    {
-        var value = property.getValue();
-        if(value != null)
-        {
-            var parsedObject = serializeParseFunction.apply(value);
-            if(parsedObject != null)
-            {
-                jsonDataMap.set(super.key, parsedObject);
-            }
-        }
-    }
 
-    @Override
-    public void deserializeFrom(Property<T> property, JSONDataMap jsonDataMap)
-    {
-        var deserializedValue = deserializeFunction.apply(jsonDataMap, super.key);
-        super.setValue(property, deserializedValue);
-    }
-*/
     @Override
     public Data<T> createData(Attribute attribute)
     {

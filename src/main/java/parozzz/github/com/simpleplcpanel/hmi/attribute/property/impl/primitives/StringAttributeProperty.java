@@ -23,23 +23,6 @@ public class StringAttributeProperty extends AttributeProperty<String>
         return new StringData();
     }
 
-    /*
-    @Override
-    public void serializeInto(Property<String> property, JSONDataMap jsonDataMap)
-    {
-        var value = property.getValue();
-        if(value != null)
-        {
-            jsonDataMap.set(super.key, value);
-        }
-    }
-
-    @Override
-    public void deserializeFrom(Property<String> property, JSONDataMap jsonDataMap)
-    {
-        super.setValue(property, jsonDataMap.getString(super.key));
-    }
-*/
     public class StringData extends AttributeProperty.Data<String>
     {
         protected StringData()

@@ -17,20 +17,6 @@ public class BooleanAttributeProperty extends AttributeProperty<Boolean>
         super(key, defaultValue);
     }
 
-    /*
-    @Override
-    public void serializeInto(Property<Boolean> property, JSONDataMap jsonDataMap)
-    {
-        var value = property.getValue();
-        jsonDataMap.set(super.key, value != null && value);
-    }
-
-    @Override
-    public void deserializeFrom(Property<Boolean> property, JSONDataMap jsonDataMap)
-    {
-        super.setValue(property, jsonDataMap.getBoolean(super.key));
-    }
-*/
     @Override
     public Data<Boolean> createData(Attribute attribute)
     {

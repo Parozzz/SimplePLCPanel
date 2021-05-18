@@ -29,14 +29,6 @@ public abstract class AttributeProperty<T>
     }
 
     public abstract Data<T> createData(Attribute attribute);
-    /*
-    {
-        return new Data<>(this, new SimpleObjectProperty<>(defaultValue));
-    }*/
-
-    //public abstract void serializeInto(Property<T> property, JSONDataMap jsonDataMap);
-
-    //public abstract void deserializeFrom(Property<T> property, JSONDataMap jsonDataMap);
 
     public abstract static class Data<P>
     {

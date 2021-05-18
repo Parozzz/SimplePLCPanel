@@ -14,6 +14,8 @@ import parozzz.github.com.simpleplcpanel.hmi.serialize.JSONSerializable;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
 import parozzz.github.com.simpleplcpanel.hmi.tags.stage.TagStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.ContextMenuBuilder;
+import parozzz.github.com.simpleplcpanel.hmi.util.valueintermediate.MixedIntermediate;
+import parozzz.github.com.simpleplcpanel.hmi.util.valueintermediate.ValueIntermediate;
 import parozzz.github.com.simpleplcpanel.util.Validate;
 
 import java.util.HashSet;
@@ -28,6 +30,9 @@ public abstract class Tag
     protected TagStage tagStage;
     protected TreeItem<Tag> treeItem;
 
+    private final MixedIntermediate readIntermediate;
+    private final MixedIntermediate writeIntermediate;
+
     public Tag(String key)
     {
         this(key, TagStage.LAST_INTERNAL_ID++);
@@ -38,6 +43,9 @@ public abstract class Tag
         this.internalId = internalId;
         this.keyValue = new ReadOnlyObjectWrapper<>(key);
         this.deleteRunnableSet = new HashSet<>();
+
+        this.readIntermediate = new MixedIntermediate();
+        this.writeIntermediate = new MixedIntermediate();
     }
 
     public int getInternalId()
@@ -53,6 +61,16 @@ public abstract class Tag
     public ObservableValue<String> keyValueProperty()
     {
         return keyValue;
+    }
+
+    public ValueIntermediate getReadIntermediate()
+    {
+        return readIntermediate;
+    }
+
+    public ValueIntermediate getWriteIntermediate()
+    {
+        return writeIntermediate;
     }
 
     @Nullable

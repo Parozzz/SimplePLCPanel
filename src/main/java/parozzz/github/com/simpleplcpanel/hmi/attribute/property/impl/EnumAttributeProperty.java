@@ -18,29 +18,11 @@ public class EnumAttributeProperty<E extends Enum<E>> extends AttributeProperty<
     @Override
     public Data<E> createData(Attribute attribute)
     {
-        return null;
+        return new EnumData();
     }
-/*
-    @Override
-    public void serializeInto(Property<E> property, JSONDataMap jsonDataMap)
-    {
-        var value = property.getValue();
-        if(value != null)
-        {
-            jsonDataMap.set(super.key, value);
-        }
-    }
-
-    @Override
-    public void deserializeFrom(Property<E> property, JSONDataMap jsonDataMap)
-    {
-        var enumValue = jsonDataMap.getEnum(super.key, enumClass);
-        super.setValue(property, enumValue);
-    }*/
 
     public class EnumData extends AttributeProperty.Data<E>
     {
-
         protected EnumData()
         {
             super(EnumAttributeProperty.this);

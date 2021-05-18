@@ -23,7 +23,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.sql.Ref;
 
-class TagStageUtil
+final class TagStageUtil
 {
     private final static Field TEXT_FIELD_TREE_CELL = ReflectionUtil.getField(TextFieldTreeTableCell.class, "textField");
     private final static Method LEFT_LABEL_PADDING_TREE_CELL_SKIN = ReflectionUtil.getMethod(TreeTableCellSkin.class, "leftLabelPadding");

@@ -16,24 +16,7 @@ public class ParsableAttributeProperty<T> extends AttributeProperty<T>
 
         this.parser = parser;
     }
-/*
-    @Override
-    public void serializeInto(Property<T> property, JSONDataMap jsonDataMap)
-    {
-        var value = property.getValue();
-        if(value != null)
-        {
-            jsonDataMap.set(super.key, parser.serialize(value));
-        }
-    }
 
-    @Override
-    public void deserializeFrom(Property<T> property, JSONDataMap jsonDataMap)
-    {
-        var parsedObject = jsonDataMap.getParsable(parser, super.key);
-        super.setValue(property, parsedObject);
-    }
-*/
     @Override
     public Data<T> createData(Attribute attribute)
     {

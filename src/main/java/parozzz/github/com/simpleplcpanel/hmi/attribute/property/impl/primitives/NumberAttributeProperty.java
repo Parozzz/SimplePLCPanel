@@ -23,26 +23,6 @@ public class NumberAttributeProperty<N extends Number> extends AttributeProperty
         this.function = function;
     }
 
-    /*
-        @Override
-        public void serializeInto(Property<N> property, JSONDataMap jsonDataMap)
-        {
-            var value = property.getValue();
-            if(value != null)
-            {
-                jsonDataMap.set(super.key, value);
-            }
-        }
-
-        @Override
-        public void deserializeFrom(Property<N> property, JSONDataMap jsonDataMap)
-        {
-            var number = jsonDataMap.getNumber(super.key);
-            super.setValue(property, number == null
-                                     ? super.defaultValue
-                                     : function.apply(number));
-        }
-    */
     @Override
     public Data<N> createData(Attribute attribute)
     {

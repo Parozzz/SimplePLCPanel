@@ -13,13 +13,14 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class CommunicationTagAttributeProperty
-        extends FunctionAttributeProperty<CommunicationTag>
+        extends AttributeProperty<CommunicationTag>
 {
-    public CommunicationTagAttributeProperty(String key, CommunicationTag defaultValue,
-            Function<CommunicationTag, Object> serializeParseFunction,
-            BiFunction<JSONDataMap, String, CommunicationTag> deserializeFunction)
+    private final boolean write;
+    public CommunicationTagAttributeProperty(String key, boolean write)
     {
-        super(key, defaultValue, serializeParseFunction, deserializeFunction);
+        super(key, null);
+
+        this.write = write;
     }
 
     @Override

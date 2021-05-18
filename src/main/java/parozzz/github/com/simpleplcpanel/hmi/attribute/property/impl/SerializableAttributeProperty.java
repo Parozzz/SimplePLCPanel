@@ -18,30 +18,6 @@ public class SerializableAttributeProperty<T extends JSONSerializable>
     {
         return new SerializableData();
     }
-/*
-    @Override
-    public void serializeInto(Property<T> property, JSONDataMap jsonDataMap)
-    {
-        var value = property.getValue();
-        if(value != null)
-        {
-            jsonDataMap.set(super.key, value.serialize());
-        }
-    }
-
-    @Override
-    public void deserializeFrom(Property<T> property, JSONDataMap jsonDataMap)
-    {
-        var value = property.getValue();
-        if(value != null)
-        {
-            var valueJSONDataMap = jsonDataMap.getMap(super.key);
-            if(valueJSONDataMap != null)
-            {
-                value.deserialize(valueJSONDataMap);
-            }
-        }
-    }*/
 
     public class SerializableData extends AttributeProperty.Data<T>
     {
