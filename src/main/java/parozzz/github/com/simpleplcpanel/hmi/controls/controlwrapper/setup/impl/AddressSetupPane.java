@@ -116,7 +116,6 @@ public class AddressSetupPane<A extends AddressAttribute>
                 //I don't care if is valid or not. If invalid, it won't load and will be defaulted!
                 creatorStage.setAsSubWindow(super.getSetupStage());
                 creatorStage.loadStringDataToActualValues(textAddressTextField.getText());
-                creatorStage.setReadOnly(this.isReadOnly());
                 creatorStage.showAsInputTextAddress(addressAttribute);
             }
         });
@@ -217,11 +216,6 @@ public class AddressSetupPane<A extends AddressAttribute>
         }
 
         return AttributeFetcher.fetch(selectedControlWrapper, super.getAttributeType());
-    }
-
-    private boolean isReadOnly()
-    {
-        return super.getAttributeType() == AttributeType.READ_ADDRESS;
     }
 /*
     private void parseAddressStringParser()

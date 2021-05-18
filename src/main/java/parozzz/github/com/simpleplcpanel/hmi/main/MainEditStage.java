@@ -29,6 +29,7 @@ import parozzz.github.com.simpleplcpanel.hmi.main.picturebank.PictureBankStage;
 import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupPane;
 import parozzz.github.com.simpleplcpanel.hmi.main.settings.SettingsStage;
 import parozzz.github.com.simpleplcpanel.hmi.pane.BorderPaneHMIStage;
+import parozzz.github.com.simpleplcpanel.hmi.tags.stage.TagStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXTextFormatterUtil;
 import parozzz.github.com.simpleplcpanel.util.TrigBoolean;
 import parozzz.github.com.simpleplcpanel.util.Util;
@@ -79,7 +80,10 @@ public final class MainEditStage extends BorderPaneHMIStage
     private MenuItem pictureBankMenuItem;
     @FXML
     private MenuItem modbusTCPStringAddressMenuItem;
-    @FXML private MenuItem siemensS7StringAddressMenuItem;
+    @FXML
+    private MenuItem siemensS7StringAddressMenuItem;
+    @FXML
+    private MenuItem tagsMenuItem;
 
     //Messages Menu
     @FXML
@@ -118,6 +122,7 @@ public final class MainEditStage extends BorderPaneHMIStage
     private final MessagesListStage messagesListStage;
     private final ControlWrapperCopyPasteHandler copyPasteHandler;
     private final RuntimeControlContainerStage runtimeControlMainPage;
+    private final TagStage tagStage;
 
     private final TrigBoolean messagePresentTrig;
     private ControlContainerPane shownControlContainerPane;
@@ -147,7 +152,8 @@ public final class MainEditStage extends BorderPaneHMIStage
 
                 .addFXChild((messagesListStage = new MessagesListStage()).setAsSubWindow(this))
                 //OTHER STAGES
-                .addFXChild(runtimeControlMainPage = new RuntimeControlContainerStage(this));
+                .addFXChild(runtimeControlMainPage = new RuntimeControlContainerStage(this))
+                .addFXChild(tagStage = new TagStage(communicationDataHolder));
 
         this.messagePresentTrig = new TrigBoolean(false);
     }
@@ -163,7 +169,7 @@ public final class MainEditStage extends BorderPaneHMIStage
                 .setMaximized(true)
                 .addEventFilter(KeyEvent.KEY_PRESSED, keyEvent ->
                 {
-                    if (saveKeyCombination.match(keyEvent))
+                    if(saveKeyCombination.match(keyEvent))
                     {
                         saveMenuItem.fire();
                         keyEvent.consume();
@@ -194,7 +200,7 @@ public final class MainEditStage extends BorderPaneHMIStage
         pictureBankMenuItem.setOnAction(actionEvent -> pictureBankStage.showStage());
         modbusTCPStringAddressMenuItem.setOnAction(event -> {
             var stringAddressCreator = CommunicationType.MODBUS_TCP.supplyStringAddressCreatorStage();
-            if (stringAddressCreator != null)
+            if(stringAddressCreator != null)
             {
                 stringAddressCreator.setAsSubWindow(MainEditStage.this);
                 stringAddressCreator.showAsStandalone();
@@ -202,12 +208,13 @@ public final class MainEditStage extends BorderPaneHMIStage
         });
         siemensS7StringAddressMenuItem.setOnAction(event -> {
             var stringAddressCreator = CommunicationType.SIEMENS_S7.supplyStringAddressCreatorStage();
-            if (stringAddressCreator != null)
+            if(stringAddressCreator != null)
             {
                 stringAddressCreator.setAsSubWindow(MainEditStage.this);
                 stringAddressCreator.showAsStandalone();
             }
         });
+        this.tagsMenuItem.setOnAction(event -> tagStage.showStage());
 
         //Messages Menu
         showMessageListMenuItem.setOnAction(event -> messagesListStage.showStage());
@@ -229,7 +236,7 @@ public final class MainEditStage extends BorderPaneHMIStage
         pageWidthTextField.textProperty().addListener((observableValue, oldValue, newValue) ->
         {
             var newWidth = Util.parseInt(newValue, 640);
-            for (var controlContainerPage : controlContainerDatabase)
+            for(var controlContainerPage : controlContainerDatabase)
             {
                 var anchorPane = controlContainerPage.getMainAnchorPane();
                 anchorPane.setPrefWidth(newWidth);
@@ -243,7 +250,7 @@ public final class MainEditStage extends BorderPaneHMIStage
         pageHeightTextField.textProperty().addListener((observableValue, oldValue, newValue) ->
         {
             var newHeight = Util.parseInt(newValue, 480);
-            for (var controlContainerPage : controlContainerDatabase)
+            for(var controlContainerPage : controlContainerDatabase)
             {
                 var anchorPane = controlContainerPage.getMainAnchorPane();
                 anchorPane.setPrefHeight(newHeight);
@@ -256,7 +263,7 @@ public final class MainEditStage extends BorderPaneHMIStage
         //Needs to be on the vbox in case the zoom is too low
         centerMainVBox.addEventFilter(ScrollEvent.SCROLL, scrollEvent ->
         {
-            if (scrollEvent.isControlDown())
+            if(scrollEvent.isControlDown())
             {
                 var delta = scrollEvent.getDeltaY();
 
@@ -306,17 +313,17 @@ public final class MainEditStage extends BorderPaneHMIStage
     {
         super.loop();
 
-        if (super.every(1000))
+        if(super.every(1000))
         {
             var selectedCommunicationManager = communicationDataHolder.getCommunicationStage().getSelectedCommunicationManager();
-            if (selectedCommunicationManager != null)
+            if(selectedCommunicationManager != null)
             {
                 var isConnected = selectedCommunicationManager.getCommThread().isConnected();
                 plcConnectedCircle.setFill(isConnected ? Color.GREEN : Color.RED);
             }
 
             messagePresentTrig.set(messagesListStage.areMessagesPresent());
-            switch (messagePresentTrig.checkTrig())
+            switch(messagePresentTrig.checkTrig())
             {
                 case RISING:
                     messagePresentLabel.setVisible(true);
@@ -404,7 +411,7 @@ public final class MainEditStage extends BorderPaneHMIStage
 
     public void changeRuntimePage(ControlContainerPane controlContainerPane)
     {
-        if (this.isRuntimeShowing())
+        if(this.isRuntimeShowing())
         {
             runtimeControlMainPage.setControlMainPage(controlContainerPane);
         }
@@ -413,7 +420,7 @@ public final class MainEditStage extends BorderPaneHMIStage
     public void showRuntimeScene(boolean isDebug, boolean fullScreen)
     {
         var pageList = controlContainerDatabase.getPageList();
-        if (!pageList.isEmpty())
+        if(!pageList.isEmpty())
         {
             //Disable all the non essentials stuff
             controlsPageCreationStage.setDisabled(true);
@@ -424,7 +431,7 @@ public final class MainEditStage extends BorderPaneHMIStage
 
             this.setShownControlContainerPane(null);
 
-            if (isDebug)
+            if(isDebug)
             {
                 runtimeControlMainPage.setExitKeyCombination();
             }
@@ -443,7 +450,7 @@ public final class MainEditStage extends BorderPaneHMIStage
 
     public void setShownControlContainerPane(ControlContainerPane controlContainerPane)
     {
-        if (shownControlContainerPane != null)
+        if(shownControlContainerPane != null)
         {
             //If i don't clear selections some bad things could happen, especially while debugging read only page
             shownControlContainerPane.getSelectionManager().clearSelections();
@@ -453,13 +460,13 @@ public final class MainEditStage extends BorderPaneHMIStage
         this.shownControlContainerPane = controlContainerPane;
 
         AnchorPane anchorPane;
-        if (shownControlContainerPane == null)
+        if(shownControlContainerPane == null)
         {
             centerTopLabel.setText("Not Selected");
 
             anchorPane = new AnchorPane();
             anchorPane.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        } else
+        }else
         {
             centerTopLabel.setText(controlContainerPane.getName());
             anchorPane = shownControlContainerPane.getMainAnchorPane();
@@ -499,7 +506,7 @@ public final class MainEditStage extends BorderPaneHMIStage
         pictureBankStage.setDisabled(false);
 
         var pageList = this.getControlContainerDatabase().getPageList();
-        if (!pageList.isEmpty())
+        if(!pageList.isEmpty())
         {
             this.setShownControlContainerPane(pageList.get(0));
         }

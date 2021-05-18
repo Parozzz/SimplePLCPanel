@@ -10,6 +10,7 @@ import javafx.scene.control.TreeItem;
 import parozzz.github.com.simpleplcpanel.Nullable;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationStringAddressData;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
+import parozzz.github.com.simpleplcpanel.hmi.tags.stage.TagStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.ContextMenuBuilder;
 import parozzz.github.com.simpleplcpanel.util.Validate;
 
@@ -20,30 +21,32 @@ public abstract class Tag
 {
     private final ObservableValue<String> keyValue;
     private final Set<Runnable> deleteRunnableSet;
-    private final ContextMenu contextMenu;
 
-    private TreeItem<Tag> treeItem;
+    protected TagStage tagStage;
+    protected TreeItem<Tag> treeItem;
 
     public Tag(String key)
     {
         this.keyValue = new ReadOnlyObjectWrapper<>(key);
         this.deleteRunnableSet = new HashSet<>();
+    }
 
-        this.contextMenu = ContextMenuBuilder.builder()
+    @Nullable
+    public ContextMenu createContextMenu()
+    {
+        return ContextMenuBuilder.builder()
                 .simple("Delete", this::delete)
                 .getContextMenu();
     }
 
-    public TreeItem<Tag> createTreeItem()
+    public TreeItem<Tag> init(TagStage tagStage)
     {
-        this.setTreeItem(new TreeItem<>(this));
-        return treeItem;
-    }
+        Validate.needTrue("Trying to initialize a Tag twice",
+                this.treeItem == null && this.tagStage == null);
 
-    public void setTreeItem(TreeItem<Tag> treeItem)
-    {
-        Validate.needTrue("Trying to set a TreeItem to a tag twice", this.treeItem == null);
-        this.treeItem = treeItem;
+        this.tagStage = tagStage;
+        this.treeItem = new TreeItem<>(this);
+        return treeItem;
     }
 
     @Nullable
@@ -62,13 +65,19 @@ public abstract class Tag
         return keyValue;
     }
 
-    public ContextMenu getContextMenu()
-    {
-        return contextMenu;
-    }
-
     public void delete()
     {
+        if(tagStage == null || treeItem == null)
+        {
+            return;
+        }
+
+        var parentTreeItem = treeItem.getParent();
+        if(parentTreeItem != null)
+        {
+            parentTreeItem.getChildren().remove(treeItem);
+        }
+
         deleteRunnableSet.forEach(Runnable::run);
     }
 

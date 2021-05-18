@@ -60,6 +60,12 @@ public final class StringAddressDataCellFactoryHandler extends CellFactoryHandle
                     var creatorStage = communicationType.supplyStringAddressCreatorStage();
                     if(creatorStage != null)
                     {
+                        var stringAddressData = tag.getStringAddressData();
+                        if(stringAddressData != null)
+                        {
+                            creatorStage.loadStringDataToActualValues(stringAddressData.getStringData());
+                        }
+
                         creatorStage.showAsInputTextAddress(tag);
                     }
                 }

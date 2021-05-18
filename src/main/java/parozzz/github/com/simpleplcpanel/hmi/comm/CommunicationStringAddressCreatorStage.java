@@ -108,8 +108,6 @@ public abstract class CommunicationStringAddressCreatorStage<T extends Communica
         this.showStage();
     }
 
-    public abstract void setReadOnly(boolean readOnly);
-
     public boolean loadAddressAttributeToActualValues(AddressAttribute addressAttribute)
     {
         if(addressAttribute == null)
@@ -127,6 +125,8 @@ public abstract class CommunicationStringAddressCreatorStage<T extends Communica
     }
 
     public abstract boolean loadStringDataToActualValues(String stringData);
+
+    public abstract boolean loadStringDataToActualValues(T stringData);
 
     public abstract T createDataFromActualValues();
 

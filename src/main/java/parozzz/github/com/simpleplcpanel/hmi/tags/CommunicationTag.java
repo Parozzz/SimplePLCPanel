@@ -1,8 +1,11 @@
 package parozzz.github.com.simpleplcpanel.hmi.tags;
 
 import javafx.beans.property.*;
+import javafx.scene.control.ContextMenu;
+import parozzz.github.com.simpleplcpanel.Nullable;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationStringAddressData;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
+import parozzz.github.com.simpleplcpanel.hmi.util.ContextMenuBuilder;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -51,6 +54,14 @@ public final class CommunicationTag extends Tag
 
             this.updateSelectedStringAddressDataProperty(null, selectedStringAddressDataProperty);
         });
+    }
+
+    @Nullable
+    public ContextMenu createContextMenu()
+    {
+        return ContextMenuBuilder.builder(super.createContextMenu())
+                .simple("Clone", this::addClone)
+                .getContextMenu();
     }
 
     public void updateCommunicationType(CommunicationType<?> communicationType)
@@ -148,4 +159,33 @@ public final class CommunicationTag extends Tag
         super.delete();
     }
 
+    @Override
+    public CommunicationTag clone()
+    {
+        var clone = new CommunicationTag(super.getKey());
+
+        clone.localProperty.set(localProperty.getValue());
+        stringAddressDataMap.forEach((communicationType, stringAddressDataProperty) ->
+        {
+            var addressDataProperty = new SimpleObjectProperty<CommunicationStringAddressData>();
+            addressDataProperty.setValue(stringAddressDataProperty.getValue());
+            clone.stringAddressDataMap.put(communicationType, addressDataProperty);
+        });
+
+        return clone;
+    }
+
+    private void addClone()
+    {
+        if(super.tagStage != null && treeItem != null)
+        {
+            var clone = this.clone();
+
+            var parent = treeItem.getParent();
+            if(parent != null)
+            {
+                tagStage.addTag(parent.getValue(), clone);
+            }
+        }
+    }
 }

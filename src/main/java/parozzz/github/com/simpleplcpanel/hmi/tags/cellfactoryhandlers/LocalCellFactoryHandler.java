@@ -14,7 +14,7 @@ import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
 import parozzz.github.com.simpleplcpanel.hmi.tags.CommunicationTag;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
 
-public class LocalCellFactoryHandler extends CellFactoryHandler<Boolean>
+public final class LocalCellFactoryHandler extends CellFactoryHandler<Boolean>
 {
     private final CheckBox checkBox;
     public LocalCellFactoryHandler(CommunicationDataHolder communicationDataHolder)

@@ -24,7 +24,7 @@ public final class SiemensS7StringAddressData
     @Nullable
     public static SiemensS7StringAddressData parseStringData(String stringData)
     {
-        if (stringData.isEmpty() || stringData.length() < 2) //|| string.length() < 4 || !string.contains("(") || !string.endsWith(")"))
+        if (stringData == null || stringData.isEmpty() || stringData.length() < 2) //|| string.length() < 4 || !string.contains("(") || !string.endsWith(")"))
         {
             return null;
         }
@@ -199,12 +199,12 @@ public final class SiemensS7StringAddressData
         return Integer.parseInt(array[index]);
     }
 
-    private SiemensS7ReadableData<?> readableData;
-    private SiemensS7AreaType areaType;
-    private int dbNumber;
-    private int byteOffset;
-    private int bitOffset;
-    private int stringLength;
+    private final SiemensS7ReadableData<?> readableData;
+    private final SiemensS7AreaType areaType;
+    private final int dbNumber;
+    private final int byteOffset;
+    private final int bitOffset;
+    private final int stringLength;
 
     public SiemensS7StringAddressData(SiemensS7ReadableData<?> readableData, SiemensS7AreaType areaType,
             int dbNumber, int byteOffset, int bitOffset, int stringLength)
@@ -303,18 +303,6 @@ public final class SiemensS7StringAddressData
 
         string += extraDataParser.parseIntoString();
         return string;
-    }
-
-    private void setDefaultValues()
-    {
-        this.readableData = SiemensS7DataStorage.BIT_ZERO;
-        this.areaType = SiemensS7AreaType.DB;
-        this.dbNumber = 1;
-        this.byteOffset = 1;
-        this.bitOffset = 0;
-        this.stringLength = 1;
-
-        super.stringData = this.createStringData();
     }
 
     @Override

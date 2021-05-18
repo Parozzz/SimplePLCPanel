@@ -17,12 +17,11 @@ public class ModbusStringAddressData extends CommunicationStringAddressData
     public static final int DEFAULT_OFFSET = 0;
     public static final int DEFAULT_BIT_OFFSET = 0;
     public static final boolean DEFAULT_SIGNED = false;
-    public static final boolean DEFAULT_READ_ONLY = false;
 
     @Nullable
     public static ModbusStringAddressData parseStringData(String stringData)
     {
-        if(stringData.isEmpty() || stringData.length() < 5) //|| string.length() < 4 || !string.contains("(") || !string.endsWith(")"))
+        if(stringData == null || stringData.isEmpty() || stringData.length() < 5) //|| string.length() < 4 || !string.contains("(") || !string.endsWith(")"))
         {
             return null;
         }
@@ -34,7 +33,6 @@ public class ModbusStringAddressData extends CommunicationStringAddressData
         int bitOffset = 0;
         ModbusFunctionCode functionCode;
         var signed = extraDataParser.containsExtraData("S");
-        var readOnly = extraDataParser.containsExtraData("R");
 
         var dataLength = extraDataParser.getDataType(ModbusDataLength.class);
         if(dataLength == null)
@@ -108,18 +106,17 @@ public class ModbusStringAddressData extends CommunicationStringAddressData
             functionCode = ModbusFunctionCode.COIL;
         }
 
-        return new ModbusStringAddressData(functionCode, dataLength, offset, bitOffset, signed, readOnly);
+        return new ModbusStringAddressData(functionCode, dataLength, offset, bitOffset, signed);
     }
 
-    private ModbusFunctionCode functionCode;
-    private ModbusDataLength dataLength;
-    private int offset;
-    private int bitOffset;
-    private boolean signed;
-    private boolean readOnly;
+    private final ModbusFunctionCode functionCode;
+    private final ModbusDataLength dataLength;
+    private final int offset;
+    private final int bitOffset;
+    private final boolean signed;
 
     public ModbusStringAddressData(ModbusFunctionCode functionCode, ModbusDataLength dataLength,
-            int offset, int bitOffset, boolean signed, boolean readOnly)
+            int offset, int bitOffset, boolean signed)
     {
         super(CommunicationType.MODBUS_TCP);
 
@@ -128,7 +125,6 @@ public class ModbusStringAddressData extends CommunicationStringAddressData
         this.offset = offset;
         this.bitOffset = bitOffset;
         this.signed = signed;
-        this.readOnly = readOnly;
 
         super.stringData = this.createStringData();
     }
@@ -136,7 +132,7 @@ public class ModbusStringAddressData extends CommunicationStringAddressData
     public ModbusStringAddressData()
     {
         this(DEFAULT_FUNCTION_CODE, DEFAULT_DATA_LENGTH, DEFAULT_OFFSET,
-                DEFAULT_BIT_OFFSET, DEFAULT_SIGNED, DEFAULT_READ_ONLY); //This should not parse data correctly and then set default values
+                DEFAULT_BIT_OFFSET, DEFAULT_SIGNED);
     }
 
     public ModbusFunctionCode getFunctionCode()
@@ -188,19 +184,9 @@ public class ModbusStringAddressData extends CommunicationStringAddressData
             case COIL:
                 break;
             case DISCRETE_INPUT:
-                if (!readOnly)
-                {
-                    return null;
-                }
-
                 showAddress += 10000;
                 break;
             case INPUT_REGISTER:
-                if (!readOnly)
-                {
-                    return null;
-                }
-
                 showAddress += 30000;
                 canHaveBit = true;
                 canHaveSign = true;
@@ -220,29 +206,13 @@ public class ModbusStringAddressData extends CommunicationStringAddressData
 
         var extraDataParser = new CommunicationStringAddressData.ExtraDataParser();
         extraDataParser.setDataType(dataLength.name());
-        if(readOnly)
-        {
-            extraDataParser.addData("R");
-        }
-
-        if (this.readOnly && canHaveSign && dataLength != ModbusDataLength.BIT && this.signed)
+        if (canHaveSign && dataLength != ModbusDataLength.BIT && this.signed)
         {
             extraDataParser.addData("S");
         }
 
         parseString += extraDataParser.parseIntoString();
         return parseString;
-    }
-
-    private void setDefaultValues()
-    {
-        this.functionCode = ModbusFunctionCode.HOLDING_REGISTER;
-        this.dataLength = ModbusDataLength.WORD;
-        this.offset = 0;
-        this.bitOffset = 0;
-        this.signed = false;
-
-        super.stringData = this.createStringData();
     }
 
     /*

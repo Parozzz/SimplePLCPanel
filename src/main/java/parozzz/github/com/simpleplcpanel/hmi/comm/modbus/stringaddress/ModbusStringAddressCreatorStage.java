@@ -43,9 +43,6 @@ public class ModbusStringAddressCreatorStage
     @FXML
     private CheckBox signedCheckBox;
 
-    @FXML
-    private CheckBox readOnlyAddressCheckBox;
-
     private boolean ignoreUpdate;
 
     public ModbusStringAddressCreatorStage() throws IOException
@@ -59,6 +56,7 @@ public class ModbusStringAddressCreatorStage
         super.setup();
 
         dataTypeChoiceBox.setConverter(new EnumStringConverter<>(ModbusFunctionCode.class).setCapitalize());
+        dataTypeChoiceBox.getItems().addAll(ModbusFunctionCode.values());
         dataTypeChoiceBox.valueProperty().addListener((observableValue, oldValue, newValue) ->
         {
             if (newValue == null)
@@ -93,21 +91,8 @@ public class ModbusStringAddressCreatorStage
             bitNumberLabel.setVisible(isBit);
             bitNumberTextField.setVisible(isBit);
 
-            if (readOnlyAddressCheckBox.isSelected()) //Write values have no signed label whatsoever
-            {
-                switch (functionCode)
-                {
-                    case HOLDING_REGISTER:
-                    case INPUT_REGISTER:
-                        signedLabel.setVisible(!isBit);
-                        signedCheckBox.setVisible(!isBit); //Signed booleans. A man can dream sometime.
-                        break;
-                }
-            } else
-            {
-                signedLabel.setVisible(false);
-                signedCheckBox.setVisible(false); //Signed booleans. A man can dream sometime.
-            }
+            signedLabel.setVisible(!isBit);
+            signedCheckBox.setVisible(!isBit);
         });
 
         addressTextField.setTextFormatter(FXTextFormatterUtil.positiveInteger(4));
@@ -116,11 +101,6 @@ public class ModbusStringAddressCreatorStage
                         .max(15)
                         .min(0)
                         .getTextFormatter()
-        );
-
-        this.updateReadOnlyProperty();
-        readOnlyAddressCheckBox.selectedProperty().addListener((observable, oldValue, readOnly) ->
-                this.updateReadOnlyProperty()
         );
 
         Stream.of(dataTypeChoiceBox.valueProperty(), dataLengthChoiceBox.valueProperty(),
@@ -137,40 +117,7 @@ public class ModbusStringAddressCreatorStage
     public void setDefault()
     {
         super.setDefault();
-
-        var defaultAddressData = new ModbusStringAddressData();
-        dataTypeChoiceBox.getSelectionModel().select(defaultAddressData.getFunctionCode());
-        dataLengthChoiceBox.getSelectionModel().select(defaultAddressData.getDataLength());
-        addressTextField.setText("" + defaultAddressData.getOffset());
-        bitNumberTextField.setText("" + defaultAddressData.getBitOffset());
-        signedCheckBox.setSelected(defaultAddressData.isSigned());
-    }
-
-    @Override
-    public void showAsStandalone()
-    {
-        this.disableChangesOnReadOnly(false);
-
-        super.showAsStandalone();
-    }
-
-    @Override
-    public void showAsInputTextAddress(AddressAttribute addressAttribute)
-    {
-        this.disableChangesOnReadOnly(true); //When is showed as a input, disable changes on this part. Is need to be handled to who want the address.
-
-        super.showAsInputTextAddress(addressAttribute);
-    }
-
-    @Override
-    public void setReadOnly(boolean readOnly)
-    {
-        readOnlyAddressCheckBox.setSelected(readOnly);
-    }
-
-    public void disableChangesOnReadOnly(boolean disable)
-    {
-        readOnlyAddressCheckBox.setDisable(disable);
+        this.loadStringDataToActualValues(new ModbusStringAddressData());
     }
 
     @Override
@@ -183,11 +130,22 @@ public class ModbusStringAddressCreatorStage
             return false;
         }
 
+        return this.loadStringDataToActualValues(stringAddressData);
+    }
+
+    @Override
+    public boolean loadStringDataToActualValues(ModbusStringAddressData stringAddressData)
+    {
+        if(stringAddressData == null)
+        {
+            return false;
+        }
+
         ignoreUpdate = true;
         dataTypeChoiceBox.setValue(stringAddressData.getFunctionCode());
         dataLengthChoiceBox.setValue(stringAddressData.getDataLength());
         addressTextField.setText("" + stringAddressData.getOffset());
-        bitNumberLabel.setText("" + stringAddressData.getBitOffset());
+        bitNumberTextField.setText("" + stringAddressData.getBitOffset());
         signedCheckBox.setSelected(stringAddressData.isSigned());
         ignoreUpdate = false;
 
@@ -208,9 +166,8 @@ public class ModbusStringAddressCreatorStage
         var bitNumber = Util.parseInt(bitNumberTextField.getText(), 0);
         var address = Util.parseInt(addressTextField.getText(), 1);
         var signed = signedCheckBox.isSelected();
-        var readOnly = this.readOnlyAddressCheckBox.isSelected();
 
-        return new ModbusStringAddressData(functionCode, dataLength, address, bitNumber, signed, readOnly);
+        return new ModbusStringAddressData(functionCode, dataLength, address, bitNumber, signed);
     }
 
     @Override
@@ -248,17 +205,5 @@ public class ModbusStringAddressCreatorStage
 
         lengthLabel.setVisible(true);
         dataLengthChoiceBox.setVisible(true);
-    }
-
-    private void updateReadOnlyProperty()
-    {
-        var readOnly = readOnlyAddressCheckBox.isSelected();
-
-        var dataTypeItems = dataTypeChoiceBox.getItems();
-        dataTypeItems.clear();
-        Stream.of(ModbusFunctionCode.values())
-                .filter(functionCode -> readOnly || !functionCode.isReadOnly())
-                .forEach(dataTypeItems::add);
-        dataTypeChoiceBox.getSelectionModel().selectFirst();
     }
 }

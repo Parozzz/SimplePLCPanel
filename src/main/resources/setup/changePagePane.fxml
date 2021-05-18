@@ -24,7 +24,7 @@
                   <Font size="17.0" />
                </font>
             </Label>
-            <ComboBox fx:id="selectPageComboBox" editable="true" prefWidth="175.0" stylesheets="@../styleheets/combo_box_setup_style.css" />
+            <ComboBox fx:id="selectPageComboBox" editable="true" prefWidth="175.0" stylesheets="@../stylesheets/combo_box_setup_style.css" />
          </children>
       </HBox>
    </children>

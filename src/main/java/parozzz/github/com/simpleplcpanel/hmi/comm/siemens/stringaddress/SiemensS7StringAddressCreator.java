@@ -107,6 +107,8 @@ public class SiemensS7StringAddressCreator
         offsetTextField.setText("" + defaultAddressData.getByteOffset());
         bitOffsetTextField.setText("" + defaultAddressData.getBitOffset());
         stringLengthTextField.setText("" + defaultAddressData.getStringLength());
+
+        this.updateTextConvertedAddress();
     }
 
     public void updateTextConvertedAddress()
@@ -124,18 +126,23 @@ public class SiemensS7StringAddressCreator
     }
 
     @Override
-    public void setReadOnly(boolean readOnly)
-    {
-        //Siemens does not care!
-    }
-
-    @Override
     public boolean loadStringDataToActualValues(String stringData)
     {
         var stringAddressData = SiemensS7StringAddressData.parseStringData(stringData);
         if (stringAddressData == null || !stringAddressData.validate())
         {
             this.setDefault();
+            return false;
+        }
+
+        return this.loadStringDataToActualValues(stringAddressData);
+    }
+
+    @Override
+    public boolean loadStringDataToActualValues(SiemensS7StringAddressData stringAddressData)
+    {
+        if (stringAddressData == null)
+        {
             return false;
         }
 

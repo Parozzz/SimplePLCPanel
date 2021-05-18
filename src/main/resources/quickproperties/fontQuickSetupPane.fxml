@@ -50,7 +50,7 @@
             </Label>
             <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
                <children>
-                  <ComboBox fx:id="textSizeComboBox" editable="true" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="75.0" stylesheets="@../styleheets/combo_box_setup_style.css">
+                  <ComboBox fx:id="textSizeComboBox" editable="true" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="75.0" stylesheets="@../stylesheets/combo_box_setup_style.css">
                      <StackPane.margin>
                         <Insets />
                      </StackPane.margin>

@@ -52,7 +52,7 @@
                   <Font size="17.0" />
                </font>
             </Label>
-            <ComboBox fx:id="newLineSpacingComboBox" editable="true" prefWidth="60.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;" stylesheets="@../styleheets/combo_box_setup_style.css">
+            <ComboBox fx:id="newLineSpacingComboBox" editable="true" prefWidth="60.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;" stylesheets="@../stylesheets/combo_box_setup_style.css">
                <padding>
                   <Insets bottom="-1.0" left="-1.0" right="-1.0" top="-1.0" />
                </padding>
