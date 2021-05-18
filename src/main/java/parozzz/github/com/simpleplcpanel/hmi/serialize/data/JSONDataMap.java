@@ -83,6 +83,12 @@ public final class JSONDataMap extends JSONData<JSONObject>
         return get(key, Number.class);
     }
 
+    public Number getNumberOrZero(String key)
+    {
+        var number = this.getNumber(key);
+        return number == null ? 0 : number;
+    }
+
     public String getString(String key)
     {
         var stringValue = get(key, String.class);

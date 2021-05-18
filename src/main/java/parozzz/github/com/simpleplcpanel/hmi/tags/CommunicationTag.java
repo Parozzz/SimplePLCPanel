@@ -5,6 +5,7 @@ import javafx.scene.control.ContextMenu;
 import parozzz.github.com.simpleplcpanel.Nullable;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationStringAddressData;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
+import parozzz.github.com.simpleplcpanel.hmi.tags.stage.TagStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.ContextMenuBuilder;
 
 import java.lang.ref.WeakReference;
@@ -23,9 +24,9 @@ public final class CommunicationTag extends Tag
 
     private Property<CommunicationStringAddressData> selectedStringAddressDataProperty;
 
-    public CommunicationTag(String key)
+    public CommunicationTag(String key, int internalID)
     {
-        super(key);
+        super(key, internalID);
 
         this.localProperty = new SimpleBooleanProperty(false);
         this.stringAddressDataProperty = new SimpleObjectProperty<>();
@@ -41,7 +42,6 @@ public final class CommunicationTag extends Tag
                 var property = new SimpleObjectProperty<>(stringAddressData);
                 stringAddressDataMap.put(communicationType, property);
             }
-
         }
 
         localProperty.addListener((observable, oldValue, newValue) ->
@@ -54,6 +54,11 @@ public final class CommunicationTag extends Tag
 
             this.updateSelectedStringAddressDataProperty(null, selectedStringAddressDataProperty);
         });
+    }
+
+    public CommunicationTag(String key)
+    {
+        this(key, TagStage.LAST_INTERNAL_ID++);
     }
 
     @Nullable
@@ -98,6 +103,11 @@ public final class CommunicationTag extends Tag
         return localProperty.get();
     }
 
+    public void setLocal(boolean local)
+    {
+        localProperty.set(local);
+    }
+
     public BooleanProperty localProperty()
     {
         return localProperty;
@@ -116,6 +126,23 @@ public final class CommunicationTag extends Tag
     public Property<CommunicationStringAddressData> communicationStringAddressDataProperty()
     {
         return stringAddressDataProperty;
+    }
+
+    @Nullable
+    public CommunicationStringAddressData getCommunicationTypeStringAddressData(CommunicationType<?> communicationType)
+    {
+        var property = stringAddressDataMap.get(communicationType);
+        return property == null ? null : property.getValue();
+    }
+
+    @Nullable
+    public void setCommunicationTypeStringAddressData(CommunicationType<?> communicationType, CommunicationStringAddressData stringAddressData)
+    {
+        var property = stringAddressDataMap.get(communicationType);
+        if(property != null)
+        {
+            property.setValue(stringAddressData);
+        }
     }
 
     public void addTaggable(Taggable taggable)

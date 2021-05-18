@@ -10,6 +10,8 @@ import javafx.scene.control.TreeItem;
 import parozzz.github.com.simpleplcpanel.Nullable;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationStringAddressData;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
+import parozzz.github.com.simpleplcpanel.hmi.serialize.JSONSerializable;
+import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
 import parozzz.github.com.simpleplcpanel.hmi.tags.stage.TagStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.ContextMenuBuilder;
 import parozzz.github.com.simpleplcpanel.util.Validate;
@@ -19,6 +21,7 @@ import java.util.Set;
 
 public abstract class Tag
 {
+    private final int internalId;
     private final ObservableValue<String> keyValue;
     private final Set<Runnable> deleteRunnableSet;
 
@@ -27,16 +30,35 @@ public abstract class Tag
 
     public Tag(String key)
     {
+        this(key, TagStage.LAST_INTERNAL_ID++);
+    }
+
+    public Tag(String key, int internalId)
+    {
+        this.internalId = internalId;
         this.keyValue = new ReadOnlyObjectWrapper<>(key);
         this.deleteRunnableSet = new HashSet<>();
     }
 
-    @Nullable
-    public ContextMenu createContextMenu()
+    public int getInternalId()
     {
-        return ContextMenuBuilder.builder()
-                .simple("Delete", this::delete)
-                .getContextMenu();
+        return internalId;
+    }
+
+    public String getKey()
+    {
+        return keyValue.getValue();
+    }
+
+    public ObservableValue<String> keyValueProperty()
+    {
+        return keyValue;
+    }
+
+    @Nullable
+    public TreeItem<Tag> getTreeItem()
+    {
+        return treeItem;
     }
 
     public TreeItem<Tag> init(TagStage tagStage)
@@ -50,19 +72,11 @@ public abstract class Tag
     }
 
     @Nullable
-    public TreeItem<Tag> getTreeItem()
+    public ContextMenu createContextMenu()
     {
-        return treeItem;
-    }
-
-    public String getKey()
-    {
-        return keyValue.getValue();
-    }
-
-    public ObservableValue<String> keyValueProperty()
-    {
-        return keyValue;
+        return ContextMenuBuilder.builder()
+                .simple("Delete", this::delete)
+                .getContextMenu();
     }
 
     public void delete()
@@ -85,4 +99,5 @@ public abstract class Tag
     {
         deleteRunnableSet.add(runnable);
     }
+
 }

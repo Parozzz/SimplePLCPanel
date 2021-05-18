@@ -14,9 +14,17 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.util.converter.DefaultStringConverter;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import parozzz.github.com.simpleplcpanel.Nullable;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationStringAddressData;
+import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
 import parozzz.github.com.simpleplcpanel.hmi.pane.HMIStage;
+import parozzz.github.com.simpleplcpanel.hmi.serialize.JSONSerializable;
+import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONData;
+import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataArray;
+import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
 import parozzz.github.com.simpleplcpanel.hmi.tags.CommunicationTag;
 import parozzz.github.com.simpleplcpanel.hmi.tags.FolderTag;
 import parozzz.github.com.simpleplcpanel.hmi.tags.Tag;
@@ -24,17 +32,22 @@ import parozzz.github.com.simpleplcpanel.hmi.tags.cellfactoryhandlers.LocalCellF
 import parozzz.github.com.simpleplcpanel.hmi.tags.cellfactoryhandlers.StringAddressDataCellFactoryHandler;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public final class TagStage extends HMIStage<VBox>
 {
+    public static int LAST_INTERNAL_ID = 1; //0 is ALWAYS the root
+
     private final CommunicationDataHolder communicationDataHolder;
 
     private final TreeTableView<Tag> treeTableView;
     private final Tag rootFolderTag;
 
     private final Set<Tag> tagSet;
+    private final Map<Integer, Tag> tagMap;
 
     public TagStage(CommunicationDataHolder communicationDataHolder)
     {
@@ -43,9 +56,10 @@ public final class TagStage extends HMIStage<VBox>
         this.communicationDataHolder = communicationDataHolder;
 
         this.treeTableView = new TreeTableView<>();
-        this.rootFolderTag = new FolderTag("root");
+        this.rootFolderTag = new FolderTag("root", 0);
 
         this.tagSet = new HashSet<>();
+        this.tagMap = new HashMap<>();
     }
 
     @Override
@@ -114,7 +128,7 @@ public final class TagStage extends HMIStage<VBox>
                         .map(CommunicationTag.class::cast)
                         .forEach(communicationTag -> communicationTag.updateCommunicationType(communicationType))
         );
-
+/*
         this.addTag(new CommunicationTag("Tag1"));
         this.addTag(new CommunicationTag("Tag2"));
         this.addTag(new CommunicationTag("Tag3"));
@@ -134,8 +148,12 @@ public final class TagStage extends HMIStage<VBox>
         this.addTag(aSecondFolder, new CommunicationTag("Tag9"));
         this.addTag(aSecondFolder, new CommunicationTag("Tag10"));
         this.addTag(aSecondFolder, new CommunicationTag("Tag11"));
-        this.addTag(aSecondFolder, new CommunicationTag("Tag12"));
+        this.addTag(aSecondFolder, new CommunicationTag("Tag12"));*/
+    }
 
+    public Tag getTagFromId(int internalId)
+    {
+        return tagMap.get(internalId);
     }
 
     public void addTag(Tag tag)
@@ -147,6 +165,8 @@ public final class TagStage extends HMIStage<VBox>
     {
         if(tag.getTreeItem() == null && tagSet.add(tag))
         {
+            tagMap.put(tag.getInternalId(), tag);
+
             folderTag = folderTag == null ? rootFolderTag : folderTag;
 
             var folderTreeItem = folderTag.getTreeItem();
@@ -161,8 +181,178 @@ public final class TagStage extends HMIStage<VBox>
             }
 
             tag.addDeleteRunnable(() ->
-                    tagSet.remove(tag)
+                    this.removeTag(tag)
             );
+        }
+    }
+
+    private void removeTag(Tag tag)
+    {
+        tagSet.remove(tag);
+        tagMap.remove(tag.getInternalId());
+    }
+
+    @Override
+    public JSONDataMap serialize()
+    {
+        var jsonDataMap = new JSONDataMap();
+        jsonDataMap.set("LastInternalID", TagStage.LAST_INTERNAL_ID);
+
+        var rootTreeItem = rootFolderTag.getTreeItem();
+        if(rootTreeItem != null)
+        {
+            var rootJSONDataArray = new JSONDataArray();
+            this.serializeTreeItem(rootTreeItem, rootJSONDataArray);
+            jsonDataMap.set("Root", rootJSONDataArray);
+        }
+
+        return jsonDataMap;
+    }
+
+    @Nullable
+    private void serializeTreeItem(TreeItem<Tag> treeItem,
+            JSONDataArray folderJSONDataArray)
+    {
+        if(treeItem == null)
+        {
+            return;
+        }
+
+        for(var child : treeItem.getChildren())
+        {
+            var childTag = child.getValue();
+            if(childTag == null)
+            {
+                continue;
+            }
+
+            var childJSONDataMap = new JSONDataMap();
+            childJSONDataMap.set("InternalID", childTag.getInternalId());
+            childJSONDataMap.set("Key", childTag.getKey());
+
+            if(childTag instanceof FolderTag)
+            {
+                childJSONDataMap.set("Folder", true);
+
+                var childFolderJSONDataArray = new JSONDataArray();
+                this.serializeTreeItem(childTag.getTreeItem(), childFolderJSONDataArray);
+                childJSONDataMap.set("SubKeys", childFolderJSONDataArray);
+            }
+            else if(childTag instanceof CommunicationTag)
+            {
+                var commTag = (CommunicationTag) childTag;
+
+                childJSONDataMap.set("Local", commTag.isLocal());
+
+                var stringAddressDataJSONDataMap = new JSONDataMap();
+                for(var communicationType : CommunicationType.values())
+                {
+                    var stringAddressData = commTag.getCommunicationTypeStringAddressData(communicationType);
+                    if(stringAddressData != null)
+                    {
+                        stringAddressDataJSONDataMap.set(communicationType.getName(), stringAddressData.getStringData());
+                    }
+                }
+                childJSONDataMap.set("CommData", stringAddressDataJSONDataMap);
+            }
+
+            folderJSONDataArray.add(childJSONDataMap);
+        }
+    }
+
+    @Override
+    public void deserialize(JSONDataMap jsonDataMap)
+    {
+        if(jsonDataMap == null || jsonDataMap.size() == 0)
+        {
+            return;
+        }
+
+        LAST_INTERNAL_ID = jsonDataMap.getNumberOrZero("LastInternalID").intValue();
+
+        var rootTreeItem = rootFolderTag.getTreeItem();
+        var rootJSONDataArray = jsonDataMap.getArray("Root");
+        if(rootTreeItem == null || rootJSONDataArray == null)
+        {
+            return;
+        }
+
+        for(var obj : rootJSONDataArray)
+        {
+            if(!(obj instanceof JSONObject))
+            {
+                continue;
+            }
+
+            var childJSONDataMap = new JSONDataMap((JSONObject) obj);
+            this.parseTag(rootFolderTag, childJSONDataMap);
+        }
+    }
+
+    private Tag parseTag(Tag folderTag, JSONDataMap jsonDataMap)
+    {
+        var internalID = jsonDataMap.getNumber("InternalID");
+        var key = jsonDataMap.getString("Key");
+
+        if(internalID == null || key == null)
+        {
+            return null;
+        }
+
+        if(jsonDataMap.getBoolean("Folder"))
+        {
+            var childFolderTag = new FolderTag(key, internalID.intValue());
+            this.addTag(folderTag, childFolderTag);
+
+            var folderTreeItem = childFolderTag.getTreeItem();
+            if(folderTreeItem == null)
+            {
+                return null;
+            }
+
+            var subKeysJSONDataArray = jsonDataMap.getArray("SubKeys");
+            if(subKeysJSONDataArray != null)
+            {
+                for(var obj : subKeysJSONDataArray)
+                {
+                    if(!(obj instanceof JSONObject))
+                    {
+                        continue;
+                    }
+
+                    var childJSONDataMap = new JSONDataMap((JSONObject) obj);
+                    this.parseTag(childFolderTag, childJSONDataMap);
+                }
+            }
+
+            return childFolderTag;
+        }
+        else
+        {
+            var tag = new CommunicationTag(key, internalID.intValue());
+            tag.setLocal(jsonDataMap.getBoolean("Local"));
+
+            var commDataJSONDataMap = jsonDataMap.getMap("CommData");
+            if(commDataJSONDataMap != null)
+            {
+                for(var communicationType : CommunicationType.values())
+                {
+                    var stringData = commDataJSONDataMap.getString(communicationType.getName());
+                    if(stringData != null && !stringData.isEmpty())
+                    {
+                        var addressStringData = communicationType.parseStringAddressData(stringData);
+                        if(addressStringData != null)
+                        {
+                            tag.setCommunicationTypeStringAddressData(communicationType, addressStringData);
+                        }
+                    }
+                }
+            }
+
+            //This needs to be done after because it bounds values together and then
+            //WON'T be able to set the whole "CommData" above!
+            this.addTag(folderTag, tag);
+            return tag;
         }
     }
 }
