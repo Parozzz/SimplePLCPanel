@@ -76,7 +76,33 @@ public abstract class Tag
     {
         return ContextMenuBuilder.builder()
                 .simple("Delete", this::delete)
+                .simple("Test", () -> System.out.println(this.getHierarchicalKey()))
                 .getContextMenu();
+    }
+
+    public String getHierarchicalKey()
+    {
+        if(this.treeItem == null)
+        {
+            return "";
+        }
+
+        var key = this.getKey();
+
+        var treeItemParent = this.treeItem.getParent();
+        while(treeItemParent != null && treeItemParent != tagStage.getRootTreeItem())
+        {
+            var tagParent = treeItemParent.getValue();
+            if(tagParent == null)
+            {
+                return "";
+            }
+
+            key = tagParent.getKey() + "." + key;
+            treeItemParent = treeItemParent.getParent();
+        }
+
+        return key;
     }
 
     public void delete()
@@ -99,5 +125,4 @@ public abstract class Tag
     {
         deleteRunnableSet.add(runnable);
     }
-
 }

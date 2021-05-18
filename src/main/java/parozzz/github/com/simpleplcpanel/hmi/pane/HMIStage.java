@@ -133,6 +133,11 @@ public abstract class HMIStage<P extends Parent>
         stageSetter.show();
     }
 
+    public void hideStage()
+    {
+        stageSetter.hide();
+    }
+
     public boolean every(long millis)
     {
         if (everyTimestamp <= 0 || System.currentTimeMillis() - everyTimestamp > millis)

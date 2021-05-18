@@ -13,6 +13,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
+import javafx.stage.Modality;
+import javafx.stage.StageStyle;
 import javafx.util.converter.DefaultStringConverter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -36,6 +38,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public final class TagStage extends HMIStage<VBox>
 {
@@ -45,6 +48,8 @@ public final class TagStage extends HMIStage<VBox>
 
     private final TreeTableView<Tag> treeTableView;
     private final Tag rootFolderTag;
+
+    private final TagStageSelectionHandler selectionHandler;
 
     private final Set<Tag> tagSet;
     private final Map<Integer, Tag> tagMap;
@@ -58,6 +63,8 @@ public final class TagStage extends HMIStage<VBox>
         this.treeTableView = new TreeTableView<>();
         this.rootFolderTag = new FolderTag("root", 0);
 
+        this.addFXChild(this.selectionHandler = new TagStageSelectionHandler(this));
+
         this.tagSet = new HashSet<>();
         this.tagMap = new HashMap<>();
     }
@@ -68,8 +75,11 @@ public final class TagStage extends HMIStage<VBox>
         super.setup();
 
         super.getStageSetter()
+                .initModality(Modality.APPLICATION_MODAL)
+                .initStyle(StageStyle.UTILITY)
                 .setAlwaysOnTop(true)
-                .setResizable(true);//.stopWidthResize();
+                .setResizable(true)
+                .setOnWindowCloseRequest(event -> selectionHandler.setSelectTagConsumer(null));//.stopWidthResize();
 
         var topLabel = new Label();
         topLabel.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
@@ -88,7 +98,7 @@ public final class TagStage extends HMIStage<VBox>
         treeTableView.setRowFactory(tTableView ->
         {
             var tableRow = new TreeTableRow<Tag>();
-            tableRow.setPrefHeight(25);
+            tableRow.setPrefHeight(20);
             tableRow.setPadding(new Insets(0));
             tableRow.treeItemProperty().addListener((observable, oldValue, newValue) ->
             {
@@ -114,6 +124,7 @@ public final class TagStage extends HMIStage<VBox>
         treeTableView.setShowRoot(true);
         treeTableView.setRoot(rootFolderTag.init(this));
         treeTableView.getColumns().addAll(nameColumn, localColumn, addressColumn);
+        treeTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
         var stackPane = new StackPane(treeTableView);
         stackPane.setMinSize(0, 0);
@@ -128,27 +139,16 @@ public final class TagStage extends HMIStage<VBox>
                         .map(CommunicationTag.class::cast)
                         .forEach(communicationTag -> communicationTag.updateCommunicationType(communicationType))
         );
-/*
-        this.addTag(new CommunicationTag("Tag1"));
-        this.addTag(new CommunicationTag("Tag2"));
-        this.addTag(new CommunicationTag("Tag3"));
-        this.addTag(new CommunicationTag("Tag4"));
+    }
 
-        var aFolder = new FolderTag("Folder1!");
-        this.addTag(aFolder);
+    TreeTableView<Tag> getTreeTableView()
+    {
+        return treeTableView;
+    }
 
-        this.addTag(aFolder, new CommunicationTag("Tag5"));
-        this.addTag(aFolder, new CommunicationTag("Tag6"));
-        this.addTag(aFolder, new CommunicationTag("Tag7"));
-        this.addTag(aFolder, new CommunicationTag("Tag8"));
-
-        var aSecondFolder = new FolderTag("Folder2!");
-        this.addTag(aSecondFolder);
-
-        this.addTag(aSecondFolder, new CommunicationTag("Tag9"));
-        this.addTag(aSecondFolder, new CommunicationTag("Tag10"));
-        this.addTag(aSecondFolder, new CommunicationTag("Tag11"));
-        this.addTag(aSecondFolder, new CommunicationTag("Tag12"));*/
+    public TreeItem<Tag> getRootTreeItem()
+    {
+        return treeTableView.getRoot();
     }
 
     public Tag getTagFromId(int internalId)
@@ -190,6 +190,30 @@ public final class TagStage extends HMIStage<VBox>
     {
         tagSet.remove(tag);
         tagMap.remove(tag.getInternalId());
+    }
+
+    @Override
+    public void showStage()
+    {
+        selectionHandler.setSelectTagConsumer(null);
+
+        var selectionHandlerParent = selectionHandler.getMainParent();
+        super.parent.getChildren().remove(selectionHandlerParent);
+
+        super.showStage();
+    }
+
+    public void showAsSelection(Consumer<CommunicationTag> selectTagConsumer)
+    {
+        selectionHandler.setSelectTagConsumer(selectTagConsumer);
+
+        var selectionHandlerParent = selectionHandler.getMainParent();
+
+        var children = super.parent.getChildren();
+        if(!children.contains(selectionHandlerParent))
+        {
+            children.add(selectionHandlerParent);
+        }
     }
 
     @Override
@@ -237,8 +261,7 @@ public final class TagStage extends HMIStage<VBox>
                 var childFolderJSONDataArray = new JSONDataArray();
                 this.serializeTreeItem(childTag.getTreeItem(), childFolderJSONDataArray);
                 childJSONDataMap.set("SubKeys", childFolderJSONDataArray);
-            }
-            else if(childTag instanceof CommunicationTag)
+            }else if(childTag instanceof CommunicationTag)
             {
                 var commTag = (CommunicationTag) childTag;
 
@@ -289,14 +312,14 @@ public final class TagStage extends HMIStage<VBox>
         }
     }
 
-    private Tag parseTag(Tag folderTag, JSONDataMap jsonDataMap)
+    private void parseTag(Tag folderTag, JSONDataMap jsonDataMap)
     {
         var internalID = jsonDataMap.getNumber("InternalID");
         var key = jsonDataMap.getString("Key");
 
         if(internalID == null || key == null)
         {
-            return null;
+            return;
         }
 
         if(jsonDataMap.getBoolean("Folder"))
@@ -307,7 +330,7 @@ public final class TagStage extends HMIStage<VBox>
             var folderTreeItem = childFolderTag.getTreeItem();
             if(folderTreeItem == null)
             {
-                return null;
+                return;
             }
 
             var subKeysJSONDataArray = jsonDataMap.getArray("SubKeys");
@@ -324,10 +347,7 @@ public final class TagStage extends HMIStage<VBox>
                     this.parseTag(childFolderTag, childJSONDataMap);
                 }
             }
-
-            return childFolderTag;
-        }
-        else
+        }else
         {
             var tag = new CommunicationTag(key, internalID.intValue());
             tag.setLocal(jsonDataMap.getBoolean("Local"));
@@ -352,7 +372,6 @@ public final class TagStage extends HMIStage<VBox>
             //This needs to be done after because it bounds values together and then
             //WON'T be able to set the whole "CommData" above!
             this.addTag(folderTag, tag);
-            return tag;
         }
     }
 }
