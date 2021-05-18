@@ -64,12 +64,12 @@ public abstract class Attribute extends FXObject// implements Cloneable
 
     public void copyInto(Attribute pasteAttribute)
     {
-        attributePropertyManager.forEachPropertyBis(propertyBis ->
+        attributePropertyManager.forEachAttributePropertyData(data ->
         {
             //This should be fine since if they have the same attribute property, they have the same type!
             //Otherwise something is not working properly ... (And now a check is in place >:) )
-            var attributeProperty = propertyBis.getAttributeProperty();
-            Property property = propertyBis.getProperty();
+            var attributeProperty = data.getAttributeProperty();
+            Property property = data.getProperty();
 
             Property pasteProperty = pasteAttribute.getAttributePropertyManager().getByAttributeProperty(attributeProperty);
             if(pasteProperty != null)

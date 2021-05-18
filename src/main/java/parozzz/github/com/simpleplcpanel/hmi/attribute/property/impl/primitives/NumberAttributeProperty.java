@@ -1,6 +1,7 @@
 package parozzz.github.com.simpleplcpanel.hmi.attribute.property.impl.primitives;
 
 import javafx.beans.property.Property;
+import parozzz.github.com.simpleplcpanel.hmi.attribute.Attribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.property.AttributeProperty;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
 
@@ -22,22 +23,56 @@ public class NumberAttributeProperty<N extends Number> extends AttributeProperty
         this.function = function;
     }
 
-    @Override
-    public void serializeInto(Property<N> property, JSONDataMap jsonDataMap)
-    {
-        var value = property.getValue();
-        if (value != null)
+    /*
+        @Override
+        public void serializeInto(Property<N> property, JSONDataMap jsonDataMap)
         {
-            jsonDataMap.set(super.key, value);
+            var value = property.getValue();
+            if(value != null)
+            {
+                jsonDataMap.set(super.key, value);
+            }
         }
+
+        @Override
+        public void deserializeFrom(Property<N> property, JSONDataMap jsonDataMap)
+        {
+            var number = jsonDataMap.getNumber(super.key);
+            super.setValue(property, number == null
+                                     ? super.defaultValue
+                                     : function.apply(number));
+        }
+    */
+    @Override
+    public Data<N> createData(Attribute attribute)
+    {
+        return new NumberData();
     }
 
-    @Override
-    public void deserializeFrom(Property<N> property, JSONDataMap jsonDataMap)
+    public class NumberData extends AttributeProperty.Data<N>
     {
-        var number = jsonDataMap.getNumber(super.key);
-        super.setValue(property, number == null
-                ? super.defaultValue
-                : function.apply(number));
+        protected NumberData()
+        {
+            super(NumberAttributeProperty.this);
+        }
+
+        @Override
+        public void serializeInto(JSONDataMap jsonDataMap)
+        {
+            var value = property.getValue();
+            if(value != null)
+            {
+                jsonDataMap.set(key, value);
+            }
+        }
+
+        @Override
+        public void deserializeFrom(JSONDataMap jsonDataMap)
+        {
+            var number = jsonDataMap.getNumber(key);
+            super.setValue(number == null
+                           ? defaultValue
+                           : function.apply(number));
+        }
     }
 }

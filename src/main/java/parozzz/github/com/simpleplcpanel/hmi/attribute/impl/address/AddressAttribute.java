@@ -13,11 +13,14 @@ import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.stringaddress.ModbusStr
 import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.stringaddress.SiemensS7StringAddressData;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.impl.AddressSetupPane;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
+import parozzz.github.com.simpleplcpanel.hmi.tags.CommunicationTag;
+import parozzz.github.com.simpleplcpanel.hmi.tags.Tag;
 
 import java.util.function.Function;
 
 public abstract class AddressAttribute extends Attribute
 {
+
     public static final AttributeProperty<AddressSetupPane.AddressType> ADDRESS_TYPE =
             new EnumAttributeProperty<>("CommunicationType", AddressSetupPane.AddressType.NONE);
 

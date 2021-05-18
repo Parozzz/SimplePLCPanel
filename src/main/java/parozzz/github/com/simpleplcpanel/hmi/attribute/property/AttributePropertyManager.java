@@ -19,7 +19,7 @@ public class AttributePropertyManager
 
     private final Map<AttributeProperty<?>, Property<?>> attributePropertyMap;
     private final Map<String, AttributeProperty<?>> attributePropertyKeyMap;
-    private final Set<PropertyBis<?>> propertyBisSet;
+    private final Set<AttributeProperty.Data<?>> attributePropertyDataSet;
 
     public AttributePropertyManager(Attribute attribute)
     {
@@ -27,7 +27,7 @@ public class AttributePropertyManager
 
         this.attributePropertyMap = new HashMap<>();
         this.attributePropertyKeyMap = new HashMap<>();
-        this.propertyBisSet = new HashSet<>();
+        this.attributePropertyDataSet = new HashSet<>();
     }
 
     public void addAll(AttributeProperty<?>... attributeProperties)
@@ -38,20 +38,23 @@ public class AttributePropertyManager
     public <P> AttributePropertyManager add(AttributeProperty<P> attributeProperty)
     {
         var key = attributeProperty.getKey();
-        Validate.needFalse("Trying to add an attribute with the same key twice. Key: ", key, attributePropertyKeyMap.containsKey(key));
 
-        var property = new SimpleObjectProperty<>(attributeProperty.getDefaultValue());
+        var putReturn = attributePropertyKeyMap.putIfAbsent(key, attributeProperty);
+        Validate.needTrue("Trying to add an attribute with the same key twice. Key: ",
+                key, putReturn != attributeProperty);
+
+        var attributePropertyData = attributeProperty.createData(attribute);
+        attributePropertyDataSet.add(attributePropertyData);
+
+        var property = attributePropertyData.getProperty();
+        attributePropertyMap.put(attributeProperty, property);
         property.addListener((observable, oldValue, newValue) -> {
             attribute.update();
 
             var attributeType = attribute.getType();
-            attribute.getAttributeMap().getControlWrapper().getAttributeUpdater().updateAttribute(attributeType);
+            attribute.getAttributeMap().getControlWrapper()
+                    .getAttributeUpdater().updateAttribute(attributeType);
         });
-
-        attributePropertyMap.put(attributeProperty, property);
-
-        attributePropertyKeyMap.put(key, attributeProperty);
-        propertyBisSet.add(new PropertyBis<>(attributeProperty, property));
         return this;
     }
 
@@ -66,7 +69,7 @@ public class AttributePropertyManager
         if(removed)
         {
             attributePropertyMap.remove(attributeProperty);
-            propertyBisSet.removeIf(propertyBis -> propertyBis.getAttributeProperty() == attributeProperty);
+            attributePropertyDataSet.removeIf(propertyBis -> propertyBis.getAttributeProperty() == attributeProperty);
         }
     }
 
@@ -82,50 +85,22 @@ public class AttributePropertyManager
         return attributePropertyKeyMap.get(key);
     }
 
-    public void forEachPropertyBis(Consumer<PropertyBis<?>> consumer)
+    public void forEachAttributePropertyData(Consumer<AttributeProperty.Data<?>> consumer)
     {
-        propertyBisSet.forEach(consumer);
+        attributePropertyDataSet.forEach(consumer);
     }
 
     public void serializeInto(JSONDataMap jsonDataMap)
     {
-        propertyBisSet.forEach(propertyBis -> propertyBis.serializeInto(jsonDataMap));
+        attributePropertyDataSet.forEach(data ->
+                data.serializeInto(jsonDataMap)
+        );
     }
 
     public void deserializeFrom(JSONDataMap jsonDataMap)
     {
-        propertyBisSet.forEach(propertyBis -> propertyBis.deserializeFrom(jsonDataMap));
-    }
-
-    public static final class PropertyBis<P>
-    {
-        private final AttributeProperty<P> attributeProperty;
-        private final Property<P> property;
-
-        private PropertyBis(AttributeProperty<P> attributeProperty, Property<P> property)
-        {
-            this.attributeProperty = attributeProperty;
-            this.property = property;
-        }
-
-        public AttributeProperty<P> getAttributeProperty()
-        {
-            return attributeProperty;
-        }
-
-        public Property<P> getProperty()
-        {
-            return property;
-        }
-
-        public void serializeInto(JSONDataMap jsonDataMap)
-        {
-            attributeProperty.serializeInto(property, jsonDataMap);
-        }
-
-        public void deserializeFrom(JSONDataMap jsonDataMap)
-        {
-            attributeProperty.deserializeFrom(property, jsonDataMap);
-        }
+        attributePropertyDataSet.forEach(data ->
+                data.deserializeFrom(jsonDataMap)
+        );
     }
 }

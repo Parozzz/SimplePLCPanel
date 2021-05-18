@@ -394,6 +394,11 @@ public final class MainEditStage extends BorderPaneHMIStage
         return shownControlContainerPane;
     }
 
+    public TagStage getTagStage()
+    {
+        return tagStage;
+    }
+
     public int getPageWidth()
     {
         return Integer.parseInt(pageWidthTextField.getText());
