@@ -11,6 +11,10 @@ import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.AddressAttri
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.propertyholders.SiemensS7AttributePropertyHolder;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
+import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.intermediate.bit.ModbusWriteBitIntermediate;
+import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.intermediate.doubleword.ModbusWriteDWordIntermediate;
+import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.intermediate.quadword.ModbusWriteQWordIntermediate;
+import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.intermediate.word.ModbusWriteWordIntermediate;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.stringaddress.ModbusStringAddressData;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.tcp.ModbusTCPThread;
 import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7Thread;
@@ -20,6 +24,8 @@ import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.intermediate.SiemensS7
 import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.stringaddress.SiemensS7StringAddressData;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.impl.AddressSetupPane;
 import parozzz.github.com.simpleplcpanel.hmi.database.ControlContainerDatabase;
+import parozzz.github.com.simpleplcpanel.hmi.tags.CommunicationTag;
+import parozzz.github.com.simpleplcpanel.hmi.tags.stage.TagStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.valueintermediate.ValueIntermediate;
 
 import java.util.Objects;
@@ -28,19 +34,20 @@ import java.util.function.Consumer;
 
 public final class SiemensPLCDataUpdater extends ControlDataUpdater<SiemensS7Thread>
 {
-    public static SiemensPLCDataUpdater createInstance(ControlContainerDatabase controlContainerDatabase,
+    public static SiemensPLCDataUpdater createInstance(TagStage tagStage,
+            ControlContainerDatabase controlContainerDatabase,
             CommunicationDataHolder communicationDataHolder)
     {
         var siemensS7Thread = communicationDataHolder.getCommThread(CommunicationType.SIEMENS_S7, SiemensS7Thread.class);
         Objects.requireNonNull(siemensS7Thread, "SiemensS7Thread is null while creating SiemensPLCDataUpdater?");
 
-        return new SiemensPLCDataUpdater(controlContainerDatabase, communicationDataHolder, siemensS7Thread);
+        return new SiemensPLCDataUpdater(tagStage, controlContainerDatabase, communicationDataHolder, siemensS7Thread);
     }
 
-    private SiemensPLCDataUpdater(ControlContainerDatabase controlContainerDatabase,
+    private SiemensPLCDataUpdater(TagStage tagStage, ControlContainerDatabase controlContainerDatabase,
             CommunicationDataHolder communicationDataHolder, SiemensS7Thread siemensS7Thread)
     {
-        super(CommunicationType.SIEMENS_S7, controlContainerDatabase,
+        super(tagStage, CommunicationType.SIEMENS_S7, controlContainerDatabase,
                 communicationDataHolder, siemensS7Thread);
     }
 
@@ -71,6 +78,37 @@ public final class SiemensPLCDataUpdater extends ControlDataUpdater<SiemensS7Thr
         var writeBitSet = commThread.getWriteBitWrapperSet();
         writeBitSet.clear();
 
+        for (var tag : tagStage.getTagSet())
+        {
+            if (!(tag instanceof CommunicationTag))
+            {
+                continue;
+            }
+
+            var commTag = (CommunicationTag) tag;
+
+            var stringAddressData = commTag.getStringAddressData();
+            if (commTag.isLocal() || !commTag.hasProperty(CommunicationTag.TagProperty.ACTIVE)
+                    || !(stringAddressData instanceof SiemensS7StringAddressData))
+            {
+                continue;
+            }
+
+            var siemensS7StringAddressData = (SiemensS7StringAddressData) stringAddressData;
+
+            if (super.needWriteTagSet.remove(tag))
+            {
+                var writeIntermediate = commTag.getWriteIntermediate();
+                this.parseWrite(writeIntermediate, siemensS7StringAddressData, writeSet, writeBitSet);
+            }
+
+            if (commTag.hasProperty(CommunicationTag.TagProperty.NEED_READ))
+            {
+                var readIntermediate = commTag.getReadIntermediate();
+                this.parseRead(readIntermediate, siemensS7StringAddressData, readSet);
+            }
+        }
+        /*
         for (var controlWrapper : controlContainerDatabase.getControlWrapperSet())
         {
             if (newValueControlWrapperSet.remove(controlWrapper))
@@ -90,7 +128,7 @@ public final class SiemensPLCDataUpdater extends ControlDataUpdater<SiemensS7Thr
                 var externalValue = controlWrapper.getValue().getOutsideValue();
                 this.parseRead(externalValue, readAddressData, readSet);
             }
-        }
+        }*/
 
         //There needs to be some values inside this sets, otherwise it makes no sense to commit an update
         if (!(readSet.isEmpty() && writeSet.isEmpty() && writeBitSet.isEmpty()))
@@ -222,7 +260,7 @@ public final class SiemensPLCDataUpdater extends ControlDataUpdater<SiemensS7Thr
         return new SiemensS7ReadableWrappedDataIntermediate<>(readableData,
                 addressData.getAreaType(), addressData.getDbNumber(), addressData.getByteOffset(), consumer);
     }
-
+/*
     private SiemensS7StringAddressData getAddressData(AddressAttribute addressAttribute)
     {
         if (addressAttribute == null)
@@ -237,6 +275,6 @@ public final class SiemensPLCDataUpdater extends ControlDataUpdater<SiemensS7Thr
         }
 
         return addressAttribute.getValue(AddressAttribute.SIEMENS_STRING_DATA);
-    }
+    }*/
 
 }

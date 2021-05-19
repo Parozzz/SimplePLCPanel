@@ -1,16 +1,11 @@
 package parozzz.github.com.simpleplcpanel.hmi.database.dataupdater;
 
-import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeFetcher;
-import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
-import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.AddressAttribute;
-import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.propertyholders.ModbusAttributePropertyHolder;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
 import parozzz.github.com.simpleplcpanel.hmi.comm.ReadOnlyIntermediate;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.stringaddress.ModbusStringAddressData;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.tcp.ModbusTCPThread;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.intermediate.ModbusReadNumberIntermediate;
-import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.intermediate.bit.ModbusReadBitIntermediate;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.intermediate.bit.ModbusWriteBitIntermediate;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.intermediate.doubleword.ModbusReadDWordIntermediate;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.intermediate.doubleword.ModbusWriteDWordIntermediate;
@@ -18,8 +13,9 @@ import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.intermediate.quadword.M
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.intermediate.quadword.ModbusWriteQWordIntermediate;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.intermediate.word.ModbusReadWordIntermediate;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.intermediate.word.ModbusWriteWordIntermediate;
-import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.impl.AddressSetupPane;
 import parozzz.github.com.simpleplcpanel.hmi.database.ControlContainerDatabase;
+import parozzz.github.com.simpleplcpanel.hmi.tags.CommunicationTag;
+import parozzz.github.com.simpleplcpanel.hmi.tags.stage.TagStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.valueintermediate.ValueIntermediate;
 
 import java.util.Objects;
@@ -27,20 +23,21 @@ import java.util.Set;
 
 public final class ModbusTCPDataUpdater extends ControlDataUpdater<ModbusTCPThread>
 {
-    public static ModbusTCPDataUpdater createInstance(ControlContainerDatabase controlContainerDatabase,
+    public static ModbusTCPDataUpdater createInstance(TagStage tagStage,
+            ControlContainerDatabase controlContainerDatabase,
             CommunicationDataHolder communicationDataHolder)
     {
         var modbusTCPThread = communicationDataHolder.getCommThread(CommunicationType.MODBUS_TCP, ModbusTCPThread.class);
         Objects.requireNonNull(modbusTCPThread, "ModbusTCPThread is null while creating ModbusTCPDataUpdater?");
 
-        return new ModbusTCPDataUpdater(controlContainerDatabase, communicationDataHolder, modbusTCPThread);
+        return new ModbusTCPDataUpdater(tagStage, controlContainerDatabase, communicationDataHolder, modbusTCPThread);
     }
 
-    private ModbusTCPDataUpdater(ControlContainerDatabase controlContainerDatabase,
+    private ModbusTCPDataUpdater(TagStage tagStage, ControlContainerDatabase controlContainerDatabase,
             CommunicationDataHolder communicationDataHolder, ModbusTCPThread modbusTCPThread)
     {
-        super(CommunicationType.MODBUS_TCP, controlContainerDatabase,
-                communicationDataHolder,modbusTCPThread);
+        super(tagStage, CommunicationType.MODBUS_TCP, controlContainerDatabase,
+                communicationDataHolder, modbusTCPThread);
     }
 
     @Override
@@ -54,7 +51,7 @@ public final class ModbusTCPDataUpdater extends ControlDataUpdater<ModbusTCPThre
 
     private void parseReadOnlySet(Set<? extends ReadOnlyIntermediate> intermediateSet)
     {
-        if(intermediateSet != null && !intermediateSet.isEmpty())
+        if (intermediateSet != null && !intermediateSet.isEmpty())
         {
             intermediateSet.forEach(ReadOnlyIntermediate::parse);
         }
@@ -63,7 +60,7 @@ public final class ModbusTCPDataUpdater extends ControlDataUpdater<ModbusTCPThre
     @Override
     public void update()
     {
-        if(commThread.isUpdating())
+        if (commThread.isUpdating())
         {
             return;
         }
@@ -86,46 +83,126 @@ public final class ModbusTCPDataUpdater extends ControlDataUpdater<ModbusTCPThre
         var readInputRegistersSet = commThread.getReadInputRegistersSet();
         readInputRegistersSet.clear();
 
-        for(var controlWrapper : controlContainerDatabase.getControlWrapperSet())
+        for (var tag : tagStage.getTagSet())
         {
-            if(newValueControlWrapperSet.remove(controlWrapper))
+            if (!(tag instanceof CommunicationTag))
             {
-                var writeAddressData = this.getAddressData(AttributeFetcher.fetch(controlWrapper, AttributeType.WRITE_ADDRESS));
-                if(writeAddressData != null)
-                {
-                    var offset = writeAddressData.getOffset();
-                    var internalValue = controlWrapper.getValue().getInternalValue();
-                    switch(writeAddressData.getFunctionCode())
-                    {
-                        case HOLDING_REGISTER:
-                            switch(writeAddressData.getDataLength())
-                            {
-                                case WORD:
-                                    writeHoldingRegisterSet.add(new ModbusWriteWordIntermediate(offset, internalValue.asInteger()));
-                                    break;
-                                case DOUBLE_WORD:
-                                    writeHoldingRegisterSet.add(new ModbusWriteDWordIntermediate(offset, internalValue.asInteger()));
-                                    break;
-                                case QUAD_WORD:
-                                    writeHoldingRegisterSet.add(new ModbusWriteQWordIntermediate(offset, internalValue.asLong()));
-                                    break;
-                            }
-                            break;
-                        case COIL:
-                            writeCoilsSet.add(new ModbusWriteBitIntermediate(offset, internalValue.asBoolean()));
-                            break;
-                    }
-                }
+                continue;
+            }
 
-                //Parse write values here!
+            var commTag = (CommunicationTag) tag;
+
+            var stringAddressData = commTag.getStringAddressData();
+            if (commTag.isLocal() || !commTag.hasProperty(CommunicationTag.TagProperty.ACTIVE)
+                    ||  !(stringAddressData instanceof ModbusStringAddressData))
+            {
+                continue;
+            }
+
+            var modbusStringAddressData = (ModbusStringAddressData) stringAddressData;
+
+            if (super.needWriteTagSet.remove(tag))
+            {
+                var writeIntermediate = commTag.getWriteIntermediate();
+
+                var offset = modbusStringAddressData.getOffset();
+                switch (modbusStringAddressData.getFunctionCode())
+                {
+                    case HOLDING_REGISTER:
+                        switch (modbusStringAddressData.getDataLength())
+                        {
+                            case WORD:
+                                writeHoldingRegisterSet.add(new ModbusWriteWordIntermediate(offset, writeIntermediate.asInteger()));
+                                break;
+                            case DOUBLE_WORD:
+                                writeHoldingRegisterSet.add(new ModbusWriteDWordIntermediate(offset, writeIntermediate.asInteger()));
+                                break;
+                            case QUAD_WORD:
+                                writeHoldingRegisterSet.add(new ModbusWriteQWordIntermediate(offset, writeIntermediate.asLong()));
+                                break;
+                        }
+                        break;
+                    case COIL:
+                        writeCoilsSet.add(new ModbusWriteBitIntermediate(offset, writeIntermediate.asBoolean()));
+                        break;
+                }
+            }
+
+            if (commTag.hasProperty(CommunicationTag.TagProperty.NEED_READ))
+            {
+                var readIntermediate = commTag.getReadIntermediate();
+
+                var offset = modbusStringAddressData.getOffset();
+                switch (modbusStringAddressData.getFunctionCode())
+                {
+                    case HOLDING_REGISTER:
+                        switch (modbusStringAddressData.getDataLength())
+                        {
+                            case WORD:
+                                writeHoldingRegisterSet.add(new ModbusWriteWordIntermediate(offset, readIntermediate.asInteger()));
+                                break;
+                            case DOUBLE_WORD:
+                                writeHoldingRegisterSet.add(new ModbusWriteDWordIntermediate(offset, readIntermediate.asInteger()));
+                                break;
+                            case QUAD_WORD:
+                                writeHoldingRegisterSet.add(new ModbusWriteQWordIntermediate(offset, readIntermediate.asLong()));
+                                break;
+                        }
+                        break;
+                    case COIL:
+                        writeCoilsSet.add(new ModbusWriteBitIntermediate(offset, readIntermediate.asBoolean()));
+                        break;
+                }
+            }
+        }
+
+        /*
+        for (var controlWrapper : controlContainerDatabase.getControlWrapperSet())
+        {
+
+
+            var writeAddress = AttributeFetcher.fetch(controlWrapper, AttributeType.WRITE_ADDRESS);
+            if (writeAddress != null)
+            {
+                var writeTag = writeAddress.getValue(AddressAttribute.COMMUNICATION_TAG);
+                if (writeTag != null)
+                {
+
+                }
+            }
+            var writeAddressData = this.getAddressData(AttributeFetcher.fetch(controlWrapper, AttributeType.WRITE_ADDRESS));
+            if (writeAddressData != null)
+            {
+                var offset = writeAddressData.getOffset();
+                var internalValue = controlWrapper.getValue().getInternalValue();
+                switch (writeAddressData.getFunctionCode())
+                {
+                    case HOLDING_REGISTER:
+                        switch (writeAddressData.getDataLength())
+                        {
+                            case WORD:
+                                writeHoldingRegisterSet.add(new ModbusWriteWordIntermediate(offset, internalValue.asInteger()));
+                                break;
+                            case DOUBLE_WORD:
+                                writeHoldingRegisterSet.add(new ModbusWriteDWordIntermediate(offset, internalValue.asInteger()));
+                                break;
+                            case QUAD_WORD:
+                                writeHoldingRegisterSet.add(new ModbusWriteQWordIntermediate(offset, internalValue.asLong()));
+                                break;
+                        }
+                        break;
+                    case COIL:
+                        writeCoilsSet.add(new ModbusWriteBitIntermediate(offset, internalValue.asBoolean()));
+                        break;
+                }
             }
 
             var readAddressData = this.getAddressData(AttributeFetcher.fetch(controlWrapper, AttributeType.READ_ADDRESS));
-            if(readAddressData != null)
+            if (readAddressData != null)
             {
                 var offset = readAddressData.getOffset();
                 var outsideValue = controlWrapper.getValue().getOutsideValue();
-                switch(readAddressData.getFunctionCode())
+                switch (readAddressData.getFunctionCode())
                 {
                     case HOLDING_REGISTER:
                         readHoldingRegisterSet.add(this.parseReadNumberIntermediate(readAddressData, offset, outsideValue));
@@ -143,8 +220,8 @@ public final class ModbusTCPDataUpdater extends ControlDataUpdater<ModbusTCPThre
             }
             //Parse read values here
         }
-
-        if(!(readHoldingRegisterSet.isEmpty() && writeHoldingRegisterSet.isEmpty()
+*/
+        if (!(readHoldingRegisterSet.isEmpty() && writeHoldingRegisterSet.isEmpty()
                 && writeCoilsSet.isEmpty() && readCoilsSet.isEmpty()
                 && readDiscreteInputsSet.isEmpty()
                 && readInputRegistersSet.isEmpty()))
@@ -157,7 +234,7 @@ public final class ModbusTCPDataUpdater extends ControlDataUpdater<ModbusTCPThre
             int offset, ValueIntermediate intermediate)
     {
         ModbusReadNumberIntermediate readNumberIntermediate;
-        switch(addressData.getDataLength())
+        switch (addressData.getDataLength())
         {
             case BIT:
                 var bitOffset = addressData.getBitOffset();
@@ -180,7 +257,7 @@ public final class ModbusTCPDataUpdater extends ControlDataUpdater<ModbusTCPThre
                 return null;
         }
 
-        if(addressData.isSigned())
+        if (addressData.isSigned())
         {
             readNumberIntermediate.setSigned();
         }
@@ -188,20 +265,20 @@ public final class ModbusTCPDataUpdater extends ControlDataUpdater<ModbusTCPThre
         return readNumberIntermediate;
     }
 
-
+/*
     private ModbusStringAddressData getAddressData(AddressAttribute addressAttribute)
     {
-        if(addressAttribute == null)
+        if (addressAttribute == null)
         {
             return null;
         }
 
         var addressType = addressAttribute.getValue(AddressAttribute.ADDRESS_TYPE);
-        if(addressType != AddressSetupPane.AddressType.COMMUNICATION)
+        if (addressType != AddressSetupPane.AddressType.COMMUNICATION)
         {
             return null;
         }
 
         return addressAttribute.getValue(AddressAttribute.MODBUS_TCP_STRING_DATA);
-    }
+    }*/
 }

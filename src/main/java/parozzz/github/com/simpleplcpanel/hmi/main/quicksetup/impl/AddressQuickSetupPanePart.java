@@ -10,17 +10,17 @@ import parozzz.github.com.simpleplcpanel.Nullable;
 import parozzz.github.com.simpleplcpanel.hmi.FXObject;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
-import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.BackgroundAttribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.AddressAttribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.property.AttributeProperty;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationStringAddressData;
-import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.impl.AddressSetupPane;
 import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupPane;
 import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupPanePart;
 import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupStateBinder;
+import parozzz.github.com.simpleplcpanel.hmi.tags.CommunicationTag;
+import parozzz.github.com.simpleplcpanel.hmi.tags.stage.TagStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.EnumStringConverter;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
 
@@ -30,22 +30,22 @@ public final class AddressQuickSetupPanePart
         extends FXObject
         implements QuickSetupPanePart
 {
-    @FXML private Label addressTypeLabel;
-    @FXML private TextField addressTextField;
-    @FXML private ChoiceBox<AddressSetupPane.AddressType> addressTypeChoiceBox;
+    @FXML private Label topLabel;
+    @FXML private TextField tagTextField;
 
     private final QuickSetupPane quickSetupPane;
-    private final CommunicationDataHolder communicationDataHolder;
+    private final TagStage tagStage;
     private final boolean readOnly;
 
     private final VBox vBox;
 
     public AddressQuickSetupPanePart(QuickSetupPane quickSetupPane,
+            TagStage tagStage,
             CommunicationDataHolder communicationDataHolder,
             boolean readOnly) throws IOException
     {
         this.quickSetupPane = quickSetupPane;
-        this.communicationDataHolder = communicationDataHolder;
+        this.tagStage = tagStage;
         this.readOnly = readOnly;
 
         this.vBox = (VBox) FXUtil.loadFXML("quickproperties/addressQuickSetupPane.fxml", this);
@@ -54,13 +54,8 @@ public final class AddressQuickSetupPanePart
     @Override
     public void setup()
     {
-
-        communicationDataHolder.getCommunicationStage().addCommunicationTypeListener(communicationType ->
-                quickSetupPane.loadAllValuesFromControlWrapperOf(this.getAttributeType())
-        );
-
-        addressTypeLabel.setText(readOnly ? "Read Address" : "Write Address");
-        addressTextField.setOnMouseClicked(mouseEvent ->
+        topLabel.setText(readOnly ? "Read Tag" : "Write Tag");
+        tagTextField.setOnMouseClicked(mouseEvent ->
         {
             var controlWrapper = quickSetupPane.getSelectedControlWrapper();
             if(controlWrapper == null)
@@ -68,39 +63,14 @@ public final class AddressQuickSetupPanePart
                 return;
             }
 
-            var addressType = addressTypeChoiceBox.getValue();
-            if(addressType == null || addressType == AddressSetupPane.AddressType.NONE)
-            {
-                return;
-            }
-
             var addressAttribute = AttributeFetcher.fetch(controlWrapper, this.getAttributeType());
-            if(addressAttribute == null)
+            if(addressAttribute != null)
             {
-                return;
-            }
-
-            if(addressType == AddressSetupPane.AddressType.COMMUNICATION)
-            {
-                var communicationType = communicationDataHolder.getCurrentCommunicationType();
-                if(communicationType == null)
-                {
-                    return;
-                }
-
-                var stringAddressCreator = communicationType.supplyStringAddressCreatorStage();
-                if(stringAddressCreator == null)
-                {
-                    return;
-                }
-
-                stringAddressCreator.loadAddressAttributeToActualValues(addressAttribute);
-                stringAddressCreator.showAsInputTextAddress(addressAttribute);
+                tagStage.showAsSelection(tag ->
+                        addressAttribute.setValue(AddressAttribute.COMMUNICATION_TAG, tag)
+                );
             }
         });
-
-        addressTypeChoiceBox.setConverter(new EnumStringConverter<>(AddressSetupPane.AddressType.class).setCapitalize());
-        addressTypeChoiceBox.getItems().addAll(AddressSetupPane.AddressType.values());
     }
 
     @Override
@@ -118,39 +88,17 @@ public final class AddressQuickSetupPanePart
     @Override
     public void clearControlWrapper()
     {
-        addressTextField.setText("");
+        tagTextField.setText("");
     }
 
     @Override
     public void addBinders(QuickSetupStateBinder stateBinder)
     {
         stateBinder.builder(this.getAttributeType())
-                .readOnlyIndirect(addressTextField.textProperty(),
-                        CommunicationStringAddressData::getStringData,
-                        () ->
-                        {
-                            var attributeProperty = this.getAttributeProperty();
-                            if(attributeProperty == null)
-                            {
-                                addressTextField.setText("");
-                                return null;
-                            }
-
-                            return attributeProperty;
-                        }
-                ).direct(addressTypeChoiceBox.valueProperty(), AddressAttribute.ADDRESS_TYPE);
-    }
-
-    @Nullable
-    private AttributeProperty<? extends CommunicationStringAddressData> getAttributeProperty()
-    {
-        var addressType = addressTypeChoiceBox.getValue();
-        if(addressType == null || addressType == AddressSetupPane.AddressType.NONE)
-        {
-            return null;
-        }
-
-        return communicationDataHolder.getCurrentCommunicationType().getAttributeProperty();
+                .readOnlyIndirect(tagTextField.textProperty(),
+                        CommunicationTag::getHierarchicalKey,
+                        () -> AddressAttribute.COMMUNICATION_TAG
+                );
     }
 
     private AttributeType<? extends AddressAttribute> getAttributeType()

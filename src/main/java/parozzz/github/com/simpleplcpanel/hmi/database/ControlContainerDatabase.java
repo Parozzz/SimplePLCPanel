@@ -15,6 +15,7 @@ import parozzz.github.com.simpleplcpanel.hmi.database.dataupdater.SiemensPLCData
 import parozzz.github.com.simpleplcpanel.hmi.main.MainEditStage;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataArray;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
+import parozzz.github.com.simpleplcpanel.hmi.tags.stage.TagStage;
 import parozzz.github.com.simpleplcpanel.logger.Loggable;
 import parozzz.github.com.simpleplcpanel.logger.MainLogger;
 import parozzz.github.com.simpleplcpanel.util.Cooldown;
@@ -27,9 +28,9 @@ public final class ControlContainerDatabase extends FXController implements Iter
     private final MainEditStage mainEditStage;
     private final CommunicationDataHolder communicationDataHolder;
 
-    private final Map<CommunicationType, ControlDataUpdater<?>> controlDataUpdaterMap;
+    private final Map<CommunicationType<?>, ControlDataUpdater<?>> controlDataUpdaterMap;
     private ControlDataUpdater<?> selectedControlDataUpdater;
-    private CommunicationType nextControlDataCommunicationType;
+    private CommunicationType<?> nextControlDataCommunicationType;
 
     private final Cooldown nextDataUpdateCooldown;
     private boolean parseUpdatedData;
@@ -38,7 +39,7 @@ public final class ControlContainerDatabase extends FXController implements Iter
     private final Set<ControlWrapper<?>> controlWrapperSet;
     private Set<ControlWrapper<?>> immutableControlWrapperSet;
 
-    public ControlContainerDatabase(MainEditStage mainEditStage, CommunicationDataHolder communicationDataHolder)
+    public ControlContainerDatabase(MainEditStage mainEditStage, TagStage tagStage, CommunicationDataHolder communicationDataHolder)
     {
         this.mainEditStage = mainEditStage;
         this.communicationDataHolder = communicationDataHolder;
@@ -46,11 +47,11 @@ public final class ControlContainerDatabase extends FXController implements Iter
         this.controlDataUpdaterMap = new HashMap<>();
         controlDataUpdaterMap.put(
                 CommunicationType.SIEMENS_S7,
-                SiemensPLCDataUpdater.createInstance(this, communicationDataHolder)
+                SiemensPLCDataUpdater.createInstance(tagStage, this, communicationDataHolder)
         );
         controlDataUpdaterMap.put(
                 CommunicationType.MODBUS_TCP,
-                ModbusTCPDataUpdater.createInstance(this, communicationDataHolder)
+                ModbusTCPDataUpdater.createInstance(tagStage, this, communicationDataHolder)
         );
 
         this.nextDataUpdateCooldown = new Cooldown(200);
@@ -135,21 +136,21 @@ public final class ControlContainerDatabase extends FXController implements Iter
                     {
                         controlWrapperSet.add(controlWrapper);
                         immutableControlWrapperSet = Collections.unmodifiableSet(controlWrapperSet);
-
+/*
                         if (selectedControlDataUpdater != null)
                         {
                             selectedControlDataUpdater.bindControlWrapper(controlWrapper);
-                        }
+                        }*/
                     },
                     controlWrapper ->
                     {
                         controlWrapperSet.remove(controlWrapper);
                         immutableControlWrapperSet = Collections.unmodifiableSet(controlWrapperSet);
-
+/*
                         if (selectedControlDataUpdater != null)
                         {
                             selectedControlDataUpdater.unbindControlWrapper(controlWrapper);
-                        }
+                        }*/
                     });
             controlContainerPanelMainPage.setup();
             if (setDefault)
@@ -206,19 +207,19 @@ public final class ControlContainerDatabase extends FXController implements Iter
         {
             return;
         }
-
+/*
         if (selectedControlDataUpdater != null)
         {
             controlWrapperSet.forEach(selectedControlDataUpdater::unbindControlWrapper);
         }
-
+*/
         selectedControlDataUpdater = controlDataUpdaterMap.get(nextControlDataCommunicationType);
         nextControlDataCommunicationType = null;
-
+/*
         if (selectedControlDataUpdater != null)
         {
             controlWrapperSet.forEach(selectedControlDataUpdater::bindControlWrapper);
-        }
+        }*/
     }
 
     private void updateSelectedDataUpdater()

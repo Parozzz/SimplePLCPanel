@@ -45,12 +45,13 @@ public final class WrapperStateMap extends FXObject
     {
         super.setup();
 
+        /*
         var externalValue = controlWrapper.getValue().getOutsideValue();
         externalValue.addNewValueRunnable(() ->
         {
             numericState = externalValue.asInteger();
             this.parseState(WrapperStateChangedConsumer.ChangeType.STATE_CHANGED);
-        });
+        });*/
     }
 
     public ControlWrapper<?> getControlWrapper()
@@ -111,6 +112,12 @@ public final class WrapperStateMap extends FXObject
     public WrapperState.Builder stateBuilder()
     {
         return new WrapperState.Builder(this);
+    }
+
+    public void setState(int numericState)
+    {
+        this.numericState = numericState;
+        this.parseState(WrapperStateChangedConsumer.ChangeType.STATE_CHANGED);
     }
 
     private boolean addState(WrapperState wrapperState)

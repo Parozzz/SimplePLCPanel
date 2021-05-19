@@ -3,6 +3,7 @@ package parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.impl.butto
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import parozzz.github.com.simpleplcpanel.hmi.attribute.Attribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.TextAttribute;
@@ -11,6 +12,7 @@ import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.AddressAttri
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.ReadAddressAttribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.control.ButtonDataAttribute;
 import parozzz.github.com.simpleplcpanel.hmi.controls.ControlContainerPane;
+import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapperType;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.LabeledWrapper;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.attributes.ControlWrapperAttributeInitializer;
@@ -102,15 +104,16 @@ public final class ButtonWrapper
             var writeAttribute = AttributeFetcher.fetch(this, AttributeType.WRITE_ADDRESS);
             Objects.requireNonNull(writeAttribute, "ButtonWrapper must have a WriteAddress");
 
-            var attribute = AttributeFetcher.fetch(this, AttributeType.BUTTON_DATA);
-            Objects.requireNonNull(attribute, "ButtonWrapper must have a ButtonDataAttribute");
-
             var writeTag = writeAttribute.getValue(AddressAttribute.COMMUNICATION_TAG);
             if(writeTag == null)
             {
                 return;
             }
 
+            var attribute = AttributeFetcher.fetch(this, AttributeType.BUTTON_DATA);
+            Objects.requireNonNull(attribute, "ButtonWrapper must have a ButtonDataAttribute");
+
+            var writeIntermediate = writeTag.getWriteIntermediate();
             if (attribute.getValue(ButtonDataAttribute.TYPE) == ButtonWrapperType.NORMAL)
             {
                 writeIntermediate.setBoolean(false);

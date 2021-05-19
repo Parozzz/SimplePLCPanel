@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.VBox?>
@@ -9,7 +8,7 @@
 
 <VBox maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="150.0" spacing="3.0" style="-fx-border-color: lightgray;" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label fx:id="addressTypeLabel" alignment="CENTER" maxWidth="1.7976931348623157E308" text="OOPS!">
+      <Label fx:id="topLabel" alignment="CENTER" maxWidth="1.7976931348623157E308" text="OOPS!">
          <VBox.margin>
             <Insets bottom="2.0" />
          </VBox.margin>
@@ -17,12 +16,7 @@
             <Font name="System Bold" size="14.0" />
          </font>
       </Label>
-      <ChoiceBox fx:id="addressTypeChoiceBox" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="150.0" style="-fx-background-color: transparent; -fx-border-color: lightgray;">
-         <VBox.margin>
-            <Insets left="3.0" right="3.0" />
-         </VBox.margin>
-      </ChoiceBox>
-      <TextField fx:id="addressTextField" alignment="CENTER" editable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0" prefHeight="25.0">
+      <TextField fx:id="tagTextField" alignment="CENTER" editable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0" prefHeight="25.0">
          <VBox.margin>
             <Insets left="3.0" right="3.0" />
          </VBox.margin>

@@ -28,29 +28,27 @@ public final class CommunicationType<ASD extends CommunicationStringAddressData>
     public static final CommunicationType<SiemensS7StringAddressData> SIEMENS_S7
             = create("SIEMENS",
             SiemensS7StringAddressData::new, SiemensS7StringAddressData::parseStringData,
-            SiemensS7StringAddressCreator::new, AddressAttribute.SIEMENS_STRING_DATA
+            SiemensS7StringAddressCreator::new
     );
     public static final CommunicationType<ModbusStringAddressData> MODBUS_TCP
             = create("MODBUS_TCP",
             ModbusStringAddressData::new, ModbusStringAddressData::parseStringData,
-            ModbusStringAddressCreatorStage::new, AddressAttribute.MODBUS_TCP_STRING_DATA
+            ModbusStringAddressCreatorStage::new
     );
     public static final CommunicationType<?> NONE = create("NONE",
             CommunicationStringAddressData.NoneStringAddressData::new,
             CommunicationStringAddressData.NoneStringAddressData::new,
-            () -> null, null);
+            () -> null);
 
     private static Map<String, CommunicationType<?>> DATA_TYPE_NAME_MAP;
 
     private static <ASD extends CommunicationStringAddressData> CommunicationType<ASD> create(
             String name,
             Supplier<ASD> defaultStringAddressDataSupplier, Function<String, ASD> parseStringAddressDataFunction,
-            StringAddressCreatorStageSupplier<ASD> stringAddressCreatorStageSupplier,
-            AttributeProperty<ASD> attributeProperty)
+            StringAddressCreatorStageSupplier<ASD> stringAddressCreatorStageSupplier)
     {
         var dataType = new CommunicationType<>(name,
-                defaultStringAddressDataSupplier, parseStringAddressDataFunction,
-                stringAddressCreatorStageSupplier, attributeProperty
+                defaultStringAddressDataSupplier, parseStringAddressDataFunction, stringAddressCreatorStageSupplier
         );
         if (DATA_TYPE_NAME_MAP == null)
         {
@@ -75,18 +73,15 @@ public final class CommunicationType<ASD extends CommunicationStringAddressData>
     private final Supplier<ASD> defaultStringAddressDataSupplier;
     private final Function<String, ASD> parseStringAddressDataFunction;
     private final StringAddressCreatorStageSupplier<ASD> stringAddressCreatorStageSupplier;
-    private final AttributeProperty<ASD> attributeProperty;
 
     private CommunicationType(String name,
             Supplier<ASD> defaultStringAddressDataSupplier, Function<String, ASD> parseStringAddressDataFunction,
-            StringAddressCreatorStageSupplier<ASD> stringAddressCreatorStageSupplier,
-            AttributeProperty<ASD> attributeProperty)
+            StringAddressCreatorStageSupplier<ASD> stringAddressCreatorStageSupplier)
     {
         this.name = name;
         this.defaultStringAddressDataSupplier = defaultStringAddressDataSupplier;
         this.parseStringAddressDataFunction = parseStringAddressDataFunction;
         this.stringAddressCreatorStageSupplier = stringAddressCreatorStageSupplier;
-        this.attributeProperty = attributeProperty;
     }
 
     public String getName()
@@ -123,7 +118,7 @@ public final class CommunicationType<ASD extends CommunicationStringAddressData>
 
         return null;
     }
-
+/*
     public boolean updateAddressAttributeWithStringData(String stringData, AddressAttribute addressAttribute)
     {
         var stringAddressData = parseStringAddressDataFunction.apply(stringData);
@@ -141,7 +136,7 @@ public final class CommunicationType<ASD extends CommunicationStringAddressData>
     {
         return attributeProperty;
     }
-
+*/
     @Override
     public String log()
     {

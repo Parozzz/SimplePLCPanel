@@ -20,23 +20,22 @@ import java.util.function.Supplier;
 public class ControlWrapperType<C extends Control, W extends ControlWrapper<C>>
 {
     public static final ControlWrapperType<Button, ButtonWrapper> BUTTON =
-            create("BUTTON_WRAPPER", "Button", Button::new, ButtonWrapper::new, ButtonWrapperValue::new);
+            create("BUTTON_WRAPPER", "Button", Button::new, ButtonWrapper::new);
     public static final ControlWrapperType<Label, DisplayWrapper> DISPLAY =
-            create("DISPLAY_WRAPPER", "Display", Label::new, DisplayWrapper::new, DisplayWrapperValue::new);
+            create("DISPLAY_WRAPPER", "Display", Label::new, DisplayWrapper::new);
     public static final ControlWrapperType<TextField, InputWrapper> NUMERIC_INPUT =
-            create("NUMERIC_INPUT", "Numeric Input", TextField::new, InputWrapper::new, InputWrapperValue::new);
+            create("NUMERIC_INPUT", "Numeric Input", TextField::new, InputWrapper::new);
 
     private static Map<String, ControlWrapperType<?, ?>> WRAPPER_TYPE_NAME_MAP;
     private static <C extends Control, H extends ControlWrapper<C>> ControlWrapperType<C, H> create(
-            String name, String userFriendlyName, Supplier<C> controlSupplier, ControlWrapperCreator<C, H> creator,
-            BiFunction<ControlWrapper<C>, C, ControlWrapperValue<C>> wrapperValueCreator)
+            String name, String userFriendlyName, Supplier<C> controlSupplier, ControlWrapperCreator<C, H> creator)
     {
         if(WRAPPER_TYPE_NAME_MAP == null)
         {
             WRAPPER_TYPE_NAME_MAP = new HashMap<>();
         }
 
-        var wrapperType = new ControlWrapperType<>(name, userFriendlyName, controlSupplier, creator, wrapperValueCreator);
+        var wrapperType = new ControlWrapperType<>(name, userFriendlyName, controlSupplier, creator);
         WRAPPER_TYPE_NAME_MAP.put(name, wrapperType);
         return wrapperType;
     }
@@ -50,15 +49,14 @@ public class ControlWrapperType<C extends Control, W extends ControlWrapper<C>>
     private final String userFriendlyName;
     private final Supplier<C> controlSupplier;
     private final ControlWrapperCreator<C, W> creator;
-    private final BiFunction<ControlWrapper<C>, C, ControlWrapperValue<C>> wrapperValueCreator;
-    private ControlWrapperType(String name, String userFriendlyName, Supplier<C> controlSupplier,
-            ControlWrapperCreator<C, W> creator, BiFunction<ControlWrapper<C>, C, ControlWrapperValue<C>> wrapperValueCreator)
+    private ControlWrapperType(String name, String userFriendlyName,
+            Supplier<C> controlSupplier,
+            ControlWrapperCreator<C, W> creator)
     {
         this.name = name;
         this.userFriendlyName = userFriendlyName;
         this.controlSupplier = controlSupplier;
         this.creator = creator;
-        this.wrapperValueCreator = wrapperValueCreator;
     }
 
     public String getName()
@@ -79,11 +77,6 @@ public class ControlWrapperType<C extends Control, W extends ControlWrapper<C>>
     public W createWrapper(ControlContainerPane controlsPage)
     {
         return creator.create(controlsPage);
-    }
-
-    public ControlWrapperValue<C> createWrapperValue(ControlWrapper<C> controlWrapper, C control)
-    {
-        return wrapperValueCreator.apply(controlWrapper, control);
     }
 
     @FunctionalInterface

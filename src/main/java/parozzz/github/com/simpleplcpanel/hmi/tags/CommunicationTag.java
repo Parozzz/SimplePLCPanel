@@ -10,14 +10,13 @@ import parozzz.github.com.simpleplcpanel.hmi.util.ContextMenuBuilder;
 import parozzz.github.com.simpleplcpanel.hmi.util.valueintermediate.MixedIntermediate;
 import parozzz.github.com.simpleplcpanel.hmi.util.valueintermediate.ValueIntermediate;
 
-import java.lang.ref.WeakReference;
 import java.util.*;
 
 public final class CommunicationTag extends Tag
 {
     public enum TagProperty
     {
-        READ,
+        NEED_READ,
         ACTIVE;
     }
 
@@ -27,7 +26,6 @@ public final class CommunicationTag extends Tag
 
     private final Map<CommunicationType<?>, Property<CommunicationStringAddressData>> stringAddressDataMap;
     private final Set<Taggable> taggableSet;
-    private final Set<TagProperty> propertySet;
 
     private final MixedIntermediate readIntermediate;
     private final MixedIntermediate writeIntermediate;
@@ -41,7 +39,6 @@ public final class CommunicationTag extends Tag
 
         this.stringAddressDataMap = new HashMap<>();
         this.taggableSet = new HashSet<>();
-        this.propertySet = EnumSet.noneOf(TagProperty.class);
 
         this.readIntermediate = new MixedIntermediate();
         this.writeIntermediate = new MixedIntermediate();
@@ -170,7 +167,6 @@ public final class CommunicationTag extends Tag
     public void addTaggable(Taggable taggable)
     {
         taggableSet.add(taggable);
-        this.reparseProperties();
     }
 
     public void removeTaggable(Taggable taggable)
@@ -178,28 +174,33 @@ public final class CommunicationTag extends Tag
         taggableSet.removeIf(lTaggable ->
                 lTaggable == taggable
         );
-        this.reparseProperties();
     }
 
     public boolean hasProperty(TagProperty property)
     {
-        return propertySet.contains(property);
-    }
-
-    private void reparseProperties()
-    {
-        for(var taggable : taggableSet)
+        switch (property)
         {
-            if(taggable.requireReading())
-            {
-                propertySet.add(TagProperty.READ);
-            }
-
-            if(taggable.isActive())
-            {
-                propertySet.add(TagProperty.ACTIVE);
-            }
+            case NEED_READ:
+                for(var taggable : taggableSet)
+                {
+                    if(taggable.requireReading())
+                    {
+                        return true;
+                    }
+                }
+                break;
+            case ACTIVE:
+                for(var taggable : taggableSet)
+                {
+                    if(taggable.isActive())
+                    {
+                        return true;
+                    }
+                }
+                break;
         }
+
+        return false;
     }
 
     @Override

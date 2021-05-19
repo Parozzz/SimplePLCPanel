@@ -34,14 +34,18 @@ import parozzz.github.com.simpleplcpanel.hmi.tags.cellfactoryhandlers.LocalCellF
 import parozzz.github.com.simpleplcpanel.hmi.tags.cellfactoryhandlers.StringAddressDataCellFactoryHandler;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public final class TagStage extends HMIStage<VBox>
 {
+    public enum ChangeType
+    {
+        ADD,
+        REMOVE;
+    }
+
     public static int LAST_INTERNAL_ID = 1; //0 is ALWAYS the root
 
     private final CommunicationDataHolder communicationDataHolder;
@@ -53,6 +57,7 @@ public final class TagStage extends HMIStage<VBox>
 
     private final Set<Tag> tagSet;
     private final Map<Integer, Tag> tagMap;
+    private final List<BiConsumer<Tag, ChangeType>> tagMapChangeList;
 
     public TagStage(CommunicationDataHolder communicationDataHolder)
     {
@@ -67,6 +72,7 @@ public final class TagStage extends HMIStage<VBox>
 
         this.tagSet = new HashSet<>();
         this.tagMap = new HashMap<>();
+        this.tagMapChangeList = new ArrayList<>();
     }
 
     @Override
@@ -156,6 +162,16 @@ public final class TagStage extends HMIStage<VBox>
         return tagMap.get(internalId);
     }
 
+    public Set<Tag> getTagSet()
+    {
+        return Collections.unmodifiableSet(tagSet);
+    }
+
+    public void addTagMapChangeList(BiConsumer<Tag, ChangeType> consumer)
+    {
+        this.tagMapChangeList.add(consumer);
+    }
+
     public void addTag(Tag tag)
     {
         this.addTag(null, tag);
@@ -188,8 +204,10 @@ public final class TagStage extends HMIStage<VBox>
 
     private void removeTag(Tag tag)
     {
-        tagSet.remove(tag);
-        tagMap.remove(tag.getInternalId());
+        if(tagSet.remove(tag) && tagMap.remove(tag.getInternalId(), tag))
+        {
+
+        }
     }
 
     @Override

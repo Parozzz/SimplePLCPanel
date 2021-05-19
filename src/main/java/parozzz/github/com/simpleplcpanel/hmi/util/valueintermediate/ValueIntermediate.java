@@ -1,30 +1,32 @@
 package parozzz.github.com.simpleplcpanel.hmi.util.valueintermediate;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class ValueIntermediate
 {
-    private final List<Runnable> newValueRunnableList;
+    private final Map<String, Runnable> newValueRunnableMap;
 
     public ValueIntermediate()
     {
-        this.newValueRunnableList = new ArrayList<>();
+        this.newValueRunnableMap = new HashMap<>();
     }
 
-    public void addNewValueRunnable(Runnable runnable)
+    public void addNewValueRunnable(String key, Runnable runnable)
     {
-        newValueRunnableList.add(runnable);
+        newValueRunnableMap.put(key, runnable);
     }
 
-    public void removeNewValueRunnable(Runnable runnable)
+    public void removeNewValueRunnable(String key)
     {
-        newValueRunnableList.remove(runnable);
+        newValueRunnableMap.remove(key);
     }
 
     void newValueReceived()
     {
-        newValueRunnableList.forEach(Runnable::run);
+        newValueRunnableMap.values().forEach(Runnable::run);
     }
 
     public void forceNewValueReceived()

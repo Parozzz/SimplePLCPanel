@@ -63,6 +63,13 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
                         }else if(attribute instanceof ReadAddressAttribute)
                         {
                             readAddressAttribute = (ReadAddressAttribute) attribute;
+
+                            var readTag = readAddressAttribute.getValue(AddressAttribute.COMMUNICATION_TAG);
+                            if(readTag != null)
+                            {
+                                var readIntermediate = readTag.getReadIntermediate();
+                                super.getStateMap().setState(readIntermediate.asInteger());
+                            }
                         }
                     }
 
@@ -128,16 +135,22 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
     protected void setParsedTextPlaceholders(C control, String text,
             ValueAttribute valueAttribute, AddressAttribute readAddressAttribute)
     {
-        var communicationTag = readAddressAttribute.getValue(AddressAttribute.COMMUNICATION_TAG);
+        if(!text.contains(ControlWrapper.VALUE_PLACEHOLDER))
+        {
+            control.setText(text);
+            return;
+        }
+
+        var readTag = readAddressAttribute.getValue(AddressAttribute.COMMUNICATION_TAG);
         var parseAs = valueAttribute.getValue(ValueAttribute.INTERMEDIATE_TYPE);
         var multiplyBy = valueAttribute.getValue(ValueAttribute.MULTIPLY_BY);
         var offset = valueAttribute.getValue(ValueAttribute.OFFSET);
-        if(Validate.anyNull(communicationTag, parseAs, multiplyBy, offset))
+        if(readTag == null || parseAs == null || multiplyBy == null || offset == null)
         {
             return;
         }
 
-        var readIntermediate = communicationTag.getReadIntermediate();
+        var readIntermediate = readTag.getReadIntermediate();
 
         String stringPlaceholder;
         if (parseAs == ValueIntermediateType.BOOLEAN)

@@ -22,7 +22,6 @@ public abstract class CommunicationStringAddressCreatorStage<T extends Communica
     @FXML protected TextField convertedAddressTextField;
 
     private final CommunicationType<T> communicationType;
-    private AddressAttribute addressAttribute;
     private CommunicationTag communicationTag;
     public CommunicationStringAddressCreatorStage(CommunicationType<T> communicationType, String resource) throws IOException
     {
@@ -41,7 +40,7 @@ public abstract class CommunicationStringAddressCreatorStage<T extends Communica
                 .initModality(Modality.APPLICATION_MODAL)
                 //Clear the consumer on page close
                 .addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, event ->
-                        addressAttribute = null
+                        communicationTag = null
                 );
 
         confirmButton.setOnAction(event ->
@@ -56,16 +55,6 @@ public abstract class CommunicationStringAddressCreatorStage<T extends Communica
                 }
             }
 
-            if (addressAttribute != null)
-            {
-                var data = this.createDataFromActualValues();
-                if(data != null && data.validate())
-                {
-                    addressAttribute.setValue(communicationType.getAttributeProperty(), data);
-                    addressAttribute = null;
-                }
-            }
-
             this.getStageSetter().close();
         });
 
@@ -77,7 +66,7 @@ public abstract class CommunicationStringAddressCreatorStage<T extends Communica
         this.updateTextConvertedAddress();
 
         var children = super.parent.getChildren();
-        if (addressAttribute == null && communicationTag == null)
+        if (communicationTag == null)
         {
             children.remove(confirmButtonStackPane);
         } else
@@ -93,35 +82,13 @@ public abstract class CommunicationStringAddressCreatorStage<T extends Communica
 
     public void showAsStandalone()
     {
-        this.showAsInputTextAddress((AddressAttribute) null);
-    }
-
-    public void showAsInputTextAddress(AddressAttribute addressAttribute)
-    {
-        this.addressAttribute = addressAttribute;
-        this.showStage();
+        this.showAsInputTextAddress(null);
     }
 
     public void showAsInputTextAddress(CommunicationTag communicationTag)
     {
         this.communicationTag = communicationTag;
         this.showStage();
-    }
-
-    public boolean loadAddressAttributeToActualValues(AddressAttribute addressAttribute)
-    {
-        if(addressAttribute == null)
-        {
-            return false;
-        }
-
-        var addressStringData = addressAttribute.getValue(this.communicationType.getAttributeProperty());
-        if(addressStringData == null)
-        {
-            return false;
-        }
-
-        return this.loadStringDataToActualValues(addressStringData.getStringData());
     }
 
     public abstract boolean loadStringDataToActualValues(String stringData);

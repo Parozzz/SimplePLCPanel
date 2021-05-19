@@ -34,17 +34,14 @@ public class CommunicationTagAttributeProperty
             extends AttributeProperty.Data<CommunicationTag>
             implements Taggable
     {
-        private final Attribute attribute;
-        private final Runnable tagValueChangeConsumer;
+        private final static String INTERMEDIATE_KEY = "CommunicationTagAttributeProperty.TagData";
 
+        private final Attribute attribute;
         protected TagData(Attribute attribute)
         {
             super(CommunicationTagAttributeProperty.this);
 
             this.attribute = attribute;
-
-            tagValueChangeConsumer = () ->
-                    AttributePropertyManager.updateAttribute(attribute);
 
             property.addListener((observable, oldValue, newValue) ->
             {
@@ -55,12 +52,15 @@ public class CommunicationTagAttributeProperty
 
                 if(oldValue != null)
                 {
-                    oldValue.getReadIntermediate().removeNewValueRunnable(tagValueChangeConsumer);
+                    oldValue.getReadIntermediate().removeNewValueRunnable(INTERMEDIATE_KEY);
                 }
 
                 if(newValue != null)
                 {
-                    newValue.getReadIntermediate().addNewValueRunnable(tagValueChangeConsumer);
+                    newValue.getReadIntermediate().addNewValueRunnable(
+                            INTERMEDIATE_KEY,
+                            () -> AttributePropertyManager.updateAttribute(attribute)
+                    );
                 }
             });
         }

@@ -141,7 +141,7 @@ public final class SetupPaneAttributeChanger<A extends Attribute> implements Log
                 {
                     var propertyValue = property.getValue();
                     var attributeConvertedValue = attributeToPropertyConvert.apply(attributeValue);
-                    if(!attributeConvertedValue.equals(propertyValue)) //This way to avoid propertyValue NullPointerException
+                    if(attributeConvertedValue != null && !attributeConvertedValue.equals(propertyValue)) //This way to avoid propertyValue NullPointerException
                     { //This is to avoid problems where the value has changed and get set immediately again causing glitching on controls
                         property.setValue(attributeConvertedValue);
                     }
