@@ -44,6 +44,4 @@ public final class Validate
             }
         }
     }
-
-
 }

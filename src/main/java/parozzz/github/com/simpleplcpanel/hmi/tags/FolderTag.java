@@ -4,7 +4,7 @@ import javafx.scene.control.ContextMenu;
 import parozzz.github.com.simpleplcpanel.Nullable;
 import parozzz.github.com.simpleplcpanel.hmi.util.ContextMenuBuilder;
 
-public class FolderTag extends Tag
+public final class FolderTag extends Tag
 {
     public FolderTag(String key, int internalID)
     {
@@ -34,7 +34,6 @@ public class FolderTag extends Tag
     {
         super.delete();
     }
-
 
     private void addTag()
     {

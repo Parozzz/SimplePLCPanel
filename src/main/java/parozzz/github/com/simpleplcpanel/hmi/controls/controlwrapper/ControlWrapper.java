@@ -59,7 +59,7 @@ public abstract class ControlWrapper<C extends Control>
     protected final C control;
     private final StackPane containerStackPane;
 
-    private final ControlWrapperValue<C> value;
+    //private final ControlWrapperValue<C> value;
     private final WrapperStateMap stateMap;
 
     private final AttributeMap globalAttributeMap; //This will stay here, but is still for a future. WIP
@@ -90,7 +90,8 @@ public abstract class ControlWrapper<C extends Control>
         this.control = wrapperType.supplyControl();
         this.containerStackPane = new StackPane(control);
 
-        this.addFXChild(this.value = wrapperType.createWrapperValue(this, control))
+        this
+                //.addFXChild(this.value = wrapperType.createWrapperValue(this, control))
                 .addFXChild(this.stateMap = new WrapperStateMap(this))
                 .addFXChild(this.globalAttributeMap = new AttributeMap(this, "GenericAttributeMap"))
                 .addFXChild(this.contextMenuController = new ControlWrapperContextMenuController(this, control, controlContainerPane))
@@ -264,10 +265,10 @@ public abstract class ControlWrapper<C extends Control>
         return containerStackPane;
     }
 
-    public ControlWrapperValue<C> getValue()
+    /*public ControlWrapperValue<C> getValue()
     {
         return value;
-    }
+    }*/
 
     public WrapperStateMap getStateMap()
     {

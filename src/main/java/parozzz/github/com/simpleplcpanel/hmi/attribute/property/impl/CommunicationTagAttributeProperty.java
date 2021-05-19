@@ -4,6 +4,7 @@ import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.Attribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.property.AttributeProperty;
+import parozzz.github.com.simpleplcpanel.hmi.attribute.property.AttributePropertyManager;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
 import parozzz.github.com.simpleplcpanel.hmi.tags.CommunicationTag;
 import parozzz.github.com.simpleplcpanel.hmi.tags.Tag;
@@ -34,6 +35,7 @@ public class CommunicationTagAttributeProperty
             implements Taggable
     {
         private final Attribute attribute;
+        private final Runnable tagValueChangeConsumer;
 
         protected TagData(Attribute attribute)
         {
@@ -41,16 +43,39 @@ public class CommunicationTagAttributeProperty
 
             this.attribute = attribute;
 
+            tagValueChangeConsumer = () ->
+                    AttributePropertyManager.updateAttribute(attribute);
+
             property.addListener((observable, oldValue, newValue) ->
             {
+                if(write)
+                {
+                    return;
+                }
 
+                if(oldValue != null)
+                {
+                    oldValue.getReadIntermediate().removeNewValueRunnable(tagValueChangeConsumer);
+                }
+
+                if(newValue != null)
+                {
+                    newValue.getReadIntermediate().addNewValueRunnable(tagValueChangeConsumer);
+                }
             });
+        }
+
+        @Override
+        public boolean requireReading()
+        {
+            return !write;
         }
 
         @Override
         public boolean isActive()
         {
-            return attribute.getAttributeMap().getControlWrapper().getContainerPane().isVisible();
+            return attribute.getAttributeMap().getControlWrapper()
+                    .getContainerPane().isVisible();
         }
 
         @Override

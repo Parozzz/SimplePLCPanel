@@ -4,6 +4,7 @@ import parozzz.github.com.simpleplcpanel.hmi.attribute.Attribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeMap;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.property.AttributeProperty;
+import parozzz.github.com.simpleplcpanel.hmi.attribute.property.impl.CommunicationTagAttributeProperty;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.property.impl.EnumAttributeProperty;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.property.impl.FunctionAttributeProperty;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.property.impl.primitives.StringAttributeProperty;
@@ -20,7 +21,9 @@ import java.util.function.Function;
 
 public abstract class AddressAttribute extends Attribute
 {
-
+    public static final AttributeProperty<CommunicationTag> COMMUNICATION_TAG =
+            new CommunicationTagAttributeProperty("Tag", true);
+/*
     public static final AttributeProperty<AddressSetupPane.AddressType> ADDRESS_TYPE =
             new EnumAttributeProperty<>("CommunicationType", AddressSetupPane.AddressType.NONE);
 
@@ -59,13 +62,14 @@ public abstract class AddressAttribute extends Attribute
                         return null;
                     }
             );
-
+*/
     public AddressAttribute(AttributeMap attributeMap, AttributeType<? extends AddressAttribute> attributeType,
             String name)
     {
         super(attributeMap, attributeType, name);
 
-        super.getAttributePropertyManager().addAll(ADDRESS_TYPE, SIEMENS_STRING_DATA, MODBUS_TCP_STRING_DATA);
+        super.getAttributePropertyManager().addAll(COMMUNICATION_TAG);
+        //super.getAttributePropertyManager().addAll(ADDRESS_TYPE, SIEMENS_STRING_DATA, MODBUS_TCP_STRING_DATA);
     }
 
 

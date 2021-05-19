@@ -7,22 +7,30 @@ import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationStringAddressData
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
 import parozzz.github.com.simpleplcpanel.hmi.tags.stage.TagStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.ContextMenuBuilder;
+import parozzz.github.com.simpleplcpanel.hmi.util.valueintermediate.MixedIntermediate;
+import parozzz.github.com.simpleplcpanel.hmi.util.valueintermediate.ValueIntermediate;
 
 import java.lang.ref.WeakReference;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public final class CommunicationTag extends Tag
 {
+    public enum TagProperty
+    {
+        READ,
+        ACTIVE;
+    }
+
     private final BooleanProperty localProperty;
     private final Property<CommunicationStringAddressData> stringAddressDataProperty;
+    private Property<CommunicationStringAddressData> selectedStringAddressDataProperty;
 
     private final Map<CommunicationType<?>, Property<CommunicationStringAddressData>> stringAddressDataMap;
-    private final Set<WeakReference<Taggable>> weakTaggableSet;
+    private final Set<Taggable> taggableSet;
+    private final Set<TagProperty> propertySet;
 
-    private Property<CommunicationStringAddressData> selectedStringAddressDataProperty;
+    private final MixedIntermediate readIntermediate;
+    private final MixedIntermediate writeIntermediate;
 
     public CommunicationTag(String key, int internalID)
     {
@@ -32,12 +40,16 @@ public final class CommunicationTag extends Tag
         this.stringAddressDataProperty = new SimpleObjectProperty<>();
 
         this.stringAddressDataMap = new HashMap<>();
-        this.weakTaggableSet = new HashSet<>();
+        this.taggableSet = new HashSet<>();
+        this.propertySet = EnumSet.noneOf(TagProperty.class);
 
-        for (var communicationType : CommunicationType.values())
+        this.readIntermediate = new MixedIntermediate();
+        this.writeIntermediate = new MixedIntermediate();
+
+        for(var communicationType : CommunicationType.values())
         {
             var stringAddressData = communicationType.supplyDefaultStringAddressData();
-            if (stringAddressData != null)
+            if(stringAddressData != null)
             {
                 var property = new SimpleObjectProperty<>(stringAddressData);
                 stringAddressDataMap.put(communicationType, property);
@@ -46,7 +58,7 @@ public final class CommunicationTag extends Tag
 
         localProperty.addListener((observable, oldValue, newValue) ->
         {
-            if (newValue == null || newValue)
+            if(newValue == null || newValue)
             {
                 this.updateSelectedStringAddressDataProperty(selectedStringAddressDataProperty, null);
                 return;
@@ -59,6 +71,46 @@ public final class CommunicationTag extends Tag
     public CommunicationTag(String key)
     {
         this(key, TagStage.LAST_INTERNAL_ID++);
+    }
+
+    public ValueIntermediate getReadIntermediate()
+    {
+        return readIntermediate;
+    }
+
+    public ValueIntermediate getWriteIntermediate()
+    {
+        return writeIntermediate;
+    }
+
+    public boolean isLocal()
+    {
+        return localProperty.get();
+    }
+
+    public void setLocal(boolean local)
+    {
+        localProperty.set(local);
+    }
+
+    public BooleanProperty localProperty()
+    {
+        return localProperty;
+    }
+
+    public CommunicationStringAddressData getStringAddressData()
+    {
+        return stringAddressDataProperty.getValue();
+    }
+
+    public void setStringAddressData(CommunicationStringAddressData stringAddressData)
+    {
+        stringAddressDataProperty.setValue(stringAddressData);
+    }
+
+    public Property<CommunicationStringAddressData> communicationStringAddressDataProperty()
+    {
+        return stringAddressDataProperty;
     }
 
     @Nullable
@@ -80,52 +132,22 @@ public final class CommunicationTag extends Tag
     private void updateSelectedStringAddressDataProperty(Property<CommunicationStringAddressData> oldValue,
             Property<CommunicationStringAddressData> newValue)
     {
-        if (oldValue != null)
+        if(oldValue != null)
         {
             oldValue.unbind();
         }
 
-        if (localProperty.get())
+        if(localProperty.get())
         {
             stringAddressDataProperty.setValue(null);
             return;
         }
 
-        if (newValue != null)
+        if(newValue != null)
         {
             stringAddressDataProperty.setValue(newValue.getValue());
             newValue.bind(stringAddressDataProperty);
         }
-    }
-
-    public boolean isLocal()
-    {
-        return localProperty.get();
-    }
-
-    public void setLocal(boolean local)
-    {
-        localProperty.set(local);
-    }
-
-    public BooleanProperty localProperty()
-    {
-        return localProperty;
-    }
-
-    public void setStringAddressData(CommunicationStringAddressData stringAddressData)
-    {
-        stringAddressDataProperty.setValue(stringAddressData);
-    }
-
-    public CommunicationStringAddressData getStringAddressData()
-    {
-        return stringAddressDataProperty.getValue();
-    }
-
-    public Property<CommunicationStringAddressData> communicationStringAddressDataProperty()
-    {
-        return stringAddressDataProperty;
     }
 
     @Nullable
@@ -147,37 +169,37 @@ public final class CommunicationTag extends Tag
 
     public void addTaggable(Taggable taggable)
     {
-        weakTaggableSet.add(new WeakReference<>(taggable));
+        taggableSet.add(taggable);
+        this.reparseProperties();
     }
 
     public void removeTaggable(Taggable taggable)
     {
-        weakTaggableSet.removeIf(weakRef ->
-        {
-            var lTaggable = weakRef.get();
-            return lTaggable == null || lTaggable == taggable;
-        });
+        taggableSet.removeIf(lTaggable ->
+                lTaggable == taggable
+        );
+        this.reparseProperties();
     }
 
-    public boolean isAnyTaggableActive()
+    public boolean hasProperty(TagProperty property)
     {
-        var it = weakTaggableSet.iterator();
-        while(it.hasNext())
+        return propertySet.contains(property);
+    }
+
+    private void reparseProperties()
+    {
+        for(var taggable : taggableSet)
         {
-            var taggable = it.next().get();
-            if(taggable == null)
+            if(taggable.requireReading())
             {
-                it.remove();
-                continue;
+                propertySet.add(TagProperty.READ);
             }
 
             if(taggable.isActive())
             {
-                return true;
+                propertySet.add(TagProperty.ACTIVE);
             }
         }
-
-        return false;
     }
 
     @Override

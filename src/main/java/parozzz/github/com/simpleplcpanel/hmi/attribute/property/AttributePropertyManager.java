@@ -15,6 +15,13 @@ import java.util.stream.Stream;
 
 public class AttributePropertyManager
 {
+    public static void updateAttribute(Attribute attribute)
+    {
+        attribute.update();
+        attribute.getAttributeMap().getControlWrapper()
+                .getAttributeUpdater().updateAttribute(attribute.getType());
+    }
+
     private final Attribute attribute;
 
     private final Map<AttributeProperty<?>, Property<?>> attributePropertyMap;
@@ -48,13 +55,9 @@ public class AttributePropertyManager
 
         var property = attributePropertyData.getProperty();
         attributePropertyMap.put(attributeProperty, property);
-        property.addListener((observable, oldValue, newValue) -> {
-            attribute.update();
-
-            var attributeType = attribute.getType();
-            attribute.getAttributeMap().getControlWrapper()
-                    .getAttributeUpdater().updateAttribute(attributeType);
-        });
+        property.addListener((observable, oldValue, newValue) ->
+                AttributePropertyManager.updateAttribute(attribute)
+        );
         return this;
     }
 
@@ -69,7 +72,9 @@ public class AttributePropertyManager
         if(removed)
         {
             attributePropertyMap.remove(attributeProperty);
-            attributePropertyDataSet.removeIf(propertyBis -> propertyBis.getAttributeProperty() == attributeProperty);
+            attributePropertyDataSet.removeIf(data ->
+                    data.getAttributeProperty() == attributeProperty
+            );
         }
     }
 

@@ -1,14 +1,23 @@
 package parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.impl.button;
 
 import javafx.scene.control.Button;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.TextAttribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.ValueAttribute;
+import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.AddressAttribute;
+import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.ReadAddressAttribute;
+import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.control.ButtonDataAttribute;
 import parozzz.github.com.simpleplcpanel.hmi.controls.ControlContainerPane;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapperType;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.LabeledWrapper;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.attributes.ControlWrapperAttributeInitializer;
+import parozzz.github.com.simpleplcpanel.logger.MainLogger;
+import parozzz.github.com.simpleplcpanel.util.Validate;
+
+import java.util.Objects;
 
 public final class ButtonWrapper
         extends LabeledWrapper<Button>
@@ -23,51 +32,89 @@ public final class ButtonWrapper
     {
         super.registerAttributeInitializers(attributeInitializer);
 
-        attributeInitializer.addGlobals(AttributeType.READ_ADDRESS, AttributeType.BUTTON_DATA)
-                .addStates(AttributeType.WRITE_ADDRESS, AttributeType.TEXT, AttributeType.VALUE)
-                .addAttributeUpdateConsumer(updateData ->
-                {
-                    var control = updateData.getControl();
-
-                    TextAttribute textAttribute = null;
-                    ValueAttribute valueAttribute = null;
-
-                    for(var attribute : updateData.getAttributeList())
-                    {
-                        if(attribute instanceof TextAttribute)
-                        {
-                            textAttribute = (TextAttribute) attribute;
-                        }
-                        else if(attribute instanceof ValueAttribute)
-                        {
-                            valueAttribute = (ValueAttribute) attribute;
-                        }
-                    }
-
-                    if(textAttribute == null)
-                    {
-                        textAttribute = AttributeFetcher.fetch(this, AttributeType.TEXT);
-                    }
-
-                    if(valueAttribute == null)
-                    {
-                        valueAttribute = AttributeFetcher.fetch(this, AttributeType.VALUE);
-                    }
-
-                    if (textAttribute != null && valueAttribute != null)
-                    {
-                        control.setTextAlignment(textAttribute.getValue(TextAttribute.TEXT_ALIGNMENT));
-                        control.setLineSpacing(textAttribute.getValue(TextAttribute.LINE_SPACING));
-
-                        var text = textAttribute.getValue(TextAttribute.TEXT);
-                        super.setParsedTextPlaceholders(control, text, valueAttribute);
-                    }
-                });
+        attributeInitializer.addGlobals(AttributeType.BUTTON_DATA)
+                .addStates(AttributeType.WRITE_ADDRESS);
     }
 
     @Override
     public void setup()
     {
         super.setup();
+
+        //These needs to be EventHandler because i might use event filter to consume events and these should not fire
+        control.addEventHandler(MouseEvent.MOUSE_PRESSED, mouseEvent ->
+        {
+            if (mouseEvent.getButton() != MouseButton.PRIMARY)
+            {
+                return;
+            }
+
+            var writeAttribute = AttributeFetcher.fetch(this, AttributeType.WRITE_ADDRESS);
+            Objects.requireNonNull(writeAttribute, "ButtonWrapper must have a WriteAddress");
+
+            var writeTag = writeAttribute.getValue(AddressAttribute.COMMUNICATION_TAG);
+            if(writeTag == null)
+            {
+                return;
+            }
+
+            var buttonDataAttribute = AttributeFetcher.fetch(this, AttributeType.BUTTON_DATA);
+            Objects.requireNonNull(buttonDataAttribute, "ButtonWrapper must have a ButtonDataAttribute");
+
+            var writeIntermediate = writeTag.getWriteIntermediate();
+            switch (buttonDataAttribute.getValue(ButtonDataAttribute.TYPE))
+            {
+                case NORMAL:
+                    writeIntermediate.setBoolean(true);
+                    break;
+                case TOGGLE:
+                    var readAttribute = AttributeFetcher.fetch(this, AttributeType.READ_ADDRESS);
+                    Objects.requireNonNull(readAttribute, "ButtonWrapper must have a ReadAddress");
+
+                    var readTag = readAttribute.getValue(AddressAttribute.COMMUNICATION_TAG);
+                    if(readTag == null)
+                    {
+                        writeIntermediate.setBoolean(!writeIntermediate.asBoolean());
+                    }
+                    else
+                    {
+                        var readIntermediate = readTag.getReadIntermediate();
+                        writeIntermediate.setBoolean(!readIntermediate.asBoolean());
+                    }
+                    break;
+                case SET_TO_ON:
+                    writeIntermediate.setBoolean(true, true);
+                    break;
+                case SET_TO_OFF:
+                    writeIntermediate.setBoolean(false, true);
+                    break;
+            }
+
+        });
+
+        control.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseEvent ->
+        {
+            if (mouseEvent.getButton() != MouseButton.PRIMARY)
+            {
+                return;
+            }
+
+            var writeAttribute = AttributeFetcher.fetch(this, AttributeType.WRITE_ADDRESS);
+            Objects.requireNonNull(writeAttribute, "ButtonWrapper must have a WriteAddress");
+
+            var attribute = AttributeFetcher.fetch(this, AttributeType.BUTTON_DATA);
+            Objects.requireNonNull(attribute, "ButtonWrapper must have a ButtonDataAttribute");
+
+            var writeTag = writeAttribute.getValue(AddressAttribute.COMMUNICATION_TAG);
+            if(writeTag == null)
+            {
+                return;
+            }
+
+            if (attribute.getValue(ButtonDataAttribute.TYPE) == ButtonWrapperType.NORMAL)
+            {
+                writeIntermediate.setBoolean(false);
+            }
+        });
     }
 }
