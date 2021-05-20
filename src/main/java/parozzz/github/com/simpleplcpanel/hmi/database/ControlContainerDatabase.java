@@ -45,14 +45,14 @@ public final class ControlContainerDatabase extends FXController implements Iter
         this.communicationDataHolder = communicationDataHolder;
 
         this.controlDataUpdaterMap = new HashMap<>();
-        controlDataUpdaterMap.put(
-                CommunicationType.SIEMENS_S7,
-                SiemensPLCDataUpdater.createInstance(tagStage, this, communicationDataHolder)
-        );
-        controlDataUpdaterMap.put(
-                CommunicationType.MODBUS_TCP,
-                ModbusTCPDataUpdater.createInstance(tagStage, this, communicationDataHolder)
-        );
+
+        var siemensPLCDataUpdater = SiemensPLCDataUpdater.createInstance(tagStage, this, communicationDataHolder);
+        var modbusTCPDataUpdater = ModbusTCPDataUpdater.createInstance(tagStage, this, communicationDataHolder);
+
+        this.addMultipleFXChild(siemensPLCDataUpdater, modbusTCPDataUpdater);
+
+        controlDataUpdaterMap.put(CommunicationType.SIEMENS_S7, siemensPLCDataUpdater);
+        controlDataUpdaterMap.put(CommunicationType.MODBUS_TCP, modbusTCPDataUpdater);
 
         this.nextDataUpdateCooldown = new Cooldown(200);
 
@@ -123,7 +123,7 @@ public final class ControlContainerDatabase extends FXController implements Iter
     private ControlContainerPane create(String name, boolean setDefault)
     {
         name = name.toLowerCase();
-        if (doNameExists(name))
+        if(doNameExists(name))
         {
             return null;
         }
@@ -153,14 +153,15 @@ public final class ControlContainerDatabase extends FXController implements Iter
                         }*/
                     });
             controlContainerPanelMainPage.setup();
-            if (setDefault)
+            if(setDefault)
             {
                 controlContainerPanelMainPage.setDefault();
             }
 
             this.addPage(controlContainerPanelMainPage);
             return controlContainerPanelMainPage;
-        } catch (IOException exception)
+        }
+        catch(IOException exception)
         {
             MainLogger.getInstance().warning("Something went wrong while create a new Page", exception, this);
             return null;
@@ -169,13 +170,13 @@ public final class ControlContainerDatabase extends FXController implements Iter
 
     public void addPage(ControlContainerPane controlContainerPane)
     {
-        if (!controlContainerPane.isSetupDone())
+        if(!controlContainerPane.isSetupDone())
         {
             MainLogger.getInstance().warning("Cannot add a non initialized ControlContainerPane", this);
             return;
         }
 
-        if (controlsPageMap.containsKey(controlContainerPane.getName()))
+        if(controlsPageMap.containsKey(controlContainerPane.getName()))
         {
             MainLogger.getInstance().warning("Trying to add a ControlContainerPane twice", this);
             return;
@@ -188,7 +189,7 @@ public final class ControlContainerDatabase extends FXController implements Iter
 
     public void deletePage(ControlContainerPane controlContainer)
     {
-        if (controlsPageMap.remove(controlContainer.getName(), controlContainer))
+        if(controlsPageMap.remove(controlContainer.getName(), controlContainer))
         {
             mainEditStage.getPageScrollingPane().removeImagePane(controlContainer.getMenuBottomImagePane());
             mainEditStage.setShownControlContainerPane(null);
@@ -197,13 +198,13 @@ public final class ControlContainerDatabase extends FXController implements Iter
 
     private void changeSelectedDataUpdater()
     {
-        if (nextControlDataCommunicationType == null)
+        if(nextControlDataCommunicationType == null)
         {
             return;
         }
 
         //If i have to change data updater, i need to do it only when the selected data updater has finished (aka is ready)
-        if (selectedControlDataUpdater != null && !selectedControlDataUpdater.isReady())
+        if(selectedControlDataUpdater != null && !selectedControlDataUpdater.isReady())
         {
             return;
         }
@@ -224,12 +225,12 @@ public final class ControlContainerDatabase extends FXController implements Iter
 
     private void updateSelectedDataUpdater()
     {
-        if (selectedControlDataUpdater == null)
+        if(selectedControlDataUpdater == null)
         {
             return;
         }
 
-        if (!selectedControlDataUpdater.isReady())
+        if(!selectedControlDataUpdater.isReady())
         {
             //Keep the cooldown refreshed so when the updater is ready, will wait the full time
             nextDataUpdateCooldown.createStamp();
@@ -237,13 +238,13 @@ public final class ControlContainerDatabase extends FXController implements Iter
         }
 
         //If the data updater is ready it means the plc thread has finished, so i update the read data
-        if (parseUpdatedData)
+        if(parseUpdatedData)
         {
             selectedControlDataUpdater.parseReadData();
             parseUpdatedData = false;
         }
         //And then wait some time for the next update
-        if (nextDataUpdateCooldown.passed())
+        if(nextDataUpdateCooldown.passed())
         {
             selectedControlDataUpdater.update();
             parseUpdatedData = true;
@@ -264,7 +265,7 @@ public final class ControlContainerDatabase extends FXController implements Iter
         super.deserialize(jsonDataMap);
 
         var pagesJSONArray = jsonDataMap.getArray("Pages");
-        if (pagesJSONArray == null)
+        if(pagesJSONArray == null)
         {
             MainLogger.getInstance().warning("Pages JSONArray has not been found while de-serializing", this);
             return;
@@ -276,14 +277,14 @@ public final class ControlContainerDatabase extends FXController implements Iter
                 .forEach(pageJSONDataMap ->
                 {
                     var pageName = pageJSONDataMap.getString("ControlWrapperPageName");
-                    if (pageName != null)
+                    if(pageName != null)
                     {
                         var controlWrapperPage = this.create(pageName, false);
-                        if (controlWrapperPage != null)
+                        if(controlWrapperPage != null)
                         {
                             controlWrapperPage.deserialize(pageJSONDataMap);
                             //No setupComplete here, is called automagically inside the FXController
-                        } else
+                        }else
                         {
                             MainLogger.getInstance().warning("Creating while deserializing a ControlMainPage has returned null.", this);
                         }
@@ -308,7 +309,7 @@ public final class ControlContainerDatabase extends FXController implements Iter
     private String getSelectedControlDataUpdaterName()
     {
         return selectedControlDataUpdater == null
-                ? "none"
-                : selectedControlDataUpdater.getClass().getSimpleName();
+               ? "none"
+               : selectedControlDataUpdater.getClass().getSimpleName();
     }
 }

@@ -3,6 +3,7 @@ package parozzz.github.com.simpleplcpanel.hmi.database.dataupdater;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
 import parozzz.github.com.simpleplcpanel.hmi.comm.ReadOnlyIntermediate;
+import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.intermediate.bit.ModbusReadBitIntermediate;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.stringaddress.ModbusStringAddressData;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.tcp.ModbusTCPThread;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.intermediate.ModbusReadNumberIntermediate;
@@ -92,9 +93,10 @@ public final class ModbusTCPDataUpdater extends ControlDataUpdater<ModbusTCPThre
 
             var commTag = (CommunicationTag) tag;
 
+            var tagActive = commTag.hasProperty(CommunicationTag.TagProperty.ACTIVE);
             var stringAddressData = commTag.getStringAddressData();
-            if (commTag.isLocal() || !commTag.hasProperty(CommunicationTag.TagProperty.ACTIVE)
-                    ||  !(stringAddressData instanceof ModbusStringAddressData))
+            if (commTag.isLocal() || !tagActive
+                    || !(stringAddressData instanceof ModbusStringAddressData))
             {
                 continue;
             }
@@ -136,21 +138,16 @@ public final class ModbusTCPDataUpdater extends ControlDataUpdater<ModbusTCPThre
                 switch (modbusStringAddressData.getFunctionCode())
                 {
                     case HOLDING_REGISTER:
-                        switch (modbusStringAddressData.getDataLength())
-                        {
-                            case WORD:
-                                writeHoldingRegisterSet.add(new ModbusWriteWordIntermediate(offset, readIntermediate.asInteger()));
-                                break;
-                            case DOUBLE_WORD:
-                                writeHoldingRegisterSet.add(new ModbusWriteDWordIntermediate(offset, readIntermediate.asInteger()));
-                                break;
-                            case QUAD_WORD:
-                                writeHoldingRegisterSet.add(new ModbusWriteQWordIntermediate(offset, readIntermediate.asLong()));
-                                break;
-                        }
+                        readHoldingRegisterSet.add(this.parseReadNumberIntermediate(modbusStringAddressData, offset, readIntermediate));
                         break;
                     case COIL:
-                        writeCoilsSet.add(new ModbusWriteBitIntermediate(offset, readIntermediate.asBoolean()));
+                        readCoilsSet.add(new ModbusReadBitIntermediate(offset, readIntermediate::setBoolean));
+                        break;
+                    case INPUT_REGISTER:
+                        readInputRegistersSet.add(this.parseReadNumberIntermediate(modbusStringAddressData, offset, readIntermediate));
+                        break;
+                    case DISCRETE_INPUT:
+                        readDiscreteInputsSet.add(new ModbusReadBitIntermediate(offset, readIntermediate::setBoolean));
                         break;
                 }
             }

@@ -10,6 +10,7 @@ import parozzz.github.com.simpleplcpanel.logger.Loggable;
 import parozzz.github.com.simpleplcpanel.logger.MainLogger;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public final class SetupPaneAttributeChangerList<A extends Attribute>
@@ -20,8 +21,8 @@ public final class SetupPaneAttributeChangerList<A extends Attribute>
     private final Set<SetupPaneAttributeChanger<A>> attributeChangerSet;
     private final Map<Property<?>, SetupPaneAttributeChanger<A>> propertyToAttributeChangerMap;
 
-    private Runnable postReadRunnable;
-    private Runnable postSaveRunnable;
+    private Consumer<A> postReadConsumer;
+    private Consumer<A> postSaveConsumer;
 
     private boolean ignoreCopy;
 
@@ -34,15 +35,15 @@ public final class SetupPaneAttributeChangerList<A extends Attribute>
         this.propertyToAttributeChangerMap = new HashMap<>();
     }
 
-    public SetupPaneAttributeChangerList<A> setPostReadRunnable(Runnable runnable)
+    public SetupPaneAttributeChangerList<A> setPostReadConsumer(Consumer<A> consumer)
     {
-        this.postReadRunnable = runnable;
+        this.postReadConsumer = consumer;
         return this;
     }
 
-    public SetupPaneAttributeChangerList<A> setPostSaveRunnable(Runnable runnable)
+    public SetupPaneAttributeChangerList<A> setPostSaveConsumer(Consumer<A> consumer)
     {
-        this.postSaveRunnable = runnable;
+        this.postSaveConsumer = consumer;
         return this;
     }
 
@@ -109,9 +110,9 @@ public final class SetupPaneAttributeChangerList<A extends Attribute>
             }
         }
 
-        if(postSaveRunnable != null)
+        if(postSaveConsumer != null)
         {
-            postSaveRunnable.run();
+            postSaveConsumer.accept(attribute);
         }
     }
 
@@ -134,9 +135,9 @@ public final class SetupPaneAttributeChangerList<A extends Attribute>
             attributeChanger.copyDataFromAttribute(attribute);
         }
 
-        if(postReadRunnable != null)
+        if(postReadConsumer != null)
         {
-            postReadRunnable.run();
+            postReadConsumer.accept(attribute);
         }
     }
 

@@ -6,15 +6,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import parozzz.github.com.simpleplcpanel.hmi.controls.ControlContainerPane;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.impl.button.ButtonWrapper;
-import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.impl.button.ButtonWrapperValue;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.impl.display.DisplayWrapper;
-import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.impl.display.DisplayWrapperValue;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.impl.textinput.InputWrapper;
-import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.impl.textinput.InputWrapperValue;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 public class ControlWrapperType<C extends Control, W extends ControlWrapper<C>>

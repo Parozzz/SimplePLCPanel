@@ -21,6 +21,7 @@ public abstract class ControlDataUpdater<C extends CommThread<?>> extends FXObje
     protected final CommunicationDataHolder communicationDataHolder;
     protected final C commThread;
 
+    //This need to be a set to avoid duplicate Tag!
     protected final Set<Tag> needWriteTagSet;
 
     public ControlDataUpdater(TagStage tagStage,

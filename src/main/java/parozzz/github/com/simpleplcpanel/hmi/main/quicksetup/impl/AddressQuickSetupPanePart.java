@@ -11,6 +11,8 @@ import parozzz.github.com.simpleplcpanel.hmi.FXObject;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.AddressAttribute;
+import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.ReadAddressAttribute;
+import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.WriteAddressAttribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.property.AttributeProperty;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationStringAddressData;
@@ -41,7 +43,6 @@ public final class AddressQuickSetupPanePart
 
     public AddressQuickSetupPanePart(QuickSetupPane quickSetupPane,
             TagStage tagStage,
-            CommunicationDataHolder communicationDataHolder,
             boolean readOnly) throws IOException
     {
         this.quickSetupPane = quickSetupPane;
@@ -67,7 +68,7 @@ public final class AddressQuickSetupPanePart
             if(addressAttribute != null)
             {
                 tagStage.showAsSelection(tag ->
-                        addressAttribute.setValue(AddressAttribute.COMMUNICATION_TAG, tag)
+                        addressAttribute.setValue(addressAttribute.getTagAttributeProperty(), tag)
                 );
             }
         });
@@ -97,7 +98,7 @@ public final class AddressQuickSetupPanePart
         stateBinder.builder(this.getAttributeType())
                 .readOnlyIndirect(tagTextField.textProperty(),
                         CommunicationTag::getHierarchicalKey,
-                        () -> AddressAttribute.COMMUNICATION_TAG
+                        () -> readOnly ? ReadAddressAttribute.READ_TAG : WriteAddressAttribute.WRITE_TAG
                 );
     }
 

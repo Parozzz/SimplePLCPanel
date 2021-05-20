@@ -5,6 +5,8 @@ import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
 import parozzz.github.com.simpleplcpanel.util.Validate;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -12,17 +14,18 @@ import java.util.logging.Logger;
 
 public abstract class FXController extends FXObject
 {
-    private final Set<FXObjectWrapper> childSet;
+    //I DO care about the order in which objects are added, especially for deserializing!
+    private final List<FXObjectWrapper> childList;
     public FXController()
     {
-        this.childSet = new HashSet<>();
+        this.childList = new LinkedList<>();
     }
 
     public FXController(String name)
     {
         super(name);
 
-        this.childSet = new HashSet<>();
+        this.childList = new LinkedList<>();
     }
 
     public FXController addMultipleFXChild(FXObject... children)
@@ -43,7 +46,7 @@ public abstract class FXController extends FXObject
     {
         Validate.needFalse("Cannot add itself as a child", child == this);
 
-        var added = childSet.add(new FXObjectWrapper(child, allowSerialization));
+        var added = childList.add(new FXObjectWrapper(child, allowSerialization));
         Validate.needTrue("Trying to add a child twice. Class: " + child.getClass().getSimpleName(), added);
 
         child.controller = this;
@@ -53,7 +56,7 @@ public abstract class FXController extends FXObject
 
     public void removeFXChild(FXObject child)
     {
-        if(childSet.removeIf(fxObjectWrapper -> fxObjectWrapper.fxObject == child))
+        if(childList.removeIf(fxObjectWrapper -> fxObjectWrapper.fxObject == child))
         {
             child.controller = null;
         }
@@ -64,7 +67,7 @@ public abstract class FXController extends FXObject
     {
         super.setup();
 
-        childSet.stream().map(FXObjectWrapper::getFxObject)
+        childList.stream().map(FXObjectWrapper::getFxObject)
                 .filter(Predicate.not(FXObject::isDisabled))
                 .forEach(FXObject::setup);
     }
@@ -74,7 +77,7 @@ public abstract class FXController extends FXObject
     {
         super.setDefault();
 
-        childSet.stream().map(FXObjectWrapper::getFxObject)
+        childList.stream().map(FXObjectWrapper::getFxObject)
                 .filter(Predicate.not(FXObject::isDisabled))
                 .forEach(FXObject::setDefault);
     }
@@ -84,7 +87,7 @@ public abstract class FXController extends FXObject
     {
         super.setupComplete();
 
-        childSet.stream().map(FXObjectWrapper::getFxObject)
+        childList.stream().map(FXObjectWrapper::getFxObject)
                 .filter(Predicate.not(FXObject::isDisabled))
                 .forEach(FXObject::setupComplete);
     }
@@ -94,7 +97,7 @@ public abstract class FXController extends FXObject
     {
         super.loop();
         //Avoid streams here, is a method called very often better be safe than sorry!
-        for (var fxObjectWrapper : childSet)
+        for (var fxObjectWrapper : childList)
         {
             var fxObject = fxObjectWrapper.getFxObject();
             if(!fxObject.isDisabled())
@@ -108,7 +111,7 @@ public abstract class FXController extends FXObject
     public JSONDataMap serialize()
     {
         var jsonDataMap = super.serialize();
-        for (var fxObjectWrapper : childSet)
+        for (var fxObjectWrapper : childList)
         {
             if (!fxObjectWrapper.save)
             {
@@ -148,7 +151,7 @@ public abstract class FXController extends FXObject
     {
         super.deserialize(jsonDataMap);
 
-        for (var fxObjectWrapper : childSet)
+        for (var fxObjectWrapper : childList)
         {
             if (!fxObjectWrapper.save)
             {

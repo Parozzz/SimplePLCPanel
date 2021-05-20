@@ -3,27 +3,30 @@ package parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.impl.butto
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import parozzz.github.com.simpleplcpanel.hmi.attribute.Attribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
-import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.TextAttribute;
-import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.ValueAttribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.AddressAttribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.ReadAddressAttribute;
+import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.WriteAddressAttribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.control.ButtonDataAttribute;
 import parozzz.github.com.simpleplcpanel.hmi.controls.ControlContainerPane;
-import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapperType;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.LabeledWrapper;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.attributes.ControlWrapperAttributeInitializer;
-import parozzz.github.com.simpleplcpanel.logger.MainLogger;
-import parozzz.github.com.simpleplcpanel.util.Validate;
 
 import java.util.Objects;
 
 public final class ButtonWrapper
         extends LabeledWrapper<Button>
 {
+    public enum Type
+    {
+        NORMAL,
+        TOGGLE,
+        SET_TO_ON,
+        SET_TO_OFF;
+    }
+
     public ButtonWrapper(ControlContainerPane controlContainerPane)
     {
         super(controlContainerPane, ControlWrapperType.BUTTON, false);
@@ -54,7 +57,7 @@ public final class ButtonWrapper
             var writeAttribute = AttributeFetcher.fetch(this, AttributeType.WRITE_ADDRESS);
             Objects.requireNonNull(writeAttribute, "ButtonWrapper must have a WriteAddress");
 
-            var writeTag = writeAttribute.getValue(AddressAttribute.COMMUNICATION_TAG);
+            var writeTag = writeAttribute.getValue(WriteAddressAttribute.WRITE_TAG);
             if(writeTag == null)
             {
                 return;
@@ -73,7 +76,7 @@ public final class ButtonWrapper
                     var readAttribute = AttributeFetcher.fetch(this, AttributeType.READ_ADDRESS);
                     Objects.requireNonNull(readAttribute, "ButtonWrapper must have a ReadAddress");
 
-                    var readTag = readAttribute.getValue(AddressAttribute.COMMUNICATION_TAG);
+                    var readTag = readAttribute.getValue(ReadAddressAttribute.READ_TAG);
                     if(readTag == null)
                     {
                         writeIntermediate.setBoolean(!writeIntermediate.asBoolean());
@@ -104,7 +107,7 @@ public final class ButtonWrapper
             var writeAttribute = AttributeFetcher.fetch(this, AttributeType.WRITE_ADDRESS);
             Objects.requireNonNull(writeAttribute, "ButtonWrapper must have a WriteAddress");
 
-            var writeTag = writeAttribute.getValue(AddressAttribute.COMMUNICATION_TAG);
+            var writeTag = writeAttribute.getValue(WriteAddressAttribute.WRITE_TAG);
             if(writeTag == null)
             {
                 return;
@@ -114,7 +117,7 @@ public final class ButtonWrapper
             Objects.requireNonNull(attribute, "ButtonWrapper must have a ButtonDataAttribute");
 
             var writeIntermediate = writeTag.getWriteIntermediate();
-            if (attribute.getValue(ButtonDataAttribute.TYPE) == ButtonWrapperType.NORMAL)
+            if (attribute.getValue(ButtonDataAttribute.TYPE) == Type.NORMAL)
             {
                 writeIntermediate.setBoolean(false);
             }

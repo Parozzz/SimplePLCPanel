@@ -137,23 +137,23 @@ public final class MainEditStage extends BorderPaneHMIStage
 
 
         super   //HANDLERS AND VARIOUS
-                .addFXChild(controlContainerDatabase = new ControlContainerDatabase(this, communicationDataHolder))
+                .addFXChild((tagStage = new TagStage(communicationDataHolder)).setAsSubWindow(this))
+                .addFXChild(controlContainerDatabase = new ControlContainerDatabase(this, tagStage, communicationDataHolder))
                 .addFXChild(copyPasteHandler = new ControlWrapperCopyPasteHandler(this))
                 //SIDE PANES
                 .addFXChild(dragAndDropPane = new DragAndDropPane(this)) //LEFT
-                .addFXChild(quickSetupPane = new QuickSetupPane(communicationDataHolder)) //RIGHT
+                .addFXChild(quickSetupPane = new QuickSetupPane(tagStage)) //RIGHT
                 .addFXChild(pageScrollingPane = new PageScrollingPane()) //BOTTOM
                 //CHILD STAGES
                 .addFXChild((controlsPageCreationStage = new ControlContainerCreationStage(controlContainerDatabase)).setAsSubWindow(this))
-                .addFXChild((controlWrapperSetupStage = new ControlWrapperSetupStage(this, communicationDataHolder)).setAsSubWindow(this))
+                .addFXChild((controlWrapperSetupStage = new ControlWrapperSetupStage(this, tagStage)).setAsSubWindow(this))
                 .addFXChild((controlWrapperQuickTextEditorStage = new ControlWrapperQuickTextEditorStage()).setAsSubWindow(this))
                 .addFXChild((settingsStage = new SettingsStage()).setAsSubWindow(this))
                 .addFXChild((pictureBankStage = new PictureBankStage()).setAsSubWindow(this))
-
                 .addFXChild((messagesListStage = new MessagesListStage()).setAsSubWindow(this))
                 //OTHER STAGES
-                .addFXChild(runtimeControlMainPage = new RuntimeControlContainerStage(this))
-                .addFXChild(tagStage = new TagStage(communicationDataHolder));
+                .addFXChild(runtimeControlMainPage = new RuntimeControlContainerStage(this));
+
 
         this.messagePresentTrig = new TrigBoolean(false);
     }

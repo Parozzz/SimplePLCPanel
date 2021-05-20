@@ -7,7 +7,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.control.ButtonDataAttribute;
-import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.impl.button.ButtonWrapperType;
+import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.impl.button.ButtonWrapper;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.ControlWrapperSetupStage;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.SetupPane;
 import parozzz.github.com.simpleplcpanel.hmi.util.EnumStringConverter;
@@ -17,7 +17,7 @@ import java.io.IOException;
 
 public class ButtonDataSetupPane extends SetupPane<ButtonDataAttribute>
 {
-    @FXML private ChoiceBox<ButtonWrapperType> buttonTypeChoiceBox;
+    @FXML private ChoiceBox<ButtonWrapper.Type> buttonTypeChoiceBox;
     @FXML private Label toggleInformationLabel;
 
     private final VBox mainVBox;
@@ -36,11 +36,11 @@ public class ButtonDataSetupPane extends SetupPane<ButtonDataAttribute>
 
         toggleInformationLabel.setVisible(false); //Start as not visible :)
 
-        buttonTypeChoiceBox.setConverter(new EnumStringConverter<>(ButtonWrapperType.class).setCapitalize());
-        buttonTypeChoiceBox.getItems().addAll(ButtonWrapperType.values());
-        buttonTypeChoiceBox.setValue(ButtonWrapperType.NORMAL);
+        buttonTypeChoiceBox.setConverter(new EnumStringConverter<>(ButtonWrapper.Type.class).setCapitalize());
+        buttonTypeChoiceBox.getItems().addAll(ButtonWrapper.Type.values());
+        buttonTypeChoiceBox.setValue(ButtonWrapper.Type.NORMAL);
         buttonTypeChoiceBox.valueProperty().addListener((observableValue, oldValue, newValue) ->
-                toggleInformationLabel.setVisible(newValue == ButtonWrapperType.TOGGLE)
+                toggleInformationLabel.setVisible(newValue == ButtonWrapper.Type.TOGGLE)
         );
         super.getAttributeChangerList().create(buttonTypeChoiceBox.valueProperty(), ButtonDataAttribute.TYPE);
 

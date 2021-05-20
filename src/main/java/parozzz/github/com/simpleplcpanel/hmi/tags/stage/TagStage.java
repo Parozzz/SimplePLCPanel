@@ -196,9 +196,8 @@ public final class TagStage extends HMIStage<VBox>
                 ((CommunicationTag) tag).updateCommunicationType(communicationDataHolder.getCurrentCommunicationType());
             }
 
-            tag.addDeleteRunnable(() ->
-                    this.removeTag(tag)
-            );
+            tag.addDeleteRunnable(() -> this.removeTag(tag));
+            tagMapChangeList.forEach(consumer -> consumer.accept(tag, ChangeType.ADD));
         }
     }
 
@@ -206,7 +205,7 @@ public final class TagStage extends HMIStage<VBox>
     {
         if(tagSet.remove(tag) && tagMap.remove(tag.getInternalId(), tag))
         {
-
+            tagMapChangeList.forEach(consumer -> consumer.accept(tag, ChangeType.REMOVE));
         }
     }
 
@@ -232,6 +231,8 @@ public final class TagStage extends HMIStage<VBox>
         {
             children.add(selectionHandlerParent);
         }
+
+        super.showStage();
     }
 
     @Override

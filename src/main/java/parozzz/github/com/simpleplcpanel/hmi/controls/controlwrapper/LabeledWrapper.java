@@ -64,7 +64,7 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
                         {
                             readAddressAttribute = (ReadAddressAttribute) attribute;
 
-                            var readTag = readAddressAttribute.getValue(AddressAttribute.COMMUNICATION_TAG);
+                            var readTag = readAddressAttribute.getValue(ReadAddressAttribute.READ_TAG);
                             if(readTag != null)
                             {
                                 var readIntermediate = readTag.getReadIntermediate();
@@ -141,12 +141,13 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
             return;
         }
 
-        var readTag = readAddressAttribute.getValue(AddressAttribute.COMMUNICATION_TAG);
+        var readTag = readAddressAttribute.getValue(ReadAddressAttribute.READ_TAG);
         var parseAs = valueAttribute.getValue(ValueAttribute.INTERMEDIATE_TYPE);
         var multiplyBy = valueAttribute.getValue(ValueAttribute.MULTIPLY_BY);
         var offset = valueAttribute.getValue(ValueAttribute.OFFSET);
         if(readTag == null || parseAs == null || multiplyBy == null || offset == null)
         {
+            control.setText(text.replace(ControlWrapper.VALUE_PLACEHOLDER, ""));
             return;
         }
 

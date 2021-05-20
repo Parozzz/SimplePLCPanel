@@ -5,13 +5,13 @@ import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeMap;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.property.AttributeProperty;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.property.impl.EnumAttributeProperty;
-import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.impl.button.ButtonWrapperType;
+import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.impl.button.ButtonWrapper;
 
 public final class ButtonDataAttribute extends Attribute
 {
     public static final String ATTRIBUTE_NAME = "BUTTON_DATA_ATTRIBUTE";
 
-    public static final AttributeProperty<ButtonWrapperType> TYPE = new EnumAttributeProperty<>("ButtonWrapperType", ButtonWrapperType.NORMAL);
+    public static final AttributeProperty<ButtonWrapper.Type> TYPE = new EnumAttributeProperty<>("ButtonWrapperType", ButtonWrapper.Type.NORMAL);
 
     public ButtonDataAttribute(AttributeMap attributeMap)
     {

@@ -19,6 +19,7 @@ import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.state.Wrapp
 import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.impl.*;
 import parozzz.github.com.simpleplcpanel.hmi.pane.HMIPane;
 import parozzz.github.com.simpleplcpanel.hmi.pane.HidablePane;
+import parozzz.github.com.simpleplcpanel.hmi.tags.stage.TagStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
 
 import java.io.IOException;
@@ -53,7 +54,7 @@ public final class QuickSetupPane
 
     private ControlWrapper<?> selectedControlWrapper;
 
-    public QuickSetupPane(CommunicationDataHolder communicationDataHolder) throws IOException
+    public QuickSetupPane(TagStage tagStage) throws IOException
     {
         this.stateBinder = new QuickSetupStateBinder(this);
         this.mainVBox = new VBox(
@@ -68,8 +69,8 @@ public final class QuickSetupPane
                 .addFXChild(this.fontQuickSetupPanePart = new FontQuickSetupPanePart())
                 .addFXChild(this.backgroundQuickSetupPanePart = new BackgroundQuickSetupPanePart())
                 .addFXChild(this.textQuickSetupPanePart = new TextQuickSetupPanePart())
-                .addFXChild(this.readAddressQuickSetupPanePart = new AddressQuickSetupPanePart(this, communicationDataHolder ,true))
-                .addFXChild(this.writeAddressQuickSetupPanePart = new AddressQuickSetupPanePart(this, communicationDataHolder ,false));
+                .addFXChild(this.readAddressQuickSetupPanePart = new AddressQuickSetupPanePart(this, tagStage, true))
+                .addFXChild(this.writeAddressQuickSetupPanePart = new AddressQuickSetupPanePart(this, tagStage, false));
 
         this.quickSetupPanePartList = new ArrayList<>();
 

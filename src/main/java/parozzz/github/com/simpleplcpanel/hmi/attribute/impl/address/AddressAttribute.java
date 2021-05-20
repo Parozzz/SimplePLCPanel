@@ -21,61 +21,11 @@ import java.util.function.Function;
 
 public abstract class AddressAttribute extends Attribute
 {
-    public static final AttributeProperty<CommunicationTag> COMMUNICATION_TAG =
-            new CommunicationTagAttributeProperty("Tag", true);
-/*
-    public static final AttributeProperty<AddressSetupPane.AddressType> ADDRESS_TYPE =
-            new EnumAttributeProperty<>("CommunicationType", AddressSetupPane.AddressType.NONE);
-
-    public static final AttributeProperty<SiemensS7StringAddressData> SIEMENS_STRING_DATA =
-            new FunctionAttributeProperty<>("Siemens.StringData", new SiemensS7StringAddressData(),
-                    SiemensS7StringAddressData::getStringData,
-                    (jsonDataMap, key) ->
-                    {
-                        var stringData = jsonDataMap.getString(key);
-                        if(stringData != null)
-                        {
-                            var stringAddressData = SiemensS7StringAddressData.parseStringData(stringData);
-                            return stringAddressData == null
-                                    ? new SiemensS7StringAddressData()
-                                    : stringAddressData;
-                        }
-
-                        return null;
-                    }
-            );
-
-    public static final AttributeProperty<ModbusStringAddressData> MODBUS_TCP_STRING_DATA =
-            new FunctionAttributeProperty<>("ModbusTCP.StringData", new ModbusStringAddressData(),
-                    ModbusStringAddressData::getStringData,
-                    (jsonDataMap, key) ->
-                    {
-                        var stringData = jsonDataMap.getString(key);
-                        if(stringData != null)
-                        {
-                            var stringAddressData = ModbusStringAddressData.parseStringData(stringData);
-                            return stringAddressData == null
-                                    ? new ModbusStringAddressData()
-                                    : stringAddressData;
-                        }
-
-                        return null;
-                    }
-            );
-*/
-    public AddressAttribute(AttributeMap attributeMap, AttributeType<? extends AddressAttribute> attributeType,
-            String name)
+    public AddressAttribute(AttributeMap attributeMap,
+            AttributeType<? extends AddressAttribute> attributeType, String name)
     {
         super(attributeMap, attributeType, name);
-
-        super.getAttributePropertyManager().addAll(COMMUNICATION_TAG);
-        //super.getAttributePropertyManager().addAll(ADDRESS_TYPE, SIEMENS_STRING_DATA, MODBUS_TCP_STRING_DATA);
     }
 
-
-    @Override
-    public void update()
-    {
-
-    }
+    public abstract AttributeProperty<CommunicationTag> getTagAttributeProperty();
 }

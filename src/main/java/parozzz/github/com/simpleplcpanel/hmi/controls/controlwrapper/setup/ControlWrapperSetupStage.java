@@ -29,6 +29,7 @@ import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.impl.
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.state.WrapperState;
 import parozzz.github.com.simpleplcpanel.hmi.main.MainEditStage;
 import parozzz.github.com.simpleplcpanel.hmi.pane.BorderPaneHMIStage;
+import parozzz.github.com.simpleplcpanel.hmi.tags.stage.TagStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.ContextMenuBuilder;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
 import parozzz.github.com.simpleplcpanel.logger.MainLogger;
@@ -57,7 +58,7 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
     @FXML private Button deleteStateButton;
 
     private final MainEditStage mainEditStage;
-    private final CommunicationDataHolder communicationDataHolder;
+    private final TagStage tagStage;
 
     private final SetupPaneList setupPaneList;
 
@@ -70,12 +71,12 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
     private SetupSelectable activeSelectable;
     private boolean ignoreAttributeChanges;
 
-    public ControlWrapperSetupStage(MainEditStage mainEditStage, CommunicationDataHolder communicationDataHolder) throws IOException
+    public ControlWrapperSetupStage(MainEditStage mainEditStage, TagStage tagStage) throws IOException
     {
         super("ControlWrapperSetupPage", "setup/mainSetupPane.fxml");
 
         this.mainEditStage = mainEditStage;
-        this.communicationDataHolder = communicationDataHolder;
+        this.tagStage = tagStage;
 
         this.setupPaneList = new SetupPaneList();
 
@@ -127,8 +128,8 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
                     add(new BorderSetupPane(this)).
                     add(new BackgroundSetupPane(this)).
                     add(new ValueSetupPane(this)).
-                    add(new AddressSetupPane<>(this, communicationDataHolder, "Write Address", AttributeType.WRITE_ADDRESS)).
-                    add(new AddressSetupPane<>(this, communicationDataHolder,"Read Address", AttributeType.READ_ADDRESS)); //I want this last! >:(
+                    add(new AddressSetupPane<>(this, tagStage,"Write Address", AttributeType.WRITE_ADDRESS)).
+                    add(new AddressSetupPane<>(this, tagStage,"Read Address", AttributeType.READ_ADDRESS)); //I want this last! >:(
         } catch (IOException exception)
         {
             MainLogger.getInstance().error("Error while loading Setup Panes", exception, this);

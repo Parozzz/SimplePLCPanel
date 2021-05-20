@@ -6,8 +6,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.skin.TextFieldSkin;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.FontAttribute;
+import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.AddressAttribute;
+import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.WriteAddressAttribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.control.InputDataAttribute;
 import parozzz.github.com.simpleplcpanel.hmi.controls.ControlContainerPane;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
@@ -15,6 +18,8 @@ import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrap
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.attributes.ControlWrapperAttributeInitializer;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXNodeUtil;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXTextFormatterUtil;
+
+import java.util.Objects;
 
 public class InputWrapper extends ControlWrapper<TextField>
 {
@@ -34,6 +39,18 @@ public class InputWrapper extends ControlWrapper<TextField>
     public void setup()
     {
         super.setup();
+
+        control.textProperty().addListener((observableValue, oldValue, newValue) -> {
+            var writeAttribute = AttributeFetcher.fetch(InputWrapper.this, AttributeType.WRITE_ADDRESS);
+            Objects.requireNonNull(writeAttribute, "A InputWrapper has no WriteAddress?");
+
+            var tag = writeAttribute.getValue(WriteAddressAttribute.WRITE_TAG);
+            if(tag != null)
+            {
+                tag.getWriteIntermediate().setString(newValue);
+            }
+        });
+
         control.setCursor(null); //Remove the cursor that appears when hovering on it (It hides the cursor for resizing and is baaad)
     }
 
@@ -47,11 +64,11 @@ public class InputWrapper extends ControlWrapper<TextField>
                 {
                     var control = updateData.getControl();
 
-                    for (var attribute : updateData.getAttributeList())
+                    for(var attribute : updateData.getAttributeList())
                     {
-                        if (attribute instanceof InputDataAttribute)
+                        if(attribute instanceof InputDataAttribute)
                         {
-                            switch (attribute.getValue(InputDataAttribute.TYPE))
+                            switch(attribute.getValue(InputDataAttribute.TYPE))
                             {
                                 case INTEGER:
                                     control.getProperties().put(FXVK.VK_TYPE_PROP_KEY, FXVK.Type.NUMERIC.ordinal());
@@ -81,10 +98,10 @@ public class InputWrapper extends ControlWrapper<TextField>
                             }
 
                             control.setText(""); //When this changes, to avoid problems clear the text
-                        } else if (attribute instanceof FontAttribute)
+                        }else if(attribute instanceof FontAttribute)
                         {
                             var skin = control.getSkin(); //Seems like setting the skin even if already exists causes some... problems
-                            if (skin == null) //Set the skin before to be sure that it has it (It's required after)
+                            if(skin == null) //Set the skin before to be sure that it has it (It's required after)
                             {
                                 control.setSkin(new TextFieldSkin(control));
                             }
@@ -93,7 +110,7 @@ public class InputWrapper extends ControlWrapper<TextField>
                             control.setAlignment(attribute.getValue(FontAttribute.TEXT_POSITION));
 
                             var text = (Text) control.lookup(".text");
-                            if (text != null)
+                            if(text != null)
                             {
                                 //Seems like unbinding stuff that is not meant to cause graphical glitches :(
                                 text.setUnderline(attribute.getValue(FontAttribute.UNDERLINE));
@@ -101,7 +118,7 @@ public class InputWrapper extends ControlWrapper<TextField>
                             }
 
                             var caretPath = FXNodeUtil.getCaret(control); //Set this after to have it revert after changing the text fill
-                            if (caretPath != null)
+                            if(caretPath != null)
                             {
                                 caretPath.fillProperty().bind(new SimpleObjectProperty<>(Color.BLACK));
                             }

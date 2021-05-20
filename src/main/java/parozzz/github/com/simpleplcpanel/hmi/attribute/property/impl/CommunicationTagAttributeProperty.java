@@ -16,12 +16,12 @@ import java.util.function.Function;
 public class CommunicationTagAttributeProperty
         extends AttributeProperty<CommunicationTag>
 {
-    private final boolean write;
-    public CommunicationTagAttributeProperty(String key, boolean write)
+    private final boolean requireReading;
+    public CommunicationTagAttributeProperty(String key, boolean requireReading)
     {
         super(key, null);
 
-        this.write = write;
+        this.requireReading = requireReading;
     }
 
     @Override
@@ -45,18 +45,15 @@ public class CommunicationTagAttributeProperty
 
             property.addListener((observable, oldValue, newValue) ->
             {
-                if(write)
-                {
-                    return;
-                }
-
                 if(oldValue != null)
                 {
+                    oldValue.removeTaggable(this);
                     oldValue.getReadIntermediate().removeNewValueRunnable(INTERMEDIATE_KEY);
                 }
 
                 if(newValue != null)
                 {
+                    newValue.addTaggable(this);
                     newValue.getReadIntermediate().addNewValueRunnable(
                             INTERMEDIATE_KEY,
                             () -> AttributePropertyManager.updateAttribute(attribute)
@@ -68,7 +65,7 @@ public class CommunicationTagAttributeProperty
         @Override
         public boolean requireReading()
         {
-            return !write;
+            return requireReading;
         }
 
         @Override
