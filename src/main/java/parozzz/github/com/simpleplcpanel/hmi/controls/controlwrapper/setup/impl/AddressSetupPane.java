@@ -1,5 +1,8 @@
 package parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.impl;
 
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
@@ -10,8 +13,15 @@ import parozzz.github.com.simpleplcpanel.Nullable;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.AddressAttribute;
+import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.ReadAddressAttribute;
+import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.WriteAddressAttribute;
+import parozzz.github.com.simpleplcpanel.hmi.attribute.property.AttributeProperty;
+import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
+import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationStringAddressData;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.ControlWrapperSetupStage;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.SetupPane;
+import parozzz.github.com.simpleplcpanel.hmi.tags.CommunicationTag;
+import parozzz.github.com.simpleplcpanel.hmi.tags.TagsManager;
 import parozzz.github.com.simpleplcpanel.hmi.tags.stage.TagStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.ContextMenuBuilder;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
@@ -27,16 +37,23 @@ public class AddressSetupPane<A extends AddressAttribute>
     @FXML
     private TextField stringAddressTextField;
 
-    private final TagStage tagStage;
+    private final TagsManager tagsManager;
+    private final CommunicationDataHolder communicationDataHolder;
     private final VBox mainVBox;
 
-    public AddressSetupPane(ControlWrapperSetupStage setupPage, TagStage tagStage,
+    private final Property<CommunicationTag> tagProperty;
+
+    public AddressSetupPane(ControlWrapperSetupStage setupPage,
+            TagsManager tagsManager, CommunicationDataHolder communicationDataHolder,
             String buttonText, AttributeType<A> attributeType) throws IOException
     {
         super(setupPage, buttonText + "SetupPage", buttonText, attributeType);
 
-        this.tagStage = tagStage;
+        this.tagsManager = tagsManager;
+        this.communicationDataHolder = communicationDataHolder;
         this.mainVBox = (VBox) FXUtil.loadFXML("setup/addressSetupPaneV3.fxml", this);
+
+        this.tagProperty = new SimpleObjectProperty<>();
     }
 
     @Override
@@ -45,19 +62,19 @@ public class AddressSetupPane<A extends AddressAttribute>
         super.setup();
 
         tagKeyTextField.setCursor(Cursor.HAND);
-
         tagKeyTextField.setContextMenu(
                 ContextMenuBuilder.builder()
                         .simple("Clear", () ->
                         {
+                            tagProperty.setValue(null);
+                            /*
                             var addressAttribute = this.fetchAddressAttribute();
                             if (addressAttribute != null)
                             {
                                 addressAttribute.setValue(addressAttribute.getTagAttributeProperty(), null);
-                            }
+                            }*/
                         }).getContextMenu()
         );
-
         tagKeyTextField.setOnMouseClicked(event ->
         {
             if (event.getButton() == MouseButton.PRIMARY)
@@ -65,29 +82,61 @@ public class AddressSetupPane<A extends AddressAttribute>
                 var addressAttribute = this.fetchAddressAttribute();
                 if (addressAttribute != null)
                 {
-                    tagStage.showAsSelection(addressAttribute::setCommunicationTag);
+                    TagStage.showAsInput(tagsManager, communicationDataHolder, super.getSetupStage(), addressAttribute::setCommunicationTag);
                 }
             }
         });
 
-        super.getAttributeChangerList().setPostReadConsumer(attribute ->
+        ChangeListener<String> tagKeyChanged = (observable, oldValue, newValue) ->
         {
-            var tag = attribute.getValue(attribute.getTagAttributeProperty());
-            if (tag == null)
+            if(newValue == null)
             {
                 tagKeyTextField.setText("");
+                return;
+            }
+
+            tagKeyTextField.setText(newValue);
+        };
+
+        ChangeListener<CommunicationStringAddressData> communicationStringAddressDataChanged = (observable, oldValue, newValue) ->
+        {
+            if(newValue == null)
+            {
                 stringAddressTextField.setText("");
                 return;
             }
 
-            tagKeyTextField.setText(tag.getHierarchicalKey());
-
-            var stringAddressString = tag.getStringAddressData();
-            if (stringAddressString != null)
+            stringAddressTextField.setText(newValue.getStringData());
+        };
+        tagProperty.addListener((observable, oldValue, newValue) ->
+        {
+            if(oldValue != null)
             {
-                stringAddressTextField.setText(stringAddressString.getStringData());
+                oldValue.communicationStringAddressDataProperty().removeListener(communicationStringAddressDataChanged);
+                oldValue.keyValueProperty().removeListener(tagKeyChanged);
+            }
+
+            if(newValue == null)
+            {
+                tagKeyTextField.setText("");
+                stringAddressTextField.setText("");
+            }
+            else
+            {
+                newValue.keyValueProperty().addListener(tagKeyChanged);
+                newValue.communicationStringAddressDataProperty().addListener(communicationStringAddressDataChanged);
+
+                tagKeyTextField.setText(newValue.getHierarchicalKey());
+
+                var stringAddressString = newValue.getStringAddressData();
+                if (stringAddressString != null)
+                {
+                    stringAddressTextField.setText(stringAddressString.getStringData());
+                }
             }
         });
+
+        super.getAttributeChangerList().create(tagProperty, this.getAttributeProperty());
         super.computeProperties(); //Do this after i parse the address pane so all the values inside the attribute changer list are there.
     }
 
@@ -95,6 +144,21 @@ public class AddressSetupPane<A extends AddressAttribute>
     public Parent getParent()
     {
         return mainVBox;
+    }
+
+    @Override
+    public void clearControlWrapper()
+    {
+        super.clearControlWrapper();
+
+        tagProperty.setValue(null);
+    }
+
+    private AttributeProperty<CommunicationTag> getAttributeProperty()
+    {
+        return this.getAttributeType() == AttributeType.READ_ADDRESS
+                ? ReadAddressAttribute.READ_TAG
+                : WriteAddressAttribute.WRITE_TAG;
     }
 
     @Nullable

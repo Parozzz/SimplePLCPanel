@@ -29,6 +29,7 @@ import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.impl.
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.state.WrapperState;
 import parozzz.github.com.simpleplcpanel.hmi.main.MainEditStage;
 import parozzz.github.com.simpleplcpanel.hmi.pane.BorderPaneHMIStage;
+import parozzz.github.com.simpleplcpanel.hmi.tags.TagsManager;
 import parozzz.github.com.simpleplcpanel.hmi.tags.stage.TagStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.ContextMenuBuilder;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
@@ -38,7 +39,9 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Stream;
 
-public final class ControlWrapperSetupStage extends BorderPaneHMIStage implements ControlWrapperSpecific
+public final class ControlWrapperSetupStage
+        extends BorderPaneHMIStage
+        implements ControlWrapperSpecific
 {
     @FXML private Button createStateButton;
 
@@ -58,7 +61,8 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
     @FXML private Button deleteStateButton;
 
     private final MainEditStage mainEditStage;
-    private final TagStage tagStage;
+    private final TagsManager tagsManager;
+    private final CommunicationDataHolder communicationDataHolder;
 
     private final SetupPaneList setupPaneList;
 
@@ -71,12 +75,14 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
     private SetupSelectable activeSelectable;
     private boolean ignoreAttributeChanges;
 
-    public ControlWrapperSetupStage(MainEditStage mainEditStage, TagStage tagStage) throws IOException
+    public ControlWrapperSetupStage(MainEditStage mainEditStage,
+            TagsManager tagsManager, CommunicationDataHolder communicationDataHolder) throws IOException
     {
         super("ControlWrapperSetupPage", "setup/mainSetupPane.fxml");
 
         this.mainEditStage = mainEditStage;
-        this.tagStage = tagStage;
+        this.tagsManager = tagsManager;
+        this.communicationDataHolder = communicationDataHolder;
 
         this.setupPaneList = new SetupPaneList();
 
@@ -119,8 +125,8 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
 
         try
         {
-            setupPaneList.add(new SizeSetupPane(this))//This first >:)
-                    .add(new ButtonDataSetupPane(this)). //And this second! >:(
+            setupPaneList.add(new SizeSetupPane(this)).//This first >:)
+                    add(new ButtonDataSetupPane(this)). //And this second! >:(
                     add(new InputDataSetupPane(this)).
                     add(new ChangePageSetupPane(this)).
                     add(new FontSetupPane(this)).
@@ -128,8 +134,8 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
                     add(new BorderSetupPane(this)).
                     add(new BackgroundSetupPane(this)).
                     add(new ValueSetupPane(this)).
-                    add(new AddressSetupPane<>(this, tagStage,"Write Address", AttributeType.WRITE_ADDRESS)).
-                    add(new AddressSetupPane<>(this, tagStage,"Read Address", AttributeType.READ_ADDRESS)); //I want this last! >:(
+                    add(new AddressSetupPane<>(this, tagsManager, communicationDataHolder,"Write Address", AttributeType.WRITE_ADDRESS)).
+                    add(new AddressSetupPane<>(this, tagsManager, communicationDataHolder,"Read Address", AttributeType.READ_ADDRESS)); //I want this last! >:(
         } catch (IOException exception)
         {
             MainLogger.getInstance().error("Error while loading Setup Panes", exception, this);
@@ -205,7 +211,6 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
             {
                 var selectedState = stateSelectionChoiceBox.getValue();
                 attributeChangerSet.saveDataToAttribute(selectedState.getAttributeMap(), false);
-
             } else if (attributeManager.isGlobal(attributeType))
             {
                 var globalAttributeMap = selectedControlWrapper.getGlobalAttributeMap();
@@ -238,7 +243,9 @@ public final class ControlWrapperSetupStage extends BorderPaneHMIStage implement
         selectedControlWrapper = controlWrapper;
         if (controlWrapper == null)
         {
-            super.getStageSetter().close();
+            setupPaneList.forEach(SetupPane::clearControlWrapper);
+
+            this.hideStage();
             return;
         }
 

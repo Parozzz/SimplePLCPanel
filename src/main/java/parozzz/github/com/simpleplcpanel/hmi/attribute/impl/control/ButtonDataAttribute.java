@@ -11,7 +11,7 @@ public final class ButtonDataAttribute extends Attribute
 {
     public static final String ATTRIBUTE_NAME = "BUTTON_DATA_ATTRIBUTE";
 
-    public static final AttributeProperty<ButtonWrapper.Type> TYPE = new EnumAttributeProperty<>("ButtonWrapperType", ButtonWrapper.Type.NORMAL);
+    public static final AttributeProperty<ButtonWrapper.Type> TYPE = new EnumAttributeProperty<>("ButtonWrapperType", ButtonWrapper.Type.NORMAL, false);
 
     public ButtonDataAttribute(AttributeMap attributeMap)
     {

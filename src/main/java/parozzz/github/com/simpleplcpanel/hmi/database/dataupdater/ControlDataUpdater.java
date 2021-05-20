@@ -9,13 +9,14 @@ import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.simpleplcpanel.hmi.database.ControlContainerDatabase;
 import parozzz.github.com.simpleplcpanel.hmi.tags.Tag;
+import parozzz.github.com.simpleplcpanel.hmi.tags.TagsManager;
 import parozzz.github.com.simpleplcpanel.hmi.tags.stage.TagStage;
 
 import java.util.*;
 
 public abstract class ControlDataUpdater<C extends CommThread<?>> extends FXObject
 {
-    protected final TagStage tagStage;
+    protected final TagsManager tagsManager;
     protected final CommunicationType<?> communicationType;
     protected final ControlContainerDatabase controlContainerDatabase;
     protected final CommunicationDataHolder communicationDataHolder;
@@ -25,12 +26,12 @@ public abstract class ControlDataUpdater<C extends CommThread<?>> extends FXObje
     protected final Set<Tag> needWriteTagSet;
     protected final BooleanProperty activeProperty;
 
-    public ControlDataUpdater(TagStage tagStage,
+    public ControlDataUpdater(TagsManager tagsManager,
             CommunicationType<?> communicationType,
             ControlContainerDatabase controlContainerDatabase,
             CommunicationDataHolder communicationDataHolder, C commThread)
     {
-        this.tagStage = tagStage;
+        this.tagsManager = tagsManager;
         this.communicationType = communicationType;
         this.controlContainerDatabase = controlContainerDatabase;
         this.communicationDataHolder = communicationDataHolder;
@@ -54,7 +55,7 @@ public abstract class ControlDataUpdater<C extends CommThread<?>> extends FXObje
             }
         });
 
-        tagStage.addTagMapChangeList((tag, changeType) ->
+        tagsManager.addTagMapChangeList((tag, changeType) ->
         {
             switch(changeType)
             {

@@ -18,22 +18,21 @@ public class NumberAttributeProperty<N extends Number> extends AttributeProperty
 
     public NumberAttributeProperty(String key, N startValue, Function<Number, N> function)
     {
-        super(key, startValue);
+        super(key, startValue, false);
 
         this.function = function;
     }
 
     @Override
-    public Data<N> createData(Attribute attribute)
+    public Data createData(Attribute attribute)
     {
         return new NumberData();
     }
 
-    public class NumberData extends AttributeProperty.Data<N>
+    public class NumberData extends AttributeProperty<N>.Data
     {
         protected NumberData()
         {
-            super(NumberAttributeProperty.this);
         }
 
         @Override

@@ -22,8 +22,8 @@ public class BackgroundAttribute extends Attribute
 {
     public static final String ATTRIBUTE_NAME = "BACKGROUND_ATTRIBUTE";
 
-    public static final AttributeProperty<Color> BACKGROUND_COLOR = new ParsableAttributeProperty<>("BackgroundColor", Color.WHITE, JSONSerializables.COLOR);
-    public static final AttributeProperty<String> PICTURE_BANK_IMAGE_NAME = new StringAttributeProperty("PictureBankImageName", "");
+    public static final AttributeProperty<Color> BACKGROUND_COLOR = new ParsableAttributeProperty<>("BackgroundColor", Color.WHITE, JSONSerializables.COLOR, false);
+    public static final AttributeProperty<String> PICTURE_BANK_IMAGE_NAME = new StringAttributeProperty("PictureBankImageName", "", false);
     public static final AttributeProperty<Integer> CORNER_RADII = new NumberAttributeProperty<>("CornerRadii", 0, Number::intValue);
     public static final AttributeProperty<Boolean> STRETCH_IMAGE = new BooleanAttributeProperty("StretchImage");
 

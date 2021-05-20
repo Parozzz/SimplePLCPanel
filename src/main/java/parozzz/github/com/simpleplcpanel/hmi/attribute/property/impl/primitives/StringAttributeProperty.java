@@ -7,27 +7,26 @@ import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
 
 public class StringAttributeProperty extends AttributeProperty<String>
 {
-    public StringAttributeProperty(String key)
+    public StringAttributeProperty(String key, boolean allowNullValues)
     {
-        this(key, "");
+        this(key, "", allowNullValues);
     }
 
-    public StringAttributeProperty(String key, String defaultValue)
+    public StringAttributeProperty(String key, String defaultValue, boolean allowNullValues)
     {
-        super(key, defaultValue);
+        super(key, defaultValue, allowNullValues);
     }
 
     @Override
-    public Data<String> createData(Attribute attribute)
+    public Data createData(Attribute attribute)
     {
         return new StringData();
     }
 
-    public class StringData extends AttributeProperty.Data<String>
+    public class StringData extends AttributeProperty<String>.Data
     {
         protected StringData()
         {
-            super(StringAttributeProperty.this);
         }
 
         @Override

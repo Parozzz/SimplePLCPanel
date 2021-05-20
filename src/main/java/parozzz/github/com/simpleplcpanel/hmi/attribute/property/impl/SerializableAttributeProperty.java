@@ -8,22 +8,21 @@ import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
 public class SerializableAttributeProperty<T extends JSONSerializable>
         extends AttributeProperty<T>
 {
-    public SerializableAttributeProperty(String key, T defaultValue)
+    public SerializableAttributeProperty(String key, T defaultValue, boolean allowNullValues)
     {
-        super(key, defaultValue);
+        super(key, defaultValue, allowNullValues);
     }
 
     @Override
-    public Data<T> createData(Attribute attribute)
+    public Data createData(Attribute attribute)
     {
         return new SerializableData();
     }
 
-    public class SerializableData extends AttributeProperty.Data<T>
+    public class SerializableData extends AttributeProperty<T>.Data
     {
         protected SerializableData()
         {
-            super(SerializableAttributeProperty.this);
         }
 
         @Override

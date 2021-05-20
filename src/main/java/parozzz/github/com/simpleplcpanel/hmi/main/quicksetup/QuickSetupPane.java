@@ -16,9 +16,11 @@ import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrap
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.attributes.ControlWrapperGenericAttributeUpdateConsumer;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.state.WrapperState;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.state.WrapperStateChangedConsumer;
+import parozzz.github.com.simpleplcpanel.hmi.main.MainEditStage;
 import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.impl.*;
 import parozzz.github.com.simpleplcpanel.hmi.pane.HMIPane;
 import parozzz.github.com.simpleplcpanel.hmi.pane.HidablePane;
+import parozzz.github.com.simpleplcpanel.hmi.tags.TagsManager;
 import parozzz.github.com.simpleplcpanel.hmi.tags.stage.TagStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
 
@@ -54,7 +56,8 @@ public final class QuickSetupPane
 
     private ControlWrapper<?> selectedControlWrapper;
 
-    public QuickSetupPane(TagStage tagStage) throws IOException
+    public QuickSetupPane(MainEditStage mainEditStage,
+            TagsManager tagsManager, CommunicationDataHolder communicationDataHolder) throws IOException
     {
         this.stateBinder = new QuickSetupStateBinder(this);
         this.mainVBox = new VBox(
@@ -69,21 +72,25 @@ public final class QuickSetupPane
                 .addFXChild(this.fontQuickSetupPanePart = new FontQuickSetupPanePart())
                 .addFXChild(this.backgroundQuickSetupPanePart = new BackgroundQuickSetupPanePart())
                 .addFXChild(this.textQuickSetupPanePart = new TextQuickSetupPanePart())
-                .addFXChild(this.readAddressQuickSetupPanePart = new AddressQuickSetupPanePart(this, tagStage, true))
-                .addFXChild(this.writeAddressQuickSetupPanePart = new AddressQuickSetupPanePart(this, tagStage, false));
+                .addFXChild(this.readAddressQuickSetupPanePart = new AddressQuickSetupPanePart(
+                        mainEditStage, this, tagsManager, communicationDataHolder, true
+                ))
+                .addFXChild(this.writeAddressQuickSetupPanePart = new AddressQuickSetupPanePart(
+                        mainEditStage, this, tagsManager, communicationDataHolder, false
+                ));
 
         this.quickSetupPanePartList = new ArrayList<>();
 
         this.validControlWrapperListener = (observableValue, oldValue, newValue) ->
         {
-            if(!newValue)
+            if (!newValue)
             {
                 this.setSelectedControlWrapper(null);
             }
         };
         this.attributeUpdatedConsumer = updateData ->
         {
-            for(var attribute : updateData.getAttributeList())
+            for (var attribute : updateData.getAttributeList())
             {
                 var attributeType = attribute.getType();
                 stateBinder.loadValueFromControlWrapperOf(attributeType);
@@ -92,7 +99,7 @@ public final class QuickSetupPane
         //Since this is trigged also when a state is added/removed it should be gucci here
         this.stateChangeConsumer = (stateMap, oldState, changeType) ->
         {
-            switch(changeType)
+            switch (changeType)
             {
                 case ADD:
                 case REMOVE:
@@ -155,7 +162,7 @@ public final class QuickSetupPane
 
     public void refreshValuesIfSelected(ControlWrapper<?> controlWrapper)
     {
-        if(selectedControlWrapper != null && selectedControlWrapper == controlWrapper)
+        if (selectedControlWrapper != null && selectedControlWrapper == controlWrapper)
         {
             stateBinder.loadAllValuesFromControlWrapper();
         }
@@ -164,7 +171,7 @@ public final class QuickSetupPane
     @Override
     public void setSelectedControlWrapper(ControlWrapper<?> controlWrapper)
     {
-        if(selectedControlWrapper != null)
+        if (selectedControlWrapper != null)
         {
             selectedControlWrapper.validProperty().removeListener(validControlWrapperListener);
             selectedControlWrapper.getAttributeUpdater().removeGenericUpdateConsumer(attributeUpdatedConsumer);
@@ -172,7 +179,7 @@ public final class QuickSetupPane
         }
 
         this.selectedControlWrapper = controlWrapper;
-        if(controlWrapper == null)
+        if (controlWrapper == null)
         {
             var children = paneVBox.getChildren();
             children.clear();
@@ -188,9 +195,9 @@ public final class QuickSetupPane
 
         var children = paneVBox.getChildren();
         children.clear();
-        for(var quickSetupPane : quickSetupPanePartList)
+        for (var quickSetupPane : quickSetupPanePartList)
         {
-            if(quickSetupPane.validateControlWrapper(controlWrapper))
+            if (quickSetupPane.validateControlWrapper(controlWrapper))
             {
                 children.add(quickSetupPane.getParent());
             }
@@ -217,7 +224,7 @@ public final class QuickSetupPane
 
     private void computeQuickSetupPane(QuickSetupPanePart... quickSetupPaneParts)
     {
-        for(var quickSetupPane : quickSetupPaneParts)
+        for (var quickSetupPane : quickSetupPaneParts)
         {
             quickSetupPane.addBinders(stateBinder);
             quickSetupPanePartList.add(quickSetupPane);

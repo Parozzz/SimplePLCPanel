@@ -10,24 +10,23 @@ public class ParsableAttributeProperty<T> extends AttributeProperty<T>
 {
     private final SuppliedJSONObjectParser<T> parser;
     public ParsableAttributeProperty(String key, T defaultValue,
-            SuppliedJSONObjectParser<T> parser)
+            SuppliedJSONObjectParser<T> parser, boolean allowNullValues)
     {
-        super(key, defaultValue);
+        super(key, defaultValue, allowNullValues);
 
         this.parser = parser;
     }
 
     @Override
-    public Data<T> createData(Attribute attribute)
+    public Data createData(Attribute attribute)
     {
         return new ParsableData();
     }
 
-    public class ParsableData extends AttributeProperty.Data<T>
+    public class ParsableData extends AttributeProperty<T>.Data
     {
         protected ParsableData()
         {
-            super(ParsableAttributeProperty.this);
         }
 
         @Override

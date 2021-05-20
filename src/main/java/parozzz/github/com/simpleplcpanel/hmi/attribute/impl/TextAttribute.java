@@ -12,8 +12,8 @@ public class TextAttribute extends Attribute
 {
     public static final String ATTRIBUTE_NAME = "TEXT_ATTRIBUTE";
 
-    public static final StringAttributeProperty TEXT = new StringAttributeProperty("Text", "DEFAULT\nTEXT");
-    public static final EnumAttributeProperty<TextAlignment> TEXT_ALIGNMENT = new EnumAttributeProperty<>("TextAlignment", TextAlignment.CENTER);
+    public static final StringAttributeProperty TEXT = new StringAttributeProperty("Text", "DEFAULT\nTEXT", false);
+    public static final EnumAttributeProperty<TextAlignment> TEXT_ALIGNMENT = new EnumAttributeProperty<>("TextAlignment", TextAlignment.CENTER, false);
     public static final NumberAttributeProperty<Integer> LINE_SPACING = new NumberAttributeProperty<>("LineSpacing", 0, Number::intValue);
 
     public TextAttribute(AttributeMap attributeMap)

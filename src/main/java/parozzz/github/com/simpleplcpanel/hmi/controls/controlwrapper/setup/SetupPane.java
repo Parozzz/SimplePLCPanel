@@ -82,6 +82,11 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
         return attributeChangerList;
     }
 
+    public void clearControlWrapper()
+    {
+
+    }
+
     public void setAsState()
     {
         stateBased = true;

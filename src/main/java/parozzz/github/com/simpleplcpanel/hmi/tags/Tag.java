@@ -27,7 +27,7 @@ public abstract class Tag
     private final ObservableValue<String> keyValue;
     private final Set<Runnable> deleteRunnableSet;
 
-    protected TagStage tagStage;
+    protected TagsManager tagsManager;
     protected TreeItem<Tag> treeItem;
 
     private final MixedIntermediate readIntermediate;
@@ -35,7 +35,7 @@ public abstract class Tag
 
     public Tag(String key)
     {
-        this(key, TagStage.LAST_INTERNAL_ID++);
+        this(key, TagsManager.LAST_INTERNAL_ID.getAndAdd());
     }
 
     public Tag(String key, int internalId)
@@ -79,12 +79,12 @@ public abstract class Tag
         return treeItem;
     }
 
-    public TreeItem<Tag> init(TagStage tagStage)
+    public TreeItem<Tag> init(TagsManager tagsManager)
     {
         Validate.needTrue("Trying to initialize a Tag twice",
-                this.treeItem == null && this.tagStage == null);
+                this.treeItem == null && this.tagsManager == null);
 
-        this.tagStage = tagStage;
+        this.tagsManager = tagsManager;
         this.treeItem = new TreeItem<>(this);
         return treeItem;
     }
@@ -108,7 +108,7 @@ public abstract class Tag
         var key = this.getKey();
 
         var treeItemParent = this.treeItem.getParent();
-        while(treeItemParent != null && treeItemParent != tagStage.getRootTreeItem())
+        while(treeItemParent != null && treeItemParent != tagsManager.getRootItem())
         {
             var tagParent = treeItemParent.getValue();
             if(tagParent == null)
@@ -125,7 +125,7 @@ public abstract class Tag
 
     public void delete()
     {
-        if(tagStage == null || treeItem == null)
+        if(tagsManager == null || treeItem == null)
         {
             return;
         }

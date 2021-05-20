@@ -136,8 +136,14 @@ public final class SetupPaneAttributeChanger<A extends Attribute> implements Log
             try
             {
                 var attributeValue = attribute.getValue(attributeProperty);
-                //It might happen is null, especially for cases where two equal attributes can have different properties
-                if(attributeValue != null)
+                if(attributeValue == null)
+                {
+                    if(attributeProperty.allowNullValues())
+                    {
+                        property.setValue(null);
+                    }
+                }
+                else
                 {
                     var propertyValue = property.getValue();
                     var attributeConvertedValue = attributeToPropertyConvert.apply(attributeValue);
@@ -164,7 +170,14 @@ public final class SetupPaneAttributeChanger<A extends Attribute> implements Log
             try
             {
                 var propertyValue = property.getValue();
-                if(propertyValue != null)
+                if(propertyValue == null)
+                {
+                    if(attributeProperty.allowNullValues())
+                    {
+                        attribute.setValue(attributeProperty, null);
+                    }
+                }
+                else
                 {
                     var propertyConvertedValue = propertyToAttributeConvert.apply(propertyValue);
                     attribute.setValue(attributeProperty, propertyConvertedValue);

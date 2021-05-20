@@ -12,7 +12,7 @@ public final class ChangePageAttribute extends Attribute
     public static final String ATTRIBUTE_NAME = "CHANGE_PAGE_ATTRIBUTE";
 
     public final static AttributeProperty<Boolean> ENABLED = new BooleanAttributeProperty("Enabled", false);
-    public final static AttributeProperty<String> PAGE_NAME = new StringAttributeProperty("PageName", "");
+    public final static AttributeProperty<String> PAGE_NAME = new StringAttributeProperty("PageName", "", false);
 
     public ChangePageAttribute(AttributeMap attributeMap)
     {

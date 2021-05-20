@@ -37,17 +37,17 @@ public final class FolderTag extends Tag
 
     private void addTag()
     {
-        if(super.tagStage != null)
+        if(super.tagsManager != null)
         {
-            super.tagStage.addTag(this, new CommunicationTag("NewTag"));
+            super.tagsManager.addTag(this, new CommunicationTag("NewTag"));
         }
     }
 
     private void addFolder()
     {
-        if(super.tagStage != null)
+        if(super.tagsManager != null)
         {
-            super.tagStage.addTag(this, new FolderTag("NewFolder"));
+            super.tagsManager.addTag(this, new FolderTag("NewFolder"));
         }
     }
 }

@@ -26,7 +26,7 @@ public class AttributePropertyManager
 
     private final Map<AttributeProperty<?>, Property<?>> attributePropertyMap;
     private final Map<String, AttributeProperty<?>> attributePropertyKeyMap;
-    private final Set<AttributeProperty.Data<?>> attributePropertyDataSet;
+    private final Set<AttributeProperty<?>.Data> attributePropertyDataSet;
 
     public AttributePropertyManager(Attribute attribute)
     {
@@ -90,7 +90,7 @@ public class AttributePropertyManager
         return attributePropertyKeyMap.get(key);
     }
 
-    public void forEachAttributePropertyData(Consumer<AttributeProperty.Data<?>> consumer)
+    public void forEachAttributePropertyData(Consumer<AttributeProperty<?>.Data> consumer)
     {
         attributePropertyDataSet.forEach(consumer);
     }

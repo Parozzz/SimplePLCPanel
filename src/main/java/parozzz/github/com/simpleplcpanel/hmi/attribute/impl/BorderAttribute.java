@@ -28,9 +28,9 @@ public class BorderAttribute extends Attribute
         }
     }
 
-    public static final AttributeProperty<Color> COLOR = new ParsableAttributeProperty<>("Color", Color.BLACK, JSONSerializables.COLOR);
+    public static final AttributeProperty<Color> COLOR = new ParsableAttributeProperty<>("Color", Color.BLACK, JSONSerializables.COLOR, false);
     public static final AttributeProperty<Integer> WIDTH = new NumberAttributeProperty<>("Width", 3, Number::intValue);
-    public static final AttributeProperty<StrokeStyle> STROKE_STYLE = new EnumAttributeProperty<>("StrokeStyle", StrokeStyle.SOLID);
+    public static final AttributeProperty<StrokeStyle> STROKE_STYLE = new EnumAttributeProperty<>("StrokeStyle", StrokeStyle.SOLID, false);
     public static final AttributeProperty<Integer> CORNER_RADII = new NumberAttributeProperty<>("CornerRadii", 0, Number::intValue);
 
     private Border border;

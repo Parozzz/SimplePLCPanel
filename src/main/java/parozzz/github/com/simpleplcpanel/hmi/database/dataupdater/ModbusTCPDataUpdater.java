@@ -16,6 +16,7 @@ import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.intermediate.word.Modbu
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.intermediate.word.ModbusWriteWordIntermediate;
 import parozzz.github.com.simpleplcpanel.hmi.database.ControlContainerDatabase;
 import parozzz.github.com.simpleplcpanel.hmi.tags.CommunicationTag;
+import parozzz.github.com.simpleplcpanel.hmi.tags.TagsManager;
 import parozzz.github.com.simpleplcpanel.hmi.tags.stage.TagStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.valueintermediate.ValueIntermediate;
 
@@ -24,20 +25,20 @@ import java.util.Set;
 
 public final class ModbusTCPDataUpdater extends ControlDataUpdater<ModbusTCPThread>
 {
-    public static ModbusTCPDataUpdater createInstance(TagStage tagStage,
+    public static ModbusTCPDataUpdater createInstance(TagsManager tagsManager,
             ControlContainerDatabase controlContainerDatabase,
             CommunicationDataHolder communicationDataHolder)
     {
         var modbusTCPThread = communicationDataHolder.getCommThread(CommunicationType.MODBUS_TCP, ModbusTCPThread.class);
         Objects.requireNonNull(modbusTCPThread, "ModbusTCPThread is null while creating ModbusTCPDataUpdater?");
 
-        return new ModbusTCPDataUpdater(tagStage, controlContainerDatabase, communicationDataHolder, modbusTCPThread);
+        return new ModbusTCPDataUpdater(tagsManager, controlContainerDatabase, communicationDataHolder, modbusTCPThread);
     }
 
-    private ModbusTCPDataUpdater(TagStage tagStage, ControlContainerDatabase controlContainerDatabase,
+    private ModbusTCPDataUpdater(TagsManager tagsManager, ControlContainerDatabase controlContainerDatabase,
             CommunicationDataHolder communicationDataHolder, ModbusTCPThread modbusTCPThread)
     {
-        super(tagStage, CommunicationType.MODBUS_TCP, controlContainerDatabase,
+        super(tagsManager, CommunicationType.MODBUS_TCP, controlContainerDatabase,
                 communicationDataHolder, modbusTCPThread);
     }
 
@@ -84,7 +85,7 @@ public final class ModbusTCPDataUpdater extends ControlDataUpdater<ModbusTCPThre
         var readInputRegistersSet = commThread.getReadInputRegistersSet();
         readInputRegistersSet.clear();
 
-        for (var tag : tagStage.getTagSet())
+        for (var tag : tagsManager)
         {
             if (!(tag instanceof CommunicationTag))
             {

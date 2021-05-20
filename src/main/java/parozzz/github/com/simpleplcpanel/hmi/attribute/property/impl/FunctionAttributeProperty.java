@@ -14,25 +14,24 @@ public class FunctionAttributeProperty<T> extends AttributeProperty<T>
     private final BiFunction<JSONDataMap, String, T> deserializeFunction;
     public FunctionAttributeProperty(String key, T defaultValue,
             Function<T, Object> serializeParseFunction,
-            BiFunction<JSONDataMap, String, T> deserializeFunction)
+            BiFunction<JSONDataMap, String, T> deserializeFunction, boolean allowNullValues)
     {
-        super(key, defaultValue);
+        super(key, defaultValue, allowNullValues);
 
         this.serializeParseFunction = serializeParseFunction;
         this.deserializeFunction = deserializeFunction;
     }
 
     @Override
-    public Data<T> createData(Attribute attribute)
+    public Data createData(Attribute attribute)
     {
         return new FunctionData();
     }
 
-    public class FunctionData extends AttributeProperty.Data<T>
+    public class FunctionData extends AttributeProperty<T>.Data
     {
         protected FunctionData()
         {
-            super(FunctionAttributeProperty.this);
         }
 
         @Override

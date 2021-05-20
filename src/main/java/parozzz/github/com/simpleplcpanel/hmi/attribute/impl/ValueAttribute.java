@@ -15,7 +15,7 @@ public class ValueAttribute extends Attribute
     public static final AttributeProperty<ValueIntermediateType<?>> INTERMEDIATE_TYPE =
             new FunctionAttributeProperty<>("IntermediateType", ValueIntermediateType.INTEGER,
                     ValueIntermediateType::getName,
-                    (jsonDataMap, key) -> ValueIntermediateType.getByName(jsonDataMap.getString(key)));
+                    (jsonDataMap, key) -> ValueIntermediateType.getByName(jsonDataMap.getString(key)), false);
 
     public static final AttributeProperty<Double> MULTIPLY_BY = new NumberAttributeProperty<>("DivideBy", 1d, Number::doubleValue);
     public static final AttributeProperty<Double> OFFSET = new NumberAttributeProperty<>("Offset", 0d, Number::doubleValue);

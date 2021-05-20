@@ -11,11 +11,13 @@ public abstract class AttributeProperty<T>
 {
     protected final String key;
     protected final T defaultValue;
+    private final boolean allowNullValues;
 
-    public AttributeProperty(String key, T defaultValue)
+    public AttributeProperty(String key, T defaultValue, boolean allowNullValues)
     {
         this.key = key;
         this.defaultValue = defaultValue;
+        this.allowNullValues = allowNullValues;
     }
 
     public String getKey()
@@ -28,36 +30,49 @@ public abstract class AttributeProperty<T>
         return defaultValue;
     }
 
-    public abstract Data<T> createData(Attribute attribute);
-
-    public abstract static class Data<P>
+    public boolean allowNullValues()
     {
-        protected final AttributeProperty<P> attributeProperty;
-        protected final Property<P> property;
+        return allowNullValues;
+    }
 
-        protected Data(AttributeProperty<P> attributeProperty)
+    public abstract Data createData(Attribute attribute);
+
+    public abstract class Data
+    {
+        protected final Property<T> property;
+
+        protected Data()
         {
-            this.attributeProperty = attributeProperty;
-            this.property = new SimpleObjectProperty<>(attributeProperty.getDefaultValue());
+            this.property = new SimpleObjectProperty<>(defaultValue);
         }
 
-        public AttributeProperty<P> getAttributeProperty()
+        public AttributeProperty<T> getAttributeProperty()
         {
-            return attributeProperty;
+            return AttributeProperty.this;
         }
 
-        public Property<P> getProperty()
+        public Property<T> getProperty()
         {
             return property;
         }
 
-        protected void setValue(P value)
+        protected void setValue(T value)
         {
-            property.setValue(
-                    Objects.requireNonNullElse(
-                            value, attributeProperty.getDefaultValue()
-                    )
-            );
+            if(value == null)
+            {
+                if(allowNullValues)
+                {
+                    property.setValue(null);
+                }
+                else if(defaultValue != null)
+                {
+                    property.setValue(defaultValue);
+                }
+
+                return;
+            }
+
+            property.setValue(value);
         }
 
         public abstract void serializeInto(JSONDataMap jsonDataMap);

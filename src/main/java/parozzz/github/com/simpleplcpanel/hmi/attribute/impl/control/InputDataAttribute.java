@@ -12,7 +12,7 @@ public final class InputDataAttribute extends Attribute
 {
     public static final String ATTRIBUTE_NAME = "INPUT_DATA_ATTRIBUTE";
 
-    public static final AttributeProperty<InputWrapper.Type> TYPE = new EnumAttributeProperty<>("InputType", InputWrapper.Type.INTEGER);
+    public static final AttributeProperty<InputWrapper.Type> TYPE = new EnumAttributeProperty<>("InputType", InputWrapper.Type.INTEGER, false);
 
     public static final AttributeProperty<Long> INTEGER_MAX_VALUE = new NumberAttributeProperty<>("IntegerMaxValue", Long.MAX_VALUE, Number::longValue);
     public static final AttributeProperty<Long> INTEGER_MIN_VALUE = new NumberAttributeProperty<>("IntegerMinValue", Long.MIN_VALUE, Number::longValue);

@@ -20,11 +20,11 @@ public final class FontAttribute extends Attribute
 {
     public static final String ATTRIBUTE_NAME = "FONT_ATTRIBUTE";
 
-    public static final AttributeProperty<Color> TEXT_COLOR = new ParsableAttributeProperty<>("TextColor", Color.BLACK, JSONSerializables.COLOR);
-    public static final EnumAttributeProperty<Pos> TEXT_POSITION = new EnumAttributeProperty<>("TextPosition", Pos.CENTER);
+    public static final AttributeProperty<Color> TEXT_COLOR = new ParsableAttributeProperty<>("TextColor", Color.BLACK, JSONSerializables.COLOR, false);
+    public static final EnumAttributeProperty<Pos> TEXT_POSITION = new EnumAttributeProperty<>("TextPosition", Pos.CENTER, false);
     public static final AttributeProperty<Boolean> UNDERLINE = new BooleanAttributeProperty("Underline");
 
-    public static final AttributeProperty<String> FONT_NAME = new StringAttributeProperty("FontName", Font.getDefault().getName());
+    public static final AttributeProperty<String> FONT_NAME = new StringAttributeProperty("FontName", Font.getDefault().getName(), false);
     public static final AttributeProperty<Boolean> BOLD_WEIGHT = new BooleanAttributeProperty("Bold");
     public static final AttributeProperty<Boolean> ITALIC_POSTURE = new BooleanAttributeProperty("Italic");
     public static final AttributeProperty<Boolean> STRIKETHROUGH = new BooleanAttributeProperty("Strikethrough");

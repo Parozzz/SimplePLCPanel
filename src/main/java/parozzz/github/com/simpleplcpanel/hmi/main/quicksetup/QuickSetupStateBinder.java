@@ -62,16 +62,6 @@ public final class QuickSetupStateBinder
         {
             selectedControlWrapper.getAttributeTypeManager().forEach(this::loadValueFromControlWrapperOf);
         }
-
-        /*
-        attributeBoundPropertySetMap.values().forEach(boundAttributePropertySet ->
-        {
-            var attributeMap = this.getAttributeMapOf(boundAttributePropertySet.attributeType);
-            if(attributeMap != null)
-            {
-                boundAttributePropertySet.copyFromAttributeMap(attributeMap);
-            }
-        });*/
     }
 
     public <A extends Attribute> Builder<A> builder(AttributeType<A> attributeType)
@@ -114,14 +104,33 @@ public final class QuickSetupStateBinder
                     var attribute = attributeMap.get(attributeType);
                     if(attribute != null)
                     {
-                        var attributeNewValue = quickToAttribute.apply(newValue);
-                        attribute.setValue(attributeProperty, attributeNewValue);
+                        if(newValue == null)
+                        {
+                            if(attributeProperty.allowNullValues())
+                            {
+                                attribute.setValue(attributeProperty, null);
+                            }
+                        }
+                        else
+                        {
+                            var attributeNewValue = quickToAttribute.apply(newValue);
+                            attribute.setValue(attributeProperty, attributeNewValue);
+                        }
                     }
                 }
             }
 
             writeConsumerList.forEach(consumer -> consumer.accept(attributeType));
         });
+    }
+
+
+    public <T, A extends Attribute> void addReadOnlyDirectProperty(Property<T> property,
+            AttributeType<A> attributeType, Supplier<AttributeProperty<T>> attributePropertySupplier,
+            T defaultValue)
+    {
+        this.addReadOnlyIndirectProperty(property, Function.identity(), attributeType,
+                attributePropertySupplier, defaultValue);
     }
 
     public <T, H, A extends Attribute> void addReadOnlyIndirectProperty(Property<H> property,
@@ -217,7 +226,11 @@ public final class QuickSetupStateBinder
             var attributeValue = attribute.getValue(attributeProperty);
             if(attributeValue == null)
             {
-                if(defaultValue != null)
+                if(attributeProperty.allowNullValues())
+                {
+                    property.setValue(null);
+                }
+                else if(defaultValue != null)
                 {
                     property.setValue(defaultValue);
                 }
@@ -336,6 +349,35 @@ public final class QuickSetupStateBinder
         }
         /*
             READ ONLY INDIRECT
+         */
+        /*
+            READ ONLY DIRECT
+         */
+        public <T> Builder<A> readOnlyDirect(Property<T> property, Supplier<AttributeProperty<T>> attributePropertySupplier,
+                T defaultValue)
+        {
+            QuickSetupStateBinder.this.addReadOnlyDirectProperty(
+                    property, attributeType, attributePropertySupplier, defaultValue
+            );
+            return this;
+        }
+
+        public <T> Builder<A> readOnlyDirect(Property<T> property, Supplier<AttributeProperty<T>> attributePropertySupplier)
+        {
+            return this.readOnlyDirect(property, attributePropertySupplier, null);
+        }
+
+        public <T> Builder<A> readOnlyDirect(Property<T> property, AttributeProperty<T> attributeProperty, T defaultValue)
+        {
+            return this.readOnlyDirect(property, () -> attributeProperty, defaultValue);
+        }
+
+        public <T> Builder<A> readOnlyDirect(Property<T> property, AttributeProperty<T> attributeProperty)
+        {
+            return this.readOnlyDirect(property, () -> attributeProperty, null);
+        }
+        /*
+            READ ONLY DIRECT
          */
         /*
             DIRECT

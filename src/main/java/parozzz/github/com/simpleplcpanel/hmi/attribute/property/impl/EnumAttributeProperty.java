@@ -8,24 +8,23 @@ import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
 public class EnumAttributeProperty<E extends Enum<E>> extends AttributeProperty<E>
 {
     private final Class<E> enumClass;
-    public EnumAttributeProperty(String key, E defaultValue)
+    public EnumAttributeProperty(String key, E defaultValue, boolean allowNullValues)
     {
-        super(key, defaultValue);
+        super(key, defaultValue, allowNullValues);
 
         enumClass = defaultValue.getDeclaringClass();
     }
 
     @Override
-    public Data<E> createData(Attribute attribute)
+    public Data createData(Attribute attribute)
     {
         return new EnumData();
     }
 
-    public class EnumData extends AttributeProperty.Data<E>
+    public class EnumData extends AttributeProperty<E>.Data
     {
         protected EnumData()
         {
-            super(EnumAttributeProperty.this);
         }
 
         @Override

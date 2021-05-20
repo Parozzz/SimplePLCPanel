@@ -14,20 +14,19 @@ public class BooleanAttributeProperty extends AttributeProperty<Boolean>
 
     public BooleanAttributeProperty(String key, boolean defaultValue)
     {
-        super(key, defaultValue);
+        super(key, defaultValue, false);
     }
 
     @Override
-    public Data<Boolean> createData(Attribute attribute)
+    public BooleanData createData(Attribute attribute)
     {
         return new BooleanData();
     }
 
-    public class BooleanData extends AttributeProperty.Data<Boolean>
+    public class BooleanData extends AttributeProperty<Boolean>.Data
     {
         protected BooleanData()
         {
-            super(BooleanAttributeProperty.this);
         }
 
         @Override

@@ -15,6 +15,7 @@ import parozzz.github.com.simpleplcpanel.hmi.database.dataupdater.SiemensPLCData
 import parozzz.github.com.simpleplcpanel.hmi.main.MainEditStage;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataArray;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
+import parozzz.github.com.simpleplcpanel.hmi.tags.TagsManager;
 import parozzz.github.com.simpleplcpanel.hmi.tags.stage.TagStage;
 import parozzz.github.com.simpleplcpanel.logger.Loggable;
 import parozzz.github.com.simpleplcpanel.logger.MainLogger;
@@ -39,15 +40,16 @@ public final class ControlContainerDatabase extends FXController implements Iter
     private final Set<ControlWrapper<?>> controlWrapperSet;
     private Set<ControlWrapper<?>> immutableControlWrapperSet;
 
-    public ControlContainerDatabase(MainEditStage mainEditStage, TagStage tagStage, CommunicationDataHolder communicationDataHolder)
+    public ControlContainerDatabase(MainEditStage mainEditStage, TagsManager tagsManager,
+            CommunicationDataHolder communicationDataHolder)
     {
         this.mainEditStage = mainEditStage;
         this.communicationDataHolder = communicationDataHolder;
 
         this.controlDataUpdaterMap = new HashMap<>();
 
-        var siemensPLCDataUpdater = SiemensPLCDataUpdater.createInstance(tagStage, this, communicationDataHolder);
-        var modbusTCPDataUpdater = ModbusTCPDataUpdater.createInstance(tagStage, this, communicationDataHolder);
+        var siemensPLCDataUpdater = SiemensPLCDataUpdater.createInstance(tagsManager, this, communicationDataHolder);
+        var modbusTCPDataUpdater = ModbusTCPDataUpdater.createInstance(tagsManager, this, communicationDataHolder);
 
         this.addMultipleFXChild(siemensPLCDataUpdater, modbusTCPDataUpdater);
 

@@ -25,6 +25,7 @@ import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.stringaddress.SiemensS
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.impl.AddressSetupPane;
 import parozzz.github.com.simpleplcpanel.hmi.database.ControlContainerDatabase;
 import parozzz.github.com.simpleplcpanel.hmi.tags.CommunicationTag;
+import parozzz.github.com.simpleplcpanel.hmi.tags.TagsManager;
 import parozzz.github.com.simpleplcpanel.hmi.tags.stage.TagStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.valueintermediate.ValueIntermediate;
 
@@ -34,20 +35,20 @@ import java.util.function.Consumer;
 
 public final class SiemensPLCDataUpdater extends ControlDataUpdater<SiemensS7Thread>
 {
-    public static SiemensPLCDataUpdater createInstance(TagStage tagStage,
+    public static SiemensPLCDataUpdater createInstance(TagsManager tagsManager,
             ControlContainerDatabase controlContainerDatabase,
             CommunicationDataHolder communicationDataHolder)
     {
         var siemensS7Thread = communicationDataHolder.getCommThread(CommunicationType.SIEMENS_S7, SiemensS7Thread.class);
         Objects.requireNonNull(siemensS7Thread, "SiemensS7Thread is null while creating SiemensPLCDataUpdater?");
 
-        return new SiemensPLCDataUpdater(tagStage, controlContainerDatabase, communicationDataHolder, siemensS7Thread);
+        return new SiemensPLCDataUpdater(tagsManager, controlContainerDatabase, communicationDataHolder, siemensS7Thread);
     }
 
-    private SiemensPLCDataUpdater(TagStage tagStage, ControlContainerDatabase controlContainerDatabase,
+    private SiemensPLCDataUpdater(TagsManager tagsManager, ControlContainerDatabase controlContainerDatabase,
             CommunicationDataHolder communicationDataHolder, SiemensS7Thread siemensS7Thread)
     {
-        super(tagStage, CommunicationType.SIEMENS_S7, controlContainerDatabase,
+        super(tagsManager, CommunicationType.SIEMENS_S7, controlContainerDatabase,
                 communicationDataHolder, siemensS7Thread);
     }
 
@@ -78,7 +79,7 @@ public final class SiemensPLCDataUpdater extends ControlDataUpdater<SiemensS7Thr
         var writeBitSet = commThread.getWriteBitWrapperSet();
         writeBitSet.clear();
 
-        for (var tag : tagStage.getTagSet())
+        for (var tag : tagsManager)
         {
             if (!(tag instanceof CommunicationTag))
             {

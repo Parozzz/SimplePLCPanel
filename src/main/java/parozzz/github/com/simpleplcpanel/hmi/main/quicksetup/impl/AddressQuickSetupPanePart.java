@@ -1,5 +1,8 @@
 package parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.impl;
 
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -23,10 +26,12 @@ import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationStringAddressData;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.impl.AddressSetupPane;
+import parozzz.github.com.simpleplcpanel.hmi.main.MainEditStage;
 import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupPane;
 import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupPanePart;
 import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupStateBinder;
 import parozzz.github.com.simpleplcpanel.hmi.tags.CommunicationTag;
+import parozzz.github.com.simpleplcpanel.hmi.tags.TagsManager;
 import parozzz.github.com.simpleplcpanel.hmi.tags.stage.TagStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.ContextMenuBuilder;
 import parozzz.github.com.simpleplcpanel.hmi.util.EnumStringConverter;
@@ -42,57 +47,37 @@ public final class AddressQuickSetupPanePart
     @FXML private TextField tagTextField;
     private TextField stringAddressDataTextField;
 
+    private final MainEditStage mainEditStage;
     private final QuickSetupPane quickSetupPane;
-    private final TagStage tagStage;
+    private final CommunicationDataHolder communicationDataHolder;
+    private final TagsManager tagsManager;
     private final boolean readOnly;
 
     private final VBox vBox;
 
-    public AddressQuickSetupPanePart(QuickSetupPane quickSetupPane,
-            TagStage tagStage,
+    private final Property<CommunicationTag> tagProperty;
+
+    public AddressQuickSetupPanePart(MainEditStage mainEditStage, QuickSetupPane quickSetupPane,
+            TagsManager tagsManager, CommunicationDataHolder communicationDataHolder,
             boolean readOnly) throws IOException
     {
+        this.mainEditStage = mainEditStage;
         this.quickSetupPane = quickSetupPane;
-        this.tagStage = tagStage;
+        this.tagsManager = tagsManager;
+        this.communicationDataHolder = communicationDataHolder;
         this.readOnly = readOnly;
 
         this.vBox = (VBox) FXUtil.loadFXML("quickproperties/addressQuickSetupPane.fxml", this);
+
+        this.tagProperty = new SimpleObjectProperty<>();
     }
 
     @Override
     public void setup()
     {
+        super.setup();
+
         topLabel.setText(readOnly ? "Read Tag" : "Write Tag");
-
-/*
-        var addressTooltip = new Tooltip();
-        addressTooltip.setShowDelay(Duration.seconds(1));
-        addressTooltip.setShowDuration(Duration.seconds(3));
-        addressTooltip.setFont(Font.font(12));
-        addressTooltip.addEventFilter(WindowEvent.WINDOW_SHOWN, event ->
-        {
-            var addressAttribute = this.fetchAttribute();
-            if(addressAttribute == null)
-            {
-                event.consume();
-                return;
-            }
-
-            var tag = addressAttribute.getCommunicationTag();
-            if(tag == null)
-            {
-                event.consume();
-                return;
-            }
-
-            var stringAddressData = tag.getStringAddressData();
-            if(stringAddressData != null)
-            {
-                addressTooltip.setText(stringAddressData.getStringData());
-            }
-        });
-        tagTextField.setTooltip(addressTooltip);
-        */
 
         stringAddressDataTextField = new TextField();
         stringAddressDataTextField.setMinSize(0, 0);
@@ -110,6 +95,7 @@ public final class AddressQuickSetupPanePart
                         .spacer(2)
                         .simple("Clear", () ->
                         {
+                            //This is set directly to the attribute
                             var addressAttribute = this.fetchAttribute();
                             if (addressAttribute != null)
                             {
@@ -120,12 +106,51 @@ public final class AddressQuickSetupPanePart
 
         tagTextField.setOnMouseClicked(mouseEvent ->
         {
-            if(mouseEvent.getButton() == MouseButton.PRIMARY)
+            if (mouseEvent.getButton() == MouseButton.PRIMARY)
             {
                 var addressAttribute = this.fetchAttribute();
-                if(addressAttribute != null)
+                if (addressAttribute != null)
                 {
-                    tagStage.showAsSelection(addressAttribute::setCommunicationTag);
+                    TagStage.showAsInput(
+                            tagsManager, communicationDataHolder, mainEditStage, addressAttribute::setCommunicationTag
+                    );
+                }
+            }
+        });
+
+        ChangeListener<String> tagKeyChanged = (observable, oldValue, newValue) ->
+        {
+            if (newValue == null)
+            {
+                tagTextField.setText("");
+                return;
+            }
+
+            tagTextField.setText(newValue);
+        };
+
+        tagProperty.addListener((observable, oldValue, newValue) ->
+        {
+            if (oldValue != null)
+            {
+                oldValue.keyValueProperty().removeListener(tagKeyChanged);
+            }
+
+            if(newValue == null)
+            {
+                tagTextField.setText("");
+                stringAddressDataTextField.setText("");
+            }
+            else
+            {
+                newValue.keyValueProperty().addListener(tagKeyChanged);
+
+                tagTextField.setText(newValue.getHierarchicalKey());
+
+                var stringAddressData = newValue.getStringAddressData();
+                if (stringAddressData != null)
+                {
+                    stringAddressDataTextField.setText(stringAddressData.getStringData());
                 }
             }
         });
@@ -147,21 +172,24 @@ public final class AddressQuickSetupPanePart
     public void clearControlWrapper()
     {
         tagTextField.setText("");
+        tagProperty.setValue(null);
     }
 
     @Override
     public void addBinders(QuickSetupStateBinder stateBinder)
     {
         stateBinder.builder(this.getAttributeType())
+                .direct(tagProperty, this.getAttributeProperty());
+                /*
                 .addLoadConsumer(attributeType ->
                 {
-                    if(attributeType == this.getAttributeType())
+                    if (attributeType == this.getAttributeType())
                     {
                         var attribute = this.fetchAttribute();
-                        if(attribute != null)
+                        if (attribute != null)
                         {
                             var tag = attribute.getCommunicationTag();
-                            if(tag == null)
+                            if (tag == null)
                             {
                                 tagTextField.setText("");
                                 stringAddressDataTextField.setText("");
@@ -171,13 +199,18 @@ public final class AddressQuickSetupPanePart
                             tagTextField.setText(tag.getHierarchicalKey());
 
                             var stringAddressData = tag.getStringAddressData();
-                            if(stringAddressData != null)
+                            if (stringAddressData != null)
                             {
                                 stringAddressDataTextField.setText(stringAddressData.getStringData());
                             }
                         }
                     }
-                });
+                });*/
+    }
+
+    private AttributeProperty<CommunicationTag> getAttributeProperty()
+    {
+        return readOnly ? ReadAddressAttribute.READ_TAG : WriteAddressAttribute.WRITE_TAG;
     }
 
     private AddressAttribute fetchAttribute()

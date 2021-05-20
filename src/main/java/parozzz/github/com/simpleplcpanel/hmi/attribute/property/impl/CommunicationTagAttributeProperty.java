@@ -19,7 +19,7 @@ public class CommunicationTagAttributeProperty
     private final boolean requireReading;
     public CommunicationTagAttributeProperty(String key, boolean requireReading)
     {
-        super(key, null);
+        super(key, null, true);
 
         this.requireReading = requireReading;
     }
@@ -31,13 +31,13 @@ public class CommunicationTagAttributeProperty
     }
 
     public class TagData
-            extends AttributeProperty.Data<CommunicationTag>
+            extends AttributeProperty<CommunicationTag>.Data
             implements Taggable
     {
         private final Attribute attribute;
         protected TagData(Attribute attribute)
         {
-            super(CommunicationTagAttributeProperty.this);
+            super();
 
             this.attribute = attribute;
 
@@ -86,7 +86,7 @@ public class CommunicationTagAttributeProperty
         public void deserializeFrom(JSONDataMap jsonDataMap)
         {
             var tagStage = attribute.getAttributeMap().getControlWrapper()
-                    .getControlMainPage().getMainEditStage().getTagStage();
+                    .getControlMainPage().getMainEditStage().getTagsManager();
 
             var tagId = jsonDataMap.getNumber("TagID");
             if(tagId != null)

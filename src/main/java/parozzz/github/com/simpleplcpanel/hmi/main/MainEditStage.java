@@ -26,6 +26,7 @@ import parozzz.github.com.simpleplcpanel.hmi.main.picturebank.PictureBankStage;
 import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupPane;
 import parozzz.github.com.simpleplcpanel.hmi.main.settings.SettingsStage;
 import parozzz.github.com.simpleplcpanel.hmi.pane.BorderPaneHMIStage;
+import parozzz.github.com.simpleplcpanel.hmi.tags.TagsManager;
 import parozzz.github.com.simpleplcpanel.hmi.tags.stage.TagStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXTextFormatterUtil;
 import parozzz.github.com.simpleplcpanel.util.TrigBoolean;
@@ -119,31 +120,31 @@ public final class MainEditStage extends BorderPaneHMIStage
     private final MessagesListStage messagesListStage;
     private final ControlWrapperCopyPasteHandler copyPasteHandler;
     private final RuntimeControlContainerStage runtimeControlMainPage;
-    private final TagStage tagStage;
+    private final TagsManager tagsManager;
 
     private final TrigBoolean messagePresentTrig;
     private ControlContainerPane shownControlContainerPane;
 
-    public MainEditStage(TagStage tagStage, CommunicationDataHolder communicationDataHolder,
-            Runnable saveDataRunnable) throws IOException
+    public MainEditStage(TagsManager tagsManager,
+            CommunicationDataHolder communicationDataHolder, Runnable saveDataRunnable) throws IOException
     {
         super("Menu", "mainEditPane.fxml");
 
-        this.tagStage = tagStage;
+        this.tagsManager = tagsManager;
 
         (this.communicationDataHolder = communicationDataHolder).getCommunicationStage().setAsSubWindow(this);
         this.saveDataRunnable = saveDataRunnable;
 
         super   //HANDLERS AND VARIOUS
-                .addFXChild(controlContainerDatabase = new ControlContainerDatabase(this, tagStage, communicationDataHolder))
+                .addFXChild(controlContainerDatabase = new ControlContainerDatabase(this, tagsManager, communicationDataHolder))
                 .addFXChild(copyPasteHandler = new ControlWrapperCopyPasteHandler(this))
                 //SIDE PANES
                 .addFXChild(dragAndDropPane = new DragAndDropPane(this)) //LEFT
-                .addFXChild(quickSetupPane = new QuickSetupPane(tagStage)) //RIGHT
+                .addFXChild(quickSetupPane = new QuickSetupPane(this, tagsManager, communicationDataHolder)) //RIGHT
                 .addFXChild(pageScrollingPane = new PageScrollingPane()) //BOTTOM
                 //CHILD STAGES
                 .addFXChild((controlsPageCreationStage = new ControlContainerCreationStage(controlContainerDatabase)).setAsSubWindow(this))
-                .addFXChild((controlWrapperSetupStage = new ControlWrapperSetupStage(this, tagStage)).setAsSubWindow(this))
+                .addFXChild((controlWrapperSetupStage = new ControlWrapperSetupStage(this, tagsManager, communicationDataHolder)).setAsSubWindow(this))
                 .addFXChild((controlWrapperQuickTextEditorStage = new ControlWrapperQuickTextEditorStage()).setAsSubWindow(this))
                 .addFXChild((settingsStage = new SettingsStage()).setAsSubWindow(this))
                 .addFXChild((pictureBankStage = new PictureBankStage()).setAsSubWindow(this))
@@ -211,7 +212,7 @@ public final class MainEditStage extends BorderPaneHMIStage
                 stringAddressCreator.showAsStandalone();
             }
         });
-        this.tagsMenuItem.setOnAction(event -> tagStage.showStage());
+        this.tagsMenuItem.setOnAction(event -> TagStage.showStandalone(tagsManager, communicationDataHolder, MainEditStage.this));
 
         //Messages Menu
         showMessageListMenuItem.setOnAction(event -> messagesListStage.showStage());
@@ -391,9 +392,9 @@ public final class MainEditStage extends BorderPaneHMIStage
         return shownControlContainerPane;
     }
 
-    public TagStage getTagStage()
+    public TagsManager getTagsManager()
     {
-        return tagStage;
+        return tagsManager;
     }
 
     public int getPageWidth()

@@ -3,21 +3,22 @@ package parozzz.github.com.simpleplcpanel.hmi;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
 import parozzz.github.com.simpleplcpanel.hmi.main.MainEditStage;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
+import parozzz.github.com.simpleplcpanel.hmi.tags.TagsManager;
 import parozzz.github.com.simpleplcpanel.hmi.tags.stage.TagStage;
 
 import java.io.IOException;
 
 public final class HMIManager extends FXController
 {
-    private final TagStage tagStage;
+    private final TagsManager tagsManager;
     private final CommunicationDataHolder communicationDataHolder;
     private final MainEditStage mainEditStage;
 
     public HMIManager(CommunicationDataHolder communicationDataHolder, Runnable saveDataRunnable) throws IOException
     {
         super.addFXChild(this.communicationDataHolder = communicationDataHolder)
-                .addFXChild(this.tagStage = new TagStage(communicationDataHolder))
-                .addFXChild(this.mainEditStage = new MainEditStage(tagStage, communicationDataHolder, saveDataRunnable));
+                .addFXChild(this.tagsManager = new TagsManager(communicationDataHolder))
+                .addFXChild(this.mainEditStage = new MainEditStage(tagsManager, communicationDataHolder, saveDataRunnable));
     }
 
     public CommunicationDataHolder getCommunicationDataHolder()
@@ -30,9 +31,9 @@ public final class HMIManager extends FXController
         return mainEditStage;
     }
 
-    public TagStage getTagStage()
+    public TagsManager getTagStage()
     {
-        return tagStage;
+        return tagsManager;
     }
 
     public void showStage()

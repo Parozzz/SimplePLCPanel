@@ -67,7 +67,7 @@ public final class CommunicationTag extends Tag
 
     public CommunicationTag(String key)
     {
-        this(key, TagStage.LAST_INTERNAL_ID++);
+        this(key, TagsManager.LAST_INTERNAL_ID.getAndAdd());
     }
 
     public ValueIntermediate getReadIntermediate()
@@ -227,14 +227,14 @@ public final class CommunicationTag extends Tag
 
     private void addClone()
     {
-        if(super.tagStage != null && treeItem != null)
+        if(super.tagsManager != null && treeItem != null)
         {
             var clone = this.clone();
 
             var parent = treeItem.getParent();
             if(parent != null)
             {
-                tagStage.addTag(parent.getValue(), clone);
+                tagsManager.addTag(parent.getValue(), clone);
             }
         }
     }
