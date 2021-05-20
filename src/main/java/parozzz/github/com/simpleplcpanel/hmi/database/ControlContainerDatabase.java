@@ -136,21 +136,11 @@ public final class ControlContainerDatabase extends FXController implements Iter
                     {
                         controlWrapperSet.add(controlWrapper);
                         immutableControlWrapperSet = Collections.unmodifiableSet(controlWrapperSet);
-/*
-                        if (selectedControlDataUpdater != null)
-                        {
-                            selectedControlDataUpdater.bindControlWrapper(controlWrapper);
-                        }*/
                     },
                     controlWrapper ->
                     {
                         controlWrapperSet.remove(controlWrapper);
                         immutableControlWrapperSet = Collections.unmodifiableSet(controlWrapperSet);
-/*
-                        if (selectedControlDataUpdater != null)
-                        {
-                            selectedControlDataUpdater.unbindControlWrapper(controlWrapper);
-                        }*/
                     });
             controlContainerPanelMainPage.setup();
             if(setDefault)
@@ -208,19 +198,19 @@ public final class ControlContainerDatabase extends FXController implements Iter
         {
             return;
         }
-/*
+
         if (selectedControlDataUpdater != null)
         {
-            controlWrapperSet.forEach(selectedControlDataUpdater::unbindControlWrapper);
+            selectedControlDataUpdater.setActive(false);
         }
-*/
+
         selectedControlDataUpdater = controlDataUpdaterMap.get(nextControlDataCommunicationType);
         nextControlDataCommunicationType = null;
-/*
+
         if (selectedControlDataUpdater != null)
         {
-            controlWrapperSet.forEach(selectedControlDataUpdater::bindControlWrapper);
-        }*/
+            selectedControlDataUpdater.setActive(true);
+        }
     }
 
     private void updateSelectedDataUpdater()

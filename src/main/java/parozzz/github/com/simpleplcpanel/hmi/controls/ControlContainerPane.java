@@ -1,6 +1,8 @@
 package parozzz.github.com.simpleplcpanel.hmi.controls;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -55,11 +57,12 @@ public class ControlContainerPane extends FXController implements Loggable
     private final Set<ControlWrapper<?>> controlWrapperSet;
     private final ControlWrappersSelectionManager controlWrappersSelectionManager;
 
+    private final BooleanProperty activeProperty;
     private final Property<Color> backgroundColorProperty;
     private final Property<String> backgroundPictureNameProperty;
 
-    public ControlContainerPane(MainEditStage mainEditStage, ControlContainerDatabase controlContainerDatabase,
-            String name,
+    public ControlContainerPane(MainEditStage mainEditStage,
+            ControlContainerDatabase controlContainerDatabase, String name,
             Consumer<ControlWrapper<?>> newControlWrapperConsumer,
             Consumer<ControlWrapper<?>> deleteControlWrapperConsumer) throws IOException
     {
@@ -78,6 +81,7 @@ public class ControlContainerPane extends FXController implements Loggable
         super.addFXChild(controlWrappersSelectionManager = new ControlWrappersSelectionManager(this, mainAnchorPane));
         this.controlWrapperSet = new HashSet<>();
 
+        this.activeProperty = new SimpleBooleanProperty(false);
         this.backgroundColorProperty = new SimpleObjectProperty<>(Color.WHITE);
         this.backgroundPictureNameProperty = new SimpleObjectProperty<>("");
     }
@@ -317,6 +321,21 @@ public class ControlContainerPane extends FXController implements Loggable
     public void setBackgroundPictureName(String pictureName)
     {
         backgroundPictureNameProperty.setValue(pictureName);
+    }
+
+    public boolean isActive()
+    {
+        return activeProperty.get();
+    }
+
+    public void setActive(boolean active)
+    {
+        activeProperty.set(active);
+    }
+
+    public BooleanProperty activeProperty()
+    {
+        return activeProperty;
     }
 
     public void convertToReadOnly()

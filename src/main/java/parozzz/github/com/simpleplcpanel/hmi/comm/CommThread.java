@@ -61,6 +61,7 @@ public abstract class CommThread<T extends CommunicationConnectionParams>
     {
         this.timeBetweenRetries = timeBetweenRetries;
     }
+
     @Override
     public final void run()
     {
@@ -105,7 +106,12 @@ public abstract class CommThread<T extends CommunicationConnectionParams>
 
     public synchronized void doUpdate()
     {
-        update = true;
+        //Allow to update only if the PLC is connected!
+        //Otherwise it will stay in update forever!
+        if(this.isConnected())
+        {
+            update = true;
+        }
     }
 
     public abstract void disconnect();
@@ -130,7 +136,6 @@ public abstract class CommThread<T extends CommunicationConnectionParams>
             if(!alwaysRetryConnection && connectedTried)
             {
                 Thread.sleep(1000);
-                //this.sleepWithStopCheck(5);
                 return;
             }
 

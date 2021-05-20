@@ -1,4 +1,4 @@
-package parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.impl.display;
+package parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.impl;
 
 import javafx.scene.control.Label;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeFetcher;

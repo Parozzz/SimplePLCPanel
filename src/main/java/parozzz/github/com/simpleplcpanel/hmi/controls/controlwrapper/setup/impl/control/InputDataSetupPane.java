@@ -12,7 +12,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.control.InputDataAttribute;
-import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.impl.textinput.InputWrapper;
+import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.impl.InputWrapper;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.ControlWrapperSetupStage;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.SetupPane;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.attributechanger.SetupPaneAttributeChangerList;

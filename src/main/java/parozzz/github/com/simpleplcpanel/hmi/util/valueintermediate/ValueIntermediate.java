@@ -7,19 +7,19 @@ import java.util.Map;
 
 public abstract class ValueIntermediate
 {
-    private final Map<String, Runnable> newValueRunnableMap;
+    private final Map<Object, Runnable> newValueRunnableMap;
 
     public ValueIntermediate()
     {
         this.newValueRunnableMap = new HashMap<>();
     }
 
-    public void addNewValueRunnable(String key, Runnable runnable)
+    public void addNewValueRunnable(Object key, Runnable runnable)
     {
         newValueRunnableMap.put(key, runnable);
     }
 
-    public void removeNewValueRunnable(String key)
+    public void removeNewValueRunnable(Object key)
     {
         newValueRunnableMap.remove(key);
     }

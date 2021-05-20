@@ -1,4 +1,4 @@
-package parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.impl.textinput;
+package parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.impl;
 
 import com.sun.javafx.scene.control.skin.FXVK;
 import javafx.beans.property.SimpleObjectProperty;
@@ -9,7 +9,6 @@ import javafx.scene.text.Text;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.FontAttribute;
-import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.AddressAttribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.WriteAddressAttribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.control.InputDataAttribute;
 import parozzz.github.com.simpleplcpanel.hmi.controls.ControlContainerPane;

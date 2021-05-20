@@ -7,7 +7,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.control.ButtonDataAttribute;
-import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.impl.button.ButtonWrapper;
+import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.impl.ButtonWrapper;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.ControlWrapperSetupStage;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.SetupPane;
 import parozzz.github.com.simpleplcpanel.hmi.util.EnumStringConverter;

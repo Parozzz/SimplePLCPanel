@@ -1,5 +1,7 @@
 package parozzz.github.com.simpleplcpanel.hmi.database.dataupdater;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import parozzz.github.com.simpleplcpanel.hmi.FXObject;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommThread;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
@@ -13,8 +15,6 @@ import java.util.*;
 
 public abstract class ControlDataUpdater<C extends CommThread<?>> extends FXObject
 {
-    private final static String WRITE_INTERMEDIATE_KEY = "ControlDataUpdater";
-
     protected final TagStage tagStage;
     protected final CommunicationType<?> communicationType;
     protected final ControlContainerDatabase controlContainerDatabase;
@@ -23,6 +23,7 @@ public abstract class ControlDataUpdater<C extends CommThread<?>> extends FXObje
 
     //This need to be a set to avoid duplicate Tag!
     protected final Set<Tag> needWriteTagSet;
+    protected final BooleanProperty activeProperty;
 
     public ControlDataUpdater(TagStage tagStage,
             CommunicationType<?> communicationType,
@@ -36,6 +37,8 @@ public abstract class ControlDataUpdater<C extends CommThread<?>> extends FXObje
         this.commThread = commThread;
 
         this.needWriteTagSet = new HashSet<>();
+
+        this.activeProperty = new SimpleBooleanProperty(false);
     }
 
     @Override
@@ -43,42 +46,55 @@ public abstract class ControlDataUpdater<C extends CommThread<?>> extends FXObje
     {
         super.setup();
 
+        activeProperty.addListener((observable, oldValue, newValue) ->
+        {
+            if(newValue == null || !newValue)
+            {
+                needWriteTagSet.clear();
+            }
+        });
+
         tagStage.addTagMapChangeList((tag, changeType) ->
         {
-            switch (changeType)
+            switch(changeType)
             {
                 case ADD:
                     tag.getWriteIntermediate().addNewValueRunnable(
-                            WRITE_INTERMEDIATE_KEY,
-                            () -> needWriteTagSet.add(tag)
+                            this,
+                            () -> {
+                                //Add Tag only if active!
+                                if(this.isActive())
+                                {
+                                    needWriteTagSet.add(tag);
+                                }
+                            }
                     );
                     break;
                 case REMOVE:
-                    tag.getWriteIntermediate().removeNewValueRunnable(WRITE_INTERMEDIATE_KEY);
+                    tag.getWriteIntermediate().removeNewValueRunnable(this);
                     break;
             }
         });
     }
-/*
-    public void bindControlWrapper(ControlWrapper<?> controlWrapper)
+
+    public boolean isActive()
     {
-        Runnable internalValueRunnable = () -> newValueControlWrapperSet.add(controlWrapper);
-        controlWrapper.getValue().getInternalValue().addNewValueRunnable(internalValueRunnable);
-        newValueRunnableMap.put(controlWrapper, internalValueRunnable);
+        return activeProperty.get();
     }
 
-    public void unbindControlWrapper(ControlWrapper<?> controlWrapper)
+    public void setActive(boolean active)
     {
-        var runnable = newValueRunnableMap.remove(controlWrapper);
-        if(runnable != null)
-        {
-            controlWrapper.getValue().getInternalValue().removeNewValueRunnable(runnable);
-        }
-    }*/
+        activeProperty.set(active);
+    }
+
+    public BooleanProperty activeProperty()
+    {
+        return activeProperty;
+    }
 
     public boolean isReady()
     {
-        return !commThread.isUpdating();
+        return commThread.isConnected() && !commThread.isUpdating();
     }
 
     //This is to allow the data to be set in the JavaFX Thread

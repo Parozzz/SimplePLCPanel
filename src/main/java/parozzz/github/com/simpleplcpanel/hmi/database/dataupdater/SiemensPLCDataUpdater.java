@@ -87,8 +87,9 @@ public final class SiemensPLCDataUpdater extends ControlDataUpdater<SiemensS7Thr
 
             var commTag = (CommunicationTag) tag;
 
+            var tagActive = commTag.hasProperty(CommunicationTag.TagProperty.ACTIVE);
             var stringAddressData = commTag.getStringAddressData();
-            if (commTag.isLocal() || !commTag.hasProperty(CommunicationTag.TagProperty.ACTIVE)
+            if (commTag.isLocal() || !tagActive
                     || !(stringAddressData instanceof SiemensS7StringAddressData))
             {
                 continue;

@@ -1,4 +1,4 @@
-package parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.impl.button;
+package parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.impl;
 
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseButton;
@@ -77,7 +77,7 @@ public final class ButtonWrapper
                     Objects.requireNonNull(readAttribute, "ButtonWrapper must have a ReadAddress");
 
                     var readTag = readAttribute.getValue(ReadAddressAttribute.READ_TAG);
-                    if(readTag == null)
+                    if(readTag == null || !readTag.equals(writeTag))
                     {
                         writeIntermediate.setBoolean(!writeIntermediate.asBoolean());
                     }

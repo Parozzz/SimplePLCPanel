@@ -143,4 +143,14 @@ public abstract class Tag
     {
         deleteRunnableSet.add(runnable);
     }
+
+    public int hashCode()
+    {
+        return internalId;
+    }
+
+    public boolean equals(Object obj)
+    {
+        return this == obj || (obj instanceof Tag && this.internalId == ((Tag) obj).internalId);
+    }
 }

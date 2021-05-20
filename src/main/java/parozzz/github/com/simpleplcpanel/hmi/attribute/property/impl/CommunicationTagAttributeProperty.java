@@ -34,8 +34,6 @@ public class CommunicationTagAttributeProperty
             extends AttributeProperty.Data<CommunicationTag>
             implements Taggable
     {
-        private final static String INTERMEDIATE_KEY = "CommunicationTagAttributeProperty.TagData";
-
         private final Attribute attribute;
         protected TagData(Attribute attribute)
         {
@@ -48,14 +46,14 @@ public class CommunicationTagAttributeProperty
                 if(oldValue != null)
                 {
                     oldValue.removeTaggable(this);
-                    oldValue.getReadIntermediate().removeNewValueRunnable(INTERMEDIATE_KEY);
+                    oldValue.getReadIntermediate().removeNewValueRunnable(this);
                 }
 
                 if(newValue != null)
                 {
                     newValue.addTaggable(this);
                     newValue.getReadIntermediate().addNewValueRunnable(
-                            INTERMEDIATE_KEY,
+                            this,
                             () -> AttributePropertyManager.updateAttribute(attribute)
                     );
                 }
@@ -71,8 +69,7 @@ public class CommunicationTagAttributeProperty
         @Override
         public boolean isActive()
         {
-            return attribute.getAttributeMap().getControlWrapper()
-                    .getContainerPane().isVisible();
+            return attribute.getAttributeMap().getControlWrapper().isActive();
         }
 
         @Override

@@ -98,6 +98,7 @@ public final class RuntimeControlContainerStage extends HMIStage<StackPane>
     {
         if (this.controlContainerPane != null)
         {
+            this.controlContainerPane.setActive(false);
             this.controlContainerPane.convertToReadWrite();
         }
 
@@ -106,7 +107,9 @@ public final class RuntimeControlContainerStage extends HMIStage<StackPane>
         AnchorPane anchorPane;
         if (controlContainerPane != null)
         {
+            controlContainerPane.setActive(true);
             controlContainerPane.convertToReadOnly();
+
             anchorPane = controlContainerPane.getMainAnchorPane();
         } else
         {

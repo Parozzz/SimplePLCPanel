@@ -12,10 +12,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
-import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationStage;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
-import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.tcp.ModbusTCPThread;
-import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7Thread;
 import parozzz.github.com.simpleplcpanel.hmi.controls.ControlContainerCreationStage;
 import parozzz.github.com.simpleplcpanel.hmi.controls.ControlContainerPane;
 import parozzz.github.com.simpleplcpanel.hmi.runtime.RuntimeControlContainerStage;
@@ -127,17 +124,17 @@ public final class MainEditStage extends BorderPaneHMIStage
     private final TrigBoolean messagePresentTrig;
     private ControlContainerPane shownControlContainerPane;
 
-    public MainEditStage(CommunicationDataHolder communicationDataHolder, Runnable saveDataRunnable) throws IOException
+    public MainEditStage(TagStage tagStage, CommunicationDataHolder communicationDataHolder,
+            Runnable saveDataRunnable) throws IOException
     {
         super("Menu", "mainEditPane.fxml");
 
-        this.communicationDataHolder = communicationDataHolder;
-        communicationDataHolder.getCommunicationStage().setAsSubWindow(this);
+        this.tagStage = tagStage;
+
+        (this.communicationDataHolder = communicationDataHolder).getCommunicationStage().setAsSubWindow(this);
         this.saveDataRunnable = saveDataRunnable;
 
-
         super   //HANDLERS AND VARIOUS
-                .addFXChild((tagStage = new TagStage(communicationDataHolder)).setAsSubWindow(this))
                 .addFXChild(controlContainerDatabase = new ControlContainerDatabase(this, tagStage, communicationDataHolder))
                 .addFXChild(copyPasteHandler = new ControlWrapperCopyPasteHandler(this))
                 //SIDE PANES
@@ -455,26 +452,30 @@ public final class MainEditStage extends BorderPaneHMIStage
 
     public void setShownControlContainerPane(ControlContainerPane controlContainerPane)
     {
-        if(shownControlContainerPane != null)
+        if(this.shownControlContainerPane != null)
         {
             //If i don't clear selections some bad things could happen, especially while debugging read only page
-            shownControlContainerPane.getSelectionManager().clearSelections();
-            shownControlContainerPane.getMenuBottomImagePane().updateSnapshot();
+            this.shownControlContainerPane.setActive(false);
+            this.shownControlContainerPane.getSelectionManager().clearSelections();
+            this.shownControlContainerPane.getMenuBottomImagePane().updateSnapshot();
         }
 
         this.shownControlContainerPane = controlContainerPane;
 
         AnchorPane anchorPane;
-        if(shownControlContainerPane == null)
+        if(controlContainerPane != null)
+        {
+            controlContainerPane.setActive(true);
+
+            centerTopLabel.setText(controlContainerPane.getName());
+            anchorPane = shownControlContainerPane.getMainAnchorPane();
+        }
+        else
         {
             centerTopLabel.setText("Not Selected");
 
             anchorPane = new AnchorPane();
             anchorPane.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        }else
-        {
-            centerTopLabel.setText(controlContainerPane.getName());
-            anchorPane = shownControlContainerPane.getMainAnchorPane();
         }
 
         var pageWidth = this.getPageWidth();
@@ -485,9 +486,6 @@ public final class MainEditStage extends BorderPaneHMIStage
         var children = centerScrollStackPane.getChildren();
         children.clear();
         children.add(anchorPane);
-        //centerScrollPane.setContent(anchorPane);
-
-        //this.getStageSetter().get().sizeToScene();
     }
 
     public boolean runtimeFullScreen()
