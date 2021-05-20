@@ -19,6 +19,12 @@ public final class ControlWrapperAttributeTypeManager extends FXObject
     {
     }
 
+    public void forEach(Consumer<AttributeType<?>> consumer)
+    {
+        forEachState(consumer);
+        forEachGlobal(consumer);
+    }
+
     public void forEachState(Consumer<AttributeType<?>> consumer)
     {
         stateAttributeTypeSet.forEach(consumer);

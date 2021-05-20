@@ -1,15 +1,14 @@
 package parozzz.github.com.simpleplcpanel.hmi.main.quicksetup;
 
 import javafx.beans.property.Property;
+import parozzz.github.com.simpleplcpanel.Nullable;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.Attribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeMap;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.property.AttributeProperty;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -19,6 +18,9 @@ public final class QuickSetupStateBinder
     private final Set<BoundProperty<?, ?>> boundPropertySet;
     private final Map<AttributeType<?>, BoundAttributePropertySet<?>> attributeBoundPropertySetMap;
 
+    private final List<Consumer<AttributeType<?>>> loadConsumerList;
+    private final List<Consumer<AttributeType<?>>> writeConsumerList;
+
     private boolean ignoreAttributeUpdate;
 
     QuickSetupStateBinder(QuickSetupPane quickSetupPane)
@@ -26,6 +28,9 @@ public final class QuickSetupStateBinder
         this.quickSetupPane = quickSetupPane;
         this.boundPropertySet = new HashSet<>();
         this.attributeBoundPropertySetMap = new HashMap<>();
+
+        this.loadConsumerList = new ArrayList<>();
+        this.writeConsumerList = new ArrayList<>();
     }
 
     public void setIgnoreAttributeUpdate(boolean ignoreAttributeUpdate)
@@ -41,13 +46,24 @@ public final class QuickSetupStateBinder
             var boundAttributeProperty = attributeBoundPropertySetMap.get(attributeType);
             if(boundAttributeProperty != null)
             {
+                //I need to use directly the attribute map to keep the type sealed inside the "BoundAttributeProperty"
+                //Otherwise using a generic for the type of AttributeType will not work.
                 boundAttributeProperty.copyFromAttributeMap(attributeMap);
             }
         }
+
+        loadConsumerList.forEach(consumer -> consumer.accept(attributeType));
     }
 
     public void loadAllValuesFromControlWrapper()
     {
+        var selectedControlWrapper = quickSetupPane.getSelectedControlWrapper();
+        if(selectedControlWrapper != null)
+        {
+            selectedControlWrapper.getAttributeTypeManager().forEach(this::loadValueFromControlWrapperOf);
+        }
+
+        /*
         attributeBoundPropertySetMap.values().forEach(boundAttributePropertySet ->
         {
             var attributeMap = this.getAttributeMapOf(boundAttributePropertySet.attributeType);
@@ -55,7 +71,7 @@ public final class QuickSetupStateBinder
             {
                 boundAttributePropertySet.copyFromAttributeMap(attributeMap);
             }
-        });
+        });*/
     }
 
     public <A extends Attribute> Builder<A> builder(AttributeType<A> attributeType)
@@ -64,31 +80,19 @@ public final class QuickSetupStateBinder
     }
 
     public <T, A extends Attribute> void addDirectProperty(Property<T> property,
-            AttributeType<A> attributeType, Supplier<AttributeProperty<T>> attributePropertySupplier)
+            AttributeType<A> attributeType, Supplier<AttributeProperty<T>> attributePropertySupplier,
+            T defaultValue)
     {
         this.addIndirectProperty(property, Function.identity(), Function.identity(),
-                attributeType, attributePropertySupplier);
-    }
-
-    public <T, A extends Attribute> void addDirectProperty(Property<T> property,
-            AttributeType<A> attributeType, AttributeProperty<T> attributeProperty)
-    {
-        this.addIndirectProperty(property, Function.identity(), Function.identity(),
-                attributeType, attributeProperty);
+                attributeType, attributePropertySupplier, defaultValue);
     }
 
     public <T, H, A extends Attribute> void addIndirectProperty(Property<H> property,
             Function<H, T> quickToAttribute, Function<T, H> attributeToQuick,
-            AttributeType<A> attributeType, AttributeProperty<T> attributeProperty)
+            AttributeType<A> attributeType, Supplier<AttributeProperty<T>> attributePropertySupplier,
+            H defaultValue)
     {
-        this.addIndirectProperty(property, quickToAttribute, attributeToQuick, attributeType, () -> attributeProperty);
-    }
-
-    public <T, H, A extends Attribute> void addIndirectProperty(Property<H> property,
-            Function<H, T> quickToAttribute, Function<T, H> attributeToQuick,
-            AttributeType<A> attributeType, Supplier<AttributeProperty<T>> attributePropertySupplier)
-    {
-        var boundProperty = new BoundProperty<>(property, attributePropertySupplier, attributeToQuick);
+        var boundProperty = new BoundProperty<>(property, attributePropertySupplier, attributeToQuick, defaultValue);
         boundPropertySet.add(boundProperty);
 
         attributeBoundPropertySetMap.computeIfAbsent(attributeType, BoundAttributePropertySet::new)
@@ -102,38 +106,30 @@ public final class QuickSetupStateBinder
             }
 
             var attributeMap = this.getAttributeMapOf(attributeType);
-            if(attributeMap == null)
+            if(attributeMap != null)
             {
-                return;
+                var attributeProperty = attributePropertySupplier.get();
+                if(attributeProperty != null)
+                {
+                    var attribute = attributeMap.get(attributeType);
+                    if(attribute != null)
+                    {
+                        var attributeNewValue = quickToAttribute.apply(newValue);
+                        attribute.setValue(attributeProperty, attributeNewValue);
+                    }
+                }
             }
 
-            var attributeProperty = attributePropertySupplier.get();
-            if(attributeProperty == null)
-            {
-                return;
-            }
-
-            var attribute = attributeMap.get(attributeType);
-            if(attribute != null)
-            {
-                var attributeNewValue = quickToAttribute.apply(newValue);
-                attribute.setValue(attributeProperty, attributeNewValue);
-            }
+            writeConsumerList.forEach(consumer -> consumer.accept(attributeType));
         });
     }
 
     public <T, H, A extends Attribute> void addReadOnlyIndirectProperty(Property<H> property,
             Function<T, H> attributeToQuick,
-            AttributeType<A> attributeType, AttributeProperty<T> attributeProperty)
+            AttributeType<A> attributeType, Supplier<AttributeProperty<T>> attributePropertySupplier,
+            H defaultValue)
     {
-        this.addReadOnlyIndirectProperty(property, attributeToQuick, attributeType, attributeProperty);
-    }
-
-    public <T, H, A extends Attribute> void addReadOnlyIndirectProperty(Property<H> property,
-            Function<T, H> attributeToQuick,
-            AttributeType<A> attributeType, Supplier<AttributeProperty<T>> attributePropertySupplier)
-    {
-        var boundProperty = new BoundProperty<>(property, attributePropertySupplier, attributeToQuick);
+        var boundProperty = new BoundProperty<>(property, attributePropertySupplier, attributeToQuick, defaultValue);
         boundPropertySet.add(boundProperty);
 
         attributeBoundPropertySetMap.computeIfAbsent(attributeType, BoundAttributePropertySet::new)
@@ -198,13 +194,16 @@ public final class QuickSetupStateBinder
         private final Property<V> property;
         private final Supplier<AttributeProperty<H>> attributePropertySupplier;
         private final Function<H, V> converter;
+        private final V defaultValue;
 
         public BoundProperty(Property<V> property,
-                Supplier<AttributeProperty<H>> attributePropertySupplier, Function<H, V> converter)
+                Supplier<AttributeProperty<H>> attributePropertySupplier, Function<H, V> converter,
+                V defaultValue)
         {
             this.property = property;
             this.attributePropertySupplier = attributePropertySupplier;
             this.converter = converter;
+            this.defaultValue = defaultValue;
         }
 
         public void copyFromAttribute(Attribute attribute)
@@ -218,6 +217,11 @@ public final class QuickSetupStateBinder
             var attributeValue = attribute.getValue(attributeProperty);
             if(attributeValue == null)
             {
+                if(defaultValue != null)
+                {
+                    property.setValue(defaultValue);
+                }
+
                 return;
             }
 
@@ -238,49 +242,130 @@ public final class QuickSetupStateBinder
             this.attributeType = attributeType;
         }
 
+        public Builder<A> addLoadConsumer(Consumer<AttributeType<?>> consumer)
+        {
+            QuickSetupStateBinder.this.loadConsumerList.add(consumer);
+            return this;
+        }
+
+        public Builder<A> addWriteConsumer(Consumer<AttributeType<?>> consumer)
+        {
+            QuickSetupStateBinder.this.writeConsumerList.add(consumer);
+            return this;
+        }
+
+        /*
+            INDIRECT
+        */
+        public <T, H> Builder<A> indirect(Property<H> property,
+                Function<H, T> quickToAttribute, Function<T, H> attributeToQuick,
+                Supplier<AttributeProperty<T>> attributePropertySupplier, H defaultValue)
+        {
+            QuickSetupStateBinder.this.addIndirectProperty(
+                    property, quickToAttribute, attributeToQuick,
+                    attributeType, attributePropertySupplier, defaultValue
+            );
+            return this;
+        }
+
         public <T, H> Builder<A> indirect(Property<H> property,
                 Function<H, T> quickToAttribute, Function<T, H> attributeToQuick,
                 Supplier<AttributeProperty<T>> attributePropertySupplier)
         {
-            QuickSetupStateBinder.this.addIndirectProperty(property, quickToAttribute, attributeToQuick,
-                    attributeType, attributePropertySupplier);
-            return this;
+            return this.indirect(
+                    property, quickToAttribute, attributeToQuick, attributePropertySupplier, null
+            );
+        }
+
+        public <T, H> Builder<A> indirect(Property<H> property,
+                Function<H, T> quickToAttribute, Function<T, H> attributeToQuick,
+                AttributeProperty<T> attributeProperty, H defaultValue)
+        {
+            return this.indirect(
+                    property, quickToAttribute, attributeToQuick, () -> attributeProperty, defaultValue
+            );
         }
 
         public <T, H> Builder<A> indirect(Property<H> property,
                 Function<H, T> quickToAttribute, Function<T, H> attributeToQuick,
                 AttributeProperty<T> attributeProperty)
         {
-            QuickSetupStateBinder.this.addIndirectProperty(property, quickToAttribute, attributeToQuick,
-                    attributeType, attributeProperty);
+            return this.indirect(
+                    property, quickToAttribute, attributeToQuick, () -> attributeProperty, null
+            );
+        }
+        /*
+            INDIRECT
+        */
+        /*
+            READ ONLY INDIRECT
+         */
+        public <T, H> Builder<A> readOnlyIndirect(Property<H> property,
+                Function<T, H> attributeToQuick, Supplier<AttributeProperty<T>> attributePropertySupplier,
+                H defaultValue)
+        {
+            QuickSetupStateBinder.this.addReadOnlyIndirectProperty(
+                    property, attributeToQuick, attributeType, attributePropertySupplier, defaultValue
+            );
             return this;
         }
 
         public <T, H> Builder<A> readOnlyIndirect(Property<H> property,
                 Function<T, H> attributeToQuick, Supplier<AttributeProperty<T>> attributePropertySupplier)
         {
-            QuickSetupStateBinder.this.addReadOnlyIndirectProperty(property, attributeToQuick, attributeType, attributePropertySupplier);
-            return this;
+            return this.readOnlyIndirect(
+                    property, attributeToQuick, attributePropertySupplier, null
+            );
+        }
+
+        public <T, H> Builder<A> readOnlyIndirect(Property<H> property,
+                Function<T, H> attributeToQuick, AttributeProperty<T> attributeProperty,
+                H defaultValue)
+        {
+            return this.readOnlyIndirect(
+                    property, attributeToQuick, attributeProperty, defaultValue
+            );
         }
 
         public <T, H> Builder<A> readOnlyIndirect(Property<H> property,
                 Function<T, H> attributeToQuick, AttributeProperty<T> attributeProperty)
         {
-            QuickSetupStateBinder.this.addReadOnlyIndirectProperty(property, attributeToQuick, attributeType, attributeProperty);
+            return this.readOnlyIndirect(
+                    property, attributeToQuick, attributeProperty, null
+            );
+        }
+        /*
+            READ ONLY INDIRECT
+         */
+        /*
+            DIRECT
+         */
+        public <T> Builder<A> direct(Property<T> property, Supplier<AttributeProperty<T>> attributePropertySupplier,
+                T defaultValue)
+        {
+            QuickSetupStateBinder.this.addDirectProperty(
+                    property, attributeType, attributePropertySupplier, defaultValue
+            );
             return this;
         }
 
         public <T> Builder<A> direct(Property<T> property, Supplier<AttributeProperty<T>> attributePropertySupplier)
         {
-            QuickSetupStateBinder.this.addDirectProperty(property, attributeType, attributePropertySupplier);
-            return this;
+            return this.direct(property, attributePropertySupplier, null);
+        }
+
+        public <T> Builder<A> direct(Property<T> property, AttributeProperty<T> attributeProperty, T defaultValue)
+        {
+            return this.direct(property, () -> attributeProperty, defaultValue);
         }
 
         public <T> Builder<A> direct(Property<T> property, AttributeProperty<T> attributeProperty)
         {
-            QuickSetupStateBinder.this.addDirectProperty(property, attributeType, attributeProperty);
-            return this;
+            return this.direct(property, () -> attributeProperty, null);
         }
+        /*
+            DIRECT
+         */
     }
 
 }

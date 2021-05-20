@@ -8,6 +8,7 @@ import parozzz.github.com.simpleplcpanel.hmi.controls.ControlContainerPane;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.simpleplcpanel.hmi.util.ContextMenuBuilder;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXTextFormatterUtil;
+import parozzz.github.com.simpleplcpanel.util.Util;
 
 public final class ControlWrapperContextMenuController extends FXObject
 {
@@ -51,7 +52,7 @@ public final class ControlWrapperContextMenuController extends FXObject
         control.setOnContextMenuRequested(event ->
         {
             //Show only if selected!
-            if(controlWrapper.isSelected())
+            if (controlWrapper.isSelected())
             {
                 contextMenu.show(control, event.getScreenX(), event.getScreenY());
             }
@@ -81,14 +82,17 @@ public final class ControlWrapperContextMenuController extends FXObject
 
         label.setGraphic(textField);
 
+        textField.setTextFormatter(FXTextFormatterUtil.positiveInteger(4));
+        textField.textProperty().addListener((observableValue, oldValue, newValue) ->
+                layoutProperty.set(newValue == null
+                        ? 0
+                        : Util.parseDouble(newValue, 0))
+        );
+
         textField.setText("" + (int) layoutProperty.get());
-
-        textField.setTextFormatter(FXTextFormatterUtil.simpleInteger(4));
-        textField.textProperty().addListener(
-                (observableValue, oldValue, newValue) -> layoutProperty.set(Double.parseDouble(textField.getText())));
-
-        layoutProperty.addListener((observableValue, oldValue, newValue) -> textField
-                .setText("" + (int) Math.floor(newValue.doubleValue())));
+        layoutProperty.addListener((observableValue, oldValue, newValue) ->
+                textField.setText("" + newValue.intValue())
+        );
 
         return label;
     }
