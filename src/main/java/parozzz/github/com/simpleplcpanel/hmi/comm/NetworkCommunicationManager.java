@@ -1,21 +1,15 @@
 package parozzz.github.com.simpleplcpanel.hmi.comm;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.Property;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import javafx.util.converter.IntegerStringConverter;
 import parozzz.github.com.simpleplcpanel.hmi.FXObject;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXTextFormatterUtil;
 import parozzz.github.com.simpleplcpanel.util.Util;
 
-import java.awt.*;
 import java.io.IOException;
 
 public abstract class NetworkCommunicationManager<T extends CommThread<?>> extends FXObject

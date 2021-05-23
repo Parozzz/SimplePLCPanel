@@ -4,7 +4,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
-import javafx.scene.control.TreeTableView;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -13,7 +12,6 @@ import javafx.scene.text.FontWeight;
 import parozzz.github.com.simpleplcpanel.hmi.FXObject;
 import parozzz.github.com.simpleplcpanel.hmi.pane.HMIPane;
 import parozzz.github.com.simpleplcpanel.hmi.tags.CommunicationTag;
-import parozzz.github.com.simpleplcpanel.hmi.tags.Tag;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
 
 import java.util.function.Consumer;

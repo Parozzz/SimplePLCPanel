@@ -24,10 +24,4 @@ public class WriteAddressAttribute extends AddressAttribute
     {
         return WRITE_TAG;
     }
-
-    @Override
-    public void update()
-    {
-
-    }
 }

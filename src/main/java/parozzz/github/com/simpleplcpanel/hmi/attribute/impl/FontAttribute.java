@@ -53,5 +53,7 @@ public final class FontAttribute extends Attribute
         var fontPosture = this.getValue(ITALIC_POSTURE) ? FontPosture.ITALIC : FontPosture.REGULAR;
         var fontTextSize = this.getValue(FONT_TEXT_SIZE);
         this.font = Font.font(fontName, fontWeight, fontPosture, fontTextSize);
+
+        super.update(); //This will call the Update Runnables
     }
 }

@@ -6,13 +6,12 @@ import parozzz.github.com.simpleplcpanel.hmi.FXObject;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommThread;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
-import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.simpleplcpanel.hmi.database.ControlContainerDatabase;
 import parozzz.github.com.simpleplcpanel.hmi.tags.Tag;
 import parozzz.github.com.simpleplcpanel.hmi.tags.TagsManager;
-import parozzz.github.com.simpleplcpanel.hmi.tags.stage.TagStage;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 public abstract class ControlDataUpdater<C extends CommThread<?>> extends FXObject
 {

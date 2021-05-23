@@ -8,8 +8,6 @@ import javafx.scene.control.TextField;
 import parozzz.github.com.simpleplcpanel.PLC.siemens.data.SiemensS7DataStorage;
 import parozzz.github.com.simpleplcpanel.PLC.siemens.data.SiemensS7ReadableData;
 import parozzz.github.com.simpleplcpanel.PLC.siemens.util.SiemensS7AreaType;
-import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.AddressAttribute;
-import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.propertyholders.SiemensS7AttributePropertyHolder;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationStringAddressCreatorStage;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
 import parozzz.github.com.simpleplcpanel.hmi.util.EnumStringConverter;

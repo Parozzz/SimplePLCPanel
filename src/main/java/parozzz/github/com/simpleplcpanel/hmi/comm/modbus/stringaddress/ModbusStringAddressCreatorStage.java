@@ -5,8 +5,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.AddressAttribute;
-import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.propertyholders.ModbusAttributePropertyHolder;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationStringAddressCreatorStage;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.ModbusDataLength;
@@ -16,7 +14,6 @@ import parozzz.github.com.simpleplcpanel.hmi.util.FXTextFormatterUtil;
 import parozzz.github.com.simpleplcpanel.util.Util;
 
 import java.io.IOException;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public class ModbusStringAddressCreatorStage

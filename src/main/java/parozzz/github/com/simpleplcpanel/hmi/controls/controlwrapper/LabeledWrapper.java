@@ -10,9 +10,7 @@ import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.AddressAttri
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.ReadAddressAttribute;
 import parozzz.github.com.simpleplcpanel.hmi.controls.ControlContainerPane;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.attributes.ControlWrapperAttributeInitializer;
-import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.state.WrapperStateChangedConsumer;
 import parozzz.github.com.simpleplcpanel.hmi.util.valueintermediate.ValueIntermediateType;
-import parozzz.github.com.simpleplcpanel.util.Validate;
 
 public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C>
 {
@@ -40,62 +38,56 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
                 {
                     var control = updateData.getControl();
 
-                    TextAttribute textAttribute = null;
-                    ValueAttribute valueAttribute = null;
-                    AddressAttribute readAddressAttribute = null;
-
-                    for(var attribute : updateData.getAttributeList())
+                    boolean requireTextUpdate = false;
+                    for(var attributeType : updateData.getAttributeTypeCollection())
                     {
-                        if (attribute instanceof FontAttribute)
+                        if(attributeType == AttributeType.FONT)
                         {
-                            control.setFont(((FontAttribute) attribute).getFont());
-                            control.setUnderline(attribute.getValue(FontAttribute.UNDERLINE));
-                            control.setAlignment(attribute.getValue(FontAttribute.TEXT_POSITION));
-                            control.setTextFill(attribute.getValue(FontAttribute.TEXT_COLOR));
-                        }
-                        else if(attribute instanceof TextAttribute)
-                        {
-                            textAttribute = (TextAttribute) attribute;
-                        }
-                        else if(attribute instanceof ValueAttribute)
-                        {
-                            valueAttribute = (ValueAttribute) attribute;
-                        }else if(attribute instanceof ReadAddressAttribute)
-                        {
-                            readAddressAttribute = (ReadAddressAttribute) attribute;
-
-                            var readTag = readAddressAttribute.getValue(ReadAddressAttribute.READ_TAG);
-                            if(readTag != null)
+                            var attribute = AttributeFetcher.fetch(this, attributeType);
+                            if (attribute instanceof FontAttribute)
                             {
-                                var readIntermediate = readTag.getReadIntermediate();
-                                super.getStateMap().setState(readIntermediate.asInteger());
+                                control.setFont(((FontAttribute) attribute).getFont());
+                                control.setUnderline(attribute.getValue(FontAttribute.UNDERLINE));
+                                control.setAlignment(attribute.getValue(FontAttribute.TEXT_POSITION));
+                                control.setTextFill(attribute.getValue(FontAttribute.TEXT_COLOR));
                             }
                         }
+                        else if(attributeType == AttributeType.READ_ADDRESS)
+                        {
+                            requireTextUpdate = true;
+
+                            var attribute = AttributeFetcher.fetch(this, attributeType);
+                            if (attribute instanceof ReadAddressAttribute)
+                            {
+                                //I know that changing the stat here will cause another attribute update,
+                                //updating some attributes twice. ReadAddressAttribute is a GLOBAL attribute, so
+                                //this should happen only if edge cases caused by the user and not impact a lot during runtime.
+                                var readTag = attribute.getValue(ReadAddressAttribute.READ_TAG);
+                                if(readTag != null)
+                                {
+                                    var readIntermediate = readTag.getReadIntermediate();
+                                    super.getStateMap().setNumericState(readIntermediate.asInteger());
+                                }
+                            }
+                        }
+                        else if(attributeType == AttributeType.TEXT || attributeType == AttributeType.VALUE)
+                        {
+                            requireTextUpdate = true;
+                        }
                     }
 
-                    //If they are all false, it means none of my interest is being update and won't update.
-                    if(textAttribute == null && valueAttribute == null && readAddressAttribute == null)
+                    //DO NOT CACHE STUFF HERE since the attributes below could change during the looping above!
+                    if(requireTextUpdate)
                     {
-                        return;
-                    }
+                        var textAttribute = AttributeFetcher.fetch(this, AttributeType.TEXT);
+                        var valueAttribute = AttributeFetcher.fetch(this, AttributeType.VALUE);
+                        var readAddressAttribute = AttributeFetcher.fetch(this, AttributeType.READ_ADDRESS);
 
-                    if(textAttribute == null)
-                    {
-                        textAttribute = AttributeFetcher.fetch(this, AttributeType.TEXT);
-                    }
+                        if(textAttribute == null || valueAttribute == null || readAddressAttribute == null)
+                        {
+                            return;
+                        }
 
-                    if(valueAttribute == null)
-                    {
-                        valueAttribute = AttributeFetcher.fetch(this, AttributeType.VALUE);
-                    }
-
-                    if(readAddressAttribute == null)
-                    {
-                        readAddressAttribute = AttributeFetcher.fetch(this, AttributeType.READ_ADDRESS);
-                    }
-
-                    if (textAttribute != null && valueAttribute != null && readAddressAttribute != null)
-                    {
                         control.setTextAlignment(textAttribute.getValue(TextAttribute.TEXT_ALIGNMENT));
                         control.setLineSpacing(textAttribute.getValue(TextAttribute.LINE_SPACING));
 
@@ -110,16 +102,14 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
     {
         super.setup();
 
-        super.getStateMap().addStateValueChangedConsumer((stateMap, oldState, changeType) ->
+        super.getStateMap().currentWrapperStateProperty().addListener((observable, oldValue, newValue) ->
         {
-            if (changeType != WrapperStateChangedConsumer.ChangeType.STATE_CHANGED)
+            if(newValue == null)
             {
                 return;
             }
 
-            var currentState = stateMap.getCurrentState();
-
-            var attributeMap = currentState.getAttributeMap();
+            var attributeMap = newValue.getAttributeMap();
 
             var textAttribute = attributeMap.get(AttributeType.TEXT);
             var valueAttribute = attributeMap.get(AttributeType.VALUE);

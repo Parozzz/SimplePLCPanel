@@ -5,22 +5,10 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
-import parozzz.github.com.simpleplcpanel.Nullable;
-import parozzz.github.com.simpleplcpanel.hmi.attribute.property.AttributeProperty;
-import parozzz.github.com.simpleplcpanel.hmi.attribute.property.impl.FunctionAttributeProperty;
-import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.tcp.ModbusTCPCommunicationManager;
-import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.tcp.ModbusTCPThread;
-import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7CommunicationManager;
-import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7Thread;
 import parozzz.github.com.simpleplcpanel.hmi.pane.HMIStage;
-import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
-import parozzz.github.com.simpleplcpanel.hmi.serialize.property.SerializableProperty;
-import parozzz.github.com.simpleplcpanel.hmi.util.EnumStringConverter;
 import parozzz.github.com.simpleplcpanel.util.Util;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Consumer;
 
 public final class CommunicationStage extends HMIStage<VBox>

@@ -1,20 +1,16 @@
 package parozzz.github.com.simpleplcpanel.hmi.comm;
 
 import parozzz.github.com.simpleplcpanel.hmi.FXController;
-import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.stringaddress.ModbusStringAddressCreatorStage;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.tcp.ModbusTCPCommunicationManager;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.tcp.ModbusTCPThread;
 import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7CommunicationManager;
 import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.SiemensS7Thread;
-import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.stringaddress.SiemensS7StringAddressCreator;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 public final class CommunicationDataHolder extends FXController
 {

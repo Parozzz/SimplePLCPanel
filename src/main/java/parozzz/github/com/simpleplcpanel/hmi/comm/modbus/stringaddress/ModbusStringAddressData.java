@@ -1,10 +1,6 @@
 package parozzz.github.com.simpleplcpanel.hmi.comm.modbus.stringaddress;
 
 import parozzz.github.com.simpleplcpanel.Nullable;
-import parozzz.github.com.simpleplcpanel.PLC.siemens.data.SiemensS7DataStorage;
-import parozzz.github.com.simpleplcpanel.PLC.siemens.util.SiemensS7AreaType;
-import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.AddressAttribute;
-import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.propertyholders.ModbusAttributePropertyHolder;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationStringAddressData;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.ModbusDataLength;

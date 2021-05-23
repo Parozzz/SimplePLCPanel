@@ -1,7 +1,6 @@
 package parozzz.github.com.simpleplcpanel.hmi.attribute.property;
 
 import javafx.beans.property.Property;
-import javafx.beans.property.SimpleObjectProperty;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.Attribute;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
 import parozzz.github.com.simpleplcpanel.util.Validate;
@@ -52,12 +51,12 @@ public class AttributePropertyManager
 
         var attributePropertyData = attributeProperty.createData(attribute);
         attributePropertyDataSet.add(attributePropertyData);
+        attributePropertyMap.put(attributeProperty, attributePropertyData.getProperty());
 
-        var property = attributePropertyData.getProperty();
-        attributePropertyMap.put(attributeProperty, property);
-        property.addListener((observable, oldValue, newValue) ->
+        attributePropertyData.getProperty().addListener((observable, oldValue, newValue) ->
                 AttributePropertyManager.updateAttribute(attribute)
         );
+
         return this;
     }
 
@@ -69,7 +68,7 @@ public class AttributePropertyManager
     public void remove(AttributeProperty<?> attributeProperty)
     {
         var removed = attributePropertyKeyMap.remove(attributeProperty.getKey(), attributeProperty);
-        if(removed)
+        if (removed)
         {
             attributePropertyMap.remove(attributeProperty);
             attributePropertyDataSet.removeIf(data ->

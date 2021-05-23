@@ -30,6 +30,15 @@ public final class ControlWrapperAttributeUpdater<C extends Control> extends FXO
 
     public void initialize(ControlWrapperAttributeInitializer<C> attributeInitializer)
     {
+        controlWrapper.getStateMap().currentWrapperStateProperty()
+                .addListener((observable, oldValue, newValue) ->
+                        //When the Current Wrapper State change only update state attributes!
+                        this.update(
+                                control, controlWrapper.getContainerPane(),
+                                controlWrapper.getAttributeTypeManager().getStateTypeCollection()
+                        )
+                );
+
         attributeUpdateConsumerSet.addAll(attributeInitializer.attributeUpdateConsumerSet);
     }
 
@@ -47,7 +56,7 @@ public final class ControlWrapperAttributeUpdater<C extends Control> extends FXO
     public void updateAttribute(AttributeType<?> attributeType)
     {
         var attributeTypeManager = controlWrapper.getAttributeTypeManager();
-        if(attributeTypeManager.hasType(attributeType))
+        if (attributeTypeManager.hasType(attributeType))
         {
             this.update(control, controlWrapper.getContainerPane(), Collections.singleton(attributeType));
         }

@@ -1,18 +1,10 @@
 package parozzz.github.com.simpleplcpanel.hmi.tags;
 
-import com.sun.source.tree.Tree;
-import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TreeItem;
 import parozzz.github.com.simpleplcpanel.Nullable;
-import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationStringAddressData;
-import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
-import parozzz.github.com.simpleplcpanel.hmi.serialize.JSONSerializable;
-import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
-import parozzz.github.com.simpleplcpanel.hmi.tags.stage.TagStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.ContextMenuBuilder;
 import parozzz.github.com.simpleplcpanel.hmi.util.valueintermediate.MixedIntermediate;
 import parozzz.github.com.simpleplcpanel.hmi.util.valueintermediate.ValueIntermediate;
@@ -25,7 +17,7 @@ public abstract class Tag
 {
     private final int internalId;
     private final ObservableValue<String> keyValue;
-    private final Set<Runnable> deleteRunnableSet;
+    private final Set<DeleteRunnable> deleteRunnableSet;
 
     protected TagsManager tagsManager;
     protected TreeItem<Tag> treeItem;
@@ -94,7 +86,6 @@ public abstract class Tag
     {
         return ContextMenuBuilder.builder()
                 .simple("Delete", this::delete)
-                .simple("Test", () -> System.out.println(this.getHierarchicalKey()))
                 .getContextMenu();
     }
 
@@ -105,7 +96,7 @@ public abstract class Tag
             return "";
         }
 
-        var key = this.getKey();
+        var key = new StringBuilder(this.getKey());
 
         var treeItemParent = this.treeItem.getParent();
         while(treeItemParent != null && treeItemParent != tagsManager.getRootItem())
@@ -116,11 +107,11 @@ public abstract class Tag
                 return "";
             }
 
-            key = tagParent.getKey() + "." + key;
+            key.insert(0, tagParent.getKey() + ".");
             treeItemParent = treeItemParent.getParent();
         }
 
-        return key;
+        return key.toString();
     }
 
     public void delete()
@@ -136,12 +127,17 @@ public abstract class Tag
             parentTreeItem.getChildren().remove(treeItem);
         }
 
-        deleteRunnableSet.forEach(Runnable::run);
+        deleteRunnableSet.forEach(DeleteRunnable::onTagDelete);
     }
 
-    public void addDeleteRunnable(Runnable runnable)
+    public void addDeleteRunnable(DeleteRunnable runnable)
     {
         deleteRunnableSet.add(runnable);
+    }
+
+    public void removeDeleteRunnable(DeleteRunnable runnable)
+    {
+        deleteRunnableSet.remove(runnable);
     }
 
     public int hashCode()
@@ -152,5 +148,11 @@ public abstract class Tag
     public boolean equals(Object obj)
     {
         return this == obj || (obj instanceof Tag && this.internalId == ((Tag) obj).internalId);
+    }
+
+    @FunctionalInterface
+    public interface DeleteRunnable
+    {
+        void onTagDelete();
     }
 }

@@ -7,22 +7,29 @@ import parozzz.github.com.simpleplcpanel.hmi.attribute.property.AttributePropert
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
 import parozzz.github.com.simpleplcpanel.util.Validate;
 
+import java.util.IdentityHashMap;
+import java.util.Map;
+
 public abstract class Attribute extends FXObject// implements Cloneable
 {
     protected final AttributeMap attributeMap;
-    private final AttributePropertyManager attributePropertyManager;
     private final AttributeType<?> attributeType;
+
+    private final AttributePropertyManager attributePropertyManager;
+    private final Map<Object, Runnable> attributeUpdateRunnableMap;
 
     public Attribute(AttributeMap attributeMap,
             AttributeType<?> attributeType, String name)
     {
         super(name);
 
-        this.attributeMap = attributeMap;
-        this.attributePropertyManager = new AttributePropertyManager(this);
         //This is here in case of human error
         Validate.needTrue("Invalid Attribute Type", attributeType.getAttributeClass().isAssignableFrom(this.getClass()));
         this.attributeType = attributeType;
+        this.attributeMap = attributeMap;
+
+        this.attributePropertyManager = new AttributePropertyManager(this);
+        this.attributeUpdateRunnableMap = new IdentityHashMap<>();
     }
 
     public AttributeType<?> getType()
@@ -33,6 +40,16 @@ public abstract class Attribute extends FXObject// implements Cloneable
     public AttributeMap getAttributeMap()
     {
         return attributeMap;
+    }
+
+    public void addAttributeUpdaterRunnable(Object key, Runnable attributeUpdateRunnable)
+    {
+        attributeUpdateRunnableMap.put(key, attributeUpdateRunnable);
+    }
+
+    public void removeAttributeUpdaterRunnable(Object key)
+    {
+        attributeUpdateRunnableMap.remove(key);
     }
 
     public <P> Property<P> getProperty(AttributeProperty<P> attributeProperty)
@@ -60,7 +77,10 @@ public abstract class Attribute extends FXObject// implements Cloneable
         return attributePropertyManager;
     }
 
-    public abstract void update();
+    public void update()
+    {
+        attributeUpdateRunnableMap.values().forEach(Runnable::run);
+    }
 
     public void copyInto(Attribute pasteAttribute)
     {

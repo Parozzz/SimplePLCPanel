@@ -7,8 +7,11 @@ import javafx.scene.control.Control;
 import javafx.scene.paint.Color;
 import parozzz.github.com.simpleplcpanel.hmi.FXObject;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.Attribute;
+import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeFetcher;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeMap;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
+import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
+import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.attributechanger.SetupPaneAttributeChanger;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.attributechanger.SetupPaneAttributeChangerList;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.extra.ControlWrapperSetupUtil;
 import parozzz.github.com.simpleplcpanel.hmi.util.ContextMenuBuilder;
@@ -21,7 +24,6 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
     private final SetupPaneAttributeChangerList<A> attributeChangerList;
 
     private final Button selectButton;
-    private boolean stateBased = false;
 
     public SetupPane(ControlWrapperSetupStage setupStage, String name, String buttonText,
             AttributeType<A> attributeType)
@@ -82,14 +84,38 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
         return attributeChangerList;
     }
 
+    public void bindAll(ControlWrapper<?> controlWrapper)
+    {
+        var attribute = AttributeFetcher.fetch(controlWrapper, this.attributeType);
+        if(attribute != null)
+        {
+            this.attributeChangerList.forEach(attributeChanger ->
+                    attributeChanger.bindToAttribute(attribute)
+            );
+        }
+
+        if(controlWrapper.getAttributeTypeManager().isGlobal(attributeType))
+        {
+            this.setAsGlobal();
+        }
+        else
+        {
+            this.setAsState();
+        }
+    }
+
+    public void unbindAll()
+    {
+        this.attributeChangerList.forEach(SetupPaneAttributeChanger::unbind);
+    }
+
     public void clearControlWrapper()
     {
 
     }
 
-    public void setAsState()
+    protected void setAsState()
     {
-        stateBased = true;
         ContextMenuBuilder.builder()
                 .simple("Write to All", this::writeToAllStates)
                 .setTo(selectButton);
@@ -116,9 +142,8 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
         });
     }
 
-    public void setAsGlobal()
+    protected void setAsGlobal()
     {
-        stateBased = false;
         selectButton.setContextMenu(null);
 
         var propertySet = attributeChangerList.getPropertySet();

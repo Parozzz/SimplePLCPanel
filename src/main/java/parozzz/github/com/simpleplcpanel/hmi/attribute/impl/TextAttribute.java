@@ -22,10 +22,4 @@ public class TextAttribute extends Attribute
 
         super.getAttributePropertyManager().addAll(TEXT, TEXT_ALIGNMENT, LINE_SPACING);
     }
-
-    @Override
-    public void update()
-    {
-
-    }
 }

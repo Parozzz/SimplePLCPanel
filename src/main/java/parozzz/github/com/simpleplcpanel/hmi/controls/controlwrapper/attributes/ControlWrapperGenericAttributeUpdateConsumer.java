@@ -22,7 +22,7 @@ public interface ControlWrapperGenericAttributeUpdateConsumer
         private final ControlWrapper<?> controlWrapper;
         private final Control control;
         private final Pane containerPane;
-        private final List<Attribute> attributeList;
+        private final Collection<AttributeType<?>> attributeTypeCollection;
 
         public GenericUpdateData(ControlWrapper<?> controlWrapper, Control control, Pane containerPane,
                 AttributeType<?>... attributeTypes)
@@ -36,11 +36,9 @@ public interface ControlWrapperGenericAttributeUpdateConsumer
             this.controlWrapper = controlWrapper;
             this.control = control;
             this.containerPane = containerPane;
+            this.attributeTypeCollection = attributeTypeCollection;
 
-            attributeList = attributeTypeCollection.stream()
-                    .map(attributeType -> AttributeFetcher.fetch(controlWrapper, attributeType))
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toUnmodifiableList());
+            //DO NOT CACHE DATA HERE! IT MIGHT CAUSE PROBLEMS DURING UPDATING!
         }
 
         public ControlWrapper<?> getControlWrapper()
@@ -48,9 +46,9 @@ public interface ControlWrapperGenericAttributeUpdateConsumer
             return controlWrapper;
         }
 
-        public List<Attribute> getAttributeList()
+        public Collection<AttributeType<?>> getAttributeTypeCollection()
         {
-            return attributeList;
+            return attributeTypeCollection;
         }
 
         public Control getControl()

@@ -42,28 +42,6 @@ public final class AttributeMap extends FXController
             typeToAttributeMap.put(attributeType, attribute);
             attributeSet.add(attribute);
         });
-        /*
-        if (state)
-        {
-            attributeTypeManager.forEachState(attributeType ->
-            {
-                var attribute = attributeType.create(this);
-                typeToAttributeMap.put(attributeType, attribute);
-                attributeSet.add(attribute);
-
-                super.addFXChild(attribute);
-            });
-        } else
-        {
-            attributeTypeManager.forEachGlobal(attributeType ->
-            {
-                var attribute = attributeType.create(this);
-                typeToAttributeMap.put(attributeType, attribute);
-                attributeSet.add(attribute);
-
-                super.addFXChild(attribute);
-            });
-        }*/
     }
 
     public ControlWrapper<?> getControlWrapper()

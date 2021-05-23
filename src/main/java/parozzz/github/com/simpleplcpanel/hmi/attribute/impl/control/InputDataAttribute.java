@@ -31,10 +31,4 @@ public final class InputDataAttribute extends Attribute
                 REAL_MAX_DECIMALS, REAL_MAX_VALUE, REAL_MIN_VALUE,
                 CHARACTER_LIMIT);
     }
-
-    @Override
-    public void update()
-    {
-
-    }
 }

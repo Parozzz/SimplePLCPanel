@@ -24,10 +24,4 @@ public class ReadAddressAttribute extends AddressAttribute
     {
         return READ_TAG;
     }
-
-    @Override
-    public void update()
-    {
-
-    }
 }

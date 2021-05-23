@@ -61,7 +61,7 @@ public abstract class ControlWrapper<C extends Control>
 
     private final WrapperStateMap stateMap;
 
-    private final AttributeMap globalAttributeMap; //This will stay here, but is still for a future. WIP
+    private final AttributeMap globalAttributeMap;
     private final ControlWrapperContextMenuController contextMenuController;
     private final ControlWrapperAttributeTypeManager attributeTypeManager;
     private final ControlWrapperAttributeUpdater<C> attributeUpdater;
@@ -478,8 +478,17 @@ public abstract class ControlWrapper<C extends Control>
             var control = updateData.getControl();
             var containerPane = updateData.getContainerPane();
 
-            for(var attribute : updateData.getAttributeList())
+            for(var attributeType : updateData.getAttributeTypeCollection())
             {
+                if(!(attributeType == AttributeType.CHANGE_PAGE ||
+                        attributeType == AttributeType.SIZE ||
+                        attributeType == AttributeType.BACKGROUND ||
+                        attributeType == AttributeType.BORDER))
+                {
+                    continue;
+                }
+
+                var attribute = AttributeFetcher.fetch(this, attributeType);
                 if(attribute instanceof ChangePageAttribute)
                 {
                     if(control == this.control) //This needs to be set only if is the same control as the one inside the controlwrapper

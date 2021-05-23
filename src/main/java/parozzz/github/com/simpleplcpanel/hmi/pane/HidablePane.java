@@ -12,9 +12,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
-import parozzz.github.com.simpleplcpanel.util.functionalinterface.primitives.BooleanConsumer;
-
-import java.util.function.Consumer;
 
 public interface HidablePane
 {

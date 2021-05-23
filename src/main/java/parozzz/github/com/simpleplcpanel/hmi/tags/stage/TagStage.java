@@ -1,10 +1,11 @@
 package parozzz.github.com.simpleplcpanel.hmi.tags.stage;
 
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
-import javafx.scene.control.cell.TextFieldTreeTableCell;
+import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TreeTableRow;
+import javafx.scene.control.TreeTableView;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -15,28 +16,13 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Modality;
 import javafx.stage.StageStyle;
-import javafx.util.converter.DefaultStringConverter;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import parozzz.github.com.simpleplcpanel.Nullable;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
-import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationStringAddressData;
-import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
 import parozzz.github.com.simpleplcpanel.hmi.pane.HMIStage;
-import parozzz.github.com.simpleplcpanel.hmi.serialize.JSONSerializable;
-import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONData;
-import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataArray;
-import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
 import parozzz.github.com.simpleplcpanel.hmi.tags.CommunicationTag;
-import parozzz.github.com.simpleplcpanel.hmi.tags.FolderTag;
 import parozzz.github.com.simpleplcpanel.hmi.tags.Tag;
 import parozzz.github.com.simpleplcpanel.hmi.tags.TagsManager;
-import parozzz.github.com.simpleplcpanel.hmi.tags.cellfactoryhandlers.LocalCellFactoryHandler;
-import parozzz.github.com.simpleplcpanel.hmi.tags.cellfactoryhandlers.StringAddressDataCellFactoryHandler;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
 
-import java.util.*;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public final class TagStage extends HMIStage<VBox>

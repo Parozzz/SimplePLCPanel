@@ -23,10 +23,4 @@ public final class SizeAttribute extends Attribute
         super.getAttributePropertyManager().addAll(ADAPT, WIDTH, HEIGHT, PADDING);
 
     }
-
-    @Override
-    public void update()
-    {
-
-    }
 }

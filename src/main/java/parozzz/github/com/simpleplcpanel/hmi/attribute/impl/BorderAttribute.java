@@ -58,5 +58,7 @@ public class BorderAttribute extends Attribute
         this.border = new Border(
                 new BorderStroke(borderColor, strokeStyle.borderStrokeStyle, new CornerRadii(cornerRadii), new BorderWidths(borderWidth))
         );
+
+        super.update(); //This will call the Update Runnables
     }
 }

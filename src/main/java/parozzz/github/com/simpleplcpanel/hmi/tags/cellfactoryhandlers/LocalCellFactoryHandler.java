@@ -1,13 +1,10 @@
 package parozzz.github.com.simpleplcpanel.hmi.tags.cellfactoryhandlers;
 
-import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.skin.CheckBoxSkin;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;

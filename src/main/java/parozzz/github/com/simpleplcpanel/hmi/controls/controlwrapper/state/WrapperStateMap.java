@@ -1,6 +1,12 @@
 package parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.state;
 
+import com.sun.javafx.collections.ObservableListWrapper;
+import javafx.beans.property.ReadOnlyListProperty;
+import javafx.beans.property.ReadOnlyListWrapper;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.ReadOnlyProperty;
 import org.json.simple.JSONObject;
+import parozzz.github.com.simpleplcpanel.Nullable;
 import parozzz.github.com.simpleplcpanel.hmi.FXObject;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.Attribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
@@ -20,13 +26,9 @@ public final class WrapperStateMap extends FXObject
 {
     private final ControlWrapper<?> controlWrapper;
 
-    private final List<WrapperState> wrapperStateList;
     private final WrapperState defaultWrapperState;
-
-    private WrapperState currentWrapperState;
-    private int numericState;
-
-    private final Set<WrapperStateChangedConsumer> wrapperStateChangedConsumerList;
+    private final ReadOnlyListWrapper<WrapperState> wrapperStateListProperty;
+    private final ReadOnlyObjectWrapper<WrapperState> currentWrapperStateProperty;
 
     private boolean defaultStateInitialized = false;
 
@@ -34,24 +36,9 @@ public final class WrapperStateMap extends FXObject
     {
         this.controlWrapper = controlWrapper;
 
-        this.wrapperStateList = new LinkedList<>();
         this.defaultWrapperState = new WrapperDefaultState(this);
-
-        this.wrapperStateChangedConsumerList = new HashSet<>();
-    }
-
-    @Override
-    public void setup()
-    {
-        super.setup();
-
-        /*
-        var externalValue = controlWrapper.getValue().getOutsideValue();
-        externalValue.addNewValueRunnable(() ->
-        {
-            numericState = externalValue.asInteger();
-            this.parseState(WrapperStateChangedConsumer.ChangeType.STATE_CHANGED);
-        });*/
+        this.wrapperStateListProperty = new ReadOnlyListWrapper<>(new ObservableListWrapper<>(new LinkedList<>()));
+        this.currentWrapperStateProperty = new ReadOnlyObjectWrapper<>(defaultWrapperState);
     }
 
     public ControlWrapper<?> getControlWrapper()
@@ -64,22 +51,20 @@ public final class WrapperStateMap extends FXObject
         return defaultWrapperState;
     }
 
-    public void forceCurrentState(WrapperState forcedWrapperState)
+    public WrapperState getCurrentState()
     {
         this.requireDefaultInit();
-        if (wrapperStateList.contains(forcedWrapperState) || forcedWrapperState == defaultWrapperState)
-        {
-            var oldWrapperState = currentWrapperState;
-            this.currentWrapperState = forcedWrapperState;
-            if(!currentWrapperState.equals(oldWrapperState)) //Using current as primary since the old can be null!
-            { //Apply attributes only if the state is actually changed!
-                controlWrapper.getAttributeUpdater().updateAllAttributes();
-            }
+        return Objects.requireNonNullElse(currentWrapperStateProperty.getValue(), defaultWrapperState);
+    }
 
-            wrapperStateChangedConsumerList.forEach(consumer ->
-                    consumer.stateChanged(this, oldWrapperState, WrapperStateChangedConsumer.ChangeType.STATE_CHANGED)
-            );
-        }
+    public ReadOnlyProperty<WrapperState> currentWrapperStateProperty()
+    {
+        return currentWrapperStateProperty.getReadOnlyProperty();
+    }
+
+    public ReadOnlyListProperty<WrapperState> wrapperStateListProperty()
+    {
+        return wrapperStateListProperty.getReadOnlyProperty();
     }
 
     public void initDefaultState(ControlWrapperAttributeTypeManager attributeTypeManager)
@@ -90,6 +75,7 @@ public final class WrapperStateMap extends FXObject
         defaultWrapperState.getAttributeMap().parseAttributes(attributeTypeManager, true);
     }
 
+    @Nullable
     public WrapperState createState(WrapperState wrapperState)
     {
         return this.createState(
@@ -98,6 +84,7 @@ public final class WrapperStateMap extends FXObject
         );
     }
 
+    @Nullable
     public WrapperState createState(int firstCompare, WrapperState.CompareType firstCompareType,
             int secondCompare, WrapperState.CompareType secondCompareType)
     {
@@ -114,28 +101,33 @@ public final class WrapperStateMap extends FXObject
         return new WrapperState.Builder(this);
     }
 
-    public void setState(int numericState)
+    public void setWrapperState(WrapperState wrapperState)
     {
-        this.numericState = numericState;
-        this.parseState(WrapperStateChangedConsumer.ChangeType.STATE_CHANGED);
+        this.requireDefaultInit();
+        if (wrapperStateListProperty.contains(wrapperState) || wrapperState == defaultWrapperState)
+        {
+            currentWrapperStateProperty.setValue(wrapperState);
+        }
+    }
+
+    public void setNumericState(int numericState)
+    {
+        this.setWrapperState(this.getStateOf(numericState));
     }
 
     private boolean addState(WrapperState wrapperState)
     {
         this.requireDefaultInit();
-        if(wrapperStateList.contains(wrapperState))
+        if (wrapperStateListProperty.contains(wrapperState))
         {
             return false;
         }
-
-        wrapperStateList.add(wrapperState);
 
         var attributeManager = controlWrapper.getAttributeTypeManager();
         wrapperState.getAttributeMap().parseAttributes(attributeManager, true);
 
         defaultWrapperState.copyInto(wrapperState); //Copy the default state into it!
-
-        this.parseState(WrapperStateChangedConsumer.ChangeType.ADD); //In case a new state is added that is more valid than others, it should be updated immediately!
+        wrapperStateListProperty.add(wrapperState); //Do this after initialization so for listener is already populated!
         return true;
     }
 
@@ -143,20 +135,11 @@ public final class WrapperStateMap extends FXObject
     {
         this.requireDefaultInit();
 
-        wrapperStateList.remove(wrapperState);
-        this.parseState(WrapperStateChangedConsumer.ChangeType.REMOVE); //In case something changes, reparse.
-    }
-
-    public int getNumericState()
-    {
-        this.requireDefaultInit();
-        return numericState;
-    }
-
-    public WrapperState getCurrentState()
-    {
-        this.requireDefaultInit();
-        return Objects.requireNonNullElse(currentWrapperState, defaultWrapperState);
+        wrapperStateListProperty.remove(wrapperState);
+        if (currentWrapperStateProperty.getValue() == wrapperState)
+        {
+            currentWrapperStateProperty.setValue(defaultWrapperState);
+        }
     }
 
     public WrapperState getStateOf(int state)
@@ -164,7 +147,7 @@ public final class WrapperStateMap extends FXObject
         this.requireDefaultInit();
 
         //Since this could be a pretty hot method, better use for loop that are a bit more efficient
-        for (var wrapperState : wrapperStateList)
+        for (var wrapperState : wrapperStateListProperty)
         {
             if (wrapperState.isActive(state))
             {
@@ -176,7 +159,7 @@ public final class WrapperStateMap extends FXObject
 
     public void copyInto(WrapperStateMap pasteStateMap)
     {
-        wrapperStateList.forEach(wrapperState ->
+        wrapperStateListProperty.forEach(wrapperState ->
         {
             var pasteWrapperState = pasteStateMap.createState(wrapperState);
             wrapperState.copyInto(pasteWrapperState);
@@ -185,17 +168,17 @@ public final class WrapperStateMap extends FXObject
         defaultWrapperState.copyInto(pasteStateMap.getDefaultState());
     }
 
-    public void forEachNoDefault(Consumer<WrapperState> consumer)
-    {
-        wrapperStateList.forEach(consumer);
-    }
-
     public List<Attribute> getAllAttributesOfType(AttributeType<?> attributeType)
     {
-        return wrapperStateList.stream()
+        return wrapperStateListProperty.stream()
                 .map(wrapperState -> wrapperState.getAttributeMap().get(attributeType))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+    }
+
+    public void forEachNoDefault(Consumer<WrapperState> consumer)
+    {
+        wrapperStateListProperty.forEach(consumer);
     }
 
     public void forEach(Consumer<WrapperState> consumer)
@@ -204,38 +187,9 @@ public final class WrapperStateMap extends FXObject
         this.forEachNoDefault(consumer);
     }
 
-    public void addStateValueChangedConsumer(WrapperStateChangedConsumer consumer)
-    {
-        wrapperStateChangedConsumerList.add(consumer);
-    }
-
-    public void removeStateValueChangedConsumer(WrapperStateChangedConsumer consumer)
-    {
-        wrapperStateChangedConsumerList.remove(consumer);
-    }
-
     public boolean contains(WrapperState wrapperState)
     {
-        return wrapperStateList.contains(wrapperState);
-    }
-
-    private void parseState(WrapperStateChangedConsumer.ChangeType changeType)
-    {
-        var oldWrapperState = currentWrapperState;
-        currentWrapperState = Objects.requireNonNull(this.getStateOf(numericState),
-                "Trying to get a state but is returned null and not default?");
-
-        //Apply attributes only if the state is actually changed!
-        if(!currentWrapperState.equals(oldWrapperState)) //Using current as primary since the old can be null!
-        {
-            controlWrapper.getAttributeUpdater().updateAllAttributes();
-        }
-
-        //This needs to be here after the #setAttributesToControlWrapper because stuff
-        //can depend on attributes to be already set
-        wrapperStateChangedConsumerList.forEach(consumer ->
-                consumer.stateChanged(this, oldWrapperState, changeType)
-        );
+        return wrapperStateListProperty.contains(wrapperState);
     }
 
     @Override
@@ -247,7 +201,7 @@ public final class WrapperStateMap extends FXObject
         jsonDataMap.set("DefaultWrapperState", WrapperStateSerializer.serializeDefaultState(defaultWrapperState));
 
         var jsonArray = new JSONDataArray();
-        wrapperStateList.stream().map(WrapperStateSerializer::serialize).forEach(jsonArray::add);
+        wrapperStateListProperty.stream().map(WrapperStateSerializer::serialize).forEach(jsonArray::add);
         jsonDataMap.set("WrapperStateList", jsonArray);
 
         return jsonDataMap;

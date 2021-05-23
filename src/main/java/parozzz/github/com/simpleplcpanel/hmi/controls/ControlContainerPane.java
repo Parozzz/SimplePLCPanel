@@ -26,8 +26,8 @@ import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.Contr
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.quicktext.ControlWrapperQuickTextEditorStage;
 import parozzz.github.com.simpleplcpanel.hmi.controls.others.ControlWrappersSelectionManager;
 import parozzz.github.com.simpleplcpanel.hmi.database.ControlContainerDatabase;
-import parozzz.github.com.simpleplcpanel.hmi.main.PageScrollingPane;
 import parozzz.github.com.simpleplcpanel.hmi.main.MainEditStage;
+import parozzz.github.com.simpleplcpanel.hmi.main.PageScrollingPane;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.JSONSerializables;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataArray;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;

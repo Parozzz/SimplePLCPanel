@@ -1,7 +1,5 @@
 package parozzz.github.com.simpleplcpanel.hmi.attribute.property.impl;
 
-import javafx.beans.property.Property;
-import javafx.beans.property.SimpleObjectProperty;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.Attribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.property.AttributeProperty;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.property.AttributePropertyManager;
@@ -9,9 +7,6 @@ import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
 import parozzz.github.com.simpleplcpanel.hmi.tags.CommunicationTag;
 import parozzz.github.com.simpleplcpanel.hmi.tags.Tag;
 import parozzz.github.com.simpleplcpanel.hmi.tags.Taggable;
-
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 public class CommunicationTagAttributeProperty
         extends AttributeProperty<CommunicationTag>
@@ -32,7 +27,7 @@ public class CommunicationTagAttributeProperty
 
     public class TagData
             extends AttributeProperty<CommunicationTag>.Data
-            implements Taggable
+            implements Taggable, Tag.DeleteRunnable
     {
         private final Attribute attribute;
         protected TagData(Attribute attribute)
@@ -45,12 +40,14 @@ public class CommunicationTagAttributeProperty
             {
                 if(oldValue != null)
                 {
+                    oldValue.removeDeleteRunnable(this);
                     oldValue.removeTaggable(this);
                     oldValue.getReadIntermediate().removeNewValueRunnable(this);
                 }
 
                 if(newValue != null)
                 {
+                    newValue.addDeleteRunnable(this);
                     newValue.addTaggable(this);
                     newValue.getReadIntermediate().addNewValueRunnable(
                             this,
@@ -97,6 +94,12 @@ public class CommunicationTagAttributeProperty
                     super.setValue((CommunicationTag) tag);
                 }
             }
+        }
+
+        @Override
+        public void onTagDelete()
+        {
+            attribute.setValue(CommunicationTagAttributeProperty.this, null);
         }
     }
 

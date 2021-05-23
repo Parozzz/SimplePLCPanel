@@ -1,8 +1,6 @@
 package parozzz.github.com.simpleplcpanel.hmi.util.valueintermediate;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.IdentityHashMap;
 import java.util.Map;
 
 public abstract class ValueIntermediate
@@ -11,7 +9,7 @@ public abstract class ValueIntermediate
 
     public ValueIntermediate()
     {
-        this.newValueRunnableMap = new HashMap<>();
+        this.newValueRunnableMap = new IdentityHashMap<>();
     }
 
     public void addNewValueRunnable(Object key, Runnable runnable)

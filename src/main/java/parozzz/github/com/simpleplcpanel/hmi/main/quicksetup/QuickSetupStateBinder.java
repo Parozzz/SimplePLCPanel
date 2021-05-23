@@ -1,7 +1,6 @@
 package parozzz.github.com.simpleplcpanel.hmi.main.quicksetup;
 
 import javafx.beans.property.Property;
-import parozzz.github.com.simpleplcpanel.Nullable;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.Attribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeMap;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;

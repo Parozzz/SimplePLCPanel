@@ -10,7 +10,6 @@ import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.intermediate.SiemensS7
 import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.intermediate.SiemensS7WrappedDataIntermediate;
 import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.intermediate.SiemensS7WritableBitWrappedDataIntermediate;
 import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.intermediate.SiemensS7WritableWrappedDataIntermediate;
-import parozzz.github.com.simpleplcpanel.logger.Loggable;
 import parozzz.github.com.simpleplcpanel.logger.MainLogger;
 import parozzz.github.com.simpleplcpanel.util.concurrent.SettableConcurrentObject;
 

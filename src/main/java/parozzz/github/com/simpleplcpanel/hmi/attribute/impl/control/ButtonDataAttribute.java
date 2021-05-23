@@ -19,8 +19,4 @@ public final class ButtonDataAttribute extends Attribute
 
         super.getAttributePropertyManager().addAll(TYPE);
     }
-
-    @Override public void update()
-    {
-    }
 }

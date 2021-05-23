@@ -26,9 +26,4 @@ public class ValueAttribute extends Attribute
 
         this.getAttributePropertyManager().addAll(INTERMEDIATE_TYPE, MULTIPLY_BY, OFFSET);
     }
-
-    @Override public void update()
-    {
-
-    }
 }

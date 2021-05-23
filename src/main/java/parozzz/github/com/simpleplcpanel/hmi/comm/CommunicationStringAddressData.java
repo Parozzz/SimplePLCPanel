@@ -1,7 +1,5 @@
 package parozzz.github.com.simpleplcpanel.hmi.comm;
 
-import parozzz.github.com.simpleplcpanel.Nullable;
-import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.AddressAttribute;
 import parozzz.github.com.simpleplcpanel.util.Util;
 
 import java.util.ArrayList;

@@ -107,6 +107,11 @@ public final class RuntimeControlContainerStage extends HMIStage<StackPane>
         AnchorPane anchorPane;
         if (controlContainerPane != null)
         {
+            //This is avoid interference when switching from editing to runtime!
+            controlContainerPane.getControlWrapperSet().forEach(controlWrapper ->
+                    controlWrapper.getAttributeUpdater().updateAllAttributes()
+            );
+
             controlContainerPane.setActive(true);
             controlContainerPane.convertToReadOnly();
 

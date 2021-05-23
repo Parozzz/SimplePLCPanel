@@ -1,14 +1,7 @@
 package parozzz.github.com.simpleplcpanel.hmi.comm;
 
-import javafx.beans.property.Property;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.scene.control.CheckBox;
 import parozzz.github.com.simpleplcpanel.logger.Loggable;
 import parozzz.github.com.simpleplcpanel.logger.MainLogger;
-
-import java.awt.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 public abstract class CommThread<T extends CommunicationConnectionParams>
         extends Thread

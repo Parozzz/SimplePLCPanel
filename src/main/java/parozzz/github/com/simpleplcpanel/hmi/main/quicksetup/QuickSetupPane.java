@@ -3,25 +3,25 @@ package parozzz.github.com.simpleplcpanel.hmi.main.quicksetup;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.collections.ListChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import parozzz.github.com.simpleplcpanel.hmi.FXController;
+import parozzz.github.com.simpleplcpanel.hmi.attribute.Attribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapperSpecific;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.attributes.ControlWrapperGenericAttributeUpdateConsumer;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.state.WrapperState;
-import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.state.WrapperStateChangedConsumer;
 import parozzz.github.com.simpleplcpanel.hmi.main.MainEditStage;
 import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.impl.*;
 import parozzz.github.com.simpleplcpanel.hmi.pane.HMIPane;
 import parozzz.github.com.simpleplcpanel.hmi.pane.HidablePane;
 import parozzz.github.com.simpleplcpanel.hmi.tags.TagsManager;
-import parozzz.github.com.simpleplcpanel.hmi.tags.stage.TagStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
 
 import java.io.IOException;
@@ -50,7 +50,10 @@ public final class QuickSetupPane
 
     private final ChangeListener<Boolean> validControlWrapperListener;
     private final ControlWrapperGenericAttributeUpdateConsumer attributeUpdatedConsumer;
-    private final WrapperStateChangedConsumer stateChangeConsumer;
+    private final ChangeListener<WrapperState> wrapperStateChangeListener;
+    private final ListChangeListener<WrapperState> wrapperStateListChangeListener;
+
+    //private final WrapperStateChangedConsumer stateChangeConsumer;
 
     private final BooleanProperty visible;
 
@@ -89,27 +92,18 @@ public final class QuickSetupPane
             }
         };
         this.attributeUpdatedConsumer = updateData ->
+                updateData.getAttributeTypeCollection().forEach(stateBinder::loadValueFromControlWrapperOf);
+
+        this.wrapperStateChangeListener = (observable, oldValue, newValue) ->
         {
-            for (var attribute : updateData.getAttributeList())
+            if (newValue != null)
             {
-                var attributeType = attribute.getType();
-                stateBinder.loadValueFromControlWrapperOf(attributeType);
+                stateSelectionQuickSetupPanePart.changeState(newValue);
             }
         };
-        //Since this is trigged also when a state is added/removed it should be gucci here
-        this.stateChangeConsumer = (stateMap, oldState, changeType) ->
-        {
-            switch (changeType)
-            {
-                case ADD:
-                case REMOVE:
-                    stateSelectionQuickSetupPanePart.loadStatesOf(selectedControlWrapper);
-                    break;
-            }
 
-            stateSelectionQuickSetupPanePart.changeState(stateMap.getCurrentState());
-        };
-
+        this.wrapperStateListChangeListener = change ->
+                stateSelectionQuickSetupPanePart.loadStatesOf(selectedControlWrapper);
         this.visible = new SimpleBooleanProperty(true);
     }
 
@@ -175,7 +169,10 @@ public final class QuickSetupPane
         {
             selectedControlWrapper.validProperty().removeListener(validControlWrapperListener);
             selectedControlWrapper.getAttributeUpdater().removeGenericUpdateConsumer(attributeUpdatedConsumer);
-            selectedControlWrapper.getStateMap().removeStateValueChangedConsumer(stateChangeConsumer);
+
+            var stateMap = selectedControlWrapper.getStateMap();
+            stateMap.currentWrapperStateProperty().removeListener(wrapperStateChangeListener);
+            stateMap.wrapperStateListProperty().removeListener(wrapperStateListChangeListener);
         }
 
         this.selectedControlWrapper = controlWrapper;
@@ -191,7 +188,10 @@ public final class QuickSetupPane
 
         controlWrapper.validProperty().addListener(validControlWrapperListener);
         controlWrapper.getAttributeUpdater().addGenericUpdateConsumer(attributeUpdatedConsumer);
-        controlWrapper.getStateMap().addStateValueChangedConsumer(stateChangeConsumer);
+
+        var stateMap = controlWrapper.getStateMap();
+        stateMap.currentWrapperStateProperty().addListener(wrapperStateChangeListener);
+        stateMap.wrapperStateListProperty().addListener(wrapperStateListChangeListener);
 
         var children = paneVBox.getChildren();
         children.clear();

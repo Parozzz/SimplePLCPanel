@@ -3,10 +3,7 @@ package parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.attributes
 import parozzz.github.com.simpleplcpanel.hmi.FXObject;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 public final class ControlWrapperAttributeTypeManager extends FXObject
@@ -17,22 +14,6 @@ public final class ControlWrapperAttributeTypeManager extends FXObject
 
     public ControlWrapperAttributeTypeManager()
     {
-    }
-
-    public void forEach(Consumer<AttributeType<?>> consumer)
-    {
-        forEachState(consumer);
-        forEachGlobal(consumer);
-    }
-
-    public void forEachState(Consumer<AttributeType<?>> consumer)
-    {
-        stateAttributeTypeSet.forEach(consumer);
-    }
-
-    public void forEachGlobal(Consumer<AttributeType<?>> consumer)
-    {
-        globalAttributeTypeSet.forEach(consumer);
     }
 
     public void initialize(ControlWrapperAttributeInitializer<?> attributeInitializer)
@@ -73,7 +54,22 @@ public final class ControlWrapperAttributeTypeManager extends FXObject
 
     public boolean hasType(AttributeType<?> attributeType)
     {
-        return stateAttributeTypeSet.contains(attributeType) ||
-                globalAttributeTypeSet.contains(attributeType);
+        return attributeTypeSet.contains(attributeType);
+    }
+
+    public void forEachState(Consumer<AttributeType<?>> consumer)
+    {
+        stateAttributeTypeSet.forEach(consumer);
+    }
+
+    public void forEachGlobal(Consumer<AttributeType<?>> consumer)
+    {
+        globalAttributeTypeSet.forEach(consumer);
+    }
+
+    public void forEach(Consumer<AttributeType<?>> consumer)
+    {
+        forEachState(consumer);
+        forEachGlobal(consumer);
     }
 }

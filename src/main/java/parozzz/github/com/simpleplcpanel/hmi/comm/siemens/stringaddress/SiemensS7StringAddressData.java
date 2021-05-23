@@ -6,8 +6,6 @@ import parozzz.github.com.simpleplcpanel.PLC.siemens.data.SiemensS7ReadableData;
 import parozzz.github.com.simpleplcpanel.PLC.siemens.data.primitives.SiemensS7BitData;
 import parozzz.github.com.simpleplcpanel.PLC.siemens.data.primitives.SiemensS7StringData;
 import parozzz.github.com.simpleplcpanel.PLC.siemens.util.SiemensS7AreaType;
-import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.AddressAttribute;
-import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.propertyholders.SiemensS7AttributePropertyHolder;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationStringAddressData;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
 

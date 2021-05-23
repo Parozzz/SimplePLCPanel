@@ -1,7 +1,6 @@
 package parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.attributechanger;
 
 import javafx.beans.property.Property;
-import javafx.beans.value.ObservableValue;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.Attribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.property.AttributeProperty;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.SetupPane;
@@ -10,11 +9,14 @@ import parozzz.github.com.simpleplcpanel.logger.MainLogger;
 
 import java.util.function.Function;
 
-public final class SetupPaneAttributeChanger<A extends Attribute> implements Loggable
+public final class SetupPaneAttributeChanger<A extends Attribute>
+        implements Loggable
 {
     private final SetupPane<A> setupPane;
     private final PropertyBis<?, ?> propertyBis;
-    private boolean dataChanged = false;
+    private A attribute;
+    private boolean ignoreUpdate;
+    //private boolean dataChanged = false;
 
     public <V> SetupPaneAttributeChanger(SetupPane<A> setupPane,
             Property<V> property,
@@ -32,7 +34,26 @@ public final class SetupPaneAttributeChanger<A extends Attribute> implements Log
         this.setupPane = setupPane;
         this.propertyBis = new PropertyBis<>(attributeProperty, property, propertyToAttributeConvert, attributeToPropertyConvert);
 
-        bindValueChangedObservableValue(property);
+        property.addListener((tObservableValue, oldValue, newValue) ->
+        {
+            if(attribute != null)
+            {
+                ignoreUpdate = true;
+                propertyBis.setDataToAttribute(attribute);
+                ignoreUpdate = false;
+            }
+/*
+            if(oldValue == null)
+            {
+                if(newValue != null)
+                {
+                    dataChanged = true;
+                }
+            }else if(!oldValue.equals(newValue))
+            {
+                dataChanged = true;
+            }*/
+        });
     }
 
     public PropertyBis<?, ?> getPropertyBis()
@@ -44,7 +65,7 @@ public final class SetupPaneAttributeChanger<A extends Attribute> implements Log
     {
         return propertyBis.property;
     }
-
+/*
     public void resetDataChanged()
     {
         dataChanged = false;
@@ -54,22 +75,33 @@ public final class SetupPaneAttributeChanger<A extends Attribute> implements Log
     {
         return dataChanged;
     }
+*/
 
-    private void bindValueChangedObservableValue(ObservableValue<?> observableValue)
+    public void bindToAttribute(A attribute)
     {
-        observableValue.addListener((tObservableValue, oldValue, newValue) ->
+        this.attribute = attribute;
+
+        propertyBis.copyDataFromAttribute(attribute);
+        attribute.addAttributeUpdaterRunnable(this, () ->
         {
-            if(oldValue == null)
+            if(this.attribute == null || ignoreUpdate)
             {
-                if(newValue != null)
-                {
-                    dataChanged = true;
-                }
-            }else if(!oldValue.equals(newValue))
-            {
-                dataChanged = true;
+                return;
             }
+
+            propertyBis.copyDataFromAttribute(attribute);
         });
+    }
+
+    public void unbind()
+    {
+        if(attribute != null)
+        {
+            attribute.removeAttributeUpdaterRunnable(this);
+            attribute = null;
+        }
+        //Better call this after the current attribute is cleared otherwise everything will be reset...
+        propertyBis.clear();
     }
 
     public void copyDataFromAttribute(A attribute)
@@ -103,6 +135,17 @@ public final class SetupPaneAttributeChanger<A extends Attribute> implements Log
             this.property = property;
             this.propertyToAttributeConvert = propertyToAttributeConvert;
             this.attributeToPropertyConvert = attributeToPropertyConvert;
+        }
+
+        public void clear()
+        {
+            var undoRedoManager = setupPane.getSetupStage().getUndoRedoManager();
+            undoRedoManager.setIgnoreNew(true); //Ignore all the actions while copying data to an SetupPane
+
+            var defaultValue = attributeProperty.getDefaultValue();
+            property.setValue(attributeToPropertyConvert.apply(defaultValue));
+
+            undoRedoManager.setIgnoreNew(false);
         }
 
         public void revertToDefaultValues(A attribute)
@@ -145,9 +188,8 @@ public final class SetupPaneAttributeChanger<A extends Attribute> implements Log
                 }
                 else
                 {
-                    var propertyValue = property.getValue();
                     var attributeConvertedValue = attributeToPropertyConvert.apply(attributeValue);
-                    if(attributeConvertedValue != null && !attributeConvertedValue.equals(propertyValue)) //This way to avoid propertyValue NullPointerException
+                    if(attributeConvertedValue != null)
                     { //This is to avoid problems where the value has changed and get set immediately again causing glitching on controls
                         property.setValue(attributeConvertedValue);
                     }
@@ -180,7 +222,10 @@ public final class SetupPaneAttributeChanger<A extends Attribute> implements Log
                 else
                 {
                     var propertyConvertedValue = propertyToAttributeConvert.apply(propertyValue);
-                    attribute.setValue(attributeProperty, propertyConvertedValue);
+                    if(propertyConvertedValue != null)
+                    {
+                        attribute.setValue(attributeProperty, propertyConvertedValue);
+                    }
                 }
             }
             catch(Exception exception)

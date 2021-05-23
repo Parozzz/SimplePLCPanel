@@ -5,8 +5,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.Attribute;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
 
-import java.util.Objects;
-
 public abstract class AttributeProperty<T>
 {
     protected final String key;

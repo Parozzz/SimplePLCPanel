@@ -82,5 +82,7 @@ public class BackgroundAttribute extends Attribute
         var cornerRadii = this.getValue(CORNER_RADII);
         var backgroundFill = new BackgroundFill(backgroundColor, new CornerRadii(cornerRadii), Insets.EMPTY);
         background = new Background(Collections.singletonList(backgroundFill), backgroundImageList);
+
+        super.update(); //This will call the Update Runnables
     }
 }

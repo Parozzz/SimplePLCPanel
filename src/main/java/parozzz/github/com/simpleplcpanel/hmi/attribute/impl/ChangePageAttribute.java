@@ -20,10 +20,4 @@ public final class ChangePageAttribute extends Attribute
 
         super.getAttributePropertyManager().addAll(ENABLED, PAGE_NAME);
     }
-
-    @Override
-    public void update()
-    {
-
-    }
 }

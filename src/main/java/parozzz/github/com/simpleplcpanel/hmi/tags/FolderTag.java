@@ -23,7 +23,7 @@ public final class FolderTag extends Tag
     @Nullable
     public ContextMenu createContextMenu()
     {
-        return ContextMenuBuilder.builder()
+        return ContextMenuBuilder.builder(super.createContextMenu())
                 .simple("Add tag", this::addTag)
                 .simple("Add folder", this::addFolder)
                 .getContextMenu();
@@ -33,6 +33,18 @@ public final class FolderTag extends Tag
     public void delete()
     {
         super.delete();
+
+        if(super.treeItem != null)
+        {
+            for(var child : treeItem.getChildren())
+            {
+                var childTag = child.getValue();
+                if(childTag != null)
+                {
+                    childTag.delete();
+                }
+            }
+        }
     }
 
     private void addTag()
