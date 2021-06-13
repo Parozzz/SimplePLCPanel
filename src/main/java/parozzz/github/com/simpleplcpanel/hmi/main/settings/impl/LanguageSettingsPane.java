@@ -24,18 +24,18 @@ public class LanguageSettingsPane extends SettingsPane
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         super.serializableDataSet.addString("ONBooleanPlaceholder", onBooleanPlaceholderTextField.textProperty(), "On")
                 .addString("OFFBooleanPlaceholder", offBooleanPlaceholderTextField.textProperty(), "Off");
     }
 
     @Override
-    public void setDefault()
+    public void onSetDefault()
     {
-        super.setDefault();
+        super.onSetDefault();
 
         onBooleanPlaceholderTextField.setText("On");
         offBooleanPlaceholderTextField.setText("Off");

@@ -28,9 +28,9 @@ public final class DraggableControlCreator<C extends Control> extends FXControll
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         creatorButton.addEventFilter(MouseEvent.MOUSE_PRESSED, mouseEvent ->
         {

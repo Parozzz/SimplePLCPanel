@@ -41,9 +41,9 @@ public final class TextSetupPane extends SetupPane<TextAttribute>
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         appendValuePlaceholderButton.setOnAction(actionEvent -> textArea.setText(textArea.getText() + ControlWrapper.VALUE_PLACEHOLDER));
 
@@ -56,7 +56,7 @@ public final class TextSetupPane extends SetupPane<TextAttribute>
         newLineSpacingComboBox.getEditor().setTextFormatter(FXTextFormatterUtil.simpleInteger(2));
 
         super.getAttributeChangerList().create(textArea.textProperty(), TextAttribute.TEXT)
-                .create(newLineAlignmentChoiceBox.valueProperty(), TextAttribute.TEXT_ALIGNMENT)
+                .create(newLineAlignmentChoiceBox.valueProperty(), TextAttribute.ALIGNMENT)
                 .create(newLineSpacingComboBox.valueProperty(), TextAttribute.LINE_SPACING);
 
         super.computeProperties();

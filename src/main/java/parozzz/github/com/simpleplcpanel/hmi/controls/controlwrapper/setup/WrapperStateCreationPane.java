@@ -40,9 +40,9 @@ class WrapperStateCreationPane extends FXObject implements SetupSelectable
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         /*vBox.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent ->
         {

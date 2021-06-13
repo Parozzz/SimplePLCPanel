@@ -22,9 +22,9 @@ public class ControlWrapperCopyPasteHandler extends FXObject
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
         mainEditStage.getStageSetter().addEventFilter(KeyEvent.KEY_PRESSED, keyEvent ->
         {
             var controlContainerPane = mainEditStage.getShownControlContainerPane();

@@ -104,9 +104,9 @@ public abstract class ControlWrapper<C extends Control>
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         serializableDataSet.addInt("LayoutX", containerStackPane.layoutXProperty(), 0)
                 .addInt("LayoutY", containerStackPane.layoutYProperty(), 0);
@@ -230,9 +230,9 @@ public abstract class ControlWrapper<C extends Control>
     }
 
     @Override
-    public void setupComplete()
+    public void onSetupComplete()
     {
-        super.setupComplete();
+        super.onSetupComplete();
 
         attributeUpdater.updateAllAttributes();
         ControlWrapperBorderCreator.applyDashedBorder(this);
@@ -559,5 +559,19 @@ public abstract class ControlWrapper<C extends Control>
         containerStackPane.setAlignment(Pos.CENTER);
         containerStackPane.setMinSize(10, 10);
         containerStackPane.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+    }
+
+    public abstract ControlWrapper<?> createInstance();
+
+    public ControlWrapper<?> clone()
+    {
+        var cloneControlWrapper = this.createInstance();
+        cloneControlWrapper.onSetup();
+
+        this.stateMap.copyInto(cloneControlWrapper.stateMap);
+        this.globalAttributeMap.copyInto(cloneControlWrapper.globalAttributeMap);
+
+        cloneControlWrapper.onSetupComplete();
+        return cloneControlWrapper;
     }
 }

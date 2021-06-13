@@ -31,6 +31,8 @@ public final class JavaFXMain extends Application
 
             this.hmiStarter = new HMIStarter(saveFile);
             this.hmiStarter.startEditingEngine();
+
+            new ListViewTest().showStage();
         }
         catch(Exception exception)
         {

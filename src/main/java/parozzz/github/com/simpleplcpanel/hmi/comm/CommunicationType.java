@@ -98,8 +98,8 @@ public final class CommunicationType<ASD extends CommunicationStringAddressData>
             var stringAddressCreatorStage = stringAddressCreatorStageSupplier.supply();
             if (stringAddressCreatorStage != null)
             {
-                stringAddressCreatorStage.setup();
-                stringAddressCreatorStage.setDefault();
+                stringAddressCreatorStage.onSetup();
+                stringAddressCreatorStage.onSetDefault();
                 return stringAddressCreatorStage;
             }
         } catch (IOException exception)

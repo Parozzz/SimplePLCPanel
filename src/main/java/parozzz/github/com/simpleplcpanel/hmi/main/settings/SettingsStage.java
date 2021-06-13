@@ -38,9 +38,9 @@ public class SettingsStage extends HMIStage<StackPane>
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         topLabel.setText("Settings");
 
@@ -48,9 +48,9 @@ public class SettingsStage extends HMIStage<StackPane>
     }
 
     @Override
-    public void setupComplete()
+    public void onSetupComplete()
     {
-        super.setDefault();
+        super.onSetDefault();
 
         languagePageButton.getOnAction().handle(new ActionEvent());
     }

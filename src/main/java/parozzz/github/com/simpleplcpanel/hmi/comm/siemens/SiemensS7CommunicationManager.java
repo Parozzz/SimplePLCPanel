@@ -1,113 +1,98 @@
 package parozzz.github.com.simpleplcpanel.hmi.comm.siemens;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
+import javafx.util.converter.NumberStringConverter;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommUtils;
 import parozzz.github.com.simpleplcpanel.hmi.comm.NetworkCommunicationManager;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXTextFormatterUtil;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
-import parozzz.github.com.simpleplcpanel.logger.MainLogger;
-import parozzz.github.com.simpleplcpanel.util.Util;
-import parozzz.github.com.simpleplcpanel.util.concurrent.SettableConcurrentObject;
 
 import java.io.IOException;
 import java.util.stream.Stream;
 
-public final class SiemensS7CommunicationManager extends NetworkCommunicationManager<SiemensS7Thread>
+public final class SiemensS7CommunicationManager extends NetworkCommunicationManager<SiemensS7ConnectionParams>
 {
-    @FXML
-    private TextField address1TextField;
-    @FXML
-    private TextField address2TextField;
-    @FXML
-    private TextField address3TextField;
-    @FXML
-    private TextField address4TextField;
-    @FXML
-    private TextField rackTextField;
-    @FXML
-    private TextField slotTextField;
-
-    @FXML
-    private Label modelLabel;
+    @FXML private TextField rackTextField;
+    @FXML private TextField slotTextField;
+    @FXML private Label modelLabel;
 
     private final StackPane mainStackPane;
 
-    private final SettableConcurrentObject<String> modelObject;
-    private boolean queryModelNumber = false;
+    private final IntegerProperty rack;
+    private final IntegerProperty slot;
+    private final StringProperty model;
 
-    public SiemensS7CommunicationManager(SiemensS7Thread plcThread) throws IOException
+    //private final SettableConcurrentObject<String> modelObject;
+    //private boolean queryModelNumber = false;
+
+    public SiemensS7CommunicationManager() throws IOException
     {
-        super("SiemensPLCCommunicationManager", plcThread);
+        super("SiemensPLCCommunicationManager");
 
         mainStackPane = (StackPane) FXUtil.loadFXML("siemensCommPane.fxml", this);
 
-        this.modelObject = new SettableConcurrentObject<>();
+        this.rack = new SimpleIntegerProperty();
+        this.slot = new SimpleIntegerProperty();
+        this.model = new SimpleStringProperty();
+
+        //this.modelObject = new SettableConcurrentObject<>();
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
-        serializableDataSet.addString("Address1", address1TextField.textProperty(), CommUtils.DEFAULT_IP1_STRING)
-                .addString("Address2", address2TextField.textProperty(), CommUtils.DEFAULT_IP2_STRING)
-                .addString("Address3", address3TextField.textProperty(), CommUtils.DEFAULT_IP3_STRING)
-                .addString("Address4", address4TextField.textProperty(), CommUtils.DEFAULT_IP4_STRING)
-                .addString("Slot", slotTextField.textProperty(), CommUtils.DEFAULT_SIEMENS_SLOT_STRING)
-                .addString("Rack", rackTextField.textProperty(), CommUtils.DEFAULT_SIEMENS_RACK_STRING);
+        serializableDataSet.addInt("Rack", rack, 0)
+                .addInt("Slot", slot, 2);
 
-        Stream.of(address1TextField, address2TextField, address3TextField, address4TextField).forEach(textField ->
-                textField.setTextFormatter(FXTextFormatterUtil.positiveInteger(3))
-        );
-
-        super.registerSwitchToNextTextFieldOnDecimalPress(address1TextField, address2TextField);
-        super.registerSwitchToNextTextFieldOnDecimalPress(address2TextField, address3TextField);
-        super.registerSwitchToNextTextFieldOnDecimalPress(address3TextField, address4TextField);
-
+        rackTextField.textProperty().bindBidirectional(rack, new NumberStringConverter());
+        slotTextField.textProperty().bindBidirectional(slot, new NumberStringConverter());
         Stream.of(rackTextField, slotTextField).forEach(textField ->
                 textField.setTextFormatter(FXTextFormatterUtil.positiveInteger(2))
         );
+
+        model.bindBidirectional(modelLabel.textProperty());
     }
 
     @Override
-    public void setDefault()
+    public void onSetDefault()
     {
-        super.setDefault();
-
-        address1TextField.setText(CommUtils.DEFAULT_IP1_STRING);
-        address2TextField.setText(CommUtils.DEFAULT_IP2_STRING);
-        address3TextField.setText(CommUtils.DEFAULT_IP3_STRING);
-        address4TextField.setText(CommUtils.DEFAULT_IP4_STRING);
+        super.onSetDefault();
 
         rackTextField.setText(CommUtils.DEFAULT_SIEMENS_RACK_STRING);
         slotTextField.setText(CommUtils.DEFAULT_SIEMENS_SLOT_STRING);
     }
 
     @Override
-    public void loop()
+    public void onLoop()
     {
-        super.loop();
-
-        if(!commThread.isActive())
+        super.onLoop();
+/*
+        if (!commThread.isActive())
         {
             return;
         }
 
-        if(queryModelNumber && commThread.isConnected())
+        if (queryModelNumber && commThread.isConnected())
         {
             commThread.queryModel(modelObject);
             queryModelNumber = false;
         }
 
-        if(modelObject.isObjectSet())
+        if (modelObject.isObjectSet())
         {
             modelLabel.setText(modelObject.getObject());
             modelObject.reset();
-        }
+        }*/
     }
 
     @Override
@@ -116,6 +101,31 @@ public final class SiemensS7CommunicationManager extends NetworkCommunicationMan
         return mainStackPane;
     }
 
+    @Override
+    protected SiemensS7ConnectionParams createConnectionParams()
+    {
+        var ipAddress = super.getIpAddress();
+        return ipAddress == null
+                ? null
+                : new SiemensS7ConnectionParams(ipAddress, rack.get(), slot.get());
+    }
+
+    public IntegerProperty rackProperty()
+    {
+        return rack;
+    }
+
+    public IntegerProperty slotProperty()
+    {
+        return slot;
+    }
+
+    public StringProperty modelProperty()
+    {
+        return model;
+    }
+
+    /*
     @Override
     public void parseAndUpdateCommunicationParams()
     {
@@ -126,7 +136,7 @@ public final class SiemensS7CommunicationManager extends NetworkCommunicationMan
             var slot = Util.parseInt(slotTextField.getText(), -1);
             var rack = Util.parseInt(rackTextField.getText(), -1);
 
-            if(ipAddress == null || slot < 0 || rack < 0)
+            if (ipAddress == null || slot < 0 || rack < 0)
             {
                 MainLogger.getInstance().info("Communication parameters for Siemens S7 PLC are invalid", this);
                 return;
@@ -134,11 +144,10 @@ public final class SiemensS7CommunicationManager extends NetworkCommunicationMan
 
             commThread.setConnectionParameters(new SiemensS7ConnectionParams(ipAddress, slot, rack));
             queryModelNumber = true;
-        }
-        catch(NumberFormatException exception)
+        } catch (NumberFormatException exception)
         {
             MainLogger.getInstance().warning("Something went wrong while setting communication parameters for Siemens S7 PLC",
                     exception, this);
         }
-    }
+    }*/
 }

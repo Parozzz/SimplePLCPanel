@@ -1,4 +1,4 @@
-package parozzz.github.com.simpleplcpanel.hmi.database.dataupdater;
+package parozzz.github.com.simpleplcpanel.hmi.tags.updater;
 
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
@@ -14,7 +14,6 @@ import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.intermediate.word.Modbu
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.intermediate.word.ModbusWriteWordIntermediate;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.stringaddress.ModbusStringAddressData;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.tcp.ModbusTCPThread;
-import parozzz.github.com.simpleplcpanel.hmi.database.ControlContainerDatabase;
 import parozzz.github.com.simpleplcpanel.hmi.tags.CommunicationTag;
 import parozzz.github.com.simpleplcpanel.hmi.tags.TagsManager;
 import parozzz.github.com.simpleplcpanel.hmi.util.valueintermediate.ValueIntermediate;
@@ -22,32 +21,30 @@ import parozzz.github.com.simpleplcpanel.hmi.util.valueintermediate.ValueInterme
 import java.util.Objects;
 import java.util.Set;
 
-public final class ModbusTCPDataUpdater extends ControlDataUpdater<ModbusTCPThread>
+public final class ModbusTCPValueUpdater extends TagValueUpdater<ModbusTCPThread>
 {
-    public static ModbusTCPDataUpdater createInstance(TagsManager tagsManager,
-            ControlContainerDatabase controlContainerDatabase,
+    public static ModbusTCPValueUpdater createInstance(TagsManager tagsManager,
             CommunicationDataHolder communicationDataHolder)
     {
         var modbusTCPThread = communicationDataHolder.getCommThread(CommunicationType.MODBUS_TCP, ModbusTCPThread.class);
         Objects.requireNonNull(modbusTCPThread, "ModbusTCPThread is null while creating ModbusTCPDataUpdater?");
 
-        return new ModbusTCPDataUpdater(tagsManager, controlContainerDatabase, communicationDataHolder, modbusTCPThread);
+        return new ModbusTCPValueUpdater(tagsManager, communicationDataHolder, modbusTCPThread);
     }
 
-    private ModbusTCPDataUpdater(TagsManager tagsManager, ControlContainerDatabase controlContainerDatabase,
+    private ModbusTCPValueUpdater(TagsManager tagsManager,
             CommunicationDataHolder communicationDataHolder, ModbusTCPThread modbusTCPThread)
     {
-        super(tagsManager, CommunicationType.MODBUS_TCP, controlContainerDatabase,
-                communicationDataHolder, modbusTCPThread);
+        super(tagsManager, CommunicationType.MODBUS_TCP, communicationDataHolder, modbusTCPThread);
     }
 
     @Override
     public void parseReadData()
     {
-        this.parseReadOnlySet(commThread.getReadCoilSet());
-        this.parseReadOnlySet(commThread.getReadDiscreteInputsSet());
-        this.parseReadOnlySet(commThread.getReadHoldingRegisterSet());
-        this.parseReadOnlySet(commThread.getReadInputRegistersSet());
+        this.parseReadOnlySet(communicationThread.getReadCoilSet());
+        this.parseReadOnlySet(communicationThread.getReadDiscreteInputsSet());
+        this.parseReadOnlySet(communicationThread.getReadHoldingRegisterSet());
+        this.parseReadOnlySet(communicationThread.getReadInputRegistersSet());
     }
 
     private void parseReadOnlySet(Set<? extends ReadOnlyIntermediate> intermediateSet)
@@ -61,27 +58,27 @@ public final class ModbusTCPDataUpdater extends ControlDataUpdater<ModbusTCPThre
     @Override
     public void update()
     {
-        if (commThread.isUpdating())
+        if (communicationThread.isUpdating())
         {
             return;
         }
 
-        var readHoldingRegisterSet = commThread.getReadHoldingRegisterSet();
+        var readHoldingRegisterSet = communicationThread.getReadHoldingRegisterSet();
         readHoldingRegisterSet.clear();
 
-        var writeHoldingRegisterSet = commThread.getWriteHoldingRegisterSet();
+        var writeHoldingRegisterSet = communicationThread.getWriteHoldingRegisterSet();
         writeHoldingRegisterSet.clear();
 
-        var writeCoilsSet = commThread.getWriteCoilSet();
+        var writeCoilsSet = communicationThread.getWriteCoilSet();
         writeCoilsSet.clear();
 
-        var readCoilsSet = commThread.getReadCoilSet();
+        var readCoilsSet = communicationThread.getReadCoilSet();
         readCoilsSet.clear();
 
-        var readDiscreteInputsSet = commThread.getReadDiscreteInputsSet();
+        var readDiscreteInputsSet = communicationThread.getReadDiscreteInputsSet();
         readDiscreteInputsSet.clear();
 
-        var readInputRegistersSet = commThread.getReadInputRegistersSet();
+        var readInputRegistersSet = communicationThread.getReadInputRegistersSet();
         readInputRegistersSet.clear();
 
         for (var tag : tagsManager)
@@ -223,7 +220,7 @@ public final class ModbusTCPDataUpdater extends ControlDataUpdater<ModbusTCPThre
                 && readDiscreteInputsSet.isEmpty()
                 && readInputRegistersSet.isEmpty()))
         {
-            commThread.doUpdate();
+            communicationThread.doUpdate();
         }
     }
 

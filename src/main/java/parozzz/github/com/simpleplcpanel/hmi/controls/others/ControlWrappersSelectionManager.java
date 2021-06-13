@@ -64,9 +64,9 @@ public final class ControlWrappersSelectionManager extends FXObject
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         //Mouse pressed is better here otherwise when releasing the mouse outside one it will clear selection
         controlContainerPane.getMainAnchorPane().addEventFilter(MouseEvent.MOUSE_PRESSED, mouseEvent ->

@@ -40,12 +40,7 @@ public final class HMIStarter
     {
         try
         {
-            for(var commThread : communicationDataHolder.getCommThreadCollection())
-            {
-                commThread.start();
-            }
-
-            hmiManager.setup();
+            hmiManager.onSetup();
             if(saveFile.exists())
             {
                 var jsonParser = new JSONParser();
@@ -59,19 +54,19 @@ public final class HMIStarter
                         hmiManager.deserialize(jsonDataMap);
                     }else
                     {
-                        hmiManager.setDefault();
+                        hmiManager.onSetDefault();
                     }
                 }
                 catch(ParseException exception)
                 {
-                    hmiManager.setDefault();
+                    hmiManager.onSetDefault();
 
                     MainLogger.getInstance().error("Error while Parsing Saved Data", exception, this);
                 }
             }
-            hmiManager.setupComplete();
+            hmiManager.onSetupComplete();
 
-            FXUtil.runEveryMillis(1, hmiManager::loop);
+            FXUtil.runEveryMillis(1, hmiManager::onLoop);
             //FXUtil.runEverySecond(60, this::saveData);
 
             //Stop the JavaFX platform is no windows are open
@@ -101,17 +96,9 @@ public final class HMIStarter
         {
             this.saveData();
 
-            for(var commThread : communicationDataHolder.getCommThreadCollection())
-            {
-                commThread.setStop();
-            }
-            MainLogger.getInstance().setStop();
+            hmiManager.onStop();
 
-            //Waits for all the threads to stop
-            for(var commThread : communicationDataHolder.getCommThreadCollection())
-            {
-                commThread.join();
-            }
+            MainLogger.getInstance().setStop();
             MainLogger.getInstance().join();
         }
         catch(Exception exception)

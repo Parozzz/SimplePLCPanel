@@ -11,7 +11,7 @@ public class ReadAddressAttribute extends AddressAttribute
     public static final AttributeProperty<CommunicationTag> READ_TAG =
             new CommunicationTagAttributeProperty("ReadTag", true);
 
-    public static final String ATTRIBUTE_NAME = "READ_ADDRESS_ATTRIBUTE";
+    public static final String ATTRIBUTE_NAME = "READ_ADDRESS";
     public ReadAddressAttribute(AttributeMap attributeMap)
     {
         super(attributeMap, AttributeType.READ_ADDRESS, ATTRIBUTE_NAME);

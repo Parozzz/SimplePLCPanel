@@ -25,7 +25,6 @@ import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrap
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.ControlWrapperSetupStage;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.quicktext.ControlWrapperQuickTextEditorStage;
 import parozzz.github.com.simpleplcpanel.hmi.controls.others.ControlWrappersSelectionManager;
-import parozzz.github.com.simpleplcpanel.hmi.database.ControlContainerDatabase;
 import parozzz.github.com.simpleplcpanel.hmi.main.MainEditStage;
 import parozzz.github.com.simpleplcpanel.hmi.main.PageScrollingPane;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.JSONSerializables;
@@ -87,9 +86,9 @@ public class ControlContainerPane extends FXController implements Loggable
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         super.serializableDataSet.addParsable("BackgroundColor", backgroundColorProperty, JSONSerializables.COLOR)
                 .addString("BackgroundPictureName", backgroundPictureNameProperty);
@@ -174,9 +173,9 @@ public class ControlContainerPane extends FXController implements Loggable
     }
 
     @Override
-    public void setupComplete()
+    public void onSetupComplete()
     {
-        super.setupComplete();
+        super.onSetupComplete();
 
         //This is required since the snapshot is not done correctly if the AnchorPane is not inside a
         //stage and showed (Says otherwise inside JavaDoc but background is always white).
@@ -249,11 +248,11 @@ public class ControlContainerPane extends FXController implements Loggable
     private ControlWrapper<?> createControlWrapper(ControlWrapperType<?, ?> wrapperType, boolean setDefault)
     {
         var controlWrapper = wrapperType.createWrapper(this);
-        controlWrapper.setup();
+        controlWrapper.onSetup();
         if (setDefault)
         {
-            controlWrapper.setDefault();
-            controlWrapper.setupComplete();
+            controlWrapper.onSetDefault();
+            controlWrapper.onSetupComplete();
         }
 
         this.addControlWrapper(controlWrapper);

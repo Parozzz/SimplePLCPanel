@@ -67,9 +67,9 @@ public final class AddressQuickSetupPanePart
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         topLabel.setText(readOnly ? "Read Tag" : "Write Tag");
 

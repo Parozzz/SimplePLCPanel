@@ -20,7 +20,7 @@ import parozzz.github.com.simpleplcpanel.hmi.controls.ControlContainerCreationSt
 import parozzz.github.com.simpleplcpanel.hmi.controls.ControlContainerPane;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.ControlWrapperSetupStage;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.quicktext.ControlWrapperQuickTextEditorStage;
-import parozzz.github.com.simpleplcpanel.hmi.database.ControlContainerDatabase;
+import parozzz.github.com.simpleplcpanel.hmi.controls.ControlContainerDatabase;
 import parozzz.github.com.simpleplcpanel.hmi.main.dragdrop.DragAndDropPane;
 import parozzz.github.com.simpleplcpanel.hmi.main.others.MessagesListStage;
 import parozzz.github.com.simpleplcpanel.hmi.main.others.copypaste.ControlWrapperCopyPasteHandler;
@@ -139,7 +139,7 @@ public final class MainEditStage extends BorderPaneHMIStage
         this.saveDataRunnable = saveDataRunnable;
 
         super   //HANDLERS AND VARIOUS
-                .addFXChild(controlContainerDatabase = new ControlContainerDatabase(this, tagsManager, communicationDataHolder))
+                .addFXChild(controlContainerDatabase = new ControlContainerDatabase(this))
                 .addFXChild(copyPasteHandler = new ControlWrapperCopyPasteHandler(this))
                 //SIDE PANES
                 .addFXChild(dragAndDropPane = new DragAndDropPane(this)) //LEFT
@@ -160,9 +160,9 @@ public final class MainEditStage extends BorderPaneHMIStage
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         var saveKeyCombination = KeyCombination.keyCombination("CTRL+S");
 
@@ -300,9 +300,9 @@ public final class MainEditStage extends BorderPaneHMIStage
     }
 
     @Override
-    public void setDefault()
+    public void onSetDefault()
     {
-        super.setDefault();
+        super.onSetDefault();
 
         zoomTextField.setText("100");
         pageWidthTextField.setText("640");
@@ -310,17 +310,16 @@ public final class MainEditStage extends BorderPaneHMIStage
     }
 
     @Override
-    public void loop()
+    public void onLoop()
     {
-        super.loop();
+        super.onLoop();
 
         if(super.every(1000))
         {
-            var selectedCommunicationManager = communicationDataHolder.getCommunicationStage().getSelectedCommunicationManager();
-            if(selectedCommunicationManager != null)
+            var currentCommThread = communicationDataHolder.getCurrentCommThread();
+            if(currentCommThread != null)
             {
-                var isConnected = selectedCommunicationManager.getCommThread().isConnected();
-                plcConnectedCircle.setFill(isConnected ? Color.GREEN : Color.RED);
+                plcConnectedCircle.setFill(currentCommThread.isConnected() ? Color.GREEN : Color.RED);
             }
 
             messagePresentTrig.set(messagesListStage.areMessagesPresent());
@@ -337,9 +336,9 @@ public final class MainEditStage extends BorderPaneHMIStage
     }
 
     @Override
-    public void setupComplete()
+    public void onSetupComplete()
     {
-        super.setupComplete();
+        super.onSetupComplete();
 
         //On setup complete, if there is any page, open the first.
         /*

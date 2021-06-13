@@ -37,9 +37,9 @@ public final class TagStageSelectionHandler
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         selectButtonStackPane.setMinSize(0, 0);
         selectButtonStackPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);

@@ -35,9 +35,9 @@ public class InputWrapper extends ControlWrapper<TextField>
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         control.textProperty().addListener((observableValue, oldValue, newValue) -> {
             var writeAttribute = AttributeFetcher.fetch(InputWrapper.this, AttributeType.WRITE_ADDRESS);
@@ -80,8 +80,8 @@ public class InputWrapper extends ControlWrapper<TextField>
                                     control.getProperties().put(FXVK.VK_TYPE_PROP_KEY, FXVK.Type.NUMERIC.ordinal());
                                     control.setTextFormatter(
                                             FXTextFormatterUtil.integerBuilder()
-                                                    .max(attribute.getValue(InputDataAttribute.INTEGER_MAX_VALUE))
-                                                    .min(attribute.getValue(InputDataAttribute.INTEGER_MIN_VALUE))
+                                                    .max(attribute.getValue(InputDataAttribute.INT_MAX_VALUE))
+                                                    .min(attribute.getValue(InputDataAttribute.INT_MIN_VALUE))
                                                     .getTextFormatter()
                                     );
                                     break;
@@ -113,14 +113,14 @@ public class InputWrapper extends ControlWrapper<TextField>
                             }
 
                             control.setFont(((FontAttribute) attribute).getFont());
-                            control.setAlignment(attribute.getValue(FontAttribute.TEXT_POSITION));
+                            control.setAlignment(attribute.getValue(FontAttribute.POSITION));
 
                             var text = (Text) control.lookup(".text");
                             if (text != null)
                             {
                                 //Seems like unbinding stuff that is not meant to cause graphical glitches :(
                                 text.setUnderline(attribute.getValue(FontAttribute.UNDERLINE));
-                                text.fillProperty().bind(attribute.getProperty(FontAttribute.TEXT_COLOR));
+                                text.fillProperty().bind(attribute.getProperty(FontAttribute.COLOR));
                             }
 
                             var caretPath = FXNodeUtil.getCaret(control); //Set this after to have it revert after changing the text fill
@@ -131,6 +131,12 @@ public class InputWrapper extends ControlWrapper<TextField>
                         }
                     }
                 });
+    }
+
+    @Override
+    public ControlWrapper<?> createInstance()
+    {
+        return new InputWrapper(super.getControlMainPage());
     }
 
 }

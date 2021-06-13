@@ -42,7 +42,7 @@ public abstract class FXObject implements JSONSerializable
         return disabled;
     }
 
-    public void setup()
+    public void onSetup()
     {
         Validate.needFalse("Trying to execute a setup for " + this.getFXObjectName() + " twice", setupDone);
         setupDone = true;
@@ -53,17 +53,22 @@ public abstract class FXObject implements JSONSerializable
         return setupDone;
     }
 
-    public void setDefault()
+    public void onSetDefault()
     {
 
     }
 
-    public void loop()
+    public void onLoop()
     {
 
     }
 
-    public void setupComplete()
+    public void onSetupComplete()
+    {
+
+    }
+
+    public void onStop()
     {
 
     }

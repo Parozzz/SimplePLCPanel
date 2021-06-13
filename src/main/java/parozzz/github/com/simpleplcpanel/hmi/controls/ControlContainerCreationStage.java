@@ -8,7 +8,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import parozzz.github.com.simpleplcpanel.hmi.database.ControlContainerDatabase;
 import parozzz.github.com.simpleplcpanel.hmi.pane.PaneHMIStage;
 
 import java.io.IOException;
@@ -42,9 +41,9 @@ public class ControlContainerCreationStage extends PaneHMIStage<VBox>
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         var stageSetter = super.getStageSetter()
                 .setOnWindowCloseRequest(windowEvent -> this.reset());

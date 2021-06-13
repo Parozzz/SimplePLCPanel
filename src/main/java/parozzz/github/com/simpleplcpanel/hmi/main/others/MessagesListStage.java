@@ -22,9 +22,9 @@ public class MessagesListStage extends HMIStage<VBox>
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         var stageSetter = this.getStageSetter()
                 .setResizable(true)

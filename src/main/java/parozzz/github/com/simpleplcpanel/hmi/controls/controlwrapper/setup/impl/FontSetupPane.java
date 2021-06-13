@@ -47,9 +47,9 @@ public final class FontSetupPane extends SetupPane<FontAttribute>
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         textSizeComboBox.setConverter(new IntegerStringConverter());
         textSizeComboBox.getItems().addAll(FontSetupPane.TEXT_SIZE_DEFAULT_CHOICE);
@@ -94,13 +94,13 @@ public final class FontSetupPane extends SetupPane<FontAttribute>
         textPositionChoiceBox.getItems().addAll(Pos.values());
 
 
-        super.getAttributeChangerList().create(textColorPicker.valueProperty(), FontAttribute.TEXT_COLOR)
-                .create(textPositionChoiceBox.valueProperty(), FontAttribute.TEXT_POSITION)
-                .create(boldTextStyleButton.selectedProperty(), FontAttribute.BOLD_WEIGHT)
-                .create(italicTextStyleButton.selectedProperty(), FontAttribute.ITALIC_POSTURE)
+        super.getAttributeChangerList().create(textColorPicker.valueProperty(), FontAttribute.COLOR)
+                .create(textPositionChoiceBox.valueProperty(), FontAttribute.POSITION)
+                .create(boldTextStyleButton.selectedProperty(), FontAttribute.BOLD)
+                .create(italicTextStyleButton.selectedProperty(), FontAttribute.ITALIC)
                 .create(underlineButton.selectedProperty(), FontAttribute.UNDERLINE)
                 .create(strikethroughButton.selectedProperty(), FontAttribute.STRIKETHROUGH)
-                .create(textSizeComboBox.valueProperty(), FontAttribute.FONT_TEXT_SIZE)
+                .create(textSizeComboBox.valueProperty(), FontAttribute.TEXT_SIZE)
                 .create(fontComboBox.valueProperty(), FontAttribute.FONT_NAME);
 
         super.computeProperties();

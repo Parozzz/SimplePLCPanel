@@ -5,24 +5,16 @@ import parozzz.github.com.simpleplcpanel.logger.MainLogger;
 
 final class WrapperStateSerializer
 {
-    public static final String WRAPPER_DEFAULT_STATE_STRING = "YeahBoiiiiiiiiii";
     public static JSONDataMap serializeDefaultState(WrapperState defaultWrapperState)
     {
         var jsonDataMap = new JSONDataMap();
-
-        jsonDataMap.set("WrapperDefaultState", WRAPPER_DEFAULT_STATE_STRING);
         jsonDataMap.set("AttributeMap", defaultWrapperState.getAttributeMap());
-
         return jsonDataMap;
     }
 
     public static void deserializeDefaultState(JSONDataMap jsonDataMap, WrapperState defaultWrapperState)
     {
-        var wrapperType = jsonDataMap.getString("WrapperDefaultState");
-        if (WRAPPER_DEFAULT_STATE_STRING.equals(wrapperType))
-        {
-            deserializeAttributeMap(jsonDataMap, defaultWrapperState);
-        }
+        deserializeAttributeMap(jsonDataMap, defaultWrapperState);
     }
 
     public static JSONDataMap serialize(WrapperState wrapperState)

@@ -34,9 +34,9 @@ public final class RuntimeControlContainerStage extends HMIStage<StackPane>
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         super.getStageSetter().initModality(Modality.APPLICATION_MODAL)
                 .initStyle(StageStyle.UNDECORATED)

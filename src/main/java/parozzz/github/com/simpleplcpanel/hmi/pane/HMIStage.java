@@ -60,9 +60,9 @@ public abstract class HMIStage<P extends Parent>
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         stageSetter.initStyle(StageStyle.DECORATED)
                 .setResizable(false);
@@ -95,9 +95,9 @@ public abstract class HMIStage<P extends Parent>
     }
 
     @Override
-    public void setDefault()
+    public void onSetDefault()
     {
-        super.setDefault();
+        super.onSetDefault();
     }
 
     public UndoRedoManager getUndoRedoManager()

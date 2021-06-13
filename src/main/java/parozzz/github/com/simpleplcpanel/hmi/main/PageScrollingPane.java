@@ -42,9 +42,9 @@ public final class PageScrollingPane
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         mainVBox.getChildren().add(0, this.createHideParent(Pos.TOP_RIGHT));
         mainVBox.setMinSize(0, 0);

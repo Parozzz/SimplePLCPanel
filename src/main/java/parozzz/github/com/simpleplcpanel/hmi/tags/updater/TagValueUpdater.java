@@ -1,40 +1,36 @@
-package parozzz.github.com.simpleplcpanel.hmi.database.dataupdater;
+package parozzz.github.com.simpleplcpanel.hmi.tags.updater;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import parozzz.github.com.simpleplcpanel.hmi.FXObject;
-import parozzz.github.com.simpleplcpanel.hmi.comm.CommThread;
+import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationThread;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationType;
-import parozzz.github.com.simpleplcpanel.hmi.database.ControlContainerDatabase;
 import parozzz.github.com.simpleplcpanel.hmi.tags.Tag;
 import parozzz.github.com.simpleplcpanel.hmi.tags.TagsManager;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class ControlDataUpdater<C extends CommThread<?>> extends FXObject
+public abstract class TagValueUpdater<C extends CommunicationThread<?>> extends FXObject
 {
     protected final TagsManager tagsManager;
     protected final CommunicationType<?> communicationType;
-    protected final ControlContainerDatabase controlContainerDatabase;
     protected final CommunicationDataHolder communicationDataHolder;
-    protected final C commThread;
+    protected final C communicationThread;
 
     //This need to be a set to avoid duplicate Tag!
     protected final Set<Tag> needWriteTagSet;
     protected final BooleanProperty activeProperty;
 
-    public ControlDataUpdater(TagsManager tagsManager,
+    public TagValueUpdater(TagsManager tagsManager,
             CommunicationType<?> communicationType,
-            ControlContainerDatabase controlContainerDatabase,
-            CommunicationDataHolder communicationDataHolder, C commThread)
+            CommunicationDataHolder communicationDataHolder, C communicationThread)
     {
         this.tagsManager = tagsManager;
         this.communicationType = communicationType;
-        this.controlContainerDatabase = controlContainerDatabase;
         this.communicationDataHolder = communicationDataHolder;
-        this.commThread = commThread;
+        this.communicationThread = communicationThread;
 
         this.needWriteTagSet = new HashSet<>();
 
@@ -42,13 +38,14 @@ public abstract class ControlDataUpdater<C extends CommThread<?>> extends FXObje
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         activeProperty.addListener((observable, oldValue, newValue) ->
         {
-            if(newValue == null || !newValue)
+            communicationThread.setActive(newValue);
+            if(!newValue)
             {
                 needWriteTagSet.clear();
             }
@@ -77,6 +74,11 @@ public abstract class ControlDataUpdater<C extends CommThread<?>> extends FXObje
         });
     }
 
+    public CommunicationType<?> getCommunicationType()
+    {
+        return communicationType;
+    }
+
     public boolean isActive()
     {
         return activeProperty.get();
@@ -94,7 +96,7 @@ public abstract class ControlDataUpdater<C extends CommThread<?>> extends FXObje
 
     public boolean isReady()
     {
-        return commThread.isConnected() && !commThread.isUpdating();
+        return communicationThread.isConnected() && !communicationThread.isUpdating();
     }
 
     //This is to allow the data to be set in the JavaFX Thread

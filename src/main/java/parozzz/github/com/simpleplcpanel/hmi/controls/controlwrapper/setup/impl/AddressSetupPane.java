@@ -57,9 +57,9 @@ public class AddressSetupPane<A extends AddressAttribute>
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         tagKeyTextField.setCursor(Cursor.HAND);
         tagKeyTextField.setContextMenu(

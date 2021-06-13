@@ -9,9 +9,9 @@ import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.impl.Button
 
 public final class ButtonDataAttribute extends Attribute
 {
-    public static final String ATTRIBUTE_NAME = "BUTTON_DATA_ATTRIBUTE";
+    public static final String ATTRIBUTE_NAME = "BUTTON_DATA";
 
-    public static final AttributeProperty<ButtonWrapper.Type> TYPE = new EnumAttributeProperty<>("ButtonWrapperType", ButtonWrapper.Type.NORMAL, false);
+    public static final AttributeProperty<ButtonWrapper.Type> TYPE = new EnumAttributeProperty<>("Type", ButtonWrapper.Type.NORMAL, false);
 
     public ButtonDataAttribute(AttributeMap attributeMap)
     {

@@ -11,11 +11,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 public final class CommunicationDataHolder extends FXController
 {
-    private final Map<CommunicationType, CommThread<?>> commThreadMap;
-    private final Map<CommunicationType, NetworkCommunicationManager<?>> communicationManagerMap;
+    private final Map<CommunicationType<?>, CommunicationThread<?>> commThreadMap;
+    private final Map<CommunicationType<?>, NetworkCommunicationManager<?>> communicationManagerMap;
 
     private final CommunicationStage communicationStage;
 
@@ -24,8 +25,8 @@ public final class CommunicationDataHolder extends FXController
         this.commThreadMap = new HashMap<>();
         this.communicationManagerMap = new HashMap<>();
 
-        this.fillMaps(CommunicationType.SIEMENS_S7, new SiemensS7Thread(), SiemensS7CommunicationManager::new)
-                .fillMaps(CommunicationType.MODBUS_TCP, new ModbusTCPThread(), ModbusTCPCommunicationManager::new);
+        this.fillMaps(CommunicationType.SIEMENS_S7, SiemensS7Thread::new, new SiemensS7CommunicationManager())
+                .fillMaps(CommunicationType.MODBUS_TCP, ModbusTCPThread::new, new ModbusTCPCommunicationManager());
 
         this.addFXChild(this.communicationStage = new CommunicationStage(this));
     }
@@ -45,31 +46,32 @@ public final class CommunicationDataHolder extends FXController
         COMMUNICATION THREAD
         ====================
     */
-    public CommThread<?> getCommThread(CommunicationType<?> communicationType)
+    public CommunicationThread<?> getCommThread(CommunicationType<?> communicationType)
     {
         return commThreadMap.get(communicationType);
     }
 
-    public <T extends CommThread<?>> T getCommThread(CommunicationType<?> communicationType, Class<T> tClass)
+    public <T extends CommunicationThread<?>> T getCommThread(CommunicationType<?> communicationType, Class<T> tClass)
     {
         var commThread = this.getCommThread(communicationType);
         return tClass.isInstance(commThread) ? tClass.cast(commThread) : null;
     }
 
-    public CommThread<?> getCurrentCommThread()
+    public CommunicationThread<?> getCurrentCommThread()
     {
         return this.getCommThread(communicationStage.getCommunicationType());
     }
 
-    public <CM extends CommThread<?>> CM getCurrentCommThread(Class<CM> cmClass)
+    public <CM extends CommunicationThread<?>> CM getCurrentCommThread(Class<CM> cmClass)
     {
         return this.getCommThread(communicationStage.getCommunicationType(), cmClass);
     }
 
-    public Collection<CommThread<?>> getCommThreadCollection()
+    public Collection<CommunicationThread<?>> getCommThreadCollection()
     {
         return Set.copyOf(commThreadMap.values());
     }
+
     /*
         =====================
         =====================
@@ -79,13 +81,13 @@ public final class CommunicationDataHolder extends FXController
         COMMUNICATION MANAGER
         =====================
     */
-    public NetworkCommunicationManager<?> getCommunicationManager(CommunicationType communicationType)
+    public NetworkCommunicationManager<?> getCommunicationManager(CommunicationType<?> communicationType)
     {
         return communicationManagerMap.get(communicationType);
     }
 
     public <CM extends NetworkCommunicationManager<?>> CM getCommunicationManager(
-            CommunicationType communicationType,
+            CommunicationType<?> communicationType,
             Class<CM> cmClass)
     {
         var communicationManager = this.getCommunicationManager(communicationType);
@@ -107,24 +109,17 @@ public final class CommunicationDataHolder extends FXController
         =====================
     */
 
-    private <CM extends CommThread<?>> CommunicationDataHolder fillMaps(
-            CommunicationType communicationType, CM commThread,
-            CommunicationManagerFunction<CM> communicationManagerFunction) throws IOException
+    private <P extends CommunicationConnectionParams,
+            CM extends NetworkCommunicationManager<P>> CommunicationDataHolder fillMaps(
+            CommunicationType<?> communicationType, Function<CM, CommunicationThread<P>> communicationThreadFunction,
+            CM communicationManager)
     {
-        commThreadMap.put(communicationType, commThread);
-        var communicationManager = communicationManagerFunction.accept(commThread);
-        if (communicationManager != null)
-        {
-            this.addFXChild(communicationManager);
-            communicationManagerMap.put(communicationType, communicationManager);
-        }
+        var communicationThread = communicationThreadFunction.apply(communicationManager);
+        commThreadMap.put(communicationType, communicationThread);
+        communicationManagerMap.put(communicationType, communicationManager);
 
+        this.addMultipleFXChild(communicationThread, communicationManager);
         return this;
     }
-
-
-    private interface CommunicationManagerFunction<CM extends CommThread<?>>
-    {
-        NetworkCommunicationManager<CM> accept(CM commThread) throws IOException;
-    }
+    
 }

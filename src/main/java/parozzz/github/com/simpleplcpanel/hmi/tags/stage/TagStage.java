@@ -31,7 +31,7 @@ public final class TagStage extends HMIStage<VBox>
             HMIStage<?> hmiStage)
     {
         var tagStage = new TagStage(tagsManager, communicationDataHolder);
-        tagStage.setup();
+        tagStage.onSetup();
         tagStage.setAsSubWindow(hmiStage);
         tagStage.showStage();
         return tagStage;
@@ -41,7 +41,7 @@ public final class TagStage extends HMIStage<VBox>
             HMIStage<?> hmiStage, Consumer<CommunicationTag> selectTagConsumer)
     {
         var tagStage = new TagStage(tagsManager, communicationDataHolder);
-        tagStage.setup();
+        tagStage.onSetup();
         tagStage.setAsSubWindow(hmiStage);
         tagStage.showAsSelection(selectTagConsumer);
         return tagStage;
@@ -65,9 +65,9 @@ public final class TagStage extends HMIStage<VBox>
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         super.getStageSetter()
                 .initModality(Modality.APPLICATION_MODAL)

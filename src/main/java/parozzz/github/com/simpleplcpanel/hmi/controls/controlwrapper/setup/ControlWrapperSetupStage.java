@@ -100,9 +100,9 @@ public final class ControlWrapperSetupStage
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         try
         {
@@ -429,8 +429,8 @@ public final class ControlWrapperSetupStage
 
             try
             {
-                setupPane.setup();
-                setupPane.setDefault();
+                setupPane.onSetup();
+                setupPane.onSetDefault();
 
                 ControlWrapperSetupStage.this.addFXChild(setupPane);
 

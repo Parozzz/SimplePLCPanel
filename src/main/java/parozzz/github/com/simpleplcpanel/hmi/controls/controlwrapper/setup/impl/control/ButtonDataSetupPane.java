@@ -30,9 +30,9 @@ public class ButtonDataSetupPane extends SetupPane<ButtonDataAttribute>
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         toggleInformationLabel.setVisible(false); //Start as not visible :)
 

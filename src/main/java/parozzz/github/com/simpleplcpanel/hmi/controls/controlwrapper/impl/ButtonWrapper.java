@@ -9,6 +9,7 @@ import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.ReadAddressA
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.address.WriteAddressAttribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.control.ButtonDataAttribute;
 import parozzz.github.com.simpleplcpanel.hmi.controls.ControlContainerPane;
+import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapperType;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.LabeledWrapper;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.attributes.ControlWrapperAttributeInitializer;
@@ -41,9 +42,9 @@ public final class ButtonWrapper
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         //These needs to be EventHandler because i might use event filter to consume events and these should not fire
         control.addEventHandler(MouseEvent.MOUSE_PRESSED, mouseEvent ->
@@ -122,4 +123,11 @@ public final class ButtonWrapper
             }
         });
     }
+
+    @Override
+    public ControlWrapper<?> createInstance()
+    {
+        return new ButtonWrapper(super.getControlMainPage());
+    }
+
 }

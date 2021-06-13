@@ -18,17 +18,17 @@ import parozzz.github.com.simpleplcpanel.hmi.serialize.JSONSerializables;
 
 public final class FontAttribute extends Attribute
 {
-    public static final String ATTRIBUTE_NAME = "FONT_ATTRIBUTE";
+    public static final String ATTRIBUTE_NAME = "FONT";
 
-    public static final AttributeProperty<Color> TEXT_COLOR = new ParsableAttributeProperty<>("TextColor", Color.BLACK, JSONSerializables.COLOR, false);
-    public static final EnumAttributeProperty<Pos> TEXT_POSITION = new EnumAttributeProperty<>("TextPosition", Pos.CENTER, false);
+    public static final AttributeProperty<Color> COLOR = new ParsableAttributeProperty<>("Color", Color.BLACK, JSONSerializables.COLOR, false);
+    public static final EnumAttributeProperty<Pos> POSITION = new EnumAttributeProperty<>("Position", Pos.CENTER, false);
     public static final AttributeProperty<Boolean> UNDERLINE = new BooleanAttributeProperty("Underline");
 
     public static final AttributeProperty<String> FONT_NAME = new StringAttributeProperty("FontName", Font.getDefault().getName(), false);
-    public static final AttributeProperty<Boolean> BOLD_WEIGHT = new BooleanAttributeProperty("Bold");
-    public static final AttributeProperty<Boolean> ITALIC_POSTURE = new BooleanAttributeProperty("Italic");
+    public static final AttributeProperty<Boolean> BOLD = new BooleanAttributeProperty("Bold");
+    public static final AttributeProperty<Boolean> ITALIC = new BooleanAttributeProperty("Italic");
     public static final AttributeProperty<Boolean> STRIKETHROUGH = new BooleanAttributeProperty("Strikethrough");
-    public static final AttributeProperty<Integer> FONT_TEXT_SIZE = new NumberAttributeProperty<>("FontTextSize", 16, Number::intValue);
+    public static final AttributeProperty<Integer> TEXT_SIZE = new NumberAttributeProperty<>("TextSize", 16, Number::intValue);
 
     private Font font;
 
@@ -36,7 +36,7 @@ public final class FontAttribute extends Attribute
     {
         super(attributeMap, AttributeType.FONT, ATTRIBUTE_NAME);
 
-        super.getAttributePropertyManager().addAll(TEXT_COLOR, TEXT_POSITION, UNDERLINE, FONT_NAME, BOLD_WEIGHT, ITALIC_POSTURE, STRIKETHROUGH, FONT_TEXT_SIZE);
+        super.getAttributePropertyManager().addAll(COLOR, POSITION, UNDERLINE, FONT_NAME, BOLD, ITALIC, STRIKETHROUGH, TEXT_SIZE);
         this.update(); //Have the font not to be null on startup!
     }
 
@@ -49,9 +49,9 @@ public final class FontAttribute extends Attribute
     public void update()
     {
         var fontName = this.getValue(FONT_NAME);
-        var fontWeight = this.getValue(BOLD_WEIGHT) ? FontWeight.BOLD : FontWeight.NORMAL;
-        var fontPosture = this.getValue(ITALIC_POSTURE) ? FontPosture.ITALIC : FontPosture.REGULAR;
-        var fontTextSize = this.getValue(FONT_TEXT_SIZE);
+        var fontWeight = this.getValue(BOLD) ? FontWeight.BOLD : FontWeight.NORMAL;
+        var fontPosture = this.getValue(ITALIC) ? FontPosture.ITALIC : FontPosture.REGULAR;
+        var fontTextSize = this.getValue(TEXT_SIZE);
         this.font = Font.font(fontName, fontWeight, fontPosture, fontTextSize);
 
         super.update(); //This will call the Update Runnables

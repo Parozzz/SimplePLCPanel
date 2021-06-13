@@ -10,7 +10,7 @@ import parozzz.github.com.simpleplcpanel.hmi.util.valueintermediate.ValueInterme
 
 public class ValueAttribute extends Attribute
 {
-    public static final String ATTRIBUTE_NAME = "VALUE_ATTRIBUTE";
+    public static final String ATTRIBUTE_NAME = "VALUE";
 
     public static final AttributeProperty<ValueIntermediateType<?>> INTERMEDIATE_TYPE =
             new FunctionAttributeProperty<>("IntermediateType", ValueIntermediateType.INTEGER,

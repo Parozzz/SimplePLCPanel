@@ -10,7 +10,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import parozzz.github.com.simpleplcpanel.hmi.FXController;
-import parozzz.github.com.simpleplcpanel.hmi.attribute.Attribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
@@ -114,9 +113,9 @@ public final class QuickSetupPane
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         //Hide VBox Button at the TOP
         mainVBox.getChildren().add(0, this.createHideParent(Pos.TOP_RIGHT));
@@ -136,9 +135,9 @@ public final class QuickSetupPane
     }
 
     @Override
-    public void setupComplete()
+    public void onSetupComplete()
     {
-        super.setupComplete();
+        super.onSetupComplete();
 
         this.setSelectedControlWrapper(null); //Start with a null value (Also set everything invisible)
     }

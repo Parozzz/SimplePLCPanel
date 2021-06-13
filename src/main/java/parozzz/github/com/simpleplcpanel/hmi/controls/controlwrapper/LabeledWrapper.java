@@ -48,8 +48,8 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
                             {
                                 control.setFont(((FontAttribute) attribute).getFont());
                                 control.setUnderline(attribute.getValue(FontAttribute.UNDERLINE));
-                                control.setAlignment(attribute.getValue(FontAttribute.TEXT_POSITION));
-                                control.setTextFill(attribute.getValue(FontAttribute.TEXT_COLOR));
+                                control.setAlignment(attribute.getValue(FontAttribute.POSITION));
+                                control.setTextFill(attribute.getValue(FontAttribute.COLOR));
                             }
                         }
                         else if(attributeType == AttributeType.READ_ADDRESS)
@@ -88,7 +88,7 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
                             return;
                         }
 
-                        control.setTextAlignment(textAttribute.getValue(TextAttribute.TEXT_ALIGNMENT));
+                        control.setTextAlignment(textAttribute.getValue(TextAttribute.ALIGNMENT));
                         control.setLineSpacing(textAttribute.getValue(TextAttribute.LINE_SPACING));
 
                         var text = textAttribute.getValue(TextAttribute.TEXT);
@@ -98,9 +98,9 @@ public abstract class LabeledWrapper<C extends Labeled> extends ControlWrapper<C
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         super.getStateMap().currentWrapperStateProperty().addListener((observable, oldValue, newValue) ->
         {

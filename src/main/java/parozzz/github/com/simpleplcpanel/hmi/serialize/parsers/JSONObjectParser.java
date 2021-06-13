@@ -33,7 +33,7 @@ public abstract class JSONObjectParser<V>
         jsonDataMap.set("JSONObjectParser", identifier);
     }
 
-    public JSONDataMap serializeObject(Object object)
+    public Object serializeObject(Object object)
     {
         if(valueClass.isInstance(object))
         {
@@ -43,5 +43,5 @@ public abstract class JSONObjectParser<V>
         return null;
     }
 
-    public abstract JSONDataMap serialize(V value);
+    public abstract Object serialize(V value);
 }

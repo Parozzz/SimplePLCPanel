@@ -86,6 +86,22 @@ public final class Util
         }
     }
 
+    public static byte parseByteOrZero(String string)
+    {
+        return parseByte(string, (byte) 0);
+    }
+
+    public static byte parseByte(String string, byte errorValue)
+    {
+        try
+        {
+            return Byte.parseByte(string);
+        } catch (NumberFormatException exception)
+        {
+            return errorValue;
+        }
+    }
+
     public static int parseIntOrZero(String string)
     {
         return parseInt(string, 0);
@@ -93,9 +109,14 @@ public final class Util
 
     public static int parseInt(String string, int errorValue)
     {
+        return parseInt(string, errorValue, 10);
+    }
+
+    public static int parseInt(String string, int errorValue, int radix)
+    {
         try
         {
-            return Integer.parseInt(string);
+            return Integer.parseInt(string, radix);
         } catch (NumberFormatException exception)
         {
             return errorValue;

@@ -38,9 +38,9 @@ public class FontQuickSetupPanePart extends FXObject implements QuickSetupPanePa
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         VBox.setMargin(vBox, new Insets(2, 0, 0, 0));
 
@@ -65,10 +65,10 @@ public class FontQuickSetupPanePart extends FXObject implements QuickSetupPanePa
     public void addBinders(QuickSetupStateBinder stateBinder)
     {
         stateBinder.builder(AttributeType.FONT)
-                .direct(textColorPicker.valueProperty(), FontAttribute.TEXT_COLOR)
-                .direct(textSizeComboBox.valueProperty(), FontAttribute.FONT_TEXT_SIZE)
-                .direct(boldCheckBox.selectedProperty(), FontAttribute.BOLD_WEIGHT)
-                .direct(italicCheckBox.selectedProperty(), FontAttribute.ITALIC_POSTURE)
+                .direct(textColorPicker.valueProperty(), FontAttribute.COLOR)
+                .direct(textSizeComboBox.valueProperty(), FontAttribute.TEXT_SIZE)
+                .direct(boldCheckBox.selectedProperty(), FontAttribute.BOLD)
+                .direct(italicCheckBox.selectedProperty(), FontAttribute.ITALIC)
                 .direct(underlineCheckBox.selectedProperty(), FontAttribute.UNDERLINE);
     }
 

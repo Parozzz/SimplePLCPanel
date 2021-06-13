@@ -48,9 +48,9 @@ public class ModbusStringAddressCreatorStage
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         dataTypeChoiceBox.setConverter(new EnumStringConverter<>(ModbusFunctionCode.class).setCapitalize());
         dataTypeChoiceBox.getItems().addAll(ModbusFunctionCode.values());
@@ -111,9 +111,9 @@ public class ModbusStringAddressCreatorStage
     }
 
     @Override
-    public void setDefault()
+    public void onSetDefault()
     {
-        super.setDefault();
+        super.onSetDefault();
         this.loadStringDataToActualValues(new ModbusStringAddressData());
     }
 
@@ -123,7 +123,7 @@ public class ModbusStringAddressCreatorStage
         var stringAddressData = ModbusStringAddressData.parseStringData(stringData);
         if (stringAddressData == null || !stringAddressData.validate())
         {
-            this.setDefault();
+            this.onSetDefault();
             return false;
         }
 

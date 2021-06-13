@@ -13,7 +13,7 @@ import java.util.function.Consumer;
 
 public final class CommunicationStage extends HMIStage<VBox>
 {
-    @FXML private ChoiceBox<CommunicationType> commTypeChoiceBox;
+    @FXML private ChoiceBox<CommunicationType<?>> commTypeChoiceBox;
 
     @FXML private StackPane commManagerStackPane;
 
@@ -28,9 +28,9 @@ public final class CommunicationStage extends HMIStage<VBox>
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         super.getStageSetter().setResizable(true);
 
@@ -46,7 +46,7 @@ public final class CommunicationStage extends HMIStage<VBox>
             }
 
             @Override
-            public CommunicationType fromString(String s)
+            public CommunicationType<?> fromString(String s)
             {
                 return CommunicationType.getByName(s);
             }
@@ -57,18 +57,12 @@ public final class CommunicationStage extends HMIStage<VBox>
             var children = commManagerStackPane.getChildren();
             children.clear();
 
-            if (selectedCommunicationManager != null)
-            {
-                selectedCommunicationManager.setActive(false);
-                selectedCommunicationManager = null;
-            }
-
+            selectedCommunicationManager = null;
             if (newValue != null)
             {
                 selectedCommunicationManager = communicationDataHolder.getCommunicationManager(newValue);
                 if(selectedCommunicationManager != null)
                 {
-                    selectedCommunicationManager.setActive(true);
                     children.add(selectedCommunicationManager.getParent());
                 }
             }
@@ -76,9 +70,9 @@ public final class CommunicationStage extends HMIStage<VBox>
     }
 
     @Override
-    public void setDefault()
+    public void onSetDefault()
     {
-        super.setDefault();
+        super.onSetDefault();
 
         commTypeChoiceBox.setValue(CommunicationType.SIEMENS_S7);
     }
@@ -88,12 +82,14 @@ public final class CommunicationStage extends HMIStage<VBox>
         return selectedCommunicationManager;
     }
 
-    public void addCommunicationTypeListener(Consumer<CommunicationType> consumer)
+    public void addCommunicationTypeListener(Consumer<CommunicationType<?>> consumer)
     {
-        commTypeChoiceBox.valueProperty().addListener((observableValue, oldValue, newValue) -> consumer.accept(newValue));
+        commTypeChoiceBox.valueProperty().addListener((observableValue, oldValue, newValue) ->
+                consumer.accept(newValue)
+        );
     }
 
-    public CommunicationType getCommunicationType()
+    public CommunicationType<?> getCommunicationType()
     {
         return commTypeChoiceBox.getValue();
     }

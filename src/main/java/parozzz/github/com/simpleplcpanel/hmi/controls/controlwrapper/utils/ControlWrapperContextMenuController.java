@@ -27,9 +27,9 @@ public final class ControlWrapperContextMenuController extends FXObject
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
 
         var containerStackPane = controlWrapper.getContainerPane();

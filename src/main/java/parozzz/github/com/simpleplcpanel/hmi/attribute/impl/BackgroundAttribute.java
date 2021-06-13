@@ -20,12 +20,12 @@ import java.util.Collections;
 
 public class BackgroundAttribute extends Attribute
 {
-    public static final String ATTRIBUTE_NAME = "BACKGROUND_ATTRIBUTE";
+    public static final String ATTRIBUTE_NAME = "BACKGROUND";
 
-    public static final AttributeProperty<Color> BACKGROUND_COLOR = new ParsableAttributeProperty<>("BackgroundColor", Color.WHITE, JSONSerializables.COLOR, false);
-    public static final AttributeProperty<String> PICTURE_BANK_IMAGE_NAME = new StringAttributeProperty("PictureBankImageName", "", false);
+    public static final AttributeProperty<Color> COLOR = new ParsableAttributeProperty<>("Color", Color.WHITE, JSONSerializables.COLOR, false);
+    public static final AttributeProperty<String> IMAGE_NAME = new StringAttributeProperty("ImageName", "", false);
     public static final AttributeProperty<Integer> CORNER_RADII = new NumberAttributeProperty<>("CornerRadii", 0, Number::intValue);
-    public static final AttributeProperty<Boolean> STRETCH_IMAGE = new BooleanAttributeProperty("StretchImage");
+    public static final AttributeProperty<Boolean> STRETCH = new BooleanAttributeProperty("Stretch");
 
     private final PictureBankStage pictureBank;
     private Background background;
@@ -37,7 +37,7 @@ public class BackgroundAttribute extends Attribute
         this.pictureBank = attributeMap.getControlWrapper().getControlMainPage()
                 .getMainEditStage().getPictureBankStage();
 
-        super.getAttributePropertyManager().addAll(BACKGROUND_COLOR, PICTURE_BANK_IMAGE_NAME, CORNER_RADII, STRETCH_IMAGE);
+        super.getAttributePropertyManager().addAll(COLOR, IMAGE_NAME, CORNER_RADII, STRETCH);
         this.update(); //Have the background not to be null at startup!
     }
 
@@ -52,7 +52,7 @@ public class BackgroundAttribute extends Attribute
         //Reset the image in case is not valid below
         Image image = null;
 
-        var imageName = this.getValue(PICTURE_BANK_IMAGE_NAME);
+        var imageName = this.getValue(IMAGE_NAME);
         if(imageName != null && !imageName.isEmpty())
         {
             var imageURI = pictureBank.getImageURI(imageName);
@@ -61,14 +61,14 @@ public class BackgroundAttribute extends Attribute
                 image = new Image(imageURI.toString());
             }else
             {
-                setValue(PICTURE_BANK_IMAGE_NAME, "");
+                setValue(IMAGE_NAME, "");
             }
         }
 
         var backgroundImageList = new ArrayList<BackgroundImage>();
         if(image != null)
         {
-            var stretch = this.getValue(STRETCH_IMAGE);
+            var stretch = this.getValue(STRETCH);
 
             //width, height, widthAsPercentage, heightAsPercentage
             var backgroundSize = stretch
@@ -78,7 +78,7 @@ public class BackgroundAttribute extends Attribute
                     BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize));
         }
 
-        var backgroundColor = this.getValue(BACKGROUND_COLOR);
+        var backgroundColor = this.getValue(COLOR);
         var cornerRadii = this.getValue(CORNER_RADII);
         var backgroundFill = new BackgroundFill(backgroundColor, new CornerRadii(cornerRadii), Insets.EMPTY);
         background = new Background(Collections.singletonList(backgroundFill), backgroundImageList);

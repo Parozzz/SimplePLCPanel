@@ -129,10 +129,10 @@ public final class JSONDataMap extends JSONData<JSONObject>
 
     public <V> V getParsable(SuppliedJSONObjectParser<V> objectParser, String key)
     {
-        var parsableJSONDataMap = this.getMap(key);
-        if (parsableJSONDataMap != null)
+        var parsableObject = this.get(key);
+        if (parsableObject != null)
         {
-            return objectParser.create(parsableJSONDataMap);
+            return objectParser.create(parsableObject);
         }
 
         return null;

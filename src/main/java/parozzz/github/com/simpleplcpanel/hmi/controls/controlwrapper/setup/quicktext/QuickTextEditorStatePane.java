@@ -37,9 +37,9 @@ class QuickTextEditorStatePane extends FXObject
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         this.refreshValues();
 
@@ -48,21 +48,21 @@ class QuickTextEditorStatePane extends FXObject
         );
 
         textColorPicker.valueProperty().addListener((observable, oldValue, newValue) ->
-                this.setToFontAttribute(FontAttribute.TEXT_COLOR, newValue)
+                this.setToFontAttribute(FontAttribute.COLOR, newValue)
         );
 
         textSizeComboBox.setConverter(new IntegerStringConverter());
         textSizeComboBox.getItems().addAll(FontSetupPane.TEXT_SIZE_DEFAULT_CHOICE);
         textSizeComboBox.valueProperty().addListener((observable, oldValue, newValue) ->
-                this.setToFontAttribute(FontAttribute.FONT_TEXT_SIZE, newValue)
+                this.setToFontAttribute(FontAttribute.TEXT_SIZE, newValue)
         );
 
         boldToggleButton.selectedProperty().addListener((observable, oldValue, newValue) ->
-                this.setToFontAttribute(FontAttribute.BOLD_WEIGHT, newValue)
+                this.setToFontAttribute(FontAttribute.BOLD, newValue)
         );
 
         italicToggleButton.selectedProperty().addListener((observable, oldValue, newValue) ->
-                this.setToFontAttribute(FontAttribute.ITALIC_POSTURE, newValue)
+                this.setToFontAttribute(FontAttribute.ITALIC, newValue)
         );
 
         underlineToggleButton.selectedProperty().addListener((observable, oldValue, newValue) ->
@@ -74,10 +74,10 @@ class QuickTextEditorStatePane extends FXObject
     {
         stateNameLabel.setText(wrapperState.getStringVersion());
         textArea.setText(this.getFromTextAttribute(TextAttribute.TEXT));
-        textColorPicker.setValue(this.getFromFontAttribute(FontAttribute.TEXT_COLOR));
-        textSizeComboBox.setValue(this.getFromFontAttribute(FontAttribute.FONT_TEXT_SIZE));
-        boldToggleButton.setSelected(this.getFromFontAttribute(FontAttribute.BOLD_WEIGHT));
-        italicToggleButton.setSelected(this.getFromFontAttribute(FontAttribute.ITALIC_POSTURE));
+        textColorPicker.setValue(this.getFromFontAttribute(FontAttribute.COLOR));
+        textSizeComboBox.setValue(this.getFromFontAttribute(FontAttribute.TEXT_SIZE));
+        boldToggleButton.setSelected(this.getFromFontAttribute(FontAttribute.BOLD));
+        italicToggleButton.setSelected(this.getFromFontAttribute(FontAttribute.ITALIC));
         underlineToggleButton.setSelected(this.getFromFontAttribute(FontAttribute.UNDERLINE));
     }
 

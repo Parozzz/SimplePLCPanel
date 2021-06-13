@@ -13,7 +13,7 @@ import parozzz.github.com.simpleplcpanel.hmi.serialize.JSONSerializables;
 
 public class BorderAttribute extends Attribute
 {
-    public static final String ATTRIBUTE_NAME = "BORDER_ATTRIBUTE";
+    public static final String ATTRIBUTE_NAME = "BORDER";
 
     public enum StrokeStyle
     {

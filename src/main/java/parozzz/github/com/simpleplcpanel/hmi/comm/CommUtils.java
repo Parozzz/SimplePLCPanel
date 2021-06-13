@@ -22,14 +22,13 @@ public final class CommUtils
         var ip2 = Util.parseInt(t2.getText(), -1);
         var ip3 = Util.parseInt(t3.getText(), -1);
         var ip4 = Util.parseInt(t4.getText(), -1);
-
-        if(ip1 < 0 || ip2 < 0 || ip3 < 0 || ip4 < 0)
+        if (ip1 < 0 || ip2 < 0 || ip3 < 0 || ip4 < 0)
         {
             return null;
         }
 
-        return ip1 + "." + ip2 + "." + ip3 + "." + ip4;
+        return String.format("%d.%d.%d.%d", ip1, ip2, ip3, ip4);
     }
 
-    private CommUtils(){}
+    private CommUtils() {}
 }

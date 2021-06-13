@@ -9,7 +9,7 @@ import parozzz.github.com.simpleplcpanel.hmi.attribute.property.impl.primitives.
 
 public final class SizeAttribute extends Attribute
 {
-    public static final String ATTRIBUTE_NAME = "SIZE_ATTRIBUTE";
+    public static final String ATTRIBUTE_NAME = "SIZE";
 
     public static final AttributeProperty<Boolean> ADAPT = new BooleanAttributeProperty("Adapt");
     public static final AttributeProperty<Integer> WIDTH = new NumberAttributeProperty<>("Width", 80, Number::intValue);

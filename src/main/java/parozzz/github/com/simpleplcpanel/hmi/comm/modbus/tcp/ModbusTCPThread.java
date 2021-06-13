@@ -5,7 +5,7 @@ import net.wimpi.modbus.io.ModbusTransaction;
 import net.wimpi.modbus.msg.*;
 import net.wimpi.modbus.net.TCPMasterConnection;
 import net.wimpi.modbus.procimg.SimpleInputRegister;
-import parozzz.github.com.simpleplcpanel.hmi.comm.CommThread;
+import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationThread;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.intermediate.ModbusIntermediate;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.intermediate.ModbusReadNumberIntermediate;
 import parozzz.github.com.simpleplcpanel.hmi.comm.modbus.intermediate.ModbusWriteNumberIntermediate;
@@ -18,7 +18,7 @@ import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public final class ModbusTCPThread extends CommThread<ModbusTCPConnectionParams>
+public final class ModbusTCPThread extends CommunicationThread<ModbusTCPConnectionParams>
 {
     private final TCPMasterConnection masterConnection;
 
@@ -31,9 +31,9 @@ public final class ModbusTCPThread extends CommThread<ModbusTCPConnectionParams>
     private final Set<ModbusReadBitIntermediate> readDiscreteInputsSet;
     private final Set<ModbusReadNumberIntermediate> readInputRegistersSet;
 
-    public ModbusTCPThread()
+    public ModbusTCPThread(ModbusTCPCommunicationManager communicationManager)
     {
-        this.setName("ModbusTCPThread");
+        super("ModbusTCPThread", communicationManager);
 
         this.readHoldingRegisterSet = ConcurrentHashMap.newKeySet();
         this.writeHoldingRegisterSet = ConcurrentHashMap.newKeySet();

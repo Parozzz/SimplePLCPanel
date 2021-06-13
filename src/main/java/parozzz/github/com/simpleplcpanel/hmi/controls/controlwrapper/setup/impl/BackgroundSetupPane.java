@@ -49,9 +49,9 @@ public final class BackgroundSetupPane extends SetupPane<BackgroundAttribute>
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         cornerRadiiTextField.setTextFormatter(FXTextFormatterUtil.simpleInteger(2));
 
@@ -97,9 +97,9 @@ public final class BackgroundSetupPane extends SetupPane<BackgroundAttribute>
         });
 
         super.getAttributeChangerList().createStringToNumber(cornerRadiiTextField.textProperty(), BackgroundAttribute.CORNER_RADII, Util::parseIntOrZero)
-                .create(backgroundColorPicker.valueProperty(), BackgroundAttribute.BACKGROUND_COLOR)
-                .create(imageNameTextField.textProperty(), BackgroundAttribute.PICTURE_BANK_IMAGE_NAME)
-                .create(stretchToggleButton.selectedProperty(), BackgroundAttribute.STRETCH_IMAGE);
+                .create(backgroundColorPicker.valueProperty(), BackgroundAttribute.COLOR)
+                .create(imageNameTextField.textProperty(), BackgroundAttribute.IMAGE_NAME)
+                .create(stretchToggleButton.selectedProperty(), BackgroundAttribute.STRETCH);
 
         super.computeProperties();
     }

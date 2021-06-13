@@ -61,48 +61,58 @@ public abstract class FXController extends FXObject
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         childList.stream().map(FXObjectWrapper::getFxObject)
                 .filter(Predicate.not(FXObject::isDisabled))
-                .forEach(FXObject::setup);
+                .forEach(FXObject::onSetup);
     }
 
     @Override
-    public void setDefault()
+    public void onSetDefault()
     {
-        super.setDefault();
+        super.onSetDefault();
 
         childList.stream().map(FXObjectWrapper::getFxObject)
                 .filter(Predicate.not(FXObject::isDisabled))
-                .forEach(FXObject::setDefault);
+                .forEach(FXObject::onSetDefault);
     }
 
     @Override
-    public void setupComplete()
+    public void onSetupComplete()
     {
-        super.setupComplete();
+        super.onSetupComplete();
 
         childList.stream().map(FXObjectWrapper::getFxObject)
                 .filter(Predicate.not(FXObject::isDisabled))
-                .forEach(FXObject::setupComplete);
+                .forEach(FXObject::onSetupComplete);
     }
 
     @Override
-    public void loop()
+    public void onLoop()
     {
-        super.loop();
+        super.onLoop();
         //Avoid streams here, is a method called very often better be safe than sorry!
         for (var fxObjectWrapper : childList)
         {
             var fxObject = fxObjectWrapper.getFxObject();
             if(!fxObject.isDisabled())
             {
-                fxObject.loop();
+                fxObject.onLoop();
             }
         }
+    }
+
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+
+        childList.stream().map(FXObjectWrapper::getFxObject)
+                .filter(Predicate.not(FXObject::isDisabled))
+                .forEach(FXObject::onStop);
     }
 
 
@@ -162,7 +172,7 @@ public abstract class FXController extends FXObject
             var childJSONDataMap = jsonDataMap.getMap(child.getFXObjectName());
             if (childJSONDataMap == null || childJSONDataMap.isEmpty())
             {
-                child.setDefault();
+                child.onSetDefault();
                 continue;
             }
 
@@ -171,7 +181,7 @@ public abstract class FXController extends FXObject
                 child.deserialize(childJSONDataMap);
             } catch (Exception exception)
             {
-                child.setDefault();
+                child.onSetDefault();
                 Logger.getLogger(FXController.class.getSimpleName()).log(Level.SEVERE,
                         "Child of" + this.getCompleteControllerLineup(child) +
                                 " throw an exception while de-serializing. Class: " + child.getClass().getSimpleName(),

@@ -37,9 +37,9 @@ public final class SizeSetupPane extends SetupPane<SizeAttribute>
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         widthTextField.setTextFormatter(FXTextFormatterUtil.simpleInteger(3));
         heightTextField.setTextFormatter(FXTextFormatterUtil.simpleInteger(3));

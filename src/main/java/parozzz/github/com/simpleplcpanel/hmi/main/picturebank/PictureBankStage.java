@@ -65,9 +65,9 @@ public class PictureBankStage extends HMIStage<BorderPane>
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         super.serializableDataSet.addEnum("WhiteTolerance", whiteToleranceChoiceBox.valueProperty(), WhiteToleranceEnum.class, WhiteToleranceEnum.NONE);
 
@@ -204,9 +204,9 @@ public class PictureBankStage extends HMIStage<BorderPane>
     }
 
     @Override
-    public void setupComplete()
+    public void onSetupComplete()
     {
-        super.setupComplete();
+        super.onSetupComplete();
     }
 
     public URI getImageURI(File file)

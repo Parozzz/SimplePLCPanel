@@ -29,9 +29,9 @@ public final class BackgroundQuickSetupPanePart extends FXObject implements Quic
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         VBox.setMargin(vBox, new Insets(2, 0, 0, 0));
     }
@@ -52,7 +52,7 @@ public final class BackgroundQuickSetupPanePart extends FXObject implements Quic
     public void addBinders(QuickSetupStateBinder stateBinder)
     {
         stateBinder.builder(AttributeType.BACKGROUND)
-                .direct(backgroundColorPicker.valueProperty(), BackgroundAttribute.BACKGROUND_COLOR);
+                .direct(backgroundColorPicker.valueProperty(), BackgroundAttribute.COLOR);
     }
 
     @Override

@@ -30,9 +30,9 @@ public final class TextQuickSetupPanePart extends FXObject implements QuickSetup
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         VBox.setMargin(vBox, new Insets(2, 0, 0, 0));
     }

@@ -47,7 +47,7 @@ class CopyPasteSelectionList implements java.io.Serializable
             }
 
             var controlWrapper = wrapperType.createWrapper(controlContainerPane);
-            controlWrapper.setup();
+            controlWrapper.onSetup();
             controlWrapper.deserialize(new JSONDataMap(jsonObject));
             controlWrapperList.add(controlWrapper);
         }

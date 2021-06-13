@@ -31,9 +31,9 @@ public final class ChangePageSetupPane extends SetupPane<ChangePageAttribute>
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         selectPageComboBox.setOnShowing(event ->
         {

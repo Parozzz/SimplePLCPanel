@@ -9,5 +9,5 @@ public abstract class SuppliedJSONObjectParser<V> extends JSONObjectParser<V>
         super(identifier, valueClass);
     }
 
-    public abstract V create(JSONDataMap jsonDataMap);
+    public abstract V create(Object object);
 }

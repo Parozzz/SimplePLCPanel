@@ -5,7 +5,7 @@ import parozzz.github.com.simpleplcpanel.PLC.siemens.rwdata.SiemensS7ReadData;
 import parozzz.github.com.simpleplcpanel.PLC.siemens.rwdata.SiemensS7WriteData;
 import parozzz.github.com.simpleplcpanel.PLC.siemens.util.SiemensS7AreaType;
 import parozzz.github.com.simpleplcpanel.PLC.siemens.util.SiemensS7Error;
-import parozzz.github.com.simpleplcpanel.hmi.comm.CommThread;
+import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationThread;
 import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.intermediate.SiemensS7ReadableWrappedDataIntermediate;
 import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.intermediate.SiemensS7WrappedDataIntermediate;
 import parozzz.github.com.simpleplcpanel.hmi.comm.siemens.intermediate.SiemensS7WritableBitWrappedDataIntermediate;
@@ -19,20 +19,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public final class SiemensS7Thread extends CommThread<SiemensS7ConnectionParams>
+public final class SiemensS7Thread extends CommunicationThread<SiemensS7ConnectionParams>
 {
+    private final Set<SiemensS7WritableBitWrappedDataIntermediate> writeBitWrapperSet;
     private final Set<SiemensS7ReadableWrappedDataIntermediate<?>> readDataIntermediateSet;
     private final Set<SiemensS7WritableWrappedDataIntermediate<?>> writeDataIntermediateSet;
-
-    private final Set<SiemensS7WritableBitWrappedDataIntermediate> writeBitWrapperSet;
 
     private SiemensS7Client client;
 
     private SettableConcurrentObject<String> queryModelNumberObject;
 
-    public SiemensS7Thread()
+    public SiemensS7Thread(SiemensS7CommunicationManager communicationManager)
     {
-        this.setName("SiemensPLCThread");
+        super("SiemensS7Thread", communicationManager);
 
         writeBitWrapperSet = ConcurrentHashMap.newKeySet();
         readDataIntermediateSet = ConcurrentHashMap.newKeySet();

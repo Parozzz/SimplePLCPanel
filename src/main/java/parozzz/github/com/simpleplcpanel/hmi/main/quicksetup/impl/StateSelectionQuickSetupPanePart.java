@@ -31,9 +31,9 @@ public final class StateSelectionQuickSetupPanePart extends FXObject implements 
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         VBox.setMargin(vBox, new Insets(2, 0, 0, 0));
 

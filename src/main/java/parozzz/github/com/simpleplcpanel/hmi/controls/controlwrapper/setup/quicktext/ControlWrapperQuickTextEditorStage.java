@@ -43,9 +43,9 @@ public class ControlWrapperQuickTextEditorStage extends HMIStage<VBox> implement
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         this.getStageSetter()
                 .setAlwaysOnTop(true)
@@ -79,7 +79,7 @@ public class ControlWrapperQuickTextEditorStage extends HMIStage<VBox> implement
             try
             {
                 var statePane = new QuickTextEditorStatePane(wrapperState);
-                statePane.setup();
+                statePane.onSetup();
                 statePaneList.add(statePane);
             }
             catch(IOException e)

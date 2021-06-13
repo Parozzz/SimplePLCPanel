@@ -53,9 +53,9 @@ public class InputDataSetupPane extends SetupPane<InputDataAttribute>
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         integerDataPane.setup(super.getAttributeChangerList());
         realDataPane.setup(super.getAttributeChangerList());
@@ -134,8 +134,8 @@ public class InputDataSetupPane extends SetupPane<InputDataAttribute>
             var minValueFactory = this.parseSpinner(minValueSpinner);
             minValueFactory.maxProperty().bind(maxValueSpinner.valueProperty());
 */
-            attributeChangerList.createStringToNumber(maxValueTextField.textProperty(), InputDataAttribute.INTEGER_MAX_VALUE, Util::parseLongOrZero)
-                    .createStringToNumber(minValueTextField.textProperty(), InputDataAttribute.INTEGER_MIN_VALUE, Util::parseLongOrZero);
+            attributeChangerList.createStringToNumber(maxValueTextField.textProperty(), InputDataAttribute.INT_MAX_VALUE, Util::parseLongOrZero)
+                    .createStringToNumber(minValueTextField.textProperty(), InputDataAttribute.INT_MIN_VALUE, Util::parseLongOrZero);
         }
 
         private SpinnerValueFactory.IntegerSpinnerValueFactory parseSpinner(Spinner<Integer> spinner)

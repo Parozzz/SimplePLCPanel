@@ -41,9 +41,9 @@ public class SiemensS7StringAddressCreator
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         memoryAreaChoiceBox.setConverter(new EnumStringConverter<>(SiemensS7AreaType.class));
         memoryAreaChoiceBox.getItems().addAll(SiemensS7AreaType.values());
@@ -94,9 +94,9 @@ public class SiemensS7StringAddressCreator
     }
 
     @Override
-    public void setDefault()
+    public void onSetDefault()
     {
-        super.setDefault();
+        super.onSetDefault();
 
         var defaultAddressData = new SiemensS7StringAddressData();
         memoryAreaChoiceBox.getSelectionModel().select(defaultAddressData.getAreaType());
@@ -129,7 +129,7 @@ public class SiemensS7StringAddressCreator
         var stringAddressData = SiemensS7StringAddressData.parseStringData(stringData);
         if (stringAddressData == null || !stringAddressData.validate())
         {
-            this.setDefault();
+            this.onSetDefault();
             return false;
         }
 

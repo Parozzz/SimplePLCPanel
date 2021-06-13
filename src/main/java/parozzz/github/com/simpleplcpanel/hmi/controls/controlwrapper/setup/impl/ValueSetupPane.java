@@ -34,9 +34,9 @@ public final class ValueSetupPane extends SetupPane<ValueAttribute>
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         valueTypeChoiceBox.setConverter(FXUtil.toStringOnlyConverter(valueIntermediateType ->
         {

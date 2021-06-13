@@ -46,9 +46,9 @@ public final class DragAndDropPane
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         mainVBox.getChildren().add(0, this.createHideParent(Pos.TOP_LEFT));
         mainVBox.setMinSize(0 ,0);

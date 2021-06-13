@@ -26,9 +26,9 @@ public final class GenericQuickSetupPanePart extends FXObject implements QuickSe
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         VBox.setMargin(mainVBox, new Insets(2, 0, 0,  0));
 

@@ -30,9 +30,9 @@ public abstract class CommunicationStringAddressCreatorStage<T extends Communica
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         this.getStageSetter()
                 .setAlwaysOnTop(true)

@@ -40,9 +40,9 @@ public class BorderSetupPane extends SetupPane<BorderAttribute>
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         borderStyleChoiceBox.setConverter(new EnumStringConverter<>(BorderAttribute.StrokeStyle.class).setCapitalize());
         borderStyleChoiceBox.getItems().addAll(BorderAttribute.StrokeStyle.values());

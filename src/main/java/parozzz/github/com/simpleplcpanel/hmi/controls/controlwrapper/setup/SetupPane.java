@@ -43,9 +43,9 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
 
         selectButton.setBackground(FXUtil.createBackground(Color.TRANSPARENT));
         //selectButton.setBorder(FXUtil.createBorder(Color.LIGHTGRAY, 1));

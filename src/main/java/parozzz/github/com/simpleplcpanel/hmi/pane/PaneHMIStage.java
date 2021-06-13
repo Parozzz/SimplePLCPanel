@@ -29,9 +29,9 @@ public abstract class PaneHMIStage<P extends Pane> extends HMIStage<P>
     }
 
     @Override
-    public void setup()
+    public void onSetup()
     {
-        super.setup();
+        super.onSetup();
     }
 
     public void setBackground(Background background)
