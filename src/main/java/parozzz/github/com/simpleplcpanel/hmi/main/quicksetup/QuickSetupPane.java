@@ -4,12 +4,18 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import parozzz.github.com.simpleplcpanel.hmi.FXController;
+import parozzz.github.com.simpleplcpanel.hmi.ListViewTest;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
@@ -35,6 +41,9 @@ public final class QuickSetupPane
     private final VBox mainVBox;
     private final VBox paneVBox;
 
+    private final TreeView<ParentKey> treeView;
+    private final TreeItem<ParentKey> rootTreeItem;
+
     private final GenericQuickSetupPanePart genericQuickSetupPanePart;
     private final StateSelectionQuickSetupPanePart stateSelectionQuickSetupPanePart;
     private final SizeQuickSetupPanePart sizeQuickSetupPanePart;
@@ -52,8 +61,6 @@ public final class QuickSetupPane
     private final ChangeListener<WrapperState> wrapperStateChangeListener;
     private final ListChangeListener<WrapperState> wrapperStateListChangeListener;
 
-    //private final WrapperStateChangedConsumer stateChangeConsumer;
-
     private final BooleanProperty visible;
 
     private ControlWrapper<?> selectedControlWrapper;
@@ -66,6 +73,10 @@ public final class QuickSetupPane
                 this.scrollPane = new ScrollPane(
                         this.paneVBox = new VBox()
                 )
+        );
+
+        this.treeView = new TreeView<>(
+                rootTreeItem = new TreeItem<>(new ParentKey("root"))
         );
 
         this.addFXChild(this.genericQuickSetupPanePart = new GenericQuickSetupPanePart())
@@ -116,6 +127,89 @@ public final class QuickSetupPane
     public void onSetup()
     {
         super.onSetup();
+
+        treeView.setStyle("-fx-selection-bar: white; -fx-selection-bar-non-focused: white;");
+        treeView.setBackground(null);
+        treeView.setShowRoot(false);
+
+        treeView.setPadding(new Insets(10));
+        treeView.setMinSize(0, 0);
+        treeView.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        treeView.setCellFactory(tTreeView ->
+        {
+            var treeCell = new TreeCell<ParentKey>()
+            {
+                @Override
+                public void updateItem(ParentKey item, boolean empty)
+                {
+                    super.updateItem(item, empty);
+
+                    if (empty || item == null)
+                    {
+                        setText(null);
+                        setGraphic(null);
+                        return;
+                    }
+
+                    Parent graphic;
+
+                    var label = new Label(item.label);
+                    label.setFont(Font.font(11));
+                    label.setMinSize(0, 0);
+                    label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+                    label.setAlignment(Pos.CENTER);
+                    label.textFillProperty().addListener((observable, oldValue, newValue) ->
+                            label.setTextFill(Color.BLACK)
+                    );
+
+                    if (item instanceof ValuesKey)
+                    {
+                        var hBox = new HBox();
+                        hBox.setMinSize(0, 0);
+                        hBox.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+                        hBox.setSpacing(10);
+                        hBox.setBorder(FXUtil.createBorder(Color.LIGHTGRAY, 1));
+
+                        hBox.getChildren().add(label);
+                        hBox.getChildren().addAll(
+                                ((ValuesKey) item).nodeList
+                        );
+
+                        graphic = hBox;
+                    } else
+                    {
+                        var disclosureNode = getDisclosureNode();
+                        if (disclosureNode instanceof Region)
+                        {
+                            ((Region) disclosureNode).setBorder(
+                                    new FXUtil.BorderBuilder()
+                                            .left(Color.LIGHTGRAY, 1)
+                                            .top(Color.LIGHTGRAY, 1)
+                                            .bottom(Color.LIGHTGRAY, 1)
+                                            .createBorder()
+                            );
+                        }
+
+                        label.setBorder(
+                                new FXUtil.BorderBuilder()
+                                        .top(Color.LIGHTGRAY, 1)
+                                        .right(Color.LIGHTGRAY, 1)
+                                        .bottom(Color.LIGHTGRAY, 1)
+                                        .createBorder()
+                        );
+
+                        graphic = label;
+                    }
+
+                    setGraphic(graphic);
+                }
+            };
+            treeCell.setMinSize(0, 0);
+            treeCell.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            treeCell.setPadding(Insets.EMPTY);
+            //treeCell.setBackground(FXUtil.createBackground(Color.WHITE));
+            return treeCell;
+        });
 
         //Hide VBox Button at the TOP
         mainVBox.getChildren().add(0, this.createHideParent(Pos.TOP_RIGHT));
@@ -196,7 +290,7 @@ public final class QuickSetupPane
         children.clear();
         for (var quickSetupPane : quickSetupPanePartList)
         {
-            if (quickSetupPane.validateControlWrapper(controlWrapper))
+            if (quickSetupPane.isControlWrapperValid(controlWrapper))
             {
                 children.add(quickSetupPane.getParent());
             }
@@ -227,6 +321,37 @@ public final class QuickSetupPane
         {
             quickSetupPane.addBinders(stateBinder);
             quickSetupPanePartList.add(quickSetupPane);
+        }
+    }
+
+    public static class ParentKey
+    {
+        private final String label;
+
+        public ParentKey(String label)
+        {
+            this.label = label;
+        }
+
+        public String getLabel()
+        {
+            return label;
+        }
+    }
+
+    public static class ValuesKey extends ParentKey
+    {
+        private final List<Node> nodeList;
+
+        public ValuesKey(String label)
+        {
+            super(label);
+            this.nodeList = new ArrayList<>();
+        }
+
+        public List<Node> getNodeList()
+        {
+            return nodeList;
         }
     }
 }

@@ -7,9 +7,12 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.skin.ListCellSkin;
 import javafx.scene.control.skin.TreeCellSkin;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import parozzz.github.com.simpleplcpanel.hmi.pane.HMIStage;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
 
@@ -26,6 +29,8 @@ public final class ListViewTest extends HMIStage<StackPane>
 
     void init()
     {
+        treeView.setStyle("-fx-selection-bar: white; -fx-selection-bar-non-focused: white;");
+        treeView.setBackground(null);
         treeView.setShowRoot(false);
 
         treeView.setPadding(new Insets(10));
@@ -43,14 +48,14 @@ public final class ListViewTest extends HMIStage<StackPane>
 
                     if (empty || item == null)
                     {
-                        this.setText(null);
-                        this.setGraphic(null);
+                        setText(null);
+                        setGraphic(null);
                         return;
                     }
 
                     if (item instanceof TreeViewItem)
                     {
-                        setText(null);
+                        //setStyle("-fx-indent: 0");
 
                         var hBox = new HBox();
                         hBox.setMinSize(0, 0);
@@ -58,23 +63,59 @@ public final class ListViewTest extends HMIStage<StackPane>
                         hBox.setSpacing(10);
 
                         var label = new Label(item.label);
+                        label.setFont(Font.font(11));
                         label.setMinSize(0, 0);
                         label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
                         label.setAlignment(Pos.CENTER);
+                        label.textFillProperty().addListener((observable, oldValue, newValue) ->
+                                label.setTextFill(Color.BLACK)
+                        );
 
                         hBox.getChildren().addAll(label, ((TreeViewItem) item).node);
 
-                        this.setGraphic(hBox);
+                        setGraphic(hBox);
+
+                        hBox.setBorder(FXUtil.createBorder(Color.LIGHTGRAY, 1));
                     } else
                     {
-                        this.setText(item.label);
-                        setGraphic(null);
+                        //setStyle("-fx-indent: 10");
+
+                        var label = new Label(item.label);
+                        label.setFont(Font.font(11));
+                        label.setMinSize(0, 0);
+                        label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+                        label.setAlignment(Pos.CENTER_LEFT);
+                        label.textFillProperty().addListener((observable, oldValue, newValue) ->
+                                label.setTextFill(Color.BLACK)
+                        );
+
+                        setGraphic(label);
+
+                        var disclosureNode = getDisclosureNode();
+                        if(disclosureNode instanceof Region)
+                        {
+                            ((Region) disclosureNode).setBorder(
+                                    new FXUtil.BorderBuilder()
+                                            .left(Color.LIGHTGRAY, 1)
+                                            .top(Color.LIGHTGRAY, 1)
+                                            .bottom(Color.LIGHTGRAY, 1)
+                                            .createBorder()
+                            );
+                        }
+
+                        label.setBorder(
+                                new FXUtil.BorderBuilder()
+                                        .top(Color.LIGHTGRAY, 1)
+                                        .right(Color.LIGHTGRAY, 1)
+                                        .bottom(Color.LIGHTGRAY, 1)
+                                        .createBorder()
+                        );
                     }
                 }
             };
-            treeCell.setStyle("-fx-indent: 10;");
             treeCell.setMinSize(0, 0);
             treeCell.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            treeCell.setPadding(Insets.EMPTY);
             //treeCell.setBackground(FXUtil.createBackground(Color.WHITE));
             return treeCell;
         });
@@ -110,8 +151,25 @@ public final class ListViewTest extends HMIStage<StackPane>
         treeView.setRoot(rootItem);
 
         treeView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        /*treeView.setFocusModel(new FocusModel<>()
+        {
+            @Override
+            protected int getItemCount()
+            {
+                return 0;
+            }
 
-        super.parent.getChildren().add(treeView);
+            @Override
+            protected TreeItem<FolderTreeViewItem> getModelItem(int index)
+            {
+                return null;
+            }
+        });*/
+
+        var scrollPane = new ScrollPane(treeView);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setBackground(FXUtil.createBackground(Color.TRANSPARENT));
+        super.parent.getChildren().add(scrollPane);
     }
 
     private static class TreeViewItem extends FolderTreeViewItem

@@ -43,7 +43,7 @@ public final class TextQuickSetupPanePart extends FXObject implements QuickSetup
     }
 
     @Override
-    public boolean validateControlWrapper(ControlWrapper<?> controlWrapper)
+    public boolean isControlWrapperValid(ControlWrapper<?> controlWrapper)
     {
         return controlWrapper.getAttributeTypeManager().hasType(AttributeType.TEXT);
     }

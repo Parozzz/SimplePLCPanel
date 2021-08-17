@@ -43,7 +43,7 @@ public final class BackgroundQuickSetupPanePart extends FXObject implements Quic
     }
 
     @Override
-    public boolean validateControlWrapper(ControlWrapper<?> controlWrapper)
+    public boolean isControlWrapperValid(ControlWrapper<?> controlWrapper)
     {
         return controlWrapper.getAttributeTypeManager().hasType(AttributeType.BACKGROUND);
     }

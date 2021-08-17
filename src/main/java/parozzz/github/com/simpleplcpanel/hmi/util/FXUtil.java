@@ -46,7 +46,6 @@ public class FXUtil
     {
         return new Border(new BorderStroke(color, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(width)));
     }
-
     public static <T> StringConverter<T> toStringOnlyConverter(Function<T, String> function)
     {
         return new StringConverter<>() {
@@ -156,5 +155,56 @@ public class FXUtil
         }
 
         return newEventHandler;
+    }
+
+    public static class BorderBuilder
+    {
+        private final Color[] colorArray;
+        private final int[] widthArray;
+
+        public BorderBuilder()
+        {
+            colorArray = new Color[4];
+            widthArray = new int[4];
+        }
+
+        public BorderBuilder top(Color color, int width)
+        {
+            return set(0, color, width);
+        }
+
+        public BorderBuilder right(Color color, int width)
+        {
+            return set(1, color, width);
+        }
+
+        public BorderBuilder bottom(Color color, int width)
+        {
+            return set(2, color, width);
+        }
+
+        public BorderBuilder left(Color color, int width)
+        {
+            return set(3, color, width);
+        }
+
+        private BorderBuilder set(int index, Color color, int width)
+        {
+            colorArray[index] = color;
+            widthArray[index] = width;
+            return this;
+        }
+
+        public Border createBorder()
+        {
+            var borderWidths = new BorderWidths(widthArray[0], widthArray[1], widthArray[2], widthArray[3]);
+
+            var stroke = new BorderStroke(
+                    colorArray[0], colorArray[1], colorArray[2], colorArray[3],
+                BorderStrokeStyle.SOLID, BorderStrokeStyle.SOLID, BorderStrokeStyle.SOLID,BorderStrokeStyle.SOLID,
+                CornerRadii.EMPTY, borderWidths, Insets.EMPTY
+            );
+            return new Border(stroke);
+        }
     }
 }

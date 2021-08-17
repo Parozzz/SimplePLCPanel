@@ -7,7 +7,7 @@ public interface QuickSetupPanePart
 {
     Parent getParent();
 
-    boolean validateControlWrapper(ControlWrapper<?> controlWrapper);
+    boolean isControlWrapperValid(ControlWrapper<?> controlWrapper);
 
     void clearControlWrapper();
 

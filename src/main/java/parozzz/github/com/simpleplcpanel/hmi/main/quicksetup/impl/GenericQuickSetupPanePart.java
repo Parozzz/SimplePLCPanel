@@ -41,7 +41,7 @@ public final class GenericQuickSetupPanePart extends FXObject implements QuickSe
     }
 
     @Override
-    public boolean validateControlWrapper(ControlWrapper<?> controlWrapper)
+    public boolean isControlWrapperValid(ControlWrapper<?> controlWrapper)
     {
         typeTextField.setText(controlWrapper.getType().getUserFriendlyName());
         return true;

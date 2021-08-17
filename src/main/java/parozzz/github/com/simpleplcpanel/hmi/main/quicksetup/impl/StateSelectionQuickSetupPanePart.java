@@ -70,7 +70,7 @@ public final class StateSelectionQuickSetupPanePart extends FXObject implements 
     }
 
     @Override
-    public boolean validateControlWrapper(ControlWrapper<?> controlWrapper)
+    public boolean isControlWrapperValid(ControlWrapper<?> controlWrapper)
     {
         if(controlWrapper.isStateless())
         {
