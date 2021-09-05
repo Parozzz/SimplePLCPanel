@@ -1,32 +1,49 @@
 package parozzz.github.com.simpleplcpanel.hmi;
 
-import com.sun.source.tree.Tree;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.control.*;
-import javafx.scene.control.skin.ListCellSkin;
-import javafx.scene.control.skin.TreeCellSkin;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
+import javafx.scene.control.Button;
+import javafx.scene.image.Image;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
+import javafx.stage.WindowEvent;
+import org.controlsfx.control.GridView;
+import org.controlsfx.control.Notifications;
+import org.controlsfx.control.PopOver;
+import org.controlsfx.control.cell.ImageGridCell;
 import parozzz.github.com.simpleplcpanel.hmi.pane.HMIStage;
-import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 public final class ListViewTest extends HMIStage<StackPane>
 {
-    private final TreeView<FolderTreeViewItem> treeView;
+    //private final TreeView<FolderTreeViewItem> treeView;
     public ListViewTest()
     {
         super(new StackPane());
-
-        this.treeView = new TreeView<>();
-        init();
+        doInit();
+        //this.treeView = new TreeView<>();
+        //init();
     }
 
+    void doInit()
+    {
+        var button = new Button();
+        super.parent.getChildren().addAll(
+                button
+        );
+
+        var popOver = new PopOver();
+        popOver.setPrefSize(300, 300);
+        popOver.setDetachable(false);
+        button.setOnMouseClicked(event ->{
+            if(!popOver.isShowing())
+            {
+                popOver.show(button);
+            }
+        });
+        Notifications.create().text("CoolBro").darkStyle().show();
+    }
+/*
     void init()
     {
         treeView.setStyle("-fx-selection-bar: white; -fx-selection-bar-non-focused: white;");
@@ -165,7 +182,7 @@ public final class ListViewTest extends HMIStage<StackPane>
                 return null;
             }
         });*/
-
+/*
         var scrollPane = new ScrollPane(treeView);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setBackground(FXUtil.createBackground(Color.TRANSPARENT));
@@ -192,5 +209,5 @@ public final class ListViewTest extends HMIStage<StackPane>
         {
             this.label = label;
         }
-    }
+    }*/
 }
