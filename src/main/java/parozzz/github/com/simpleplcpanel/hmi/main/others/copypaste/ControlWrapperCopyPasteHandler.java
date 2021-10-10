@@ -45,7 +45,7 @@ public class ControlWrapperCopyPasteHandler extends FXObject
     private void saveSelectedWrappers(ControlContainerPane controlContainerPane, boolean cut)
     {
         var selectionList = new CopyPasteSelectionList();
-        controlContainerPane.getSelectionManager().forEach(controlWrapper ->
+        controlContainerPane.getMultipleSelectionManager().forEach(controlWrapper ->
         {
             selectionList.add(controlWrapper);
             if(cut)

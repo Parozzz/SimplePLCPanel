@@ -7,9 +7,10 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0" spacing="10.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0" spacing="10.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label contentDisplay="RIGHT" graphicTextGap="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Enabled">
+      <Label alignment="CENTER" contentDisplay="RIGHT" graphicTextGap="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Enabled">
          <graphic>
             <CheckBox fx:id="enabledCheckBox" mnemonicParsing="false" />
          </graphic>
@@ -17,7 +18,7 @@
             <Font size="17.0" />
          </font>
       </Label>
-      <HBox maxHeight="-Infinity" maxWidth="-Infinity" spacing="10.0">
+      <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" spacing="10.0">
          <children>
             <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Page Name">
                <font>

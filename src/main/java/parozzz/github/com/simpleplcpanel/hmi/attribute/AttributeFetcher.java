@@ -4,10 +4,15 @@ import parozzz.github.com.simpleplcpanel.Nullable;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.state.WrapperState;
 
+import java.util.Objects;
+
 public final class AttributeFetcher
 {
+    @Nullable
     public static <A extends Attribute> A fetch(ControlWrapper<?> controlWrapper, AttributeType<A> attributeType)
     {
+        Objects.requireNonNull(controlWrapper, "Cannot fetch an attribute from a null ControlWrapper");
+
         var attributeManager = controlWrapper.getAttributeTypeManager();
 
         AttributeMap attributeMap;
@@ -23,6 +28,16 @@ public final class AttributeFetcher
         }
 
         return attributeMap.get(attributeType);
+    }
+
+    public static <A extends Attribute> A fetchRequired(ControlWrapper<?> controlWrapper, AttributeType<A> attributeType)
+    {
+        var attribute = fetch(controlWrapper, attributeType);
+        if(attribute == null)
+        {
+            throw new NullPointerException("Trying to fetch an attribute but it has returned null. Type: " + attributeType.getAttributeClass().getSimpleName());
+        }
+        return attribute;
     }
 
     @Nullable

@@ -21,6 +21,5 @@ public final class SizeAttribute extends Attribute
         super(attributeMap, AttributeType.SIZE, ATTRIBUTE_NAME);
 
         super.getAttributePropertyManager().addAll(ADAPT, WIDTH, HEIGHT, PADDING);
-
     }
 }

@@ -24,9 +24,11 @@ import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrap
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapperType;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.ControlWrapperSetupStage;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.quicktext.ControlWrapperQuickTextEditorStage;
-import parozzz.github.com.simpleplcpanel.hmi.controls.others.ControlWrappersSelectionManager;
 import parozzz.github.com.simpleplcpanel.hmi.main.MainEditStage;
 import parozzz.github.com.simpleplcpanel.hmi.main.PageScrollingPane;
+import parozzz.github.com.simpleplcpanel.hmi.pane.HMIStage;
+import parozzz.github.com.simpleplcpanel.hmi.redoundo.UndoRedoManager;
+import parozzz.github.com.simpleplcpanel.hmi.redoundo.UndoRedoPane;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.JSONSerializables;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataArray;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
@@ -42,7 +44,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public class ControlContainerPane extends FXController implements Loggable
+public class ControlContainerPane extends FXController implements Loggable, UndoRedoPane
 {
     private final MainEditStage mainEditStage;
     private final ControlContainerDatabase controlContainerDatabase;
@@ -54,7 +56,7 @@ public class ControlContainerPane extends FXController implements Loggable
     private final PageScrollingPane.ImagePane mainEditBottomImagePane;
 
     private final Set<ControlWrapper<?>> controlWrapperSet;
-    private final ControlWrappersSelectionManager controlWrappersSelectionManager;
+    private final ControlWrappersMultipleSelectionManager controlWrappersMultipleSelectionManager;
 
     private final BooleanProperty activeProperty;
     private final Property<Color> backgroundColorProperty;
@@ -77,7 +79,7 @@ public class ControlContainerPane extends FXController implements Loggable
 
         this.mainEditBottomImagePane = new PageScrollingPane.ImagePane(this);
 
-        super.addFXChild(controlWrappersSelectionManager = new ControlWrappersSelectionManager(this, mainAnchorPane));
+        super.addFXChild(controlWrappersMultipleSelectionManager = new ControlWrappersMultipleSelectionManager(this, mainAnchorPane));
         this.controlWrapperSet = new HashSet<>();
 
         this.activeProperty = new SimpleBooleanProperty(false);
@@ -95,7 +97,7 @@ public class ControlContainerPane extends FXController implements Loggable
 
         mainAnchorPane.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent ->
         {
-            if (controlWrappersSelectionManager.isEmpty())
+            if (controlWrappersMultipleSelectionManager.isEmpty())
             {
                 return;
             }
@@ -105,17 +107,17 @@ public class ControlContainerPane extends FXController implements Loggable
             {
                 case DELETE:
                     keyEvent.consume();
-                    controlWrappersSelectionManager.deleteAll();
+                    controlWrappersMultipleSelectionManager.deleteAll();
                     break;
                 case RIGHT:
                 case LEFT:
                     keyEvent.consume();
-                    controlWrappersSelectionManager.moveAll(keyCode == KeyCode.RIGHT ? 1 : -1, 0d);
+                    controlWrappersMultipleSelectionManager.moveAll(keyCode == KeyCode.RIGHT ? 1 : -1, 0d);
                     break;
                 case UP:
                 case DOWN:
                     keyEvent.consume();
-                    controlWrappersSelectionManager.moveAll(0d, keyCode == KeyCode.UP ? -1 : 1);
+                    controlWrappersMultipleSelectionManager.moveAll(0d, keyCode == KeyCode.UP ? -1 : 1);
                     break;
             }
         });
@@ -235,9 +237,9 @@ public class ControlContainerPane extends FXController implements Loggable
         return name;
     }
 
-    public ControlWrappersSelectionManager getSelectionManager()
+    public ControlWrappersMultipleSelectionManager getMultipleSelectionManager()
     {
-        return controlWrappersSelectionManager;
+        return controlWrappersMultipleSelectionManager;
     }
 
     public ControlWrapper<?> createControlWrapper(ControlWrapperType<?, ?> wrapperType)
@@ -286,10 +288,15 @@ public class ControlContainerPane extends FXController implements Loggable
 
         newControlWrapperConsumer.accept(controlWrapper);
 
-        var undoRedoManager = this.controlContainerDatabase.getMainEditStage().getUndoRedoManager();
-        undoRedoManager.addAction(() -> this.deleteControlWrapper(controlWrapper),
-                () -> this.addControlWrapper(controlWrapper),
-                this);
+        UndoRedoManager.getInstance().addUndoAction(returnPaneOnly ->
+        {
+            if(!returnPaneOnly)
+            {
+                this.deleteControlWrapper(controlWrapper);
+            }
+
+            return ControlContainerPane.this;
+        });
     }
 
     public void deleteControlWrapper(ControlWrapper<?> controlWrapper)
@@ -306,10 +313,15 @@ public class ControlContainerPane extends FXController implements Loggable
 
         controlWrapper.setValid(false);
 
-        var undoRedoManager = this.controlContainerDatabase.getMainEditStage().getUndoRedoManager();
-        undoRedoManager.addAction(() -> this.addControlWrapper(controlWrapper),
-                () -> this.deleteControlWrapper(controlWrapper),
-                this);
+        UndoRedoManager.getInstance().addUndoAction(returnPaneOnly ->
+        {
+            if(!returnPaneOnly)
+            {
+                this.addControlWrapper(controlWrapper);
+            }
+
+            return ControlContainerPane.this;
+        });
     }
 
     public void setBackgroundColor(Color color)
@@ -383,8 +395,7 @@ public class ControlContainerPane extends FXController implements Loggable
         if (controlJSONArray != null)
         {
             //This is necessary otherwise you would be able to cancel stuff from serialization
-            var undoRedoManager = this.getMainEditStage().getUndoRedoManager();
-            undoRedoManager.setIgnoreNew(true);
+            UndoRedoManager.getInstance().startIgnoringNextActions();
 
             controlJSONArray.stream().filter(JSONObject.class::isInstance)
                     .map(JSONObject.class::cast)
@@ -401,7 +412,7 @@ public class ControlContainerPane extends FXController implements Loggable
                         }
                     });
 
-            undoRedoManager.setIgnoreNew(false);
+            UndoRedoManager.getInstance().stopIgnoringNextActions();
         } else
         {
             MainLogger.getInstance()
@@ -443,5 +454,11 @@ public class ControlContainerPane extends FXController implements Loggable
                 "BackgroundColor: " + backgroundColorProperty.getValue() +
                 "BackgroundPictureName: " + backgroundPictureNameProperty.getValue() +
                 "ControlWrapperAmount: " + controlWrapperSet.size();
+    }
+
+    @Override
+    public void undoActionExecuted()
+    {
+        this.mainEditStage.showStage();
     }
 }

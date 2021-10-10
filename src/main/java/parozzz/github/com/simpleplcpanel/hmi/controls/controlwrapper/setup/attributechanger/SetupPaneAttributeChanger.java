@@ -4,9 +4,11 @@ import javafx.beans.property.Property;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.Attribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.property.AttributeProperty;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.SetupPane;
+import parozzz.github.com.simpleplcpanel.hmi.redoundo.UndoRedoManager;
 import parozzz.github.com.simpleplcpanel.logger.Loggable;
 import parozzz.github.com.simpleplcpanel.logger.MainLogger;
 
+import java.util.Objects;
 import java.util.function.Function;
 
 public final class SetupPaneAttributeChanger<A extends Attribute>
@@ -15,8 +17,7 @@ public final class SetupPaneAttributeChanger<A extends Attribute>
     private final SetupPane<A> setupPane;
     private final PropertyBis<?, ?> propertyBis;
     private A attribute;
-    private boolean ignoreUpdate;
-    //private boolean dataChanged = false;
+    private boolean ignoreAttributeUpdate;
 
     public <V> SetupPaneAttributeChanger(SetupPane<A> setupPane,
             Property<V> property,
@@ -38,21 +39,22 @@ public final class SetupPaneAttributeChanger<A extends Attribute>
         {
             if(attribute != null)
             {
-                ignoreUpdate = true;
+                ignoreAttributeUpdate = true;
                 propertyBis.setDataToAttribute(attribute);
-                ignoreUpdate = false;
-            }
-/*
-            if(oldValue == null)
-            {
-                if(newValue != null)
+
+                //This will set all the changed values to every selected control wrappers. It will be here to avoid
+                //updating secondary if an attribute is not set (During strange transitions / states)
+                for(var secondaryWrapperState : setupPane.getSetupStage().getSecondarySelectedWrapperStateSet())
                 {
-                    dataChanged = true;
+                    var secondaryAttribute = secondaryWrapperState.getAttributeMap().get(setupPane.getAttributeType());
+                    if(secondaryAttribute != null)
+                    {
+                        propertyBis.setDataToAttribute(secondaryAttribute);
+                    }
                 }
-            }else if(!oldValue.equals(newValue))
-            {
-                dataChanged = true;
-            }*/
+
+                ignoreAttributeUpdate = false;
+            }
         });
     }
 
@@ -65,26 +67,19 @@ public final class SetupPaneAttributeChanger<A extends Attribute>
     {
         return propertyBis.property;
     }
-/*
-    public void resetDataChanged()
-    {
-        dataChanged = false;
-    }
-
-    public boolean isDataChanged()
-    {
-        return dataChanged;
-    }
-*/
 
     public void bindToAttribute(A attribute)
     {
         this.attribute = attribute;
+        if(attribute == null)
+        {
+            return;
+        }
 
         propertyBis.copyDataFromAttribute(attribute);
         attribute.addAttributeUpdaterRunnable(this, () ->
         {
-            if(this.attribute == null || ignoreUpdate)
+            if(this.attribute == null || ignoreAttributeUpdate)
             {
                 return;
             }
@@ -139,22 +134,20 @@ public final class SetupPaneAttributeChanger<A extends Attribute>
 
         public void clear()
         {
-            var undoRedoManager = setupPane.getSetupStage().getUndoRedoManager();
-            undoRedoManager.setIgnoreNew(true); //Ignore all the actions while copying data to an SetupPane
+            UndoRedoManager.getInstance().startIgnoringNextActions(); //Ignore all the actions while copying data to an SetupPane
 
             var defaultValue = attributeProperty.getDefaultValue();
             property.setValue(attributeToPropertyConvert.apply(defaultValue));
 
-            undoRedoManager.setIgnoreNew(false);
+            UndoRedoManager.getInstance().stopIgnoringNextActions();
         }
 
         public void revertToDefaultValues(A attribute)
         {
-            var undoRedoManager = setupPane.getSetupStage().getUndoRedoManager();
-            undoRedoManager.setIgnoreNew(true); //Ignore all the actions while copying data to an SetupPane
-
             try
             {
+                UndoRedoManager.getInstance().startIgnoringNextActions();
+
                 var defaultValue = attributeProperty.getDefaultValue();
                 attribute.setValue(attributeProperty, defaultValue);
                 property.setValue(attributeToPropertyConvert.apply(defaultValue));
@@ -167,17 +160,18 @@ public final class SetupPaneAttributeChanger<A extends Attribute>
                         , exception
                 );
             }
-
-            undoRedoManager.setIgnoreNew(false);
+            finally
+            {
+                UndoRedoManager.getInstance().stopIgnoringNextActions();
+            }
         }
 
         public void copyDataFromAttribute(A attribute)
         {
-            var undoRedoManager = setupPane.getSetupStage().getUndoRedoManager();
-            undoRedoManager.setIgnoreNew(true); //Ignore all the actions while copying data to an SetupPane
-
             try
             {
+                UndoRedoManager.getInstance().startIgnoringNextActions();
+
                 var attributeValue = attribute.getValue(attributeProperty);
                 if(attributeValue == null)
                 {
@@ -203,12 +197,16 @@ public final class SetupPaneAttributeChanger<A extends Attribute>
                         , exception
                 );
             }
-            
-            undoRedoManager.setIgnoreNew(false);
+            finally
+            {
+                UndoRedoManager.getInstance().stopIgnoringNextActions();
+            }
         }
 
         public void setDataToAttribute(A attribute)
         {
+            Objects.requireNonNull(attribute, "Trying to set data to an attribute that has value null");
+
             try
             {
                 var propertyValue = property.getValue();

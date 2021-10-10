@@ -5,6 +5,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -17,11 +18,16 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 import javafx.util.converter.NumberStringConverter;
+import parozzz.github.com.simpleplcpanel.logger.MainLogger;
+import parozzz.github.com.simpleplcpanel.util.ReflectionUtil;
 import parozzz.github.com.simpleplcpanel.util.Util;
 
 import java.io.IOException;
-import java.util.Locale;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 public class FXUtil
 {
@@ -111,6 +117,56 @@ public class FXUtil
         }
 
         return fxmlLoader.load();
+    }
+
+    public static boolean validateAllFXML(Object obj)
+    {
+        var clazz = obj.getClass();
+        for(var field : clazz.getDeclaredFields())
+        {
+            field.trySetAccessible();
+
+            var isFXML = field.isAnnotationPresent(FXML.class);
+            if(isFXML && ReflectionUtil.getFieldValue(field, obj) == null)
+            {
+                MainLogger.getInstance().error("An object has failed FXML validation. One field value is null. " +
+                        "Class: " + clazz.getSimpleName() + ". FieldName: " + field.getName(), null);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static Map<Class<?>, Set<Field>> CASHED_FXML_VALIDATION_MAP;
+    public static boolean validateAllFXMLWithCashing(Object obj)
+    {
+        if(CASHED_FXML_VALIDATION_MAP == null)
+        {
+            CASHED_FXML_VALIDATION_MAP = new IdentityHashMap<>();
+        }
+
+        var clazz = obj.getClass();
+
+        var fieldSet = CASHED_FXML_VALIDATION_MAP.get(clazz);
+        if(fieldSet == null)
+        {
+            CASHED_FXML_VALIDATION_MAP.put(clazz, fieldSet = new HashSet<>());
+            Stream.of(clazz.getDeclaredFields())
+                    .filter(field -> field.isAnnotationPresent(FXML.class))
+                    .peek(AccessibleObject::trySetAccessible)
+                    .forEach(fieldSet::add);
+        }
+
+        for(var field : fieldSet)
+        {
+            if(ReflectionUtil.getFieldValue(field, obj) == null)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /*

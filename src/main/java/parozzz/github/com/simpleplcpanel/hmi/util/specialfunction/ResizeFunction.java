@@ -45,7 +45,7 @@ final class ResizeFunction
         }
 
         resizable.setLastPressedWasResize(true);
-        resizable.setResizing(true);
+        resizable.setIsResizing(true);
         //resizing = true;
 
         var resizable = specialFunctionManager.getTargetRegion();
@@ -66,7 +66,7 @@ final class ResizeFunction
             return;
         }
 
-        resizable.setResizing(false);
+        resizable.setIsResizing(false);
         //resizing = false;
     }
 

@@ -1,5 +1,6 @@
 package parozzz.github.com.simpleplcpanel.hmi.attribute;
 
+import parozzz.github.com.simpleplcpanel.Nullable;
 import parozzz.github.com.simpleplcpanel.hmi.FXController;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.attributes.ControlWrapperAttributeTypeManager;
@@ -49,6 +50,7 @@ public final class AttributeMap extends FXController
         return controlWrapper;
     }
 
+    @Nullable
     public <T extends Attribute> T get(AttributeType<T> attributeType)
     {
         var attributeClass = attributeType.getAttributeClass();
@@ -57,6 +59,21 @@ public final class AttributeMap extends FXController
         return attributeClass.isInstance(attribute)
                 ? attributeClass.cast(attribute)
                 : null;
+    }
+
+    public <T extends Attribute> T getRequired(AttributeType<T> attributeType)
+    {
+        var attributeClass = attributeType.getAttributeClass();
+
+        var attribute = typeToAttributeMap.get(attributeType);
+        if(attributeClass.isInstance(attribute))
+        {
+            return attributeClass.cast(attribute);
+        }
+
+        throw new IllegalArgumentException("An attribute of type "
+                + attributeType.getAttributeClass().getSimpleName() +
+                " is not present inside AttributeMap althougn required.");
     }
 
     public boolean contains(Attribute attribute)

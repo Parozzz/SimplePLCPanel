@@ -45,9 +45,9 @@ public class AddressSetupPane<A extends AddressAttribute>
 
     public AddressSetupPane(ControlWrapperSetupStage setupPage,
             TagsManager tagsManager, CommunicationDataHolder communicationDataHolder,
-            String buttonText, AttributeType<A> attributeType) throws IOException
+            AttributeType<A> attributeType) throws IOException
     {
-        super(setupPage, buttonText + "SetupPage", buttonText, attributeType);
+        super(setupPage, attributeType.getAttributeClass().getSimpleName() + "-SetupPage", attributeType);
 
         this.tagsManager = tagsManager;
         this.communicationDataHolder = communicationDataHolder;

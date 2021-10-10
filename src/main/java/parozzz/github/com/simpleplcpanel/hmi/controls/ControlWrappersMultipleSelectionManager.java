@@ -1,4 +1,4 @@
-package parozzz.github.com.simpleplcpanel.hmi.controls.others;
+package parozzz.github.com.simpleplcpanel.hmi.controls;
 
 import com.sun.javafx.collections.TrackableObservableList;
 import javafx.beans.property.SimpleListProperty;
@@ -9,24 +9,28 @@ import javafx.scene.layout.Region;
 import parozzz.github.com.simpleplcpanel.hmi.FXObject;
 import parozzz.github.com.simpleplcpanel.hmi.controls.ControlContainerPane;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
-import parozzz.github.com.simpleplcpanel.hmi.util.multipleobjects.MultipleObjectDragManager;
+import parozzz.github.com.simpleplcpanel.hmi.util.multipleobjects.DragAndResizeObject;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
-public final class ControlWrappersSelectionManager extends FXObject
+public final class ControlWrappersMultipleSelectionManager extends FXObject
 {
     private final ControlContainerPane controlContainerPane;
 
-    private final MultipleObjectDragManager dragManager;
+    private final List<DragAndResizeObject> dragAndResizeObjectList;
     private final ObservableList<ControlWrapper<?>> selectedControlWrapperList;
 
     private ControlWrapper<?> mainSelection;
 
-    public ControlWrappersSelectionManager(ControlContainerPane controlContainerPane, Region regionContainer)
+    public ControlWrappersMultipleSelectionManager(ControlContainerPane controlContainerPane, Region regionContainer)
     {
         this.controlContainerPane = controlContainerPane;
 
-        this.dragManager = new MultipleObjectDragManager(regionContainer);
+        this.dragAndResizeObjectList = new ArrayList<>();
         this.selectedControlWrapperList = new SimpleListProperty<>(new TrackableObservableList<>()
         {
             @Override
@@ -37,18 +41,26 @@ public final class ControlWrappersSelectionManager extends FXObject
                 {
                     for(var addedControlWrapper : change.getAddedSubList())
                     {
-                        addedControlWrapper.setSelected(true);
-                        dragManager.addRegion(addedControlWrapper.getContainerPane(), addedControlWrapper);
+                        addedControlWrapper.getSelectionHandler().setSelected(true);
+
+                        var dragAndResizeObject = addedControlWrapper.getDragAndResizeObject();
+                        dragAndResizeObjectList.add(dragAndResizeObject);
+
+                        dragAndResizeObject.setGroupedObjectIterable(dragAndResizeObjectList);
                     }
 
                     for(var removedControlWrapper : change.getRemoved())
                     {
-                        removedControlWrapper.setSelected(false);
-                        dragManager.removeRegion(removedControlWrapper.getContainerPane());
+                        removedControlWrapper.getSelectionHandler().setSelected(false);
+
+                        var dragAndResizeObject = removedControlWrapper.getDragAndResizeObject();
+                        dragAndResizeObjectList.remove(dragAndResizeObject);
+
+                        dragAndResizeObject.setGroupedObjectIterable(null);
                     }
                 }
 
-                if(mainSelection != null && !mainSelection.isSelected())
+                if(mainSelection != null && !mainSelection.getSelectionHandler().isSelected())
                 {
                     mainSelection = null;
                     controlContainerPane.getMainEditStage().getQuickPropertiesVBox().setSelectedControlWrapper(null);
@@ -56,7 +68,7 @@ public final class ControlWrappersSelectionManager extends FXObject
 
                 if(mainSelection == null && finalList.size() != 0)
                 {
-                    (mainSelection = finalList.get(0)).setAsMainSelection();
+                    (mainSelection = finalList.get(0)).getSelectionHandler().setMainSelection(true);
                     controlContainerPane.getMainEditStage().getQuickPropertiesVBox().setSelectedControlWrapper(mainSelection);
                 }
             }
@@ -109,6 +121,17 @@ public final class ControlWrappersSelectionManager extends FXObject
         selectedControlWrapperList.forEach(consumer);
     }
 
+    public void forEachIgnoring(ControlWrapper<?> toBeIgnored, Consumer<ControlWrapper<?>> consumer)
+    {
+        for(var controlWrapper : selectedControlWrapperList)
+        {
+            if(controlWrapper != toBeIgnored)
+            {
+                consumer.accept(controlWrapper);
+            }
+        }
+    }
+
     public int size()
     {
         return selectedControlWrapperList.size();
@@ -135,22 +158,18 @@ public final class ControlWrappersSelectionManager extends FXObject
     }
 
     public void moveAll(double xDiff, double yDiff)
-    {
-        if(mainSelection != null)
-        {//This way should take care of moving them all and checking the bounds
-            var objectDrag = dragManager.getObjectDragOfController(mainSelection);
-            if(objectDrag != null)
-            {
-                objectDrag.move(xDiff, yDiff);
-            }
-        }
-
-        /*
-        for(var controlWrapper : selectedControlWrapperList)
+    {//This will move all the objects inside the collections above!
+        if(dragAndResizeObjectList.size() >= 1)
         {
-            var containerPane = controlWrapper.getContainerPane();
-            containerPane.setLayoutX(containerPane.getLayoutX() + xDiff);
-            containerPane.setLayoutY(containerPane.getLayoutY() + yDiff);
-        }*/
+            dragAndResizeObjectList.get(0).move(xDiff, yDiff, true);
+        }
+    }
+
+    public void resizeAll(double newWidth, double newHeight)
+    {//This will resize all the objects inside the collections above!
+        if(dragAndResizeObjectList.size() >= 1)
+        {
+            dragAndResizeObjectList.get(0).resize(newWidth, newHeight, true);
+        }
     }
 }

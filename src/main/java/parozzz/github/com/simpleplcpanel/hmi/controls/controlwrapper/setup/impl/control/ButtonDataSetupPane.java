@@ -24,7 +24,7 @@ public class ButtonDataSetupPane extends SetupPane<ButtonDataAttribute>
 
     public ButtonDataSetupPane(ControlWrapperSetupStage setupPage) throws IOException
     {
-        super(setupPage, "ButtonDataSetupPane", "Button Data", AttributeType.BUTTON_DATA);
+        super(setupPage, "ButtonDataSetupPane", AttributeType.BUTTON_DATA);
 
         this.mainVBox = (VBox) FXUtil.loadFXML("setup/buttonDataSetupPane.fxml", this);
     }

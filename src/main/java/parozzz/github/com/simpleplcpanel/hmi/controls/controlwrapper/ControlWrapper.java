@@ -1,15 +1,12 @@
 package parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.*;
 import javafx.collections.ListChangeListener;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -31,18 +28,13 @@ import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.extra.Chang
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.extra.ControlWrapperExtraFeature;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.state.WrapperState;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.state.WrapperStateMap;
-import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.utils.ControlWrapperBorderCreator;
-import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.utils.ControlWrapperContextMenuController;
+import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.utils.*;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
 import parozzz.github.com.simpleplcpanel.hmi.util.DoubleClickable;
 import parozzz.github.com.simpleplcpanel.hmi.util.Draggable;
 import parozzz.github.com.simpleplcpanel.hmi.util.Resizable;
+import parozzz.github.com.simpleplcpanel.hmi.util.multipleobjects.DragAndResizeObject;
 import parozzz.github.com.simpleplcpanel.hmi.util.specialfunction.FXSpecialFunctionManager;
-import parozzz.github.com.simpleplcpanel.util.BooleanChangeType;
-import parozzz.github.com.simpleplcpanel.util.Util;
-
-import java.util.Objects;
-import java.util.stream.Stream;
 
 public abstract class ControlWrapper<C extends Control>
         extends FXController
@@ -65,15 +57,17 @@ public abstract class ControlWrapper<C extends Control>
     private final ControlWrapperContextMenuController contextMenuController;
     private final ControlWrapperAttributeTypeManager attributeTypeManager;
     private final ControlWrapperAttributeUpdater<C> attributeUpdater;
+    private final DragAndResizeObject dragAndResizeObject;
+    private final ControlWrapperSelectionHandler selectionHandler;
+    private final ControlWrapperPositionHandler positionHandler;
+    private final ControlWrapperUndoRedoHandler undoRedoHandler;
 
     private final boolean stateless;
 
-    private EventHandler<MouseEvent> mousePressedEventHandler;
-    private EventHandler<MouseEvent> mouseReleasedEventHandler;
+    private final ReadOnlyDoubleProperty layoutXReadOnlyProperty;
+    private final ReadOnlyDoubleProperty layoutYReadOnlyProperty;
 
     private final BooleanProperty validProperty;
-    private final BooleanProperty selectedProperty;
-    private final BooleanProperty mainSelectionProperty;
 
     private boolean readOnly = false;
     private boolean isDragged;
@@ -90,17 +84,23 @@ public abstract class ControlWrapper<C extends Control>
         this.control = wrapperType.supplyControl();
         this.containerStackPane = new StackPane(control);
 
-        this.addFXChild(this.stateMap = new WrapperStateMap(this))
-                .addFXChild(this.globalAttributeMap = new AttributeMap(this, "GenericAttributeMap"))
-                .addFXChild(this.contextMenuController = new ControlWrapperContextMenuController(this, control, controlContainerPane))
-                .addFXChild(this.attributeTypeManager = new ControlWrapperAttributeTypeManager())
-                .addFXChild(this.attributeUpdater = new ControlWrapperAttributeUpdater<>(this, control));
+        this.addMultipleFXChild(this.stateMap = new WrapperStateMap(this),
+                this.globalAttributeMap = new AttributeMap(this, "GenericAttributeMap"),
+                this.contextMenuController = new ControlWrapperContextMenuController(this, control, controlContainerPane),
+                this.attributeTypeManager = new ControlWrapperAttributeTypeManager(),
+                this.attributeUpdater = new ControlWrapperAttributeUpdater<>(this, control),
+                this.dragAndResizeObject = new DragAndResizeObject(containerStackPane, controlContainerPane.getMainAnchorPane(), this, controlContainerPane),
+                this.selectionHandler = new ControlWrapperSelectionHandler(this),
+                this.positionHandler = new ControlWrapperPositionHandler(this),
+                this.undoRedoHandler = new ControlWrapperUndoRedoHandler(controlContainerPane, stateMap, globalAttributeMap)
+        );
 
         this.stateless = stateless;
 
+        this.layoutXReadOnlyProperty = ReadOnlyDoubleProperty.readOnlyDoubleProperty(containerStackPane.layoutXProperty());
+        this.layoutYReadOnlyProperty = ReadOnlyDoubleProperty.readOnlyDoubleProperty(containerStackPane.layoutYProperty());
+
         this.validProperty = new SimpleBooleanProperty();
-        this.selectedProperty = new SimpleBooleanProperty();
-        this.mainSelectionProperty = new SimpleBooleanProperty();
     }
 
     @Override
@@ -124,11 +124,9 @@ public abstract class ControlWrapper<C extends Control>
         containerStackPane.prefWidthProperty().addListener((observable, oldValue, newValue) ->
         {
             var width = newValue.doubleValue();
-            if(width >= 0d) //It can be lower than zero for PRES_SIZE and COMPUTED_SIZE
+            if (width >= 0d) //It can be lower than zero for PRES_SIZE and COMPUTED_SIZE
             {
-                var sizeAttribute = globalAttributeMap.get(AttributeType.SIZE);
-                Objects.requireNonNull(sizeAttribute, "ControlWrapper has not SizeAttribute?");
-
+                var sizeAttribute = globalAttributeMap.getRequired(AttributeType.SIZE);
                 sizeAttribute.setValue(SizeAttribute.WIDTH, (int) Math.floor(width));
             }
         });
@@ -136,57 +134,10 @@ public abstract class ControlWrapper<C extends Control>
         containerStackPane.prefHeightProperty().addListener((observable, oldValue, newValue) ->
         {
             var height = newValue.doubleValue();
-            if(height >= 0d) //It can be lower than zero for PRES_SIZE and COMPUTED_SIZE
+            if (height >= 0d) //It can be lower than zero for PRES_SIZE and COMPUTED_SIZE
             {
-                var sizeAttribute = globalAttributeMap.get(AttributeType.SIZE);
-                Objects.requireNonNull(sizeAttribute, "ControlWrapper has not SizeAttribute?");
-
+                var sizeAttribute = globalAttributeMap.getRequired(AttributeType.SIZE);
                 sizeAttribute.setValue(SizeAttribute.HEIGHT, (int) Math.floor(height));
-            }
-        });
-
-        Stream.of(containerStackPane.widthProperty(), containerStackPane.heightProperty()).forEach(property ->
-                property.addListener((observableValue, oldValue, newValue) ->
-                { //This update the border (for the corner and center pieces) every time is resized.
-                    if(selectedProperty.get())
-                    {
-                        ControlWrapperBorderCreator.applySelectedBorder(this);
-                    }
-                })
-        );
-
-        containerStackPane.addEventFilter(MouseEvent.MOUSE_PRESSED, mousePressedEventHandler = mouseEvent ->
-        {
-            lastPressedWasResize = false; //These should reset on mouse pressed!
-            lastPressedWasDrag = false;
-
-            var selectionManager = controlContainerPane.getSelectionManager();
-            if(!mouseEvent.isControlDown() && selectionManager.isEmpty())
-            { //In this system, if i have control down and there is no selected the first will be added and deleted right away
-                selectionManager.set(this);
-            }
-        }); //No quick properties selection here. Is managed by the selection manager!
-
-        containerStackPane.addEventFilter(MouseEvent.MOUSE_RELEASED, mouseReleasedEventHandler = mouseEvent ->
-        {
-            if(lastPressedWasResize || lastPressedWasDrag)
-            {
-                return;
-            }
-
-            var selectionManager = controlContainerPane.getSelectionManager();
-            if(mouseEvent.isControlDown())
-            {
-                if(selectedProperty.get())
-                {
-                    selectionManager.remove(this);
-                }else
-                {
-                    selectionManager.add(this);
-                }
-            }else
-            {
-                selectionManager.set(this);
             }
         });
 
@@ -194,39 +145,7 @@ public abstract class ControlWrapper<C extends Control>
                 .builder(containerStackPane, controlContainerPane.getMainAnchorPane())
                 .enableDoubleClick(MouseButton.PRIMARY, this,
                         () -> controlContainerPane.getMainEditStage().getControlWrapperSetupStage().setSelectedControlWrapper(this)) //On double click open
-                .enableResizing(this)
                 .bind();
-
-        selectedProperty.addListener((observable, oldValue, newValue) ->
-        {
-            if(readOnly)
-            {
-                return;
-            }
-
-            switch(Util.checkChangeType(newValue, oldValue))
-            {
-                case FALLING:
-                    ControlWrapperBorderCreator.applyDashedBorder(this);
-                    break;
-                case RISING:
-                    ControlWrapperBorderCreator.applySelectedBorder(this);
-                    break;
-            }
-        });
-
-        mainSelectionProperty.addListener((observable, oldValue, newValue) ->
-        {
-            if(readOnly)
-            {
-                return;
-            }
-
-            if(Util.checkChangeType(newValue, oldValue) == BooleanChangeType.RISING)
-            {
-                ControlWrapperBorderCreator.applySelectedBorder(this);
-            }
-        });
     }
 
     @Override
@@ -243,9 +162,19 @@ public abstract class ControlWrapper<C extends Control>
         return containerStackPane.getLayoutX();
     }
 
+    public ReadOnlyDoubleProperty layoutXProperty()
+    {
+        return layoutXReadOnlyProperty;
+    }
+
     public double getLayoutY()
     {
         return containerStackPane.getLayoutY();
+    }
+
+    public ReadOnlyDoubleProperty layoutYProperty()
+    {
+        return layoutYReadOnlyProperty;
     }
 
     public ControlWrapperType<C, ?> getType()
@@ -278,6 +207,11 @@ public abstract class ControlWrapper<C extends Control>
         return globalAttributeMap;
     }
 
+    public ControlWrapperContextMenuController getContextMenuController()
+    {
+        return contextMenuController;
+    }
+
     public ControlWrapperAttributeTypeManager getAttributeTypeManager()
     {
         return attributeTypeManager;
@@ -286,6 +220,21 @@ public abstract class ControlWrapper<C extends Control>
     public ControlWrapperAttributeUpdater<C> getAttributeUpdater()
     {
         return attributeUpdater;
+    }
+
+    public DragAndResizeObject getDragAndResizeObject()
+    {
+        return dragAndResizeObject;
+    }
+
+    public ControlWrapperSelectionHandler getSelectionHandler()
+    {
+        return selectionHandler;
+    }
+
+    public ControlWrapperPositionHandler getPositionHandler()
+    {
+        return positionHandler;
     }
 
     public boolean isStateless()
@@ -308,43 +257,9 @@ public abstract class ControlWrapper<C extends Control>
         return validProperty;
     }
 
-    public boolean isSelected()
-    {
-        return selectedProperty.get();
-    }
-
-    public void setSelected(boolean selected)
-    {
-        this.selectedProperty.set(selected);
-        if(!selected)
-        {
-            this.mainSelectionProperty.set(false);
-        }
-    }
-
-    public BooleanProperty selectedProperty()
-    {
-        return selectedProperty;
-    }
-
-    public boolean isMainSelection()
-    {
-        return mainSelectionProperty.get();
-    }
-
-    public void setAsMainSelection()
-    {
-        this.mainSelectionProperty.set(true);
-    }
-
-    public BooleanProperty mainSelectionProperty()
-    {
-        return mainSelectionProperty;
-    }
-
     public void setExtraFeature(ControlWrapperExtraFeature extraFeature)
     {
-        if(this.extraFeature != null)
+        if (this.extraFeature != null)
         {
             this.extraFeature.unbind();
         }
@@ -361,19 +276,23 @@ public abstract class ControlWrapper<C extends Control>
     @Override
     public final boolean canResize()
     {
-        if(!selectedProperty.get()) //Only allow resizing for selected controls
-        {
-            return false;
-        }
+        //Only allow resizing for selected controls
         //And if they do not have the adapt attribute on
-        var sizeAttribute = AttributeFetcher.fetch(this, AttributeType.SIZE);
-        return !(sizeAttribute == null || sizeAttribute.getValue(SizeAttribute.ADAPT));
+        return selectionHandler.isSelected()
+                && !contextMenuController.isShowing()
+                && !globalAttributeMap.getRequired(AttributeType.SIZE).getValue(SizeAttribute.ADAPT);
     }
 
     @Override
-    public final void setResizing(boolean resizing)
+    public final void setIsResizing(boolean resizing)
     {
         this.resizing = resizing;
+    }
+
+    @Override
+    public final boolean isResizing()
+    {
+        return resizing;
     }
 
     @Override
@@ -383,9 +302,9 @@ public abstract class ControlWrapper<C extends Control>
     }
 
     @Override
-    public final boolean isResizing()
+    public final boolean wasLastPressResize()
     {
-        return resizing;
+        return lastPressedWasResize;
     }
 
     @Override
@@ -401,6 +320,18 @@ public abstract class ControlWrapper<C extends Control>
     }
 
     @Override
+    public final boolean wasLastPressDrag()
+    {
+        return lastPressedWasDrag;
+    }
+
+    @Override
+    public final boolean canDrag()
+    {
+        return selectionHandler.isSelected() && !contextMenuController.isShowing();
+    }
+
+    @Override
     public final boolean isDragged()
     {
         return isDragged;
@@ -409,16 +340,21 @@ public abstract class ControlWrapper<C extends Control>
     @Override
     public final boolean canDoubleClick()
     {//Allow double click on when an item is actually selected and not dragged :)
-        return selectedProperty.get() && !isDragged;
+        return selectionHandler.isSelected() && !isDragged;
+    }
+
+    public final boolean isReadOnly()
+    {
+        return readOnly;
     }
 
     public final void convertToReadOnly()
     {
         contextMenuController.remove();
         specialFunctionManager.unbind();
+        undoRedoHandler.unregister();
+        selectionHandler.removeEventFilters();
 
-        containerStackPane.removeEventFilter(MouseEvent.MOUSE_PRESSED, mousePressedEventHandler);
-        containerStackPane.removeEventFilter(MouseEvent.MOUSE_RELEASED, mouseReleasedEventHandler);
         containerStackPane.setBorder(null);
 
         this.readOnly = true;
@@ -428,9 +364,9 @@ public abstract class ControlWrapper<C extends Control>
     {
         contextMenuController.set();
         specialFunctionManager.bind();
+        undoRedoHandler.register();
+        selectionHandler.addEventFilters();
 
-        containerStackPane.addEventFilter(MouseEvent.MOUSE_PRESSED, mousePressedEventHandler);
-        containerStackPane.addEventFilter(MouseEvent.MOUSE_RELEASED, mouseReleasedEventHandler);
         ControlWrapperBorderCreator.applyDashedBorder(this);
 
         this.readOnly = false;
@@ -465,10 +401,10 @@ public abstract class ControlWrapper<C extends Control>
     protected void registerAttributeInitializers(ControlWrapperAttributeInitializer<C> attributeInitializer)
     {
         attributeInitializer.addGlobals(AttributeType.CHANGE_PAGE, AttributeType.SIZE);
-        if(stateless)
+        if (stateless)
         {
             attributeInitializer.addGlobals(AttributeType.BACKGROUND, AttributeType.BORDER);
-        }else
+        } else
         {
             attributeInitializer.addStates(AttributeType.BACKGROUND, AttributeType.BORDER);
         }
@@ -478,9 +414,9 @@ public abstract class ControlWrapper<C extends Control>
             var control = updateData.getControl();
             var containerPane = updateData.getContainerPane();
 
-            for(var attributeType : updateData.getAttributeTypeCollection())
+            for (var attributeType : updateData.getAttributeTypeCollection())
             {
-                if(!(attributeType == AttributeType.CHANGE_PAGE ||
+                if (!(attributeType == AttributeType.CHANGE_PAGE ||
                         attributeType == AttributeType.SIZE ||
                         attributeType == AttributeType.BACKGROUND ||
                         attributeType == AttributeType.BORDER))
@@ -489,28 +425,28 @@ public abstract class ControlWrapper<C extends Control>
                 }
 
                 var attribute = AttributeFetcher.fetch(this, attributeType);
-                if(attribute instanceof ChangePageAttribute)
+                if (attribute instanceof ChangePageAttribute)
                 {
-                    if(control == this.control) //This needs to be set only if is the same control as the one inside the controlwrapper
+                    if (control == this.control) //This needs to be set only if is the same control as the one inside the controlwrapper
                     {
                         var enabled = attribute.getValue(ChangePageAttribute.ENABLED);
-                        if(enabled)
+                        if (enabled)
                         {
                             var pageName = attribute.getValue(ChangePageAttribute.PAGE_NAME);
                             this.setExtraFeature(new ChangePageExtraFeature(this, control, pageName));
                         }
                     }
-                }else if(attribute instanceof SizeAttribute)
+                } else if (attribute instanceof SizeAttribute)
                 {
                     var padding = attribute.getValue(SizeAttribute.PADDING);
                     control.setPadding(new Insets(padding));
 
-                    if(attribute.getValue(SizeAttribute.ADAPT))
+                    if (attribute.getValue(SizeAttribute.ADAPT))
                     {
                         containerPane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
                         containerPane.setMinSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
                         containerPane.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
-                    }else
+                    } else
                     {
                         var width = attribute.getValue(SizeAttribute.WIDTH);
                         var height = attribute.getValue(SizeAttribute.HEIGHT);
@@ -519,11 +455,11 @@ public abstract class ControlWrapper<C extends Control>
                         containerPane.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
                         containerPane.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
                     }
-                }else if(attribute instanceof BackgroundAttribute)
+                } else if (attribute instanceof BackgroundAttribute)
                 {
                     var backgroundAttribute = (BackgroundAttribute) attribute;
                     control.setBackground(backgroundAttribute.getBackground());
-                }else if(attribute instanceof BorderAttribute)
+                } else if (attribute instanceof BorderAttribute)
                 {
                     var borderAttribute = (BorderAttribute) attribute;
                     control.setBorder(borderAttribute.getBorder());
@@ -549,7 +485,7 @@ public abstract class ControlWrapper<C extends Control>
             change.next();
             change.getAddedSubList().forEach(addedNode ->
             {
-                if(addedNode instanceof Text)
+                if (addedNode instanceof Text)
                 {
                     ((Text) addedNode).setBoundsType(TextBoundsType.VISUAL);
                 }

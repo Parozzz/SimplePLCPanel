@@ -43,7 +43,7 @@ public class InputDataSetupPane extends SetupPane<InputDataAttribute>
 
     public InputDataSetupPane(ControlWrapperSetupStage setupStage) throws IOException
     {
-        super(setupStage, "InputDataSetupPane", "Input Data", AttributeType.INPUT_DATA);
+        super(setupStage, "InputDataSetupPane", AttributeType.INPUT_DATA);
 
         vBox = (VBox) FXUtil.loadFXML("setup/inputData/inputDataMainPane.fxml", this);
 

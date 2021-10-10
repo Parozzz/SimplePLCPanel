@@ -25,13 +25,11 @@ public abstract class HMIStage<P extends Parent>
 
     protected final P parent;
     private final HMIStageSetter stageSetter;
-    private final UndoRedoManager undoRedoManager;
 
     public HMIStage(String resource, Class<P> parentClass) throws IOException
     {
         this.parent = parentClass.cast(FXUtil.loadFXML(resource, this));
         this.stageSetter = new HMIStageSetter(parent);
-        this.undoRedoManager = new UndoRedoManager();
     }
 
     public HMIStage(String name, String resource, Class<P> parentClass) throws IOException
@@ -40,14 +38,12 @@ public abstract class HMIStage<P extends Parent>
 
         this.parent = parentClass.cast(FXUtil.loadFXML(resource, this));
         this.stageSetter = new HMIStageSetter(parent);
-        this.undoRedoManager = new UndoRedoManager();
     }
 
     public HMIStage(P parent)
     {
         this.parent = parent;
         this.stageSetter = new HMIStageSetter(parent);
-        this.undoRedoManager = new UndoRedoManager();
     }
 
     public HMIStage(String name, P parent)
@@ -56,7 +52,6 @@ public abstract class HMIStage<P extends Parent>
 
         this.parent = parent;
         this.stageSetter = new HMIStageSetter(parent);
-        this.undoRedoManager = new UndoRedoManager();
     }
 
     @Override
@@ -84,12 +79,13 @@ public abstract class HMIStage<P extends Parent>
             if(undoKeyCombination.match(keyEvent))
             {
                 keyEvent.consume();
-                undoRedoManager.undo();
+                UndoRedoManager.getInstance().undo();
+                //undoRedoManager.undo();
             }
             else if (redoKeyCombination.match(keyEvent))
             {
                 keyEvent.consume();
-                undoRedoManager.redo();
+                //undoRedoManager.redo();
             }
         });
     }
@@ -98,11 +94,6 @@ public abstract class HMIStage<P extends Parent>
     public void onSetDefault()
     {
         super.onSetDefault();
-    }
-
-    public UndoRedoManager getUndoRedoManager()
-    {
-        return undoRedoManager;
     }
 
     public HMIStage<?> setAsSubWindow(HMIStage<?> hmiStage)

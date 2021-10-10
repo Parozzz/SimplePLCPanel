@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 @SuppressWarnings("unused")
-class WrapperStateCreationPane extends FXObject implements SetupSelectable
+class WrapperStateCreationPane extends FXObject
 {
 
     @FXML private TextField lowerValueTextField;
@@ -28,13 +28,11 @@ class WrapperStateCreationPane extends FXObject implements SetupSelectable
     @FXML private JFXButton createStateButton;
 
     private final ControlWrapperSetupStage setupStage;
-    private final Button selectButton;
     private final VBox vBox;
 
-    public WrapperStateCreationPane(ControlWrapperSetupStage setupStage, Button selectButton) throws IOException
+    public WrapperStateCreationPane(ControlWrapperSetupStage setupStage) throws IOException
     {
         this.setupStage = setupStage;
-        this.selectButton = selectButton;
 
         vBox = (VBox) FXUtil.loadFXML("setup/wrapperStateCreationPane.fxml", this);
     }
@@ -52,11 +50,6 @@ class WrapperStateCreationPane extends FXObject implements SetupSelectable
                 this.createState();
             }
         });*/
-
-        selectButton.setBackground(FXUtil.createBackground(Color.TRANSPARENT));
-        selectButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        selectButton.setUserData(this);
-        selectButton.setOnAction(actionEvent -> setupStage.setShownSelectable(this));
 
         lowerValueTextField.setTextFormatter(FXTextFormatterUtil.simpleInteger(4));
         higherValueTextField.setTextFormatter(FXTextFormatterUtil.simpleInteger(4));
@@ -92,16 +85,9 @@ class WrapperStateCreationPane extends FXObject implements SetupSelectable
         createStateButton.addEventFilter(MouseEvent.MOUSE_PRESSED, this::createState);
     }
 
-    @Override
     public Parent getParent()
     {
         return vBox;
-    }
-
-    @Override
-    public Button getSelectButton()
-    {
-        return selectButton;
     }
 
     public void reset()
@@ -165,7 +151,7 @@ class WrapperStateCreationPane extends FXObject implements SetupSelectable
         }
 
         createStateButton.setRipplerFill(Color.DARKGREEN);
-        setupStage.updateStateSelectionBox();
+        setupStage.getStateListView().loadStates();
     }
 
     private void createAndShowInvalidTooltip(MouseEvent mouseEvent, String text)

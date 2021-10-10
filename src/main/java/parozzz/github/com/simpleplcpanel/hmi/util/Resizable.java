@@ -4,9 +4,11 @@ public interface Resizable
 {
     boolean canResize();
 
-    void setResizing(boolean resizing);
-
-    void setLastPressedWasResize(boolean lastPressedWasResize);
+    void setIsResizing(boolean resizing);
 
     boolean isResizing();
+
+    boolean wasLastPressResize();
+
+    void setLastPressedWasResize(boolean lastPressedWasResize);
 }

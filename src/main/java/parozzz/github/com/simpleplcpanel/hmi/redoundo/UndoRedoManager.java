@@ -2,151 +2,137 @@ package parozzz.github.com.simpleplcpanel.hmi.redoundo;
 
 import javafx.beans.property.Property;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Predicate;
+import java.util.*;
 
 public class UndoRedoManager
 {
+    private static UndoRedoManager INSTANCE;
+
+    public static UndoRedoManager getInstance()
+    {
+        if (INSTANCE == null)
+        {
+            INSTANCE = new UndoRedoManager();
+        }
+
+        return INSTANCE;
+    }
+
     public static final int MAX_SAVED_REDO_ACTIONS = 50;
 
-    private final List<RunnableManager> undoRunnableList;
-    private final List<RunnableManager> redoRunnableList;
+    private final List<UndoAction> undoActionList;
+    private final Map<Property<?>, UndoRedoPropertyWrapper<?>> propertyWrapperMap;
 
-    private final List<Predicate<Object>> conditionList;
+    private boolean ignoreNextActions;
 
-    private boolean ignoreNew;
-    public UndoRedoManager()
+    private UndoRedoManager()
     {
-        this.undoRunnableList = new ArrayList<>();
-        this.redoRunnableList = new ArrayList<>();
+        this.undoActionList = new ArrayList<>();
+        //this.redoRunnableList = new ArrayList<>();
 
-        this.conditionList = new ArrayList<>();
+        this.propertyWrapperMap = new IdentityHashMap<>();
     }
 
-    public void addCondition(Predicate<Object> predicate)
+    public void startIgnoringNextActions()
     {
-        conditionList.add(predicate);
+        ignoreNextActions = true;
     }
 
-    public void setIgnoreNew(boolean ignoreNew)
+    public void stopIgnoringNextActions()
     {
-        this.ignoreNew = ignoreNew;
+        ignoreNextActions = false;
     }
 
-    public void addAction(Runnable undoRunnable, Runnable redoRunnable, Object data)
+    public <N> void registerProperty(UndoRedoPane pane, Property<N> property)
     {
-        if(ignoreNew)
+        var propertyWrapper = new UndoRedoPropertyWrapper<>(this, pane, property);
+        if(propertyWrapperMap.putIfAbsent(property, propertyWrapper) == null)
         {
-            return;
-        }
-
-        undoRunnableList.add(0, new RunnableManager(undoRunnable, redoRunnable, data));
-        if(undoRunnableList.size() > 20) //Max 20 undo actions
-        {
-            undoRunnableList.remove(20);
+            propertyWrapper.registerListener();
         }
     }
 
-    public void addProperties(Collection<Property<?>> propertyCollection)
+    public void unregisterProperty(Property<?> property)
     {
-        this.addProperties(propertyCollection, null);
-    }
-
-    public void addProperties(Collection<Property<?>> propertyCollection, Object data)
-    {
-        propertyCollection.forEach(property -> this.addProperty(property, data));
-    }
-
-    public <T> UndoRedoManager addProperty(Property<T> property)
-    {
-        return addProperty(property, null);
-    }
-
-    public <T> UndoRedoManager addProperty(Property<T> property, Object data)
-    {
-        property.addListener((observableValue, oldValue, newValue) ->
+        var propertyWrapper = propertyWrapperMap.remove(property);
+        if(propertyWrapper != null)
         {
-            if (ignoreNew)
+            propertyWrapper.unregisterListener();
+        }
+    }
+
+    public <N> void registerProperties(UndoRedoPane pane, Property<N>... properties)
+    {
+        for (var property : properties)
+        {
+            this.registerProperty(pane, property);
+        }
+    }
+
+    public void removeAllUndoActionsWithPane(UndoRedoPane pane)
+    {
+        undoActionList.removeIf(action -> action.undo(true) == pane);
+    }
+
+    public void addUndoAction(UndoAction action)
+    {
+        if (!ignoreNextActions)
+        {
+            undoActionList.add(0, action);
+            if (undoActionList.size() > MAX_SAVED_REDO_ACTIONS)
             {
-                return;
+                undoActionList.remove(undoActionList.size() - 1); //Remove the first one (LIFO)
             }
-
-            Runnable undoRunnable = () -> property.setValue(oldValue);
-            Runnable redoRunnable = () -> property.setValue(newValue);
-            this.addAction(undoRunnable, redoRunnable, data);
-        });
-
-        return this;
+        }
     }
 
     public void undo()
     {
-        if(undoRunnableList.isEmpty())
+        if (undoActionList.isEmpty())
         {
             return;
         }
 
-        var runnableManager = undoRunnableList.remove(0);
-        Objects.requireNonNull(runnableManager, "Found a null RunnableManager for UndoRedo class while undoing");
-
-        if(!conditionList.stream().allMatch(predicate -> predicate.test(runnableManager.data)))
+        var undoAction = undoActionList.remove(0);
+        Objects.requireNonNull(undoAction, "Found a null UndoAction for UndoRedo class while undoing");
+/*
+        if(!conditionList.stream().allMatch(predicate -> predicate.test(undoAction.data)))
         {
             return;
         }
+*/
+        startIgnoringNextActions();
+        var pane = undoAction.undo(false);
+        if (pane != null)
+        {
+            pane.undoActionExecuted();
+        }
+        stopIgnoringNextActions();
 
-        ignoreNew = true;
-        runnableManager.undoRunnable.run();
-        ignoreNew = false;
-
-        this.addToList(redoRunnableList, runnableManager);
+        //this.addToList(redoRunnableList, undoAction);
     }
 
-    public void redo()
-    {
-        if(redoRunnableList.isEmpty())
+    /*
+        public void redo()
         {
-            return;
+            if(redoRunnableList.isEmpty())
+            {
+                return;
+            }
+
+            var runnableManager = redoRunnableList.remove(0);
+            Objects.requireNonNull(runnableManager, "Found a null RunnableManager for UndoRedo class while redoing");
+
+            ignoreNextActions = true;
+            runnableManager.redoRunnable.run();
+            ignoreNextActions = false;
+
+            this.addToList(undoActionList, runnableManager);
         }
-
-        var runnableManager = redoRunnableList.remove(0);
-        Objects.requireNonNull(runnableManager, "Found a null RunnableManager for UndoRedo class while redoing");
-
-        ignoreNew = true;
-        runnableManager.redoRunnable.run();
-        ignoreNew = false;
-
-        this.addToList(undoRunnableList, runnableManager);
-    }
-
+    */
     public void clear()
     {
-        undoRunnableList.clear();
-        redoRunnableList.clear();
+        undoActionList.clear();
+        //redoRunnableList.clear();
     }
-
-    private void addToList(List<RunnableManager> list, RunnableManager runnableManager)
-    {
-        list.add(0, runnableManager);
-        if(list.size() > MAX_SAVED_REDO_ACTIONS)
-        {
-            list.remove(MAX_SAVED_REDO_ACTIONS);
-        }
-    }
-
-    private static class RunnableManager
-    {
-        private final Runnable undoRunnable;
-        private final Runnable redoRunnable;
-        private final Object data;
-        private RunnableManager(Runnable undoRunnable, Runnable redoRunnable, Object data)
-        {
-            this.undoRunnable = undoRunnable;
-            this.redoRunnable = redoRunnable;
-            this.data = data;
-        }
-    }
-
 }

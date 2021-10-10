@@ -52,6 +52,15 @@ public final class ContextMenuBuilder
         return this;
     }
 
+    public ContextMenuBuilder simpleWithConsumer(String text, Consumer<MenuItem> consumer)
+    {
+        var menuItem = new MenuItem(text);
+        menuItem.setOnAction(actionEvent -> consumer.accept(menuItem));
+        contextMenu.getItems().add(menuItem);
+        return this;
+    }
+
+
     public ContextMenuBuilder custom(Node node, boolean hideOnClick)
     {
         return this.custom(node, hideOnClick, t -> {});
@@ -78,10 +87,9 @@ public final class ContextMenuBuilder
 
     public <T extends Node> ContextMenuBuilder custom(T node, boolean hideOnClick, Consumer<T> nodeConsumer)
     {
-        nodeConsumer.accept(node);
-
         var customMenuItem = new CustomMenuItem(node);
         customMenuItem.setHideOnClick(hideOnClick);
+        customMenuItem.setOnAction(event -> nodeConsumer.accept(node));
         contextMenu.getItems().add(customMenuItem);
 
         return this;

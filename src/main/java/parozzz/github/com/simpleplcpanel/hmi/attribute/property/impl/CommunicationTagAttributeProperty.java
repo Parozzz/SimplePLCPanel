@@ -66,7 +66,7 @@ public class CommunicationTagAttributeProperty
         @Override
         public boolean isActive()
         {
-            return attribute.getAttributeMap().getControlWrapper().isActive();
+            return attribute.getRootAttributeMap().getControlWrapper().isActive();
         }
 
         @Override
@@ -82,7 +82,7 @@ public class CommunicationTagAttributeProperty
         @Override
         public void deserializeFrom(JSONDataMap jsonDataMap)
         {
-            var tagStage = attribute.getAttributeMap().getControlWrapper()
+            var tagStage = attribute.getRootAttributeMap().getControlWrapper()
                     .getControlMainPage().getMainEditStage().getTagsManager();
 
             var tagId = jsonDataMap.getNumber("TagID");

@@ -94,6 +94,19 @@ public class ReflectionUtil
         }
     }
 
+    public static Object getFieldValue(Field field, Object obj)
+    {
+        try
+        {
+            return field.get(obj);
+        }
+        catch(IllegalAccessException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     @Nullable
     public static <T> T invokeMethod(Method method, Object instance, Class<T> returnClass, Object... params)
     {

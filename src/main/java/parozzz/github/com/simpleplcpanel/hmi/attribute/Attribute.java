@@ -9,16 +9,17 @@ import parozzz.github.com.simpleplcpanel.util.Validate;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public abstract class Attribute extends FXObject// implements Cloneable
 {
-    protected final AttributeMap attributeMap;
+    protected final AttributeMap rootAttributeMap;
     private final AttributeType<?> attributeType;
 
     private final AttributePropertyManager attributePropertyManager;
     private final Map<Object, Runnable> attributeUpdateRunnableMap;
 
-    public Attribute(AttributeMap attributeMap,
+    public Attribute(AttributeMap rootAttributeMap,
             AttributeType<?> attributeType, String name)
     {
         super(name);
@@ -26,7 +27,7 @@ public abstract class Attribute extends FXObject// implements Cloneable
         //This is here in case of human error
         Validate.needTrue("Invalid Attribute Type", attributeType.getAttributeClass().isAssignableFrom(this.getClass()));
         this.attributeType = attributeType;
-        this.attributeMap = attributeMap;
+        this.rootAttributeMap = rootAttributeMap;
 
         this.attributePropertyManager = new AttributePropertyManager(this);
         this.attributeUpdateRunnableMap = new IdentityHashMap<>();
@@ -37,9 +38,9 @@ public abstract class Attribute extends FXObject// implements Cloneable
         return attributeType;
     }
 
-    public AttributeMap getAttributeMap()
+    public AttributeMap getRootAttributeMap()
     {
-        return attributeMap;
+        return rootAttributeMap;
     }
 
     public void addAttributeUpdaterRunnable(Object key, Runnable attributeUpdateRunnable)
@@ -60,7 +61,7 @@ public abstract class Attribute extends FXObject// implements Cloneable
     public <P> void setValue(AttributeProperty<P> attributeProperty, P value)
     {
         var property = this.getProperty(attributeProperty);
-        if(property != null)
+        if (property != null)
         {
             property.setValue(value);
         }
@@ -75,6 +76,13 @@ public abstract class Attribute extends FXObject// implements Cloneable
     protected AttributePropertyManager getAttributePropertyManager()
     {
         return attributePropertyManager;
+    }
+
+    public void forEachProperty(Consumer<Property<?>> consumer)
+    {
+        attributePropertyManager.forEachAttributePropertyData(data ->
+                consumer.accept(data.getProperty())
+        );
     }
 
     public void update()
@@ -92,7 +100,7 @@ public abstract class Attribute extends FXObject// implements Cloneable
             Property property = data.getProperty();
 
             Property pasteProperty = pasteAttribute.getAttributePropertyManager().getByAttributeProperty(attributeProperty);
-            if(pasteProperty != null)
+            if (pasteProperty != null)
             {
                 pasteProperty.setValue(property.getValue());
             }

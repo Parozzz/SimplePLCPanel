@@ -14,45 +14,32 @@ import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrap
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.attributechanger.SetupPaneAttributeChanger;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.attributechanger.SetupPaneAttributeChangerList;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.extra.ControlWrapperSetupUtil;
+import parozzz.github.com.simpleplcpanel.hmi.main.MainEditStage;
+import parozzz.github.com.simpleplcpanel.hmi.redoundo.UndoRedoManager;
 import parozzz.github.com.simpleplcpanel.hmi.util.ContextMenuBuilder;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
 
-public abstract class SetupPane<A extends Attribute> extends FXObject implements SetupSelectable
+import java.util.Objects;
+
+public abstract class SetupPane<A extends Attribute> extends FXObject
 {
     private final ControlWrapperSetupStage setupStage;
     private final AttributeType<A> attributeType;
     private final SetupPaneAttributeChangerList<A> attributeChangerList;
 
-    private final Button selectButton;
-
-    public SetupPane(ControlWrapperSetupStage setupStage, String name, String buttonText,
-            AttributeType<A> attributeType)
-    {
-        this(setupStage, name, new Button(buttonText), attributeType);
-    }
-
-    public SetupPane(ControlWrapperSetupStage setupStage, String name, Button selectButton,
-            AttributeType<A> attributeType)
+    public SetupPane(ControlWrapperSetupStage setupStage, String name, AttributeType<A> attributeType)
     {
         super(name);
 
-        this.setupStage = setupStage;
+        this.setupStage = Objects.requireNonNull(setupStage, "SetupStage cannot be null inside a SetupPane");
         this.attributeType = attributeType;
         this.attributeChangerList = new SetupPaneAttributeChangerList<>(this, attributeType);
-        this.selectButton = selectButton;
     }
 
     @Override
     public void onSetup()
     {
         super.onSetup();
-
-        selectButton.setBackground(FXUtil.createBackground(Color.TRANSPARENT));
-        //selectButton.setBorder(FXUtil.createBorder(Color.LIGHTGRAY, 1));
-        selectButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-
-        selectButton.setUserData(this);
-        selectButton.setOnAction(actionEvent -> setupStage.setShownSelectable(this));
     }
 
     public ControlWrapperSetupStage getSetupStage()
@@ -60,13 +47,6 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
         return setupStage;
     }
 
-    @Override
-    public Button getSelectButton()
-    {
-        return selectButton;
-    }
-
-    @Override
     public abstract Parent getParent();
 
     public final AttributeType<A> getAttributeType()
@@ -79,29 +59,45 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
         return attributeMap.hasType(attributeType);
     }
 
+    public boolean hasAttribute(ControlWrapper<?> controlWrapper)
+    {
+        return AttributeFetcher.hasAttribute(controlWrapper, this.attributeType);
+    }
+
     public SetupPaneAttributeChangerList<A> getAttributeChangerList()
     {
         return attributeChangerList;
     }
 
-    public void bindAll(ControlWrapper<?> controlWrapper)
+    /**
+     * Bind the attribute from the current state to this setup pane
+     *
+     * @param controlWrapper The control wrapper to obtain the state
+     * @return {@code true} if the ControlWrapper is not null and has the attribute in the current state.
+     */
+    public boolean bindAll(ControlWrapper<?> controlWrapper)
     {
-        var attribute = AttributeFetcher.fetch(controlWrapper, this.attributeType);
-        if(attribute != null)
+        if(controlWrapper == null)
         {
-            this.attributeChangerList.forEach(attributeChanger ->
-                    attributeChanger.bindToAttribute(attribute)
-            );
+            return false;
         }
 
-        if(controlWrapper.getAttributeTypeManager().isGlobal(attributeType))
+        var attribute = AttributeFetcher.fetch(controlWrapper, this.attributeType);
+        if(attribute == null)
+        {
+            return false;
+        }
+
+        this.attributeChangerList.forEach(attributeChanger -> attributeChanger.bindToAttribute(attribute));
+        if (controlWrapper.getAttributeTypeManager().isGlobal(attributeType))
         {
             this.setAsGlobal();
-        }
-        else
+        } else
         {
             this.setAsState();
         }
+
+        return true;
     }
 
     public void unbindAll()
@@ -116,10 +112,6 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
 
     protected void setAsState()
     {
-        ContextMenuBuilder.builder()
-                .simple("Write to All", this::writeToAllStates)
-                .setTo(selectButton);
-
         var propertySet = attributeChangerList.getPropertySet();
         propertySet.forEach(property ->
         {
@@ -144,8 +136,6 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
 
     protected void setAsGlobal()
     {
-        selectButton.setContextMenu(null);
-
         var propertySet = attributeChangerList.getPropertySet();
         propertySet.forEach(property ->
         {
@@ -189,7 +179,10 @@ public abstract class SetupPane<A extends Attribute> extends FXObject implements
 
     protected void computeProperties()
     {
+        /*
         var propertySet = attributeChangerList.getPropertySet();
-        setupStage.getUndoRedoManager().addProperties(propertySet, this);
+        propertySet.forEach(property ->
+                UndoRedoManager.getInstance().registerProperty(setupStage, property)
+        );*/
     }
 }

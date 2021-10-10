@@ -3,9 +3,11 @@ package parozzz.github.com.simpleplcpanel.util;
 import parozzz.github.com.simpleplcpanel.Main;
 
 import java.net.URL;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public final class Util
 {

@@ -60,7 +60,7 @@ public final class ControlWrapperBorderCreator
         var borderStrokeStyle = new BorderStrokeStyle(StrokeType.OUTSIDE, StrokeLineJoin.MITER,
                 StrokeLineCap.SQUARE, 10, offset, dashList);
 
-        var color = controlWrapper.isMainSelection() ? Color.DARKORANGE : Color.BLACK;
+        var color = controlWrapper.getSelectionHandler().isMainSelection() ? Color.DARKORANGE : Color.BLACK;
 
         var stroke = new BorderStroke(color, borderStrokeStyle, CornerRadii.EMPTY, new BorderWidths(dashWidth));
         var border = new Border(stroke);

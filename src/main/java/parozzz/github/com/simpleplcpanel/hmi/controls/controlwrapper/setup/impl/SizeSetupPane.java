@@ -31,7 +31,7 @@ public final class SizeSetupPane extends SetupPane<SizeAttribute>
 
     public SizeSetupPane(ControlWrapperSetupStage setupPage) throws IOException
     {
-        super(setupPage, "SizeSetupPane", "Size", AttributeType.SIZE);
+        super(setupPage, "SizeSetupPane", AttributeType.SIZE);
 
         this.mainVBox = (VBox) FXUtil.loadFXML("setup/sizeSetupPane.fxml", this);
     }

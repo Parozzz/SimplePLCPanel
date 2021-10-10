@@ -28,7 +28,7 @@ public class BorderSetupPane extends SetupPane<BorderAttribute>
 
     public BorderSetupPane(ControlWrapperSetupStage setupStage) throws IOException
     {
-        super(setupStage, "BorderSetupPane", "Border", AttributeType.BORDER);
+        super(setupStage, "BorderSetupPane", AttributeType.BORDER);
 
         this.vBox = (VBox) FXUtil.loadFXML("setup/borderSetupPane.fxml", this);
     }

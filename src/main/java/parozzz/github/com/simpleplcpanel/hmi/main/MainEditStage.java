@@ -28,6 +28,7 @@ import parozzz.github.com.simpleplcpanel.hmi.main.picturebank.PictureBankStage;
 import parozzz.github.com.simpleplcpanel.hmi.main.quicksetup.QuickSetupPane;
 import parozzz.github.com.simpleplcpanel.hmi.main.settings.SettingsStage;
 import parozzz.github.com.simpleplcpanel.hmi.pane.BorderPaneHMIStage;
+import parozzz.github.com.simpleplcpanel.hmi.redoundo.UndoRedoManager;
 import parozzz.github.com.simpleplcpanel.hmi.runtime.RuntimeControlContainerStage;
 import parozzz.github.com.simpleplcpanel.hmi.tags.TagsManager;
 import parozzz.github.com.simpleplcpanel.hmi.tags.stage.TagStage;
@@ -39,74 +40,49 @@ import java.io.IOException;
 
 public final class MainEditStage extends BorderPaneHMIStage
 {
-    @FXML
-    private CheckBox runtimeFullScreenCheckBox;
-    @FXML
-    private CheckBox runtimeAtStartupCheckBox;
-    @FXML
-    private MenuItem startRuntimeMenuItem;
+    //Runtime
+    @FXML private CheckBox runtimeFullScreenCheckBox;
+    @FXML private CheckBox runtimeAtStartupCheckBox;
+    @FXML private MenuItem startRuntimeMenuItem;
 
     //File
-    @FXML
-    private MenuItem saveMenuItem;
-    @FXML
-    private MenuItem settingsMenuItem;
+    @FXML private MenuItem saveMenuItem;
+    @FXML private MenuItem settingsMenuItem;
 
     //ControlWrapperPage Data
-    @FXML
-    private MenuItem createPageMenuItem;
-    @FXML
-    private TextField zoomTextField;
-    @FXML
-    private TextField pageWidthTextField;
-    @FXML
-    private TextField pageHeightTextField;
+    @FXML private MenuItem createPageMenuItem;
+    @FXML private TextField zoomTextField;
+    @FXML private TextField pageWidthTextField;
+    @FXML private TextField pageHeightTextField;
 
     //View Menu
-    @FXML
-    private MenuItem viewQuickSetupMenuItem;
-    @FXML
-    private MenuItem viewDragAndDropMenuItem;
-    @FXML
-    private MenuItem viewScrollingPagesMenuItem;
+    @FXML private MenuItem viewQuickSetupMenuItem;
+    @FXML private MenuItem viewDragAndDropMenuItem;
+    @FXML private MenuItem viewScrollingPagesMenuItem;
 
     //Communication
-    @FXML
-    private Circle plcConnectedCircle;
-    @FXML
-    private MenuItem setupCommunicationMenuItem;
+    @FXML private Circle plcConnectedCircle;
+    @FXML private MenuItem setupCommunicationMenuItem;
 
     //Tools Menu
-    @FXML
-    private MenuItem pictureBankMenuItem;
-    @FXML
-    private MenuItem modbusTCPStringAddressMenuItem;
-    @FXML
-    private MenuItem siemensS7StringAddressMenuItem;
-    @FXML
-    private MenuItem tagsMenuItem;
+    @FXML private MenuItem pictureBankMenuItem;
+    @FXML private MenuItem modbusTCPStringAddressMenuItem;
+    @FXML private MenuItem siemensS7StringAddressMenuItem;
+    @FXML private MenuItem tagsMenuItem;
 
     //Messages Menu
-    @FXML
-    private Label messagePresentLabel;
-    @FXML
-    private MenuItem showMessageListMenuItem;
+    @FXML private Label messagePresentLabel;
+    @FXML private MenuItem showMessageListMenuItem;
 
     //Sides Stack Panes
-    @FXML
-    private StackPane leftStackPane;
-    @FXML
-    private StackPane rightStackPane;
-    @FXML
-    private StackPane bottomStackPane;
+    @FXML private StackPane leftStackPane;
+    @FXML private StackPane rightStackPane;
+    @FXML private StackPane bottomStackPane;
 
     //Center = Page Showing
-    @FXML
-    private Label centerTopLabel;
-    @FXML
-    private VBox centerMainVBox;
-    @FXML
-    private StackPane centerScrollStackPane;
+    @FXML private Label centerTopLabel;
+    @FXML private VBox centerMainVBox;
+    @FXML private StackPane centerScrollStackPane;
 
     private final CommunicationDataHolder communicationDataHolder;
     private final Runnable saveDataRunnable;
@@ -447,9 +423,10 @@ public final class MainEditStage extends BorderPaneHMIStage
             runtimeControlMainPage.setControlMainPage(pageList.get(0));
 
             //Close all the pages
-            this.getStageSetter().close();
-            settingsStage.getStageSetter().close();
-            controlWrapperSetupStage.getStageSetter().close();
+            this.hideStage();
+            settingsStage.hideStage();
+            controlWrapperSetupStage.hideStage();
+            UndoRedoManager.getInstance().clear();
         }
     }
 
@@ -459,7 +436,7 @@ public final class MainEditStage extends BorderPaneHMIStage
         {
             //If i don't clear selections some bad things could happen, especially while debugging read only page
             this.shownControlContainerPane.setActive(false);
-            this.shownControlContainerPane.getSelectionManager().clearSelections();
+            this.shownControlContainerPane.getMultipleSelectionManager().clearSelections();
             this.shownControlContainerPane.getMenuBottomImagePane().updateSnapshot();
         }
 

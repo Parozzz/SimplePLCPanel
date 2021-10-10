@@ -17,7 +17,7 @@ public class AttributePropertyManager
     public static void updateAttribute(Attribute attribute)
     {
         attribute.update();
-        attribute.getAttributeMap().getControlWrapper()
+        attribute.getRootAttributeMap().getControlWrapper()
                 .getAttributeUpdater().updateAttribute(attribute.getType());
     }
 

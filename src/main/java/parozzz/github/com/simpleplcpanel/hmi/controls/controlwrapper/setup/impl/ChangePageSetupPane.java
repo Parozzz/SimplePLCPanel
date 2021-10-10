@@ -24,7 +24,7 @@ public final class ChangePageSetupPane extends SetupPane<ChangePageAttribute>
 
     public ChangePageSetupPane(ControlWrapperSetupStage setupPage) throws IOException
     {
-        super(setupPage, "ChangePageSetupPane", "Change Page", AttributeType.CHANGE_PAGE);
+        super(setupPage, "ChangePageSetupPane", AttributeType.CHANGE_PAGE);
 
         this.setupStage = setupPage;
         this.vBox = (VBox) FXUtil.loadFXML("setup/changePagePane.fxml", this);

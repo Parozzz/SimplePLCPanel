@@ -1,17 +1,15 @@
 package parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup;
 
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TitledPane;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeFetcher;
+import parozzz.github.com.simpleplcpanel.Nullable;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
@@ -21,82 +19,88 @@ import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.impl.
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.impl.control.InputDataSetupPane;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.state.WrapperState;
 import parozzz.github.com.simpleplcpanel.hmi.main.MainEditStage;
-import parozzz.github.com.simpleplcpanel.hmi.pane.BorderPaneHMIStage;
+import parozzz.github.com.simpleplcpanel.hmi.pane.HMIStage;
+import parozzz.github.com.simpleplcpanel.hmi.redoundo.UndoRedoManager;
+import parozzz.github.com.simpleplcpanel.hmi.redoundo.UndoRedoPane;
 import parozzz.github.com.simpleplcpanel.hmi.tags.TagsManager;
-import parozzz.github.com.simpleplcpanel.hmi.util.ContextMenuBuilder;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
 import parozzz.github.com.simpleplcpanel.logger.MainLogger;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Stream;
 
-public final class ControlWrapperSetupStage
-        extends BorderPaneHMIStage
-        implements ControlWrapperSpecific
+public class ControlWrapperSetupStage
+        extends HMIStage<HBox>
+        implements ControlWrapperSpecific, UndoRedoPane
 {
-    @FXML private Button createStateButton;
 
-    @FXML private VBox attributesVBox;
+    @FXML private ListView<WrapperState> stateListView;
+    private final ControlWrapperSetupStateListView setupStateListView;
 
-    @FXML private VBox globalAttributesVBox;
-    @FXML private TitledPane globalAttributesTitledPane;
+    @FXML private VBox mainStateAttributeVBox;
+    @FXML private HBox innerStateAttributesHBox;
+    private final List<ControlWrapperSetupPaneButton> stateSetupPaneButtonList;
 
-    @FXML private VBox stateAttributesVBox;
-    @FXML private TitledPane stateAttributesTitledPane;
+    @FXML private VBox mainGlobalAttributesVBox;
+    @FXML private HBox innerGlobalAttributesHBox;
+    private final List<ControlWrapperSetupPaneButton> globalSetupPaneButtonList;
 
-    @FXML private Label selectedPageLabel;
-    @FXML private StackPane centerStackPane;
+    @FXML private StackPane mainStackPane;
+    @FXML private Label mainLabel;
+    @FXML private Button closePageButton;
 
-    @FXML private Label stateLabel;
-    @FXML private ChoiceBox<WrapperState> stateSelectionChoiceBox;
-    @FXML private Button deleteStateButton;
+    @FXML private TextField xTextField;
+    @FXML private TextField yTextField;
+    @FXML private TextField widthTextField;
+    @FXML private TextField heightTextField;
+    @FXML private CheckBox adaptSizeCheckBox;
 
     private final MainEditStage mainEditStage;
-    private final TagsManager tagsManager;
-    private final CommunicationDataHolder communicationDataHolder;
 
-    private final SetupPaneList setupPaneList;
-
-    private final WrapperStateCreationPane wrapperStateCreationPane;
-
-    private final ChangeListener<Boolean> controlWrapperValidListener;
-    private final ChangeListener<WrapperState> wrapperStateChangeListener;
-    private final ListChangeListener<WrapperState> wrapperStateListChangeListener;
+    private final Map<SetupPane<?>, ControlWrapperSetupPaneButton> setupPaneButtonMap;
+    private final ControlWrapperSetupSizeAndPositionManager sizeAndPositionManager;
 
     private ControlWrapper<?> selectedControlWrapper;
-    private SetupSelectable activeSelectable;
+    private WrapperState mainSelectedState;
+    private final Set<WrapperState> secondarySelectedWrapperStateSet;
+
+    private final ChangeListener<? super WrapperState> currentWrapperStateListener =
+            (observable, oldValue, newValue) -> this.updateBindingOnSetupPanes();
 
     public ControlWrapperSetupStage(MainEditStage mainEditStage,
             TagsManager tagsManager, CommunicationDataHolder communicationDataHolder) throws IOException
     {
-        super("ControlWrapperSetupPage", "setup/mainSetupPane.fxml");
+        super("ControlWrapperSetupStage", "setup/ControlWrapperSetupMain.fxml", HBox.class);
+        FXUtil.validateAllFXML(this);
 
         this.mainEditStage = mainEditStage;
-        this.tagsManager = tagsManager;
-        this.communicationDataHolder = communicationDataHolder;
 
-        this.setupPaneList = new SetupPaneList();
+        this.addMultipleFXChild(
+                this.setupStateListView = new ControlWrapperSetupStateListView(this, stateListView),
+                this.sizeAndPositionManager = new ControlWrapperSetupSizeAndPositionManager(xTextField, yTextField, widthTextField, heightTextField, adaptSizeCheckBox)
+        );
 
-        this.addFXChild(wrapperStateCreationPane = new WrapperStateCreationPane(this, createStateButton));
+        this.setupPaneButtonMap = new IdentityHashMap<>();
 
-        controlWrapperValidListener = (observableValue, oldValue, newValue) ->
-        {
-            if (!newValue)
-            {
-                this.setSelectedControlWrapper(null);
-            }
-        };
+        this.stateSetupPaneButtonList = new LinkedList<>();
+        this.addStatePaneButton("selectBackgroundButton", new BackgroundSetupPane(this))
+                .addStatePaneButton("selectBorderButton", new BorderSetupPane(this))
+                .addStatePaneButton("selectFontButton", new FontSetupPane(this))
+                .addStatePaneButton("selectTextButton", new TextSetupPane(this))
+                .addStatePaneButton("selectChangePageButton", new ChangePageSetupPane(this))
+                .addStatePaneButton("selectValueButton", new ValueSetupPane(this))
+                .addStatePaneButton("selectWriteTagButton",
+                        new AddressSetupPane<>(this, tagsManager, communicationDataHolder, AttributeType.WRITE_ADDRESS)
+                );
 
-        wrapperStateChangeListener = (observable, oldValue, newValue) ->
-        {
-            //When a state changes, i unbind everything state related and bind again.
-            setupPaneList.unbindAllSelectedState();
-            setupPaneList.bindAllSelectedState();
-        };
+        this.globalSetupPaneButtonList = new LinkedList<>();
+        this.addGlobalPaneButton("selectButtonDataButton", new ButtonDataSetupPane(this))
+                .addGlobalPaneButton("selectFieldButton", new InputDataSetupPane(this))
+                .addGlobalPaneButton("selectReadTagButton",
+                        new AddressSetupPane<>(this, tagsManager, communicationDataHolder, AttributeType.READ_ADDRESS)
+                );
 
-        wrapperStateListChangeListener = change ->
-                this.updateStateSelectionBox();
+        secondarySelectedWrapperStateSet = new HashSet<>();
     }
 
     @Override
@@ -104,63 +108,19 @@ public final class ControlWrapperSetupStage
     {
         super.onSetup();
 
-        try
-        {
-            setupPaneList.add(new SizeSetupPane(this)).//This first >:)
-                    add(new ButtonDataSetupPane(this)). //And this second! >:(
-                    add(new InputDataSetupPane(this)).
-                    add(new ChangePageSetupPane(this)).
-                    add(new FontSetupPane(this)).
-                    add(new TextSetupPane(this)).
-                    add(new BorderSetupPane(this)).
-                    add(new BackgroundSetupPane(this)).
-                    add(new ValueSetupPane(this)).
-                    add(new AddressSetupPane<>(this, tagsManager, communicationDataHolder, "Write Address", AttributeType.WRITE_ADDRESS)).
-                    add(new AddressSetupPane<>(this, tagsManager, communicationDataHolder, "Read Address", AttributeType.READ_ADDRESS)); //I want this last! >:(
-        } catch (IOException exception)
-        {
-            MainLogger.getInstance().error("Error while loading Setup Panes", exception, this);
-        }
-
         this.getStageSetter().setAlwaysOnTop(true)
-                .setResizable(true)
-                .setWidth(550)
-                .setHeight(550) //To avoid starting extra small
+                .setResizable(false)
                 .setOnWindowCloseRequest(windowEvent -> this.setSelectedControlWrapper(null));
 
-        ContextMenuBuilder.builder()
-                .simple("Write to All", this::writeEntireCurrentStateToAll)
-                .setTo(stateAttributesTitledPane);
+        closePageButton.setOnMouseClicked(event ->
+                this.setActiveSetupPane(null)
+        );
 
-        stateSelectionChoiceBox.setConverter(FXUtil.toStringOnlyConverter(WrapperState::getStringVersion));
-        stateSelectionChoiceBox.getSelectionModel().selectedItemProperty()
-                .addListener((observableValue, oldValue, newValue) ->
-                {
-                    if (selectedControlWrapper != null)
-                    {
-                        selectedControlWrapper.getStateMap().setWrapperState(newValue);
-                    }
-                });
+        innerGlobalAttributesHBox.getChildren().clear();
+        innerStateAttributesHBox.getChildren().clear();
 
-        deleteStateButton.setOnAction(event ->
-        {
-            if (selectedControlWrapper != null)
-            {
-                selectedControlWrapper.getStateMap().removeState(stateSelectionChoiceBox.getValue());
-                //this.updateStateSelectionBox();
-            }
-        });
-
-        super.getUndoRedoManager().addCondition(data ->
-        {
-            if (data instanceof SetupSelectable)
-            {
-                this.setShownSelectable((SetupSelectable) data);
-                return true;
-            }
-
-            return false;
-        });
+        this.setSelectedControlWrapper(null); //This is set everything to default.
+        this.setActiveSetupPane(null); //This is set everything to default.
     }
 
     public MainEditStage getMainEditStage()
@@ -168,60 +128,9 @@ public final class ControlWrapperSetupStage
         return mainEditStage;
     }
 
-    @Override
-    public void setSelectedControlWrapper(ControlWrapper<?> controlWrapper)
+    public ControlWrapperSetupStateListView getStateListView()
     {
-        //When another is selected, i unbind and clear everything.
-        setupPaneList.unbindAll();
-        setupPaneList.forEach(SetupPane::clearControlWrapper);
-
-        if (selectedControlWrapper != null) //It means it was already showing
-        {
-            //mainEditStage.getQuickPropertiesVBox().refreshValuesIfSelected(selectedControlWrapper);
-
-            selectedControlWrapper.validProperty().removeListener(controlWrapperValidListener);
-
-            var stateMap = selectedControlWrapper.getStateMap();
-            stateMap.currentWrapperStateProperty().removeListener(wrapperStateChangeListener);
-            stateMap.wrapperStateListProperty().removeListener(wrapperStateListChangeListener);
-
-            selectedControlWrapper = null;
-        }
-
-        selectedControlWrapper = controlWrapper;
-        if (controlWrapper == null)
-        {
-            this.hideStage();
-            return;
-        }
-
-        //If a control wrapper is stateless, i will disable all stuff state related!
-        var stateless = controlWrapper.isStateless();
-        stateLabel.setDisable(stateless);
-        stateSelectionChoiceBox.setDisable(stateless);
-        deleteStateButton.setDisable(stateless);
-
-        controlWrapper.validProperty().addListener(controlWrapperValidListener);
-
-        var stateMap = controlWrapper.getStateMap();
-        stateMap.currentWrapperStateProperty().addListener(wrapperStateChangeListener);
-        stateMap.wrapperStateListProperty().addListener(wrapperStateListChangeListener);
-
-        setupPaneList.bindAll(controlWrapper);
-        this.populateButtonPanes();
-        this.updateStateSelectionBox(); //This also load all the state in the top ChoiceBox
-
-        super.getUndoRedoManager().clear(); //Clear all the redo/undo for a new ControlWrapper
-
-        if (activeSelectable instanceof SetupPane<?> &&
-                !AttributeFetcher.hasAttribute(
-                        selectedControlWrapper, ((SetupPane<?>) activeSelectable).getAttributeType()
-                ))
-        {
-            this.setShownSelectable(null);
-        }
-
-        super.showStage();
+        return setupStateListView;
     }
 
     @Override
@@ -230,282 +139,192 @@ public final class ControlWrapperSetupStage
         return selectedControlWrapper;
     }
 
-    public void setShownSelectable(SetupSelectable selectable)
+    @Override
+    public void setSelectedControlWrapper(ControlWrapper<?> controlWrapper)
     {
-        var children = centerStackPane.getChildren();
-        children.clear();
-
-        if (this.activeSelectable != null)
+        var oldControlWrapper = selectedControlWrapper;
+        if (oldControlWrapper != null)
         {
-            var oldSelectButton = this.activeSelectable.getSelectButton();
-            oldSelectButton.setBackground(FXUtil.createBackground(Color.TRANSPARENT));
-            selectedPageLabel.setText("");
+            oldControlWrapper.getStateMap().currentWrapperStateProperty().removeListener(currentWrapperStateListener);
+
+            //this.setActiveSetupPane(null); //I do not want to reset it, so I can quickly switch values without changing attribute!
+            this.setMainSelectedState(null);
+            setupStateListView.clearStates();
+            //Clear all the undoing for the old wrapper to eliminate undo from another contro.
+            UndoRedoManager.getInstance().removeAllUndoActionsWithPane(this);
         }
 
-        if (selectable != null)
+        selectedControlWrapper = controlWrapper; //This should belong here. Everything below could depend on it!
+        sizeAndPositionManager.setControlWrapper(controlWrapper);
+
+        if (controlWrapper != null)
         {
-            children.add(selectable.getParent());
+            //This listener need to stay here, so it called with the two methods below this one.
+            controlWrapper.getStateMap().currentWrapperStateProperty().addListener(currentWrapperStateListener);
 
-            var newSelectButton = selectable.getSelectButton();
-            newSelectButton.setBackground(FXUtil.createBackground(Color.LIMEGREEN));
-            selectedPageLabel.setText(newSelectButton.getText());
-
-            if (selectedControlWrapper != null && selectable instanceof SetupPane<?>)
-            {
-                var attributeType = ((SetupPane<?>) selectable).getAttributeType();
-                var attributeManager = selectedControlWrapper.getAttributeTypeManager();
-                if (attributeManager.isState(attributeType))
-                {
-                    stateAttributesTitledPane.setExpanded(true);
-                } else if (attributeManager.isGlobal(attributeType))
-                {
-                    globalAttributesTitledPane.setExpanded(true);
-                }
-
-            }
+            this.setMainSelectedState(controlWrapper.getStateMap().getCurrentState());
+            setupStateListView.loadStates();
         }
 
-        this.activeSelectable = selectable;
-    }
-
-    public void updateStateSelectionBox()
-    {
-        if (selectedControlWrapper != null)
+        //Update anyway. In case the control wrapper is null, it will just clear them.
+        this.updateBindingOnSetupPanes();
+        if (controlWrapper == null)
         {
-            var stateMap = selectedControlWrapper.getStateMap();
-
-            var choiceBoxItems = stateSelectionChoiceBox.getItems();
-            choiceBoxItems.clear();
-            stateMap.forEach(choiceBoxItems::add);
-            FXCollections.sort(choiceBoxItems);
-
-            //Always select the DefaultState first
-            //This automagically also update the preview (Because of the change listener)
-            stateSelectionChoiceBox.setValue(stateMap.getDefaultState());
-        }
-    }
-
-    private void populateButtonPanes()
-    {
-        Objects.requireNonNull(selectedControlWrapper, "Cannot populate button panes with a selected control wrapper");
-
-        //This also removed both the titled pane (That will be added in case the controlwrapper is not stateless)
-        var attributesVBoxChildren = attributesVBox.getChildren();
-        attributesVBoxChildren.clear();
-
-        //Since a control wrapper can be stateless, i want to avoid titled pane and go all buttons just there ;)
-        if (selectedControlWrapper.isStateless())
-        {
-            setupPaneList.forEach(setupPane ->
-            { //Doing this way is should respect the order given inside the list
-                var attributeType = setupPane.getAttributeType();
-                var attributeManager = selectedControlWrapper.getAttributeTypeManager();
-                if (attributeManager.isGlobal(attributeType))
-                {
-                    attributesVBoxChildren.add(setupPane.getSelectButton());
-                }
-            });
+            this.hideStage();
         } else
         {
-            //In case it has states, i just add back both the titles pane and the create state button!
-            attributesVBoxChildren.addAll(createStateButton,
-                    globalAttributesTitledPane, stateAttributesTitledPane);
-
-            //Since all the attributes are the same for each state, just compile it for the default state when a new wrapper is being edited
-            var stateAttributeButtonsChildren = stateAttributesVBox.getChildren();
-            var globalAttributeButtonsChildren = globalAttributesVBox.getChildren();
-
-            Stream.of(stateAttributeButtonsChildren, globalAttributeButtonsChildren).forEach(List::clear);
-
-            setupPaneList.forEach(setupPane ->
-            { //Doing this way is should respect the order given inside the list
-                var attributeType = setupPane.getAttributeType();
-                var attributeManager = selectedControlWrapper.getAttributeTypeManager();
-
-                if (attributeManager.isState(attributeType))
-                {
-                    stateAttributeButtonsChildren.add(setupPane.getSelectButton());
-                } else if (attributeManager.isGlobal(attributeType))
-                {
-                    globalAttributeButtonsChildren.add(setupPane.getSelectButton());
-                }
-            });
+            this.showStage();
         }
     }
 
-    private void writeEntireCurrentStateToAll()
-    {
-        Objects.requireNonNull(selectedControlWrapper, "Cannot write current state without a SelectedControlWrapper");
 
-        selectedControlWrapper.getAttributeTypeManager().forEachState(attributeType ->
-                setupPaneList.getFromAttributeType(attributeType).writeToAllStates()
-        );
+    public WrapperState getMainSelectedState()
+    {
+        return mainSelectedState;
     }
 
-    private class SetupPaneList implements Iterable<SetupPane<?>>
+    public void setMainSelectedState(WrapperState wrapperState)
     {
-        private final List<SetupPane<?>> setupPaneList;
-        private final Map<AttributeType<?>, SetupPane<?>> attributeTypeSetupPaneMap;
-
-        public SetupPaneList()
+        //When changing the mainSelectedWrapperStateProperty it will call the listener inside the StateMap
+        //of the ControlWrapper updating everything.
+        secondarySelectedWrapperStateSet.clear(); //THIS NEED TO BE FIRST. Otherwise, when setting a new value to main
+        //all the secondary data will be overwritten by default values!
+        //More checks has been added inside the SetupPaneAttributeChanger to
+        //avoid this problem, but you never know.
+        mainSelectedState = wrapperState;
+        if (wrapperState != null)
         {
-            this.setupPaneList = new ArrayList<>();
-            this.attributeTypeSetupPaneMap = new HashMap<>();
+            Objects.requireNonNull(selectedControlWrapper, "Trying to set a selected state while the selected ControlWrapper is null?");
+
+            //When a WrapperState is set, force it inside the ControlWrapper to allow the listener to be called (And execute the ABOVE).
+            selectedControlWrapper.getStateMap().setWrapperState(wrapperState);
         }
+    }
 
-        public void unbindAllSelectedState()
+    public boolean isSecondarySelectedState(WrapperState wrapperState)
+    {
+        return secondarySelectedWrapperStateSet.contains(wrapperState);
+    }
+
+    public Set<WrapperState> getSecondarySelectedWrapperStateSet()
+    {
+        return Collections.unmodifiableSet(secondarySelectedWrapperStateSet);
+    }
+
+    public void addSecondarySelectedState(WrapperState wrapperState)
+    {
+        //If there is not a main selection, it will be forced into!
+        if (mainSelectedState == null)
         {
-            if(selectedControlWrapper == null)
+            this.setMainSelectedState(wrapperState);
+        } else if (mainSelectedState != wrapperState) //Cannot add a main as a secondary!
+        {
+            secondarySelectedWrapperStateSet.add(wrapperState);
+        }
+    }
+
+    /**
+     * Set the active shown setup pane.
+     *
+     * @param setupPane The setup pane to show. Set to {@code null} to remove it.
+     */
+    public void setActiveSetupPane(@Nullable SetupPane<?> setupPane)
+    {
+        this.clearAllSelectedButtons();
+
+        mainLabel.setText("No Selected");
+
+        var children = mainStackPane.getChildren();
+        children.clear();
+        if (setupPane != null)
+        {
+            mainLabel.setText(setupPane.getAttributeType().getName());
+            children.add(setupPane.getParent());
+
+            var setupPaneButton = setupPaneButtonMap.get(setupPane);
+            if (setupPaneButton != null)
             {
-                return;
+                setupPaneButton.showButtonAsSelected();
             }
-
-            //This is required otherwise when loading stuff could be undo event if it shouldn't
-            var undoRedoManager = mainEditStage.getUndoRedoManager();
-            undoRedoManager.setIgnoreNew(true);
-
-            selectedControlWrapper.getAttributeTypeManager().forEachState(attributeType ->
-            {
-                var setupPane = attributeTypeSetupPaneMap.get(attributeType);
-                if(setupPane != null)
-                {
-                    setupPane.unbindAll();
-                }
-            });
-
-            undoRedoManager.setIgnoreNew(false);
         }
+    }
 
-        public void bindAllSelectedState()
+    void clearAllSelectedButtons()
+    {
+        stateSetupPaneButtonList.forEach(ControlWrapperSetupPaneButton::clearButtonSelection);
+        globalSetupPaneButtonList.forEach(ControlWrapperSetupPaneButton::clearButtonSelection);
+    }
+
+    private void updateBindingOnSetupPanes()
+    {
+        var selectedControlWrapper = this.getSelectedControlWrapper();
+
+        //This is required otherwise when loading stuff could be undo event if it shouldn't
+        UndoRedoManager.getInstance().startIgnoringNextActions();
+
+        //Unbinding all at start. They will be binded afterward in case.
+        innerGlobalAttributesHBox.getChildren().clear();
+        for (var globalPaneButton : globalSetupPaneButtonList)
         {
-            if(selectedControlWrapper == null)
+            var setupPane = globalPaneButton.getSetupPane();
+            setupPane.unbindAll();
+            if (setupPane.bindAll(selectedControlWrapper))
             {
-                return;
+                innerGlobalAttributesHBox.getChildren().add(globalPaneButton.getButton());
             }
-
-            //This is required otherwise when loading stuff could be undo event if it shouldn't
-            var undoRedoManager = mainEditStage.getUndoRedoManager();
-            undoRedoManager.setIgnoreNew(true);
-
-            selectedControlWrapper.getAttributeTypeManager().forEachState(attributeType ->
-            {
-                var setupPane = attributeTypeSetupPaneMap.get(attributeType);
-                if(setupPane != null)
-                {
-                    setupPane.bindAll(selectedControlWrapper);
-                }
-            });
-
-            undoRedoManager.setIgnoreNew(false);
         }
 
-        public void unbindAll()
+        innerStateAttributesHBox.getChildren().clear();
+        for (var statePaneButton : stateSetupPaneButtonList)
         {
-            //This is required otherwise when loading stuff could be undo event if it shouldn't
-            var undoRedoManager = mainEditStage.getUndoRedoManager();
-            undoRedoManager.setIgnoreNew(true);
-
-            setupPaneList.forEach(SetupPane::unbindAll);
-
-            undoRedoManager.setIgnoreNew(false);
-        }
-
-        public void bindAll(ControlWrapper<?> controlWrapper)
-        {
-            //This is required otherwise when loading stuff could be undo event if it shouldn't
-            var undoRedoManager = mainEditStage.getUndoRedoManager();
-            undoRedoManager.setIgnoreNew(true);
-
-            setupPaneList.forEach(setupPane -> setupPane.bindAll(controlWrapper));
-
-            undoRedoManager.setIgnoreNew(false);
-        }
-
-        public SetupPaneList add(SetupPane<?> setupPane)
-        {
-            //This is required otherwise when loading stuff could be undo event if it shouldn't
-            var undoRedoManager = mainEditStage.getUndoRedoManager();
-            undoRedoManager.setIgnoreNew(true);
-
-            try
+            var setupPane = statePaneButton.getSetupPane();
+            setupPane.unbindAll();
+            if (setupPane.bindAll(selectedControlWrapper))
             {
-                setupPane.onSetup();
-                setupPane.onSetDefault();
-
-                ControlWrapperSetupStage.this.addFXChild(setupPane);
-
-                setupPaneList.add(setupPane);
-                attributeTypeSetupPaneMap.put(setupPane.getAttributeType(), setupPane);
-            } catch (Exception exception)
-            {
-                MainLogger.getInstance().warning("Error while adding a SetupPane", exception);
+                innerStateAttributesHBox.getChildren().add(statePaneButton.getButton());
             }
-
-            undoRedoManager.setIgnoreNew(false);
-
-            return this;
         }
 
-        public SetupPane<?> getFromAttributeType(AttributeType<?> attributeType)
+        UndoRedoManager.getInstance().stopIgnoringNextActions();
+    }
+
+    private ControlWrapperSetupStage addStatePaneButton(String id, SetupPane<?> setupPane)
+    {
+        try
         {
-            return Objects.requireNonNull(attributeTypeSetupPaneMap.get(attributeType),
-                    "A SetupPane for attribute " + attributeType.toString() + " does not exists"
-            );
+            var setupPaneButton = new ControlWrapperSetupPaneButton(this, innerStateAttributesHBox, id, setupPane);
+            this.addFXChild(setupPaneButton);
+            this.stateSetupPaneButtonList.add(setupPaneButton);
+
+            setupPaneButtonMap.put(setupPane, setupPaneButton);
+        } catch (Exception ex)
+        {
+            MainLogger.getInstance().error("Error while loading a State SetupPane", ex, this);
         }
 
-        public boolean contains(Object object)
+        return this;
+    }
+
+    private ControlWrapperSetupStage addGlobalPaneButton(String id, SetupPane<?> setupPane)
+    {
+        try
         {
-            return setupPaneList.contains(object);
+            var setupPaneButton = new ControlWrapperSetupPaneButton(this, innerGlobalAttributesHBox, id, setupPane);
+            this.addFXChild(setupPaneButton);
+            this.globalSetupPaneButtonList.add(setupPaneButton);
+
+            setupPaneButtonMap.put(setupPane, setupPaneButton);
+        } catch (Exception ex)
+        {
+            MainLogger.getInstance().error("Error while loading a Global SetupPane", ex, this);
         }
 
-        @Override
-        public Iterator<SetupPane<?>> iterator()
-        {
-            return setupPaneList.iterator();
-        }
+        return this;
+    }
+
+    @Override
+    public void undoActionExecuted()
+    {
+
     }
 }
-
-
-
-    /*
-    public void updatePreviewImage()
-    {
-        this.updatePreviewImage(stateSelectionChoiceBox.getValue());
-    }
-
-
-    private void updatePreviewImage(WrapperState wrapperState)
-    {
-        if(selectedControlWrapper != null)
-        {
-            var children = previewStackPane.getChildren();
-            children.clear();
-
-            var preview = selectedControlWrapper.createPreviewFor(wrapperState);
-            //This is required otherwise the scaling won't work when using adapt
-            preview.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-            StackPane.setAlignment(preview, Pos.CENTER);
-
-            preview.widthProperty().addListener((observableValue, oldValue, newValue) ->
-            {
-                var scaleWidth = previewStackPane.getWidth() / newValue.doubleValue();
-                if(scaleWidth < 1)
-                {
-                    preview.setScaleX(scaleWidth);
-                }
-            });
-
-            preview.heightProperty().addListener((observableValue, oldValue, newValue) ->
-            {
-                var scaleHeight = previewStackPane.getHeight() / newValue.doubleValue();
-                if(scaleHeight < 1)
-                {
-                    preview.setScaleY(scaleHeight);
-                }
-            });
-
-            children.add(preview);
-        }
-    }
-*/

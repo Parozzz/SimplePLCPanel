@@ -3,6 +3,7 @@ package parozzz.github.com.simpleplcpanel.hmi.attribute.property;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.Attribute;
+import parozzz.github.com.simpleplcpanel.hmi.redoundo.UndoRedoManager;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
 
 public abstract class AttributeProperty<T>

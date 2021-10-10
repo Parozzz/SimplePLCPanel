@@ -35,7 +35,7 @@ public final class TextSetupPane extends SetupPane<TextAttribute>
 
     public TextSetupPane(ControlWrapperSetupStage setupPage) throws IOException
     {
-        super(setupPage, "TextSetupPane", "Custom Text", AttributeType.TEXT);
+        super(setupPage, "TextSetupPane", AttributeType.TEXT);
 
         mainVBox = (VBox) FXUtil.loadFXML("setup/textSetupPane.fxml", this);
     }
