@@ -1,6 +1,5 @@
 package parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup;
 
-import com.jfoenix.controls.JFXButton;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
@@ -12,12 +11,15 @@ import parozzz.github.com.simpleplcpanel.hmi.FXObject;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.state.WrapperState;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXTextFormatterUtil;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
+import parozzz.github.com.simpleplcpanel.hmi.util.others.TimedControlColorHandler;
+import parozzz.github.com.simpleplcpanel.util.functionalinterface.primitives.BooleanConsumer;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 @SuppressWarnings("unused")
-class WrapperStateCreationPane extends FXObject
+public class WrapperStateCreationPane extends FXObject
 {
 
     @FXML private TextField lowerValueTextField;
@@ -25,16 +27,21 @@ class WrapperStateCreationPane extends FXObject
     @FXML private ChoiceBox<WrapperState.CompareType> firstCompareChoiceBox;
     @FXML private ChoiceBox<WrapperState.CompareType> secondCompareChoiceBox;
 
-    @FXML private JFXButton createStateButton;
+    @FXML private Button createStateButton;
 
     private final ControlWrapperSetupStage setupStage;
     private final VBox vBox;
+    private final TimedControlColorHandler createStateButtonColorHandler;
+    private final Runnable successfulCreationRunnable;
 
-    public WrapperStateCreationPane(ControlWrapperSetupStage setupStage) throws IOException
+    public WrapperStateCreationPane(ControlWrapperSetupStage setupStage, Runnable successfulCreationRunnable) throws IOException
     {
         this.setupStage = setupStage;
 
         vBox = (VBox) FXUtil.loadFXML("setup/wrapperStateCreationPane.fxml", this);
+
+        this.createStateButtonColorHandler = new TimedControlColorHandler(createStateButton);
+        this.successfulCreationRunnable = successfulCreationRunnable;
     }
 
     @Override
@@ -150,8 +157,10 @@ class WrapperStateCreationPane extends FXObject
             return;
         }
 
-        createStateButton.setRipplerFill(Color.DARKGREEN);
         setupStage.getStateListView().loadStates();
+
+        createStateButtonColorHandler.setBackground(FXUtil.createBackground(Color.DARKGREEN), 1000);
+        successfulCreationRunnable.run();
     }
 
     private void createAndShowInvalidTooltip(MouseEvent mouseEvent, String text)
@@ -166,6 +175,6 @@ class WrapperStateCreationPane extends FXObject
         tooltip.show(createStateButton, mouseEvent.getScreenX(), mouseEvent.getScreenY());
         tooltip.addEventFilter(MouseEvent.MOUSE_EXITED, event -> tooltip.hide());
 
-        createStateButton.setRipplerFill(Color.DARKRED);
+        createStateButtonColorHandler.setBackground(FXUtil.createBackground(Color.DARKRED), 1000);
     }
 }

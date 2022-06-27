@@ -58,7 +58,7 @@ public class FXUtil
             @Override
             public String toString(T t)
             {
-                return function.apply(t);
+                return t == null ? null : function.apply(t);
             }
 
             @Override

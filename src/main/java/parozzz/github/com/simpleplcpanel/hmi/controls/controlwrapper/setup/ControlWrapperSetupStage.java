@@ -1,14 +1,11 @@
 package parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup;
 
-import javafx.beans.property.Property;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import parozzz.github.com.simpleplcpanel.Nullable;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
@@ -17,6 +14,8 @@ import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrap
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.impl.*;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.impl.control.ButtonDataSetupPane;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.impl.control.InputDataSetupPane;
+import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.state.ControlWrapperSetupStateListView;
+import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.state.ControlWrapperStateSelection;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.state.WrapperState;
 import parozzz.github.com.simpleplcpanel.hmi.main.MainEditStage;
 import parozzz.github.com.simpleplcpanel.hmi.pane.HMIStage;
@@ -59,10 +58,8 @@ public class ControlWrapperSetupStage
 
     private final Map<SetupPane<?>, ControlWrapperSetupPaneButton> setupPaneButtonMap;
     private final ControlWrapperSetupSizeAndPositionManager sizeAndPositionManager;
-
+    private final ControlWrapperStateSelection stateSelection;
     private ControlWrapper<?> selectedControlWrapper;
-    private WrapperState mainSelectedState;
-    private final Set<WrapperState> secondarySelectedWrapperStateSet;
 
     private final ChangeListener<? super WrapperState> currentWrapperStateListener =
             (observable, oldValue, newValue) -> this.updateBindingOnSetupPanes();
@@ -100,7 +97,7 @@ public class ControlWrapperSetupStage
                         new AddressSetupPane<>(this, tagsManager, communicationDataHolder, AttributeType.READ_ADDRESS)
                 );
 
-        secondarySelectedWrapperStateSet = new HashSet<>();
+        this.stateSelection = new ControlWrapperStateSelection(this);
     }
 
     @Override
@@ -139,6 +136,11 @@ public class ControlWrapperSetupStage
         return selectedControlWrapper;
     }
 
+    public ControlWrapperStateSelection getStateSelection()
+    {
+        return stateSelection;
+    }
+
     @Override
     public void setSelectedControlWrapper(ControlWrapper<?> controlWrapper)
     {
@@ -148,7 +150,7 @@ public class ControlWrapperSetupStage
             oldControlWrapper.getStateMap().currentWrapperStateProperty().removeListener(currentWrapperStateListener);
 
             //this.setActiveSetupPane(null); //I do not want to reset it, so I can quickly switch values without changing attribute!
-            this.setMainSelectedState(null);
+            stateSelection.setMainState(null);
             setupStateListView.clearStates();
             //Clear all the undoing for the old wrapper to eliminate undo from another contro.
             UndoRedoManager.getInstance().removeAllUndoActionsWithPane(this);
@@ -162,7 +164,7 @@ public class ControlWrapperSetupStage
             //This listener need to stay here, so it called with the two methods below this one.
             controlWrapper.getStateMap().currentWrapperStateProperty().addListener(currentWrapperStateListener);
 
-            this.setMainSelectedState(controlWrapper.getStateMap().getCurrentState());
+            stateSelection.setMainState(controlWrapper.getStateMap().getCurrentState());
             setupStateListView.loadStates();
         }
 
@@ -174,52 +176,6 @@ public class ControlWrapperSetupStage
         } else
         {
             this.showStage();
-        }
-    }
-
-
-    public WrapperState getMainSelectedState()
-    {
-        return mainSelectedState;
-    }
-
-    public void setMainSelectedState(WrapperState wrapperState)
-    {
-        //When changing the mainSelectedWrapperStateProperty it will call the listener inside the StateMap
-        //of the ControlWrapper updating everything.
-        secondarySelectedWrapperStateSet.clear(); //THIS NEED TO BE FIRST. Otherwise, when setting a new value to main
-        //all the secondary data will be overwritten by default values!
-        //More checks has been added inside the SetupPaneAttributeChanger to
-        //avoid this problem, but you never know.
-        mainSelectedState = wrapperState;
-        if (wrapperState != null)
-        {
-            Objects.requireNonNull(selectedControlWrapper, "Trying to set a selected state while the selected ControlWrapper is null?");
-
-            //When a WrapperState is set, force it inside the ControlWrapper to allow the listener to be called (And execute the ABOVE).
-            selectedControlWrapper.getStateMap().setWrapperState(wrapperState);
-        }
-    }
-
-    public boolean isSecondarySelectedState(WrapperState wrapperState)
-    {
-        return secondarySelectedWrapperStateSet.contains(wrapperState);
-    }
-
-    public Set<WrapperState> getSecondarySelectedWrapperStateSet()
-    {
-        return Collections.unmodifiableSet(secondarySelectedWrapperStateSet);
-    }
-
-    public void addSecondarySelectedState(WrapperState wrapperState)
-    {
-        //If there is not a main selection, it will be forced into!
-        if (mainSelectedState == null)
-        {
-            this.setMainSelectedState(wrapperState);
-        } else if (mainSelectedState != wrapperState) //Cannot add a main as a secondary!
-        {
-            secondarySelectedWrapperStateSet.add(wrapperState);
         }
     }
 

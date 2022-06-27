@@ -5,10 +5,6 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.WindowEvent;
-import org.controlsfx.control.GridView;
-import org.controlsfx.control.Notifications;
-import org.controlsfx.control.PopOver;
-import org.controlsfx.control.cell.ImageGridCell;
 import parozzz.github.com.simpleplcpanel.hmi.pane.HMIStage;
 
 import java.io.FileInputStream;
@@ -27,6 +23,7 @@ public final class ListViewTest extends HMIStage<StackPane>
 
     void doInit()
     {
+        /*
         var button = new Button();
         super.parent.getChildren().addAll(
                 button
@@ -41,7 +38,7 @@ public final class ListViewTest extends HMIStage<StackPane>
                 popOver.show(button);
             }
         });
-        Notifications.create().text("CoolBro").darkStyle().show();
+        Notifications.create().text("CoolBro").darkStyle().show();*/
     }
 /*
     void init()

@@ -44,9 +44,9 @@ public final class SetupPaneAttributeChanger<A extends Attribute>
 
                 //This will set all the changed values to every selected control wrappers. It will be here to avoid
                 //updating secondary if an attribute is not set (During strange transitions / states)
-                for(var secondaryWrapperState : setupPane.getSetupStage().getSecondarySelectedWrapperStateSet())
+                for(var secondaryState : setupPane.getSetupStage().getStateSelection().getSecondaryStates())
                 {
-                    var secondaryAttribute = secondaryWrapperState.getAttributeMap().get(setupPane.getAttributeType());
+                    var secondaryAttribute = secondaryState.getAttributeMap().get(setupPane.getAttributeType());
                     if(secondaryAttribute != null)
                     {
                         propertyBis.setDataToAttribute(secondaryAttribute);

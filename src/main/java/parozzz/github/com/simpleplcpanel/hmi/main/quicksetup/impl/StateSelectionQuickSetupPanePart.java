@@ -18,7 +18,6 @@ import java.io.IOException;
 public final class StateSelectionQuickSetupPanePart extends FXObject implements QuickSetupPanePart
 {
     @FXML private ChoiceBox<WrapperState> stateChoiceBox;
-
     private final QuickSetupPane quickSetupPane;
     private final VBox vBox;
 

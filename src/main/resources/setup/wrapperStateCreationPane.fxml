@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXButton?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -38,11 +37,11 @@
          <children>
             <HBox maxHeight="-Infinity" maxWidth="-Infinity" spacing="10.0">
                <children>
-                  <JFXButton fx:id="createStateButton" style="-fx-border-color: lightgray;" text="Create">
+                  <Button fx:id="createStateButton" style="-fx-border-color: lightgray;" text="Create">
                      <font>
                         <Font size="14.0" />
                      </font>
-                  </JFXButton>
+                  </Button>
                </children>
             </HBox>
          </children>

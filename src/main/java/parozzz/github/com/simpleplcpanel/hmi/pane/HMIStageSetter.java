@@ -28,6 +28,11 @@ public final class HMIStageSetter
         return this;
     }
 
+    public HMIStageSetter initOwner(HMIStage<?> hmiStage)
+    {
+        return initOwner(hmiStage.getStage());
+    }
+
     public HMIStageSetter initOwner(Window window)
     {
         stage.initOwner(window);
