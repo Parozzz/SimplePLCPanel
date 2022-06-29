@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<HBox spacing="5.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<HBox spacing="5.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <VBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefWidth="150.0">
          <children>
@@ -33,7 +33,7 @@
          <children>
             <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" spacing="10.0">
                <children>
-                  <VBox fx:id="mainStateAttributeVBox" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0">
+                  <VBox fx:id="stateMainVBox" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0">
                      <children>
                         <Label minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" style="-fx-border-color: lightgray lightgray transparent lightgray; -fx-border-width: 2;" text="State">
                            <padding>
@@ -43,45 +43,33 @@
                               <Font size="14.0" />
                            </font>
                         </Label>
-                        <HBox fx:id="innerStateAttributesHBox" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" spacing="5.0" style="-fx-border-color: lightgray; -fx-border-width: 2;">
+                        <HBox fx:id="stateButtonsHBox" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" spacing="5.0" style="-fx-border-color: lightgray; -fx-border-width: 2;">
                            <children>
-                              <Button fx:id="selectBackgroundButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" mnemonicParsing="false">
-                                 <graphic>
-                                    <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true">
-                                       <image>
-                                          <Image url="@../images/icons/noun_Picture_2283448.png" />
-                                       </image>
-                                    </ImageView>
-                                 </graphic>
+                              <Button fx:id="selectBackgroundButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="20.0" minWidth="20.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0">
                                  <padding>
-                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                    <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
                                  </padding>
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
                               </Button>
-                              <Button fx:id="selectBorderButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" mnemonicParsing="false">
-                                 <graphic>
-                                    <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true">
-                                       <image>
-                                          <Image url="@../images/icons/noun_dashed%20rectangle_384280.png" />
-                                       </image>
-                                    </ImageView>
-                                 </graphic>
+                              <Button fx:id="selectBorderButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="20.0" minWidth="20.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0">
                                  <padding>
-                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                    <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
                                  </padding>
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
                               </Button>
-                              <Button fx:id="selectFontButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" mnemonicParsing="false">
-                                 <graphic>
-                                    <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true">
-                                       <image>
-                                          <Image url="@../images/icons/noun_font%20size_2513286.png" />
-                                       </image>
-                                    </ImageView>
-                                 </graphic>
+                              <Button fx:id="selectFontButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="20.0" minWidth="20.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0">
                                  <padding>
-                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                    <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
                                  </padding>
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
                               </Button>
-                              <Button fx:id="selectTextButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" mnemonicParsing="false">
+                              <Button fx:id="selectTextButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="20.0" minWidth="20.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0">
                                  <graphic>
                                     <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true">
                                        <image>
@@ -90,10 +78,13 @@
                                     </ImageView>
                                  </graphic>
                                  <padding>
-                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                    <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
                                  </padding>
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
                               </Button>
-                              <Button fx:id="selectChangePageButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" mnemonicParsing="false">
+                              <Button fx:id="selectChangePageButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="20.0" minWidth="20.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0">
                                  <graphic>
                                     <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true">
                                        <image>
@@ -102,10 +93,13 @@
                                     </ImageView>
                                  </graphic>
                                  <padding>
-                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                    <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
                                  </padding>
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
                               </Button>
-                              <Button fx:id="selectValueButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" mnemonicParsing="false">
+                              <Button fx:id="selectValueButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="20.0" minWidth="20.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0">
                                  <graphic>
                                     <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true">
                                        <image>
@@ -114,20 +108,19 @@
                                     </ImageView>
                                  </graphic>
                                  <padding>
-                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                    <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
                                  </padding>
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
                               </Button>
-                              <Button fx:id="selectWriteTagButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" mnemonicParsing="false">
-                                 <graphic>
-                                    <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true">
-                                       <image>
-                                          <Image url="@../images/icons/noun_Edit%20Folder_288487.png" />
-                                       </image>
-                                    </ImageView>
-                                 </graphic>
+                              <Button fx:id="selectWriteTagButton" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="20.0" minWidth="20.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0">
                                  <padding>
-                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                    <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
                                  </padding>
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
                               </Button>
                            </children>
                            <padding>
@@ -136,7 +129,7 @@
                         </HBox>
                      </children>
                   </VBox>
-                  <VBox fx:id="mainGlobalAttributesVBox" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0">
+                  <VBox fx:id="globalMainVBox" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0">
                      <children>
                         <Label minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" style="-fx-border-color: lightgray lightgray transparent lightgray; -fx-border-width: 2;" text="Global">
                            <padding>
@@ -146,9 +139,9 @@
                               <Font size="14.0" />
                            </font>
                         </Label>
-                        <HBox fx:id="innerGlobalAttributesHBox" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" spacing="5.0" style="-fx-border-color: lightgray; -fx-border-width: 2;">
+                        <HBox fx:id="globalButtonsHBox" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" spacing="5.0" style="-fx-border-color: lightgray; -fx-border-width: 2;">
                            <children>
-                              <Button fx:id="selectButtonDataButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" mnemonicParsing="false">
+                              <Button fx:id="selectButtonDataButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="20.0" minWidth="20.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0">
                                  <graphic>
                                     <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true">
                                        <image>
@@ -157,10 +150,10 @@
                                     </ImageView>
                                  </graphic>
                                  <padding>
-                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                    <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
                                  </padding>
                               </Button>
-                              <Button fx:id="selectFieldButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" mnemonicParsing="false">
+                              <Button fx:id="selectFieldButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="20.0" minWidth="20.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0">
                                  <graphic>
                                     <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true">
                                        <image>
@@ -169,10 +162,10 @@
                                     </ImageView>
                                  </graphic>
                                  <padding>
-                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                    <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
                                  </padding>
                               </Button>
-                              <Button fx:id="selectReadTagButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" mnemonicParsing="false">
+                              <Button fx:id="selectReadTagButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="20.0" minWidth="20.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0">
                                  <graphic>
                                     <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true">
                                        <image>
@@ -181,7 +174,7 @@
                                     </ImageView>
                                  </graphic>
                                  <padding>
-                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                    <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
                                  </padding>
                               </Button>
                            </children>

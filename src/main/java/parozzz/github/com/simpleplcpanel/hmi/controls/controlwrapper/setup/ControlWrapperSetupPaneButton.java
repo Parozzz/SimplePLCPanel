@@ -3,12 +3,14 @@ package parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.SVGPath;
 import javafx.util.Duration;
 import parozzz.github.com.simpleplcpanel.hmi.FXController;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
-
-import java.util.Objects;
+import parozzz.github.com.simpleplcpanel.util.Util;
+import parozzz.github.com.simpleplcpanel.util.XmlTools;
 
 public final class ControlWrapperSetupPaneButton extends FXController
 {
@@ -28,17 +30,20 @@ public final class ControlWrapperSetupPaneButton extends FXController
     private final ControlWrapperSetupStage setupStage;
     private final SetupPane<?> setupPane;
     private final Button button;
+    private final Region svgImageRegion;
+    private final String svgImageResourcePath;
 
-    public ControlWrapperSetupPaneButton(ControlWrapperSetupStage setupStage, Parent containerParent, String id,
+    public ControlWrapperSetupPaneButton(ControlWrapperSetupStage setupStage, Button button, String svgImageResourcePath,
             SetupPane<?> setupPane)
     {
-        super("ControlWrapperSetupPaneButton-" + id);
+        super("ControlWrapperSetupPaneButton-" + button.getId());
 
         this.setupStage = setupStage;
         this.addFXChild(this.setupPane = setupPane);
 
-        button = searchButton(containerParent, id);
-        Objects.requireNonNull(button, "A button has not been found with id " + id + " inside the ControlWrapperSetupStage");
+        this.button = button;
+        this.svgImageRegion = new Region();
+        this.svgImageResourcePath = svgImageResourcePath;
     }
 
     @Override
@@ -47,7 +52,7 @@ public final class ControlWrapperSetupPaneButton extends FXController
         super.onSetup();
 
         button.setBackground(FXUtil.createBackground(Color.TRANSPARENT));
-        button.setBorder(FXUtil.createBorder(Color.GRAY, 2));
+        //button.setBorder(FXUtil.createBorder(Color.TRANSPARENT, 2));
 
         var attributeNameTooltip = new Tooltip();
         attributeNameTooltip.setText(setupPane.getAttributeType().getName());
@@ -60,6 +65,19 @@ public final class ControlWrapperSetupPaneButton extends FXController
         button.setOnMouseClicked(event ->
                 setupStage.setActiveSetupPane(setupPane)
         );
+
+        if (svgImageResourcePath != null && !svgImageResourcePath.isEmpty())
+        {
+            var svgString = XmlTools.svgScrap(Util.getResource(svgImageResourcePath));
+
+            var svgPath = new SVGPath();
+            svgPath.setContent(svgString);
+
+            svgImageRegion.setBorder(FXUtil.createBorder(Color.BLACK, 1));
+            svgImageRegion.setShape(svgPath);
+
+            button.setGraphic(svgImageRegion);
+        }
     }
 
     public Button getButton()
@@ -74,11 +92,13 @@ public final class ControlWrapperSetupPaneButton extends FXController
 
     public void showButtonAsSelected()
     {
-        button.setBackground(FXUtil.createBackground(Color.LIGHTGREEN));
+        svgImageRegion.setBackground(FXUtil.createBackground(Color.LIGHTGREEN));
+        //button.setBackground(FXUtil.createBackground(Color.LIGHTGREEN));
     }
 
     public void clearButtonSelection()
     {
-        button.setBackground(FXUtil.createBackground(Color.TRANSPARENT));
+        svgImageRegion.setBackground(FXUtil.createBackground(Color.TRANSPARENT));
+        //button.setBackground(FXUtil.createBackground(Color.TRANSPARENT));
     }
 }

@@ -2,10 +2,16 @@ package parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup;
 
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.scene.Group;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.FillRule;
+import javafx.scene.shape.SVGPath;
 import parozzz.github.com.simpleplcpanel.Nullable;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
 import parozzz.github.com.simpleplcpanel.hmi.comm.CommunicationDataHolder;
@@ -24,7 +30,10 @@ import parozzz.github.com.simpleplcpanel.hmi.redoundo.UndoRedoPane;
 import parozzz.github.com.simpleplcpanel.hmi.tags.TagsManager;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
 import parozzz.github.com.simpleplcpanel.logger.MainLogger;
+import parozzz.github.com.simpleplcpanel.util.Util;
+import parozzz.github.com.simpleplcpanel.util.XmlTools;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -33,26 +42,29 @@ public class ControlWrapperSetupStage
         implements ControlWrapperSpecific, UndoRedoPane
 {
 
+    private static String generateSVGPath(String imageName)
+    {
+        return "images/ControlSetup/" + imageName + ".svg";
+    }
+
     @FXML private ListView<WrapperState> stateListView;
     private final ControlWrapperSetupStateListView setupStateListView;
 
-    @FXML private VBox mainStateAttributeVBox;
-    @FXML private HBox innerStateAttributesHBox;
-    private final List<ControlWrapperSetupPaneButton> stateSetupPaneButtonList;
 
-    @FXML private VBox mainGlobalAttributesVBox;
-    @FXML private HBox innerGlobalAttributesHBox;
-    private final List<ControlWrapperSetupPaneButton> globalSetupPaneButtonList;
+    @FXML private VBox stateMainVBox;
+    @FXML private HBox stateButtonsHBox;
+    private final List<ControlWrapperSetupPaneButton> stateButtonList;
+
+
+    @FXML private VBox globalMainVBox;
+    @FXML private HBox globalButtonsHBox;
+    private final List<ControlWrapperSetupPaneButton> globalButtonList;
+
 
     @FXML private StackPane mainStackPane;
     @FXML private Label mainLabel;
     @FXML private Button closePageButton;
 
-    @FXML private TextField xTextField;
-    @FXML private TextField yTextField;
-    @FXML private TextField widthTextField;
-    @FXML private TextField heightTextField;
-    @FXML private CheckBox adaptSizeCheckBox;
 
     private final MainEditStage mainEditStage;
 
@@ -74,28 +86,29 @@ public class ControlWrapperSetupStage
 
         this.addMultipleFXChild(
                 this.setupStateListView = new ControlWrapperSetupStateListView(this, stateListView),
-                this.sizeAndPositionManager = new ControlWrapperSetupSizeAndPositionManager(xTextField, yTextField, widthTextField, heightTextField, adaptSizeCheckBox)
+                this.sizeAndPositionManager = new ControlWrapperSetupSizeAndPositionManager(this)
         );
 
         this.setupPaneButtonMap = new IdentityHashMap<>();
 
-        this.stateSetupPaneButtonList = new LinkedList<>();
-        this.addStatePaneButton("selectBackgroundButton", new BackgroundSetupPane(this))
-                .addStatePaneButton("selectBorderButton", new BorderSetupPane(this))
-                .addStatePaneButton("selectFontButton", new FontSetupPane(this))
-                .addStatePaneButton("selectTextButton", new TextSetupPane(this))
-                .addStatePaneButton("selectChangePageButton", new ChangePageSetupPane(this))
-                .addStatePaneButton("selectValueButton", new ValueSetupPane(this))
-                .addStatePaneButton("selectWriteTagButton",
+        this.stateButtonList = new LinkedList<>();
+        this.addStatePaneButton("selectBackgroundButton", generateSVGPath("background"), new BackgroundSetupPane(this))
+                .addStatePaneButton("selectBorderButton", generateSVGPath("border"), new BorderSetupPane(this))
+                .addStatePaneButton("selectFontButton", generateSVGPath("font"), new FontSetupPane(this))
+                .addStatePaneButton("selectTextButton",  generateSVGPath("text"), new TextSetupPane(this))
+                .addStatePaneButton("selectChangePageButton",  generateSVGPath("change_page"), new ChangePageSetupPane(this))
+                .addStatePaneButton("selectValueButton", null, new ValueSetupPane(this))
+                .addStatePaneButton("selectWriteTagButton", generateSVGPath("tag_read"),
                         new AddressSetupPane<>(this, tagsManager, communicationDataHolder, AttributeType.WRITE_ADDRESS)
                 );
 
-        this.globalSetupPaneButtonList = new LinkedList<>();
-        this.addGlobalPaneButton("selectButtonDataButton", new ButtonDataSetupPane(this))
-                .addGlobalPaneButton("selectFieldButton", new InputDataSetupPane(this))
-                .addGlobalPaneButton("selectReadTagButton",
+        this.globalButtonList = new LinkedList<>();
+        this.addGlobalPaneButton("selectButtonDataButton", null, new ButtonDataSetupPane(this))
+                .addGlobalPaneButton("selectFieldButton",null, new InputDataSetupPane(this))
+                .addGlobalPaneButton("selectReadTagButton", generateSVGPath("tag_write"),
                         new AddressSetupPane<>(this, tagsManager, communicationDataHolder, AttributeType.READ_ADDRESS)
                 );
+
 
         this.stateSelection = new ControlWrapperStateSelection(this);
     }
@@ -113,8 +126,8 @@ public class ControlWrapperSetupStage
                 this.setActiveSetupPane(null)
         );
 
-        innerGlobalAttributesHBox.getChildren().clear();
-        innerStateAttributesHBox.getChildren().clear();
+        globalButtonsHBox.getChildren().clear();
+        stateButtonsHBox.getChildren().clear();
 
         this.setSelectedControlWrapper(null); //This is set everything to default.
         this.setActiveSetupPane(null); //This is set everything to default.
@@ -173,7 +186,8 @@ public class ControlWrapperSetupStage
         if (controlWrapper == null)
         {
             this.hideStage();
-        } else
+        }
+        else
         {
             this.showStage();
         }
@@ -207,8 +221,8 @@ public class ControlWrapperSetupStage
 
     void clearAllSelectedButtons()
     {
-        stateSetupPaneButtonList.forEach(ControlWrapperSetupPaneButton::clearButtonSelection);
-        globalSetupPaneButtonList.forEach(ControlWrapperSetupPaneButton::clearButtonSelection);
+        stateButtonList.forEach(ControlWrapperSetupPaneButton::clearButtonSelection);
+        globalButtonList.forEach(ControlWrapperSetupPaneButton::clearButtonSelection);
     }
 
     private void updateBindingOnSetupPanes()
@@ -219,41 +233,45 @@ public class ControlWrapperSetupStage
         UndoRedoManager.getInstance().startIgnoringNextActions();
 
         //Unbinding all at start. They will be binded afterward in case.
-        innerGlobalAttributesHBox.getChildren().clear();
-        for (var globalPaneButton : globalSetupPaneButtonList)
+        globalButtonsHBox.getChildren().clear();
+        for (var globalPaneButton : globalButtonList)
         {
             var setupPane = globalPaneButton.getSetupPane();
             setupPane.unbindAll();
             if (setupPane.bindAll(selectedControlWrapper))
             {
-                innerGlobalAttributesHBox.getChildren().add(globalPaneButton.getButton());
+                globalButtonsHBox.getChildren().add(globalPaneButton.getButton());
             }
         }
 
-        innerStateAttributesHBox.getChildren().clear();
-        for (var statePaneButton : stateSetupPaneButtonList)
+        stateButtonsHBox.getChildren().clear();
+        for (var statePaneButton : stateButtonList)
         {
             var setupPane = statePaneButton.getSetupPane();
             setupPane.unbindAll();
             if (setupPane.bindAll(selectedControlWrapper))
             {
-                innerStateAttributesHBox.getChildren().add(statePaneButton.getButton());
+                stateButtonsHBox.getChildren().add(statePaneButton.getButton());
             }
         }
 
         UndoRedoManager.getInstance().stopIgnoringNextActions();
     }
 
-    private ControlWrapperSetupStage addStatePaneButton(String id, SetupPane<?> setupPane)
+    private ControlWrapperSetupStage addStatePaneButton(String buttonID, String svgImageResourcePath, SetupPane<?> setupPane)
     {
         try
         {
-            var setupPaneButton = new ControlWrapperSetupPaneButton(this, innerStateAttributesHBox, id, setupPane);
+            var button = FXUtil.findNestedChild(this, buttonID, Button.class);
+            Objects.requireNonNull(button, "Cannot find state button.");
+
+            var setupPaneButton = new ControlWrapperSetupPaneButton(this, button, svgImageResourcePath, setupPane);
             this.addFXChild(setupPaneButton);
-            this.stateSetupPaneButtonList.add(setupPaneButton);
+            this.stateButtonList.add(setupPaneButton);
 
             setupPaneButtonMap.put(setupPane, setupPaneButton);
-        } catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             MainLogger.getInstance().error("Error while loading a State SetupPane", ex, this);
         }
@@ -261,16 +279,20 @@ public class ControlWrapperSetupStage
         return this;
     }
 
-    private ControlWrapperSetupStage addGlobalPaneButton(String id, SetupPane<?> setupPane)
+    private ControlWrapperSetupStage addGlobalPaneButton(String buttonID, String svgImageResourcePath, SetupPane<?> setupPane)
     {
         try
         {
-            var setupPaneButton = new ControlWrapperSetupPaneButton(this, innerGlobalAttributesHBox, id, setupPane);
+            var button = FXUtil.findNestedChild(this, buttonID, Button.class);
+            Objects.requireNonNull(button, "Cannot find global button.");
+
+            var setupPaneButton = new ControlWrapperSetupPaneButton(this, button, svgImageResourcePath, setupPane);
             this.addFXChild(setupPaneButton);
-            this.globalSetupPaneButtonList.add(setupPaneButton);
+            this.globalButtonList.add(setupPaneButton);
 
             setupPaneButtonMap.put(setupPane, setupPaneButton);
-        } catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             MainLogger.getInstance().error("Error while loading a Global SetupPane", ex, this);
         }

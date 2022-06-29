@@ -9,6 +9,7 @@ import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.impl.SizeAttribute;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.property.AttributeProperty;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
+import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
 import parozzz.github.com.simpleplcpanel.hmi.util.textfields.IntegerTextField;
 
 public final class ControlWrapperSetupSizeAndPositionManager extends FXObject
@@ -21,19 +22,29 @@ public final class ControlWrapperSetupSizeAndPositionManager extends FXObject
     private final IntegerTextField heightTextField;
     private final CheckBox adaptSizeCheckBox;
 
+    private final ControlWrapperSetupStage setupStage;
+
     private final ChangeListener<? super Number> layoutXListener;
     private final ChangeListener<? super Number> layoutYListener;
     private ControlWrapper<?> selectedControlWrapper;
 
-    public ControlWrapperSetupSizeAndPositionManager(TextField xTextField, TextField yTextField,
-            TextField widthTextField, TextField heightTextField,
-            CheckBox adaptSizeCheckBox)
+    public ControlWrapperSetupSizeAndPositionManager(ControlWrapperSetupStage setupStage)
     {
-        this.xTextField = new IntegerTextField(xTextField).newValueConsumer(this::setLayoutX);
-        this.yTextField = new IntegerTextField(yTextField).newValueConsumer(this::setLayoutY);
-        this.widthTextField = new IntegerTextField(widthTextField).newValueConsumer(this::setWidth);
-        this.heightTextField = new IntegerTextField(heightTextField).newValueConsumer(this::setHeight);
-        this.adaptSizeCheckBox = adaptSizeCheckBox;
+        this.setupStage = setupStage;
+
+        this.xTextField = new IntegerTextField(
+                FXUtil.findNestedChild(setupStage, "xTextField", TextField.class)).newValueConsumer(this::setLayoutX);
+
+        this.yTextField = new IntegerTextField(
+                FXUtil.findNestedChild(setupStage, "yTextField", TextField.class)).newValueConsumer(this::setLayoutY);
+
+        this.widthTextField = new IntegerTextField(
+                FXUtil.findNestedChild(setupStage, "widthTextField", TextField.class)).newValueConsumer(this::setWidth);
+
+        this.heightTextField = new IntegerTextField(
+                FXUtil.findNestedChild(setupStage, "heightTextField", TextField.class)).newValueConsumer(this::setHeight);
+
+        this.adaptSizeCheckBox = FXUtil.findNestedChild(setupStage, "adaptSizeCheckBox", CheckBox.class);
 
         layoutXListener = (observable, oldValue, newValue) -> this.xTextField.setValue(newValue.intValue());
         layoutYListener = (observable, oldValue, newValue) -> this.yTextField.setValue(newValue.intValue());
@@ -57,9 +68,10 @@ public final class ControlWrapperSetupSizeAndPositionManager extends FXObject
 
         adaptSizeCheckBox.setOnAction(event ->
         {
-            if(selectedControlWrapper != null)
+            if (selectedControlWrapper != null)
             {
-                AttributeFetcher.fetchRequired(selectedControlWrapper, AttributeType.SIZE).setValue(SizeAttribute.ADAPT, adaptSizeCheckBox.isSelected());
+                AttributeFetcher.fetchRequired(selectedControlWrapper, AttributeType.SIZE)
+                        .setValue(SizeAttribute.ADAPT, adaptSizeCheckBox.isSelected());
                 this.updateValuesFromAttribute(); //This is in case my change was not effective, it will reload them!
             }
         });
@@ -95,7 +107,7 @@ public final class ControlWrapperSetupSizeAndPositionManager extends FXObject
 
     private void setLayoutX(int x)
     {
-        if(selectedControlWrapper != null)
+        if (selectedControlWrapper != null)
         {
             //When a ControlWrapper is on their SetupPage SHOULD be the only one selected,
             //but nothing bad should happen if there is a bug in the system, since it moved them together
@@ -108,7 +120,7 @@ public final class ControlWrapperSetupSizeAndPositionManager extends FXObject
 
     private void setLayoutY(int y)
     {
-        if(selectedControlWrapper != null)
+        if (selectedControlWrapper != null)
         {
             //When a ControlWrapper is on their SetupPage SHOULD be the only one selected,
             //but nothing bad should happen if there is a bug in the system, since it moved them together
@@ -121,7 +133,7 @@ public final class ControlWrapperSetupSizeAndPositionManager extends FXObject
 
     private void setWidth(int width)
     {
-        if(selectedControlWrapper != null)
+        if (selectedControlWrapper != null)
         {
             selectedControlWrapper.getDragAndResizeObject().resize(width, 0, false);
             this.updateValuesFromAttribute();//This is in case my change was not effective, it will reload them!
@@ -130,7 +142,7 @@ public final class ControlWrapperSetupSizeAndPositionManager extends FXObject
 
     private void setHeight(int height)
     {
-        if(selectedControlWrapper != null)
+        if (selectedControlWrapper != null)
         {
             selectedControlWrapper.getDragAndResizeObject().resize(0, height, false);
             this.updateValuesFromAttribute();//This is in case my change was not effective, it will reload them!
@@ -139,7 +151,7 @@ public final class ControlWrapperSetupSizeAndPositionManager extends FXObject
 
     private void updateLayoutValuesFromControlWrapper()
     {
-        if(selectedControlWrapper != null)
+        if (selectedControlWrapper != null)
         {
             xTextField.setValue((int) selectedControlWrapper.getLayoutX());
             yTextField.setValue((int) selectedControlWrapper.getLayoutY());
@@ -148,7 +160,7 @@ public final class ControlWrapperSetupSizeAndPositionManager extends FXObject
 
     private void updateValuesFromAttribute()
     {
-        if(selectedControlWrapper != null)
+        if (selectedControlWrapper != null)
         {
             var sizeAttribute = AttributeFetcher.fetchRequired(selectedControlWrapper, AttributeType.SIZE);
             widthTextField.setValue(sizeAttribute.getValue(SizeAttribute.WIDTH));

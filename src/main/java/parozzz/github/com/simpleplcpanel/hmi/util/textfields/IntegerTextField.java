@@ -17,7 +17,7 @@ public final class IntegerTextField implements NumericTextField
 
     public void init()
     {
-        textField.setOnAction(event -> this.parseText());
+        textField.setOnAction(event -> this.parseText()); //When enter is pressed
         textField.focusedProperty().addListener((observable, oldValue, newValue) ->
         {
             if(!newValue) //When focus is lost.

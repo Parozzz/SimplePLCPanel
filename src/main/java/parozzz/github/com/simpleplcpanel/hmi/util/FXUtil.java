@@ -18,9 +18,11 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 import javafx.util.converter.NumberStringConverter;
+import parozzz.github.com.simpleplcpanel.hmi.pane.HMIStage;
 import parozzz.github.com.simpleplcpanel.logger.MainLogger;
 import parozzz.github.com.simpleplcpanel.util.ReflectionUtil;
 import parozzz.github.com.simpleplcpanel.util.Util;
+import parozzz.github.com.simpleplcpanel.util.Validate;
 
 import java.io.IOException;
 import java.lang.reflect.AccessibleObject;
@@ -119,6 +121,56 @@ public class FXUtil
         return fxmlLoader.load();
     }
 
+    /**
+     * Find the FIRST child based on the childId inside all nested object of the master parent
+     * @param masterParent The parent to search into
+     * @param childId The id of the child to search
+     * @param objClass The class of the child to search
+     * @return The found child or {@code null} if not found
+     * @param <T> Class param
+     */
+    public static <T> T findNestedChild(Parent masterParent, String childId, Class<T> objClass)
+    {
+        for(var subNode : masterParent.getChildrenUnmodifiable())
+        {
+            if(childId.equals(subNode.getId()) && objClass.isInstance(subNode))
+            {
+                return objClass.cast(subNode);
+            }
+
+            if(subNode instanceof Parent)
+            {
+                var foundChild = findNestedChild((Parent) subNode, childId, objClass);
+                if(foundChild != null)
+                {
+                    return foundChild;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * {@link #findNestedChild(Parent, String, Class)}
+     */
+    public static <T> T findNestedChild(HMIStage<?> masterStage, String childId, Class<T> objClass)
+    {
+        var root = masterStage.getStage().getScene().getRoot();
+        if(root == null)
+        {
+            MainLogger.getInstance().error("Can't find nested child if root is null", masterStage);
+            return null;
+        }
+
+        return findNestedChild(masterStage.getStage().getScene().getRoot(), childId, objClass);
+    }
+
+    /**
+     * Checks that all the field marker with @FXML annotation are not null
+     * @param obj The object to check
+     * @return {@code True} if everything is not null
+     */
     public static boolean validateAllFXML(Object obj)
     {
         var clazz = obj.getClass();
