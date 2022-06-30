@@ -9,6 +9,7 @@ import javafx.scene.shape.SVGPath;
 import javafx.util.Duration;
 import parozzz.github.com.simpleplcpanel.hmi.FXController;
 import parozzz.github.com.simpleplcpanel.hmi.util.FXUtil;
+import parozzz.github.com.simpleplcpanel.logger.MainLogger;
 import parozzz.github.com.simpleplcpanel.util.Util;
 import parozzz.github.com.simpleplcpanel.util.XmlTools;
 
@@ -68,15 +69,22 @@ public final class ControlWrapperSetupPaneButton extends FXController
 
         if (svgImageResourcePath != null && !svgImageResourcePath.isEmpty())
         {
-            var svgString = XmlTools.svgScrap(Util.getResource(svgImageResourcePath));
+            var svgScrapData = XmlTools.svgScrap(Util.getResource(svgImageResourcePath));
+            if(svgScrapData == null)
+            {
+                MainLogger.getInstance().error("Invalid svg scrap data for " + svgImageResourcePath, this);
+            }
+            else
+            {
+                var svgPath = new SVGPath();
+                svgPath.setContent(svgScrapData.getPath());
 
-            var svgPath = new SVGPath();
-            svgPath.setContent(svgString);
+                svgImageRegion.setBorder(FXUtil.createBorder(Color.BLACK, 1));
+                svgImageRegion.setShape(svgPath);
 
-            svgImageRegion.setBorder(FXUtil.createBorder(Color.BLACK, 1));
-            svgImageRegion.setShape(svgPath);
+                button.setGraphic(svgImageRegion);
+            }
 
-            button.setGraphic(svgImageRegion);
         }
     }
 

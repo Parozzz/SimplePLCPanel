@@ -97,14 +97,14 @@ public class ControlWrapperSetupStage
                 .addStatePaneButton("selectFontButton", generateSVGPath("font"), new FontSetupPane(this))
                 .addStatePaneButton("selectTextButton",  generateSVGPath("text"), new TextSetupPane(this))
                 .addStatePaneButton("selectChangePageButton",  generateSVGPath("change_page"), new ChangePageSetupPane(this))
-                .addStatePaneButton("selectValueButton", null, new ValueSetupPane(this))
+                .addStatePaneButton("selectValueButton", generateSVGPath("maths"), new ValueSetupPane(this))
                 .addStatePaneButton("selectWriteTagButton", generateSVGPath("tag_read"),
                         new AddressSetupPane<>(this, tagsManager, communicationDataHolder, AttributeType.WRITE_ADDRESS)
                 );
 
         this.globalButtonList = new LinkedList<>();
-        this.addGlobalPaneButton("selectButtonDataButton", null, new ButtonDataSetupPane(this))
-                .addGlobalPaneButton("selectFieldButton",null, new InputDataSetupPane(this))
+        this.addGlobalPaneButton("selectButtonDataButton", generateSVGPath("settings"), new ButtonDataSetupPane(this))
+                .addGlobalPaneButton("selectFieldButton",generateSVGPath("settings"), new InputDataSetupPane(this))
                 .addGlobalPaneButton("selectReadTagButton", generateSVGPath("tag_write"),
                         new AddressSetupPane<>(this, tagsManager, communicationDataHolder, AttributeType.READ_ADDRESS)
                 );

@@ -21,7 +21,9 @@ import java.util.List;
 
 public class XmlTools
 {
-    public static String svgScrap(URL url)
+    private XmlTools() {}
+
+    public static SVGScrapData svgScrap(URL url)
     {
         // Instantiate the Factory
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -41,9 +43,31 @@ public class XmlTools
             // http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
             doc.getDocumentElement().normalize();
 
-            var documentElement = doc.getDocumentElement(); //This should be the SVG node
+            var svgNode = doc.getDocumentElement(); //This should be the SVG node
 
-            var pathNode = XmlTools.findFirstChild(documentElement, "path");
+            var viewportNode = svgNode.getAttributeNode("viewBox");
+            if(viewportNode == null)
+            {
+                return null;
+            }
+
+            var viewportArray = viewportNode.getTextContent().split(" ");
+            if(viewportArray.length != 4)
+            {
+                return null;
+            }
+
+            int startX = Util.parseInt(viewportArray[0], Integer.MIN_VALUE);
+            int startY = Util.parseInt(viewportArray[1], Integer.MIN_VALUE);
+            int endX = Util.parseInt(viewportArray[2], Integer.MIN_VALUE);
+            int endY = Util.parseInt(viewportArray[3], Integer.MIN_VALUE);
+            if(startX == Integer.MIN_VALUE || startY == Integer.MIN_VALUE || endX == Integer.MIN_VALUE || endY == Integer.MIN_VALUE)
+            {
+                return null;
+            }
+
+
+            var pathNode = XmlTools.findFirstChild(svgNode, "path");
             if(pathNode == null)
             {
                 return null;
@@ -55,7 +79,7 @@ public class XmlTools
                 return null;
             }
 
-            return dAttribute.getTextContent();
+            return new SVGScrapData(dAttribute.getTextContent(), endX - startX, endY - startY);
         }
         catch (ParserConfigurationException | SAXException | IOException e)
         {
@@ -87,6 +111,32 @@ public class XmlTools
         return nodeList;
     }
 
+    public static class SVGScrapData
+    {
+        private final String path;
+        private final int width;
+        private final int height;
+        private SVGScrapData(String path, int width, int height)
+        {
+            this.path = path;
+            this.width = width;
+            this.height = height;
+        }
 
-    private XmlTools() {}
+        public String getPath()
+        {
+            return path;
+        }
+
+        public int getWidth()
+        {
+            return width;
+        }
+
+        public int getHeight()
+        {
+            return height;
+        }
+    }
+
 }
