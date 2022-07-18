@@ -1,0 +1,38 @@
+/*.context-menu {
+    -fx-background-color: transparent;
+}
+
+.context-menu:focused {
+    -fx-background-color: transparent;
+}
+
+.context-menu .menu-item {
+    -fx-background-color: transparent;
+}
+*/
+.context-menu .menu-item .text {
+    -fx-fill: black;
+}
+
+.context-menu .menu-item:focused {
+    -fx-background-color: green;
+}
+
+.context-menu .menu-item:focused > .text {
+    -fx-fill: white;
+}
+
+/*
+.context-menu .custom-menu-item {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+*/
+
+.context-menu .custom-menu-item:focused {
+    -fx-background-color: transparent;
+}
+
+.context-menu .custom-menu-item .tooltip {
+    -fx-text-fill: white;
+}

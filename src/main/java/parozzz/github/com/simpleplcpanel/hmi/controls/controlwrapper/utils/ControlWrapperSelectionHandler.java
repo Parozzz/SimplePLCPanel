@@ -42,24 +42,34 @@ public final class ControlWrapperSelectionHandler extends FXObject
 
         containerStackPane.addEventFilter(MouseEvent.MOUSE_PRESSED, mousePressedEventHandler = mouseEvent ->
         {
-            mousePressedValid = false;
-            if(mouseEvent.getButton() != MouseButton.PRIMARY)
-            {
-                return;
-            }
-            //If the context menu is been shown, i close it and ignore this click. I feel like gives a better UX.
-            if(controlWrapper.getContextMenuController().isShowing())
-            {
-                controlWrapper.getContextMenuController().hide();
-                return;
-            }
+            var contextMenuController = controlWrapper.getContextMenuController();
+            var selectionManager = controlWrapper.getControlMainPage().getSelectionManager();
 
-            var multipleSelectionManager = controlWrapper.getControlMainPage().getMultipleSelectionManager();
-            if (!mouseEvent.isControlDown() && multipleSelectionManager.isEmpty())
+            mousePressedValid = false;
+            if(mouseEvent.getButton() == MouseButton.PRIMARY)
             {
-                //In this system, if i have control down and there is no selected
-                //the first will be added and deleted right away. So this is required.
-                multipleSelectionManager.set(controlWrapper);
+                //If the context menu is been shown, i close it and ignore this click. I feel like gives a better UX.
+                if(contextMenuController.isShowing())
+                {
+                    contextMenuController.hide();
+                    return;
+                }
+
+                if (!mouseEvent.isControlDown() && selectionManager.isEmpty())
+                {
+                    //In this system, if i have control down and there is no selected
+                    //the first will be added and deleted right away. So this is required.
+                    selectionManager.set(controlWrapper);
+                }
+            }
+            else
+            {
+                //This is here so, when there is nothing selected, and you request a context menu the clicked item is selected
+                //and the menu is opened.
+                if(selectionManager.isEmpty())
+                {
+                    selectionManager.set(controlWrapper);
+                }
             }
 
             mousePressedValid = true;
@@ -75,7 +85,7 @@ public final class ControlWrapperSelectionHandler extends FXObject
                 return;
             }
 
-            var multipleSelectionManager = controlWrapper.getControlMainPage().getMultipleSelectionManager();
+            var multipleSelectionManager = controlWrapper.getControlMainPage().getSelectionManager();
             if (mouseEvent.isControlDown()) //Multiple selection holding ctrl
             {
                 if (selectedProperty.get())

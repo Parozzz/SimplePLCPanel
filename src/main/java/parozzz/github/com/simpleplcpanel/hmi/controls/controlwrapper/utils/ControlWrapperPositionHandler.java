@@ -1,6 +1,5 @@
 package parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.utils;
 
-import parozzz.github.com.simpleplcpanel.Nullable;
 import parozzz.github.com.simpleplcpanel.hmi.FXObject;
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
 
@@ -21,7 +20,7 @@ public final class ControlWrapperPositionHandler extends FXObject
 
     public void alignLeft()
     {
-        var multipleSelectionManager = controlWrapper.getControlMainPage().getMultipleSelectionManager();
+        var multipleSelectionManager = controlWrapper.getControlMainPage().getSelectionManager();
         var mainSelectionControlWrapper = multipleSelectionManager.getMainSelection();
         if (multipleSelectionManager.size() < 2 || mainSelectionControlWrapper == null)
         {
@@ -37,7 +36,7 @@ public final class ControlWrapperPositionHandler extends FXObject
 
     public void alignRight()
     {
-        var multipleSelectionManager = controlWrapper.getControlMainPage().getMultipleSelectionManager();
+        var multipleSelectionManager = controlWrapper.getControlMainPage().getSelectionManager();
         var mainSelectionControlWrapper = multipleSelectionManager.getMainSelection();
         if (multipleSelectionManager.size() < 2 || mainSelectionControlWrapper == null)
         {
@@ -54,7 +53,7 @@ public final class ControlWrapperPositionHandler extends FXObject
 
     public void alignTop()
     {
-        var multipleSelectionManager = controlWrapper.getControlMainPage().getMultipleSelectionManager();
+        var multipleSelectionManager = controlWrapper.getControlMainPage().getSelectionManager();
         var mainSelectionControlWrapper = multipleSelectionManager.getMainSelection();
         if (multipleSelectionManager.size() < 2 || mainSelectionControlWrapper == null)
         {
@@ -70,7 +69,7 @@ public final class ControlWrapperPositionHandler extends FXObject
 
     public void alignBottom()
     {
-        var multipleSelectionManager = controlWrapper.getControlMainPage().getMultipleSelectionManager();
+        var multipleSelectionManager = controlWrapper.getControlMainPage().getSelectionManager();
         var mainSelectionControlWrapper = multipleSelectionManager.getMainSelection();
         if (multipleSelectionManager.size() < 2 || mainSelectionControlWrapper == null)
         {
@@ -87,7 +86,7 @@ public final class ControlWrapperPositionHandler extends FXObject
 
     public void alignVerticalCenter()
     {
-        var multipleSelectionManager = controlWrapper.getControlMainPage().getMultipleSelectionManager();
+        var multipleSelectionManager = controlWrapper.getControlMainPage().getSelectionManager();
         var mainSelectionControlWrapper = multipleSelectionManager.getMainSelection();
         if (multipleSelectionManager.size() < 2 || mainSelectionControlWrapper == null)
         {
@@ -105,7 +104,7 @@ public final class ControlWrapperPositionHandler extends FXObject
 
     public void alignHorizontalCenter()
     {
-        var multipleSelectionManager = controlWrapper.getControlMainPage().getMultipleSelectionManager();
+        var multipleSelectionManager = controlWrapper.getControlMainPage().getSelectionManager();
         var mainSelectionControlWrapper = multipleSelectionManager.getMainSelection();
         if (multipleSelectionManager.size() < 2 || mainSelectionControlWrapper == null)
         {
@@ -132,7 +131,7 @@ public final class ControlWrapperPositionHandler extends FXObject
 
         if (executeOnAllSelections)
         {
-            var multipleSelectionManager = controlWrapper.getControlMainPage().getMultipleSelectionManager();
+            var multipleSelectionManager = controlWrapper.getControlMainPage().getSelectionManager();
             multipleSelectionManager.forEachIgnoring(controlWrapper, selectedControlWrapper ->
                     selectedControlWrapper.getPositionHandler().centerX(false)
             );
@@ -149,7 +148,7 @@ public final class ControlWrapperPositionHandler extends FXObject
 
         if (executeOnAllSelections)
         {
-            var multipleSelectionManager = controlWrapper.getControlMainPage().getMultipleSelectionManager();
+            var multipleSelectionManager = controlWrapper.getControlMainPage().getSelectionManager();
             multipleSelectionManager.forEachIgnoring(controlWrapper, selectedControlWrapper ->
                     selectedControlWrapper.getPositionHandler().centerY(false)
             );

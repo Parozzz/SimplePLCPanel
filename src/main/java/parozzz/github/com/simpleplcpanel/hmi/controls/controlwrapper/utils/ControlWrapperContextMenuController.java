@@ -21,6 +21,11 @@ import parozzz.github.com.simpleplcpanel.util.Util;
 
 public final class ControlWrapperContextMenuController extends FXObject
 {
+    private static String generateSVGPath(String imageName)
+    {
+        return "images/Alignment/" + imageName + ".svg";
+    }
+
     private final ControlWrapper<?> controlWrapper;
     private final Control control;
     private final ControlContainerPane controlContainerPane;
@@ -52,6 +57,10 @@ public final class ControlWrapperContextMenuController extends FXObject
                 .custom(this.createAlignCenterBottomHBox(), false)
                 .spacer()
                 .simple("Delete", () -> controlContainerPane.deleteControlWrapper(controlWrapper));
+
+        var stylesheetURL = Util.getResource("stylesheets/ContextMenu/focusless.css").toExternalForm();
+        controlWrapper.getContainerPane().getStylesheets().add(stylesheetURL);
+
 /*
         contextMenu.showingProperty().addListener((observable, oldValue, newValue) ->
         {
@@ -164,7 +173,7 @@ public final class ControlWrapperContextMenuController extends FXObject
         button.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
         button.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         button.setBackground(FXUtil.createBackground(Color.TRANSPARENT));
-        button.setBorder(FXUtil.createBorder(Color.LIGHTGRAY, 2));
+        button.setBorder(FXUtil.createBorder(Color.TRANSPARENT, 2));
         button.setPadding(new Insets(-1));
         button.setOnAction(event -> runnable.run());
 

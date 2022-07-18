@@ -26,7 +26,6 @@ import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.Contr
 import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.setup.quicktext.ControlWrapperQuickTextEditorStage;
 import parozzz.github.com.simpleplcpanel.hmi.main.MainEditStage;
 import parozzz.github.com.simpleplcpanel.hmi.main.PageScrollingPane;
-import parozzz.github.com.simpleplcpanel.hmi.pane.HMIStage;
 import parozzz.github.com.simpleplcpanel.hmi.redoundo.UndoRedoManager;
 import parozzz.github.com.simpleplcpanel.hmi.redoundo.UndoRedoPane;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.JSONSerializables;
@@ -56,7 +55,7 @@ public class ControlContainerPane extends FXController implements Loggable, Undo
     private final PageScrollingPane.ImagePane mainEditBottomImagePane;
 
     private final Set<ControlWrapper<?>> controlWrapperSet;
-    private final ControlWrappersMultipleSelectionManager controlWrappersMultipleSelectionManager;
+    private final ControlWrappersMultipleSelectionManager controlWrappersSelectionManager;
 
     private final BooleanProperty activeProperty;
     private final Property<Color> backgroundColorProperty;
@@ -79,7 +78,7 @@ public class ControlContainerPane extends FXController implements Loggable, Undo
 
         this.mainEditBottomImagePane = new PageScrollingPane.ImagePane(this);
 
-        super.addFXChild(controlWrappersMultipleSelectionManager = new ControlWrappersMultipleSelectionManager(this, mainAnchorPane));
+        super.addFXChild(controlWrappersSelectionManager = new ControlWrappersMultipleSelectionManager(this, mainAnchorPane));
         this.controlWrapperSet = new HashSet<>();
 
         this.activeProperty = new SimpleBooleanProperty(false);
@@ -97,7 +96,7 @@ public class ControlContainerPane extends FXController implements Loggable, Undo
 
         mainAnchorPane.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent ->
         {
-            if (controlWrappersMultipleSelectionManager.isEmpty())
+            if (controlWrappersSelectionManager.isEmpty())
             {
                 return;
             }
@@ -107,17 +106,17 @@ public class ControlContainerPane extends FXController implements Loggable, Undo
             {
                 case DELETE:
                     keyEvent.consume();
-                    controlWrappersMultipleSelectionManager.deleteAll();
+                    controlWrappersSelectionManager.deleteAll();
                     break;
                 case RIGHT:
                 case LEFT:
                     keyEvent.consume();
-                    controlWrappersMultipleSelectionManager.moveAll(keyCode == KeyCode.RIGHT ? 1 : -1, 0d);
+                    controlWrappersSelectionManager.moveAll(keyCode == KeyCode.RIGHT ? 1 : -1, 0d);
                     break;
                 case UP:
                 case DOWN:
                     keyEvent.consume();
-                    controlWrappersMultipleSelectionManager.moveAll(0d, keyCode == KeyCode.UP ? -1 : 1);
+                    controlWrappersSelectionManager.moveAll(0d, keyCode == KeyCode.UP ? -1 : 1);
                     break;
             }
         });
@@ -237,9 +236,9 @@ public class ControlContainerPane extends FXController implements Loggable, Undo
         return name;
     }
 
-    public ControlWrappersMultipleSelectionManager getMultipleSelectionManager()
+    public ControlWrappersMultipleSelectionManager getSelectionManager()
     {
-        return controlWrappersMultipleSelectionManager;
+        return controlWrappersSelectionManager;
     }
 
     public ControlWrapper<?> createControlWrapper(ControlWrapperType<?, ?> wrapperType)

@@ -1,7 +1,10 @@
 package parozzz.github.com.simpleplcpanel.hmi.util;
 
+import javafx.css.PseudoClass;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
+import parozzz.github.com.simpleplcpanel.util.Util;
 
 import java.util.function.Consumer;
 
@@ -90,6 +93,7 @@ public final class ContextMenuBuilder
         var customMenuItem = new CustomMenuItem(node);
         customMenuItem.setHideOnClick(hideOnClick);
         customMenuItem.setOnAction(event -> nodeConsumer.accept(node));
+        customMenuItem.getStyleClass().add(Util.getResource("stylesheets/ContextMenu/focusless.css").toExternalForm());
         contextMenu.getItems().add(customMenuItem);
 
         return this;

@@ -436,7 +436,7 @@ public final class MainEditStage extends BorderPaneHMIStage
         {
             //If i don't clear selections some bad things could happen, especially while debugging read only page
             this.shownControlContainerPane.setActive(false);
-            this.shownControlContainerPane.getMultipleSelectionManager().clearSelections();
+            this.shownControlContainerPane.getSelectionManager().clearSelections();
             this.shownControlContainerPane.getMenuBottomImagePane().updateSnapshot();
         }
 
