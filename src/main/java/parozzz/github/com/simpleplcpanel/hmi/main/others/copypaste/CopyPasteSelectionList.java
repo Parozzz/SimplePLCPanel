@@ -5,8 +5,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import parozzz.github.com.simpleplcpanel.hmi.controls.ControlContainerPane;
-import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
-import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapperType;
+import parozzz.github.com.simpleplcpanel.hmi.controls.wrapper.ControlWrapper;
+import parozzz.github.com.simpleplcpanel.hmi.controls.wrapper.ControlWrapperType;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;
 
 import java.io.IOException;

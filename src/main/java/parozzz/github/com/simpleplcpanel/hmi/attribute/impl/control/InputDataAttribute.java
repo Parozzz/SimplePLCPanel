@@ -6,7 +6,7 @@ import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.property.AttributeProperty;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.property.impl.EnumAttributeProperty;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.property.impl.primitives.NumberAttributeProperty;
-import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.impl.InputWrapper;
+import parozzz.github.com.simpleplcpanel.hmi.controls.wrapper.impl.InputWrapper;
 
 public final class InputDataAttribute extends Attribute
 {

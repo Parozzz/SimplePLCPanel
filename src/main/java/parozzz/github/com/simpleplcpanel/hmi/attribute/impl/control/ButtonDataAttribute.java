@@ -5,7 +5,7 @@ import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeMap;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.AttributeType;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.property.AttributeProperty;
 import parozzz.github.com.simpleplcpanel.hmi.attribute.property.impl.EnumAttributeProperty;
-import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.impl.ButtonWrapper;
+import parozzz.github.com.simpleplcpanel.hmi.controls.wrapper.impl.ButtonWrapper;
 
 public final class ButtonDataAttribute extends Attribute
 {

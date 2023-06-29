@@ -8,7 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import parozzz.github.com.simpleplcpanel.hmi.FXController;
-import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapperType;
+import parozzz.github.com.simpleplcpanel.hmi.controls.wrapper.ControlWrapperType;
 import parozzz.github.com.simpleplcpanel.hmi.main.MainEditStage;
 import parozzz.github.com.simpleplcpanel.hmi.pane.HMIPane;
 import parozzz.github.com.simpleplcpanel.hmi.pane.HidablePane;

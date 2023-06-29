@@ -2,8 +2,8 @@ package parozzz.github.com.simpleplcpanel.hmi.attribute;
 
 import parozzz.github.com.simpleplcpanel.Nullable;
 import parozzz.github.com.simpleplcpanel.hmi.FXController;
-import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
-import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.attributes.ControlWrapperAttributeTypeManager;
+import parozzz.github.com.simpleplcpanel.hmi.controls.wrapper.ControlWrapper;
+import parozzz.github.com.simpleplcpanel.hmi.controls.wrapper.attributes.ControlWrapperAttributeTypeManager;
 
 import java.util.HashMap;
 import java.util.HashSet;

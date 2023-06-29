@@ -7,14 +7,11 @@ import javafx.collections.ObservableList;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import parozzz.github.com.simpleplcpanel.hmi.FXObject;
-import parozzz.github.com.simpleplcpanel.hmi.controls.ControlContainerPane;
-import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
+import parozzz.github.com.simpleplcpanel.hmi.controls.wrapper.ControlWrapper;
 import parozzz.github.com.simpleplcpanel.hmi.util.multipleobjects.DragAndResizeObject;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 
 public final class ControlWrappersMultipleSelectionManager extends FXObject
@@ -130,6 +127,11 @@ public final class ControlWrappersMultipleSelectionManager extends FXObject
                 consumer.accept(controlWrapper);
             }
         }
+    }
+
+    public List<ControlWrapper<?>> getList()
+    {
+        return List.copyOf(selectedControlWrapperList);
     }
 
     public int size()

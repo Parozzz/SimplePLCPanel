@@ -5,7 +5,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.input.MouseEvent;
 import parozzz.github.com.simpleplcpanel.hmi.FXController;
-import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapperType;
+import parozzz.github.com.simpleplcpanel.hmi.controls.wrapper.ControlWrapperType;
 import parozzz.github.com.simpleplcpanel.hmi.main.MainEditStage;
 
 

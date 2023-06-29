@@ -2,7 +2,7 @@ package parozzz.github.com.simpleplcpanel.hmi.controls;
 
 import org.json.simple.JSONObject;
 import parozzz.github.com.simpleplcpanel.hmi.FXController;
-import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
+import parozzz.github.com.simpleplcpanel.hmi.controls.wrapper.ControlWrapper;
 import parozzz.github.com.simpleplcpanel.hmi.main.MainEditStage;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataArray;
 import parozzz.github.com.simpleplcpanel.hmi.serialize.data.JSONDataMap;

@@ -1,8 +1,8 @@
 package parozzz.github.com.simpleplcpanel.hmi.attribute;
 
 import parozzz.github.com.simpleplcpanel.Nullable;
-import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.ControlWrapper;
-import parozzz.github.com.simpleplcpanel.hmi.controls.controlwrapper.state.WrapperState;
+import parozzz.github.com.simpleplcpanel.hmi.controls.wrapper.ControlWrapper;
+import parozzz.github.com.simpleplcpanel.hmi.controls.wrapper.state.WrapperState;
 
 import java.util.Objects;
 
